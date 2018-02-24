@@ -1,0 +1,19 @@
+{
+  "name": "humanmine-data-browser",
+  "version": "1.0.0",
+  "description": "Just a prototype for the HumanMine data browser project of genomic data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdrianBZG/humanmine-data-browser.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AdrianBZG/humanmine-data-browser/issues"
+  },
+  "homepage": "https://github.com/AdrianBZG/humanmine-data-browser#readme"
+}
