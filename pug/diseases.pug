@@ -23,33 +23,30 @@ html(lang='en')
       .container-fluid
         // Breadcrumbs
         ol.breadcrumb 
-          li.breadcrumb-item.active Proteins Browser
+          li.breadcrumb-item.active Diseases Browser
         // Example DataTables Card
         .card.mb-3
           .card-header
             i.fa.fa-table
-            |  Listing proteins from HumanMine
+            |  Listing diseases from HumanMine
           .div#loader
           .card-body
             .table-responsive
               table#dataTable.table.table-bordered(width='100%', cellspacing='0')
                 thead
                   tr
-                    th Primary Identifier
-                    th Primary Accession
-                    th Organism Name
+                    th Disease Identifier
+                    th Disease Name
                     th Actions
                 tbody
                   tr
                     td -
                     td -
                     td -
-                    td -
                 tfoot
                   tr
-                    th Primary Identifier
-                    th Primary Accession
-                    th Organism Name
+                    th Disease Identifier
+                    th Disease Name
                     th Actions
           .card-footer.small.text-muted
             | 
@@ -69,4 +66,4 @@ html(lang='en')
       include includes/js/custom.pug
 
       // Custom scripts for this page
-      script(src='js/proteins-datatables.min.js')
+      script(src='js/diseases-datatables.min.js')
