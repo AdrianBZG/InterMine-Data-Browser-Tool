@@ -1,37 +1,28 @@
 {
-    "title": "SB Admin",
-    "name": "startbootstrap-sb-admin",
-    "version": "4.0.0",
-    "description": "A one page app landing page HTML theme for Bootstrap.",
-    "keywords": [
-        "css",
-        "sass",
-        "html",
-        "responsive",
-        "theme",
-        "template",
-        "admin",
-        "app"
-    ],
+    "title": "HumanMine Data Brpwser",
+    "name": "humanmine-data-browser",
+    "version": "0.0.1",
+    "description": "A simple prototype for the HumanMine data browser",
     "homepage": "https://startbootstrap.com/template-overviews/sb-admin",
     "bugs": {
-        "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin/issues",
-        "email": "feedback@startbootstrap.com"
+        "url": "https://github.com/AdrianBZG/humanmine-data-browser/issues",
+        "email": ""
     },
     "license": "MIT",
-    "author": "Start Bootstrap",
+    "author": "",
     "contributors": [
-        "David Miller (http://davidmiller.io/)"
+        ""
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin.git"
+        "url": "https://github.com/AdrianBZG/humanmine-data-browser"
     },
     "dependencies": {
         "bootstrap": "4.0.0",
         "chart.js": "2.7.1",
         "datatables.net-bs4": "1.10.16",
         "font-awesome": "4.7.0",
+        "imjs": "^3.15.1",
         "jquery": "3.3.1",
         "jquery.easing": "^1.4.1"
     },

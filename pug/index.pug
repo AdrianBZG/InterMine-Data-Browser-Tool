@@ -33,9 +33,9 @@ html(lang='en')
               .card-body
                 .card-body-icon
                   i.fa.fa-fw.fa-database
-                .mr-5
+                .mr-5#genesCardText
                   | X Genes
-              a.card-footer.text-white.clearfix.small.z-1(href='#')
+              a.card-footer.text-white.clearfix.small.z-1(href='genes.html')
                 span.float-left Search for Genes...
                 span.float-right
                   i.fa.fa-angle-right
@@ -44,9 +44,9 @@ html(lang='en')
               .card-body
                 .card-body-icon
                   i.fa.fa-fw.fa-database
-                .mr-5
+                .mr-5#proteinsCardText
                   | X Proteins
-              a.card-footer.text-white.clearfix.small.z-1(href='#')
+              a.card-footer.text-white.clearfix.small.z-1(href='proteins.html')
                 span.float-left Search for Proteins...
                 span.float-right
                   i.fa.fa-angle-right
@@ -56,9 +56,9 @@ html(lang='en')
               .card-body
                 .card-body-icon
                   i.fa.fa-fw.fa-database
-                .mr-5
+                .mr-5#diseasesCardText
                   | X Diseases
-              a.card-footer.text-white.clearfix.small.z-1(href='#')
+              a.card-footer.text-white.clearfix.small.z-1(href='diseases.html')
                 span.float-left Search for Diseases...
                 span.float-right
                   i.fa.fa-angle-right
@@ -67,10 +67,10 @@ html(lang='en')
               .card-body
                 .card-body-icon
                   i.fa.fa-fw.fa-database
-                .mr-5
-                  | X Homologues
-              a.card-footer.text-white.clearfix.small.z-1(href='#')
-                span.float-left Search for Homologues...
+                .mr-5#goannotationsCardText
+                  | X GO Annotations
+              a.card-footer.text-white.clearfix.small.z-1(href='goannotations.html')
+                span.float-left Search for GO Annotations...
                 span.float-right
                   i.fa.fa-angle-right
           
@@ -90,8 +90,6 @@ html(lang='en')
 
       include includes/scroll-to-top.pug
 
-      include includes/modals/logout.pug
-
       include includes/js/core.pug
 
       // Page level plugin JavaScript
@@ -102,5 +100,4 @@ html(lang='en')
       include includes/js/custom.pug
 
       // Custom scripts for this page
-      script(src='js/sb-admin-datatables.min.js')
-      script(src='js/sb-admin-charts.min.js')
+      script(src='js/htb-charts.min.js')

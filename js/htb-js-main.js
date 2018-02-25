@@ -42,4 +42,67 @@
     }, 1000, 'easeInOutExpo');
     event.preventDefault();
   });
+  
+  // Fetch number of genes
+  var service = new imjs.Service({
+         root: 'http://www.humanmine.org/humanmine/service'
+  });
+  
+  var query = {
+    "from": "Gene",
+    "select": ["primaryIdentifier"]
+  };
+  
+  service.count(query).then(function(response) {
+    //console.log(response)
+	$("#genesCardText").text(response + " Genes");
+  });
+  
+  // Fetch number of proteins
+  var service = new imjs.Service({
+         root: 'http://www.humanmine.org/humanmine/service'
+  });
+  
+  var query = {
+    "from": "Protein",
+    "select": ["primaryIdentifier"]
+  };
+  
+  service.count(query).then(function(response) {
+    //console.log(response)
+	$("#proteinsCardText").text(response + " Proteins");
+  });
+  //
+  
+  // Fetch number of diseases
+  var service = new imjs.Service({
+         root: 'http://www.humanmine.org/humanmine/service'
+  });
+  
+  var query = {
+    "from": "Disease",
+    "select": ["identifier"]
+  };
+  
+  service.count(query).then(function(response) {
+    //console.log(response)
+	$("#diseasesCardText").text(response + " Diseases");
+  });
+  //
+  
+  // Fetch number of GO annotations
+  var service = new imjs.Service({
+         root: 'http://www.humanmine.org/humanmine/service'
+  });
+  
+  var query = {
+    "from": "GOAnnotation",
+    "select": ["annotationExtension"]
+  };
+  
+  service.count(query).then(function(response) {
+    //console.log(response)
+	$("#goannotationsCardText").text(response + " GO Annotations");
+  });
+  //
 })(jQuery); // End of use strict
