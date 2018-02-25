@@ -31,7 +31,6 @@
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
         "gulp-uglify": "3.0.0",
-        "imjs": "^3.15.1",
         "jquery": "3.3.1",
         "jquery.easing": "^1.4.1"
     },
@@ -44,6 +43,7 @@
         "gulp-pug": "^3.3.0",
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
-        "gulp-uglify": "3.0.0"
+        "gulp-uglify": "3.0.0",
+        "imjs": "^3.15.1"
     }
 }

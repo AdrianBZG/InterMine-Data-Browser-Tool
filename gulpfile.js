@@ -50,6 +50,11 @@ gulp.task('vendor', function() {
       './node_modules/jquery.easing/*.js'
     ])
     .pipe(gulp.dest('./vendor/jquery-easing'))
+	// InterMineJS
+  gulp.src([
+      './node_modules/imjs/dist/*',
+    ])
+    .pipe(gulp.dest('./vendor/imjs'))
 });
 // Compile SCSS
 gulp.task('css:compile', function() {
