@@ -104,7 +104,8 @@ gulp.task('default', ['css', 'js', 'vendor']);
 // Configure the browserSync task
 gulp.task('browserSync', function() {
   browserSync.init({
-    server: {
+    port: process.env.PORT || 8080,
+	server: {
       baseDir: "./"
     }
   });
