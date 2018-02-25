@@ -111,7 +111,7 @@ gulp.task('browserSync', function() {
   });
 });
 // Dev task
-gulp.task('dev', ['css', 'js', 'pug', 'browserSync'], function() {
+gulp.task('dev', ['css', 'js', 'vendor', 'pug', 'browserSync'], function() {
   gulp.watch('./pug/**/*', ['pug']);
   gulp.watch('./scss/**/*.scss', ['css']);
   gulp.watch('./js/*.js', ['js']);
