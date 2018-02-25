@@ -3,16 +3,15 @@ $(document).ready(function() {
 	  // Fetch number of GO annotations
 var im = new intermine.Service({root: 'http://www.humanmine.org/humanmine/service'});
 var query    = {
-  "from": "Gene",
+  "from": "Protein",
   "select": [
     "primaryIdentifier",
-	"symbol",
-    "name",
+    "primaryAccession",
     "organism.name"
   ],
   "orderBy": [
     {
-      "path": "name",
+      "path": "primaryIdentifier",
       "direction": "ASC"
     }
   ]
@@ -22,7 +21,7 @@ var dataSet = [];
 var table;
 
 im.rows(query).then(function(rows) {
-  console.log("No. of genes: " + rows.length);
+  console.log("No. of proteins: " + rows.length);
   rows.forEach(function printRow(row) {
     dataSet.push(row)
   });
@@ -34,8 +33,7 @@ im.rows(query).then(function(rows) {
         data: dataSet,
 		columns: [
             { title: "Primary Identifier" },
-			{ title: "Symbol" },
-            { title: "Name" },
+			{ title: "Primary Accession" },
             { title: "Organism Name" },
 			{ data: null, title: "Actions" }
         ],
@@ -55,7 +53,7 @@ im.rows(query).then(function(rows) {
             },
             {
                 "data": null,
-                "defaultContent": "<i class='fa fa-fw fa-link' id='gotoentry' title='Go to InterMine entry'></i><i class='fa fa-fw fa-database' id='homologues' title='Find homologues'></i>",
+                "defaultContent": "<i class='fa fa-fw fa-link' id='gotoentry' title='Go to InterMine entry'></i>",
                 "targets": -1
             }
          ]
@@ -70,11 +68,6 @@ im.rows(query).then(function(rows) {
 			//Browser has allowed it to be opened
 			win.focus();
 		}
-    } );
-	
-   $('#dataTable tbody').on( 'click', 'i[id="homologues"]', function () {
-        var data = table.row( $(this).parents('tr') ).data();
-        alert("Find homologues of gene with Primary ID: " + data[0] + " | Unavailable yet");
     } );
 
 });

@@ -10,11 +10,26 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
           i.fa.fa-fw.fa-home
           span.nav-link-text
             | Dashboard
+      li.nav-item(data-toggle='tooltip', data-placement='right', title='Diseases')
+        a.nav-link(href='diseases.html')
+          i.fa.fa-fw.fa-database
+          span.nav-link-text
+            | Diseases
+      li.nav-item(data-toggle='tooltip', data-placement='right', title='Proteins')
+        a.nav-link(href='proteins.html')
+          i.fa.fa-fw.fa-database
+          span.nav-link-text
+            | Proteins
       li.nav-item(data-toggle='tooltip', data-placement='right', title='Genes')
         a.nav-link(href='genes.html')
           i.fa.fa-fw.fa-database
           span.nav-link-text
             | Genes
+      li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotations')
+        a.nav-link(href='goannotations.html')
+          i.fa.fa-fw.fa-database
+          span.nav-link-text
+            | GO Annotations
     ul.navbar-nav.sidenav-toggler
       li.nav-item
         a#sidenavToggler.nav-link.text-center
