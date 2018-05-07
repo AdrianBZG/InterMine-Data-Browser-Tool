@@ -9,7 +9,7 @@
         "email": "adrianrodriguezbazaga@gmail.com"
     },
     "scripts": {
-        "start": "node ./bin/www"
+        "start": "gulp & node ./bin/www"
     },
     "author": "Adrian Rodriguez Bazaga",
     "contributors": [
