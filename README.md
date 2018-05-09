@@ -1,5 +1,5 @@
-# HumanMine Data Browser prototype
-Just a prototype for the HumanMine data browser project of genomic data
+# InterMine Data Browser prototype
+Just a prototype for the InterMine data browser project
 
 Heroku deployment: [http://hm-browser-proto.herokuapp.com/](http://hm-browser-proto.herokuapp.com/)
 
