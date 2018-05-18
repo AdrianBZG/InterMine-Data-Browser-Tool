@@ -97,7 +97,7 @@
   
   var query = {
     "from": "GOAnnotation",
-    "select": ["annotationExtension"]
+    "select": ["identifier"]
   };
   
   service.count(query).then(function(response) {
