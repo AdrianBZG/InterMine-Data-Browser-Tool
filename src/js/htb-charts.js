@@ -70,44 +70,18 @@ var numberGoAnnotations = 0;
   };
   
   service.count(query).then(function(response) {
-	numberProteins = response;
-	// Fetch number of diseases
-  var service = new imjs.Service({
-         root: 'http://www.humanmine.org/humanmine/service'
-  });
-  
-  var query = {
-    "from": "Disease",
-    "select": ["identifier"]
-  };
-  
-  service.count(query).then(function(response) {
-    numberDiseases = response;
-	  // Fetch number of GO annotations
-  var service = new imjs.Service({
-         root: 'http://www.humanmine.org/humanmine/service'
-  });
-  
-  var query = {
-    "from": "GOAnnotation",
-    "select": ["annotationExtension"]
-  };
-  
-  service.count(query).then(function(response) {
-    numberGoAnnotations = response;
+    numberProteins = response;
 	var myPieChart = new Chart(ctx, {
   type: 'pie',
   data: {
-    labels: ["Genes", "Diseases", "Proteins", "GO Annotations"],
+    labels: ["Genes", "Proteins"],
     datasets: [{
-      data: [numberGenes, numberDiseases, numberProteins, numberGoAnnotations],
-      backgroundColor: ['#007bff', '#dc3545', '#ffc107', '#28a745'],
+      data: [numberGenes, numberProteins],
+      backgroundColor: ['#007bff', '#ffc107'],
     }],
   },
   options: pieOptions
 });
-  });
-  });
   });
   });
   //
