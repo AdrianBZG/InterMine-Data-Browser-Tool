@@ -73,36 +73,4 @@
 	$("#proteinsCardText").text(response + " Proteins");
   });
   //
-  
-  // Fetch number of diseases
-  var service = new imjs.Service({
-         root: 'http://www.humanmine.org/humanmine/service'
-  });
-  
-  var query = {
-    "from": "Disease",
-    "select": ["identifier"]
-  };
-  
-  service.count(query).then(function(response) {
-    //console.log(response)
-	$("#diseasesCardText").text(response + " Diseases");
-  });
-  //
-  
-  // Fetch number of GO annotations
-  var service = new imjs.Service({
-         root: 'http://www.humanmine.org/humanmine/service'
-  });
-  
-  var query = {
-    "from": "GOAnnotation",
-    "select": ["identifier"]
-  };
-  
-  service.count(query).then(function(response) {
-    //console.log(response)
-	$("#goannotationsCardText").text(response + " GO Annotations");
-  });
-  //
 })(jQuery); // End of use strict
