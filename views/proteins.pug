@@ -17,44 +17,11 @@ html(lang='en')
 
     include includes/css/custom.pug
 
-  body#page-top.fixed-nav.sticky-footer.bg-dark
+    body#page-top.fixed-nav.sticky-footer.bg-dark
     include includes/navbar.pug
     .content-wrapper
       .container-fluid
-        // Breadcrumbs
-        ol.breadcrumb 
-          li.breadcrumb-item.active Proteins Browser
-        // Example DataTables Card
-        .card.mb-3
-          .card-header
-            i.fa.fa-table
-            |  Listing proteins from InterMine
-          .div#loader
-          .card-body
-            .table-responsive
-              table#dataTable.table.table-bordered(width='100%', cellspacing='0')
-                thead
-                  tr
-                    th Primary Identifier
-                    th Primary Accession
-                    th Organism Name
-                    th Actions
-                tbody
-                  tr
-                    td -
-                    td -
-                    td -
-                    td -
-                tfoot
-                  tr
-                    th Primary Identifier
-                    th Primary Accession
-                    th Organism Name
-                    th Actions
-          .card-footer.small.text-muted
-            | 
-      // /.container-fluid
-      // /.content-wrapper
+            div#dataTable
 
       include includes/footer.pug
 
