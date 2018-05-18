@@ -21,43 +21,7 @@ html(lang='en')
     include includes/navbar.pug
     .content-wrapper
       .container-fluid
-        // Breadcrumbs
-        ol.breadcrumb 
-          li.breadcrumb-item.active Genes Browser
-        // Example DataTables Card
-        .card.mb-3
-          .card-header
-            i.fa.fa-table
-            |  Listing genes from InterMine
-          .div#loader
-          .card-body
-            .table-responsive
-              table#dataTable.table.table-bordered(width='100%', cellspacing='0')
-                thead
-                  tr
-                    th Primary Identifier
-                    th Symbol
-                    th Name
-                    th Organism Name
-                    th Actions
-                tbody
-                  tr
-                    td -
-                    td -
-                    td -
-                    td -
-                    td -
-                tfoot
-                  tr
-                    th Primary Identifier
-                    th Symbol
-                    th Name
-                    th Organism Name
-                    th Actions
-          .card-footer.small.text-muted
-            | 
-      // /.container-fluid
-      // /.content-wrapper
+            div#dataTable
 
       include includes/footer.pug
 

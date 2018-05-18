@@ -1,7 +1,30 @@
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
-	  // Fetch number of GO annotations
-var im = new intermine.Service({root: 'http://www.humanmine.org/humanmine/service'});
+
+var selector = '#dataTable';
+var service  = {root: 'http://www.humanmine.org/humanmine/service'};
+var query    = {
+  select: ['*'],
+  from: 'Gene'
+};
+
+// Configure options here, using nested notation
+imtables.configure({TableCell: {PreviewTrigger: 'click'}});
+
+// Or using path names:
+imtables.configure('TableResults.CacheFactor', 20);
+
+
+imtables.loadDash(
+  selector, // Can also be an element, or a jQuery object.
+  {"start":0,"size":25}, // May be null
+  {service: service, query: query} // May be an imjs.Query
+).then(
+  function (table) { console.log('Table loaded', table); },
+  function (error) { console.error('Could not load table', error); }
+);
+
+/*var im = new intermine.Service({root: 'http://www.humanmine.org/humanmine/service'});
 var query    = {
   "from": "Gene",
   "select": [
@@ -75,6 +98,6 @@ im.rows(query).then(function(rows) {
    $('#dataTable tbody').on( 'click', 'i[id="homologues"]', function () {
         var data = table.row( $(this).parents('tr') ).data();
         alert("Find homologues of gene with Primary ID: " + data[0] + " | Unavailable yet");
-    } );
+    } );*/
 
 });
