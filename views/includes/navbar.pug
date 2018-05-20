@@ -1,26 +1,40 @@
 // Navigation
 nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
-  a.navbar-brand(href='index.html') InterMine Data Browser
-  button.navbar-toggler.navbar-toggler-right(type='button', data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
-    span.navbar-toggler-icon
-  #navbarResponsive.collapse.navbar-collapse
-    ul#exampleAccordion.navbar-nav.navbar-sidenav
-      li.nav-item(data-toggle='tooltip', data-placement='right', title='Dashboard')
-        a.nav-link(href='/')
-          i.fa.fa-fw.fa-home
-          span.nav-link-text
-            | Dashboard
-      li.nav-item(data-toggle='tooltip', data-placement='right', title='Proteins')
-        a.nav-link(href='proteins')
-          i.fa.fa-fw.fa-database
-          span.nav-link-text
-            | Proteins
-      li.nav-item(data-toggle='tooltip', data-placement='right', title='Genes')
-        a.nav-link(href='genes')
-          i.fa.fa-fw.fa-database
-          span.nav-link-text
-            | Genes
-    ul.navbar-nav.sidenav-toggler
-      li.nav-item
-        a#sidenavToggler.nav-link.text-center
-          i.fa.fa-fw.fa-angle-left
+	a.navbar-brand(href='index.html') InterMine Data Browser
+	button.navbar-toggler.navbar-toggler-right(type='button', data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
+		span.navbar-toggler-icon
+	#navbarResponsive.collapse.navbar-collapse
+		ul#exampleAccordion.navbar-nav.navbar-sidenav
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dashboard')
+				a.nav-link(href='/', style='color:black')
+					i.fa.fa-fw.fa-home
+					span.nav-link-text
+					| Dashboard
+			.card(style="width: 100%;")
+				.card-header
+					| Primary classes
+				ul.list-group.list-group-flush
+					li.list-group-item
+						a.nav-link(href='proteins', style='color:black')
+							i.fa.fa-fw.fa-database
+							span
+							| Proteins
+					li.list-group-item
+						a.nav-link(href='genes', style='color:black')
+							i.fa.fa-fw.fa-database
+							span
+							| Genes
+			.card(style="width: 100%;")
+				.card-header
+					| Test 2
+				ul.list-group.list-group-flush
+					li.list-group-item
+						a.nav-link(href='proteins', style='color:black').text-weight-normal
+							i.fa.fa-fw.fa-database
+							span
+							| Proteins
+					li.list-group-item
+						a.nav-link(href='genes', style='color:black').text-weight-normal
+							i.fa.fa-fw.fa-database
+							span
+							| Genes
