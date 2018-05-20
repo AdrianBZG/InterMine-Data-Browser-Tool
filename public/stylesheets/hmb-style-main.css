@@ -240,6 +240,10 @@ body.fixed-nav {
   color: rgba(0, 0, 0, 0.5);
 }
 
+.btn-space {
+  margin-right: 5px;
+}
+
 body.sidenav-toggled #mainNav.fixed-top .sidenav-toggler {
   overflow-x: hidden;
   width: 55px;
