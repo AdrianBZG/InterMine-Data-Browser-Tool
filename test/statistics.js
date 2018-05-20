@@ -24,6 +24,17 @@ describe('Statistics', () => {
               done();
             });
       });
+	  
+	  it('it should GET the count of HumanMine proteins', (done) => {
+        chai.request(server)
+            .get('/statistics/count/humanmine/Protein')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('number');
+                res.body.should.be.at.least(0);
+              done();
+            });
+      });
   });
 
 });
