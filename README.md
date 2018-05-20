@@ -1,6 +1,6 @@
 # InterMine Data Browser
-<p align="center">Build Status (Travis CI): [![Build Status](https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool.svg?branch=master)](https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool)</p> <br>
-<p align="center"><img src="https://badges.frapsoft.com/os/v1/open-source.png?v=103"> <img src="https://img.shields.io/badge/License-LGPL%202.1-blue.svg"> <img src="https://img.shields.io/david/strongloop/express.svg"></p>
+<p align="center">Build Status (Travis CI): <a href="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool"><img src="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool.svg?branch=master"></a><br>
+<p align="center"><img src="https://badges.frapsoft.com/os/v1/open-source.png?v=103"> <a href="LICENSE"><img src="https://img.shields.io/badge/License-LGPL%202.1-blue.svg"></a> <img src="https://img.shields.io/david/strongloop/express.svg"></p>
 
 The goal of this project, is to implement a faceted search tool to display the data from InterMine database, allowing the users to search easily within the different mines available around InterMine. without the requirement of having an extensive knowledge of the data model.
 
@@ -10,7 +10,7 @@ Please note that development is very early on and the project is not ready to us
 
 ## DEPLOYMENT
 
-Try it out with the Heroku deployment (may be outdated)!: [http://im-browser-prototype.herokuapp.com/](http://im-browser-prototype.herokuapp.com/)
+Try it out with the Heroku deployment (may be outdated!): [http://im-browser-prototype.herokuapp.com/](http://im-browser-prototype.herokuapp.com/)
 
 ## DEPENDENCIES
 
@@ -36,5 +36,5 @@ You can contact the developers by opening an issue in this repo.
 
 ## SCREENSHOTS
 
-Proteins from HumanMine listing (Pre-release 0.0.1)<br>
+Listing Proteins from HumanMine (Pre-release 0.0.1)<br>
 <div style="text-align:center"><img src ="https://i.imgur.com/Kg8FYsa.png" /></div>
