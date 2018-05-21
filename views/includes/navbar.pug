@@ -13,11 +13,11 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					i.fa.fa-fw.fa-search
 					span.nav-link-text
 					| Search
-			.card(style="width: 100%; max-width: 250px;")
+			.card(style="width: 100%; max-width: 250px")
 				.card-header
-					a(data-toggle="collapse" href="#organismshortnameblock" aria-expanded="true" aria-controls="organismshortnameblock")
+					a(data-toggle="collapse" href="#organismshortnameblock" aria-controls="organismshortnameblock")
 						i.fa.fa-caret-down  Organism short name
-				#organismshortnameblock.collapse.card-block
+				#organismshortnameblock.collapse.card-block(style="overflow: auto;")
 					ul.list-group.list-group-flush
 						li.list-group-item
 							a.nav-link(href='#', style='color:black; text-align:center;')
@@ -36,9 +36,9 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 								p.stretch C. elegans (8833)
 			.card(style="width: 100%; max-width: 250px;")
 				.card-header
-					a(data-toggle="collapse" href="#genenameblock" aria-expanded="true" aria-controls="genenameblock")
+					a(data-toggle="collapse" href="#genenameblock" aria-controls="genenameblock")
 						i.fa.fa-caret-down  Gene name
-				#genenameblock.collapse.card-block
+				#genenameblock.collapse.card-block(style="overflow: auto;")
 					ul.list-group.list-group-flush
 						li.list-group-item
 							a.nav-link(href='#', style='color:black; text-align:center;')
