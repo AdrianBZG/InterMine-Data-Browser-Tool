@@ -36,5 +36,5 @@ You can contact the developers by opening an issue in this repo.
 
 ## SCREENSHOTS
 
-Listing Proteins from HumanMine (Pre-release 0.0.1)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/Kg8FYsa.png" /></div>
+Genes view (Pre-release 0.0.1)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/JJWiyUA.png" /></div>
