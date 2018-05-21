@@ -6,38 +6,52 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 			button.btn.btn-primary.btn-space(type="button") Proteins
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
 			button.btn.btn-primary.btn-space(type="button") Genes
-	#navbarResponsive.collapse.navbar-collapse
-		ul#exampleAccordion.navbar-nav.navbar-sidenav
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dashboard')
-				a.nav-link(href='/', style='color:black')
-					i.fa.fa-fw.fa-home
+	#navbarResponsive.navbar-collapse
+		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Search')
+				a.nav-link(href='/search', style='color:black')
+					i.fa.fa-fw.fa-search
 					span.nav-link-text
-					| Dashboard
-			.card(style="width: 100%;")
+					| Search
+			.card(style="width: 100%; max-width: 250px;")
 				.card-header
-					| Primary classes
-				ul.list-group.list-group-flush
-					li.list-group-item
-						a.nav-link(href='proteins', style='color:black')
-							i.fa.fa-fw.fa-database
-							span
-							| Proteins
-					li.list-group-item
-						a.nav-link(href='genes', style='color:black')
-							i.fa.fa-fw.fa-database
-							span
-							| Genes
-			.card(style="width: 100%;")
+					a(data-toggle="collapse" href="#organismshortnameblock" aria-expanded="true" aria-controls="organismshortnameblock")
+						i.fa.fa-caret-down  Organism short name
+				#organismshortnameblock.collapse.card-block
+					ul.list-group.list-group-flush
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch M. musculus (80280)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch H. sapiens (60092)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch R. norvegicus (44997)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch D. rerio (18156)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch C. elegans (8833)
+			.card(style="width: 100%; max-width: 250px;")
 				.card-header
-					| Test 2
-				ul.list-group.list-group-flush
-					li.list-group-item
-						a.nav-link(href='proteins', style='color:black').text-weight-normal
-							i.fa.fa-fw.fa-database
-							span
-							| Proteins
-					li.list-group-item
-						a.nav-link(href='genes', style='color:black').text-weight-normal
-							i.fa.fa-fw.fa-database
-							span
-							| Genes
+					a(data-toggle="collapse" href="#genenameblock" aria-expanded="true" aria-controls="genenameblock")
+						i.fa.fa-caret-down  Gene name
+				#genenameblock.collapse.card-block
+					ul.list-group.list-group-flush
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch glyceraldehyde-3-phosphate (147)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch Y-linked testis-specific (93)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch igE-binding protein-like (91)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch 60S ribosomal (89)
+						li.list-group-item
+							a.nav-link(href='#', style='color:black; text-align:center;')
+								p.stretch glyceraldehyde-3-phosphate (85)
