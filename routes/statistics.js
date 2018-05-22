@@ -68,17 +68,7 @@ router.get('/count/items/humanmine/:classname', function(req, res, next) {
                     "itemName": "Organism short name",
                     "response": response
                 });
-                q.summarize("Gene.name", 10)
-                    .then(function(response) {
-                        result.push({
-                            "itemName": "Gene name",
-                            "response": response
-                        });
-                        res.json(result);
-                    }).catch(function(error) {
-                        console.log('error');
-                        console.log(error.message);
-                    });
+				res.json(result);
             }).catch(function(error) {
                 console.log('error');
                 console.log(error.message);

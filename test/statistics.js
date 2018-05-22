@@ -44,11 +44,9 @@ describe('Statistics', () => {
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
-				res.body.length.should.equal(2);
+				res.body.length.should.equal(1);
 				res.body[0]["itemName"].should.equal("Organism short name")
-				res.body[1]["itemName"].should.equal("Gene name")
                 should.exist(res.body[0]["response"]);
-				should.exist(res.body[1]["response"]);
               done();
             });
       });

@@ -1,126 +1,90 @@
-// Call the dataTables jQuery plugin
+function getItemsInClass() {
+    return $.ajax({
+        url: '/statistics/count/items/humanmine/Protein',
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
 $(document).ready(function() {
-var selector = '#dataTable';
-var service  = {root: 'http://www.humanmine.org/humanmine/service'};
-var query    = {
-  select: ['*'],
-  from: 'Protein'
-};
+    var selector = '#dataTable';
+    var service = {
+        root: 'http://www.humanmine.org/humanmine/service'
+    };
+    var query = {
+        select: ['*'],
+        from: 'Protein'
+    };
 
-// Configure options here, using nested notation
-imtables.configure({TableCell: {PreviewTrigger: 'click'}});
-
-// Or using path names:
-imtables.configure('TableResults.CacheFactor', 20);
-
-
-imtables.loadDash(
-  selector, // Can also be an element, or a jQuery object.
-  {"start":0,"size":25}, // May be null
-  {service: service, query: query} // May be an imjs.Query
-).then(
-  function (table) { console.log('Table loaded', table); },
-  function (error) { console.error('Could not load table', error); }
-);
-
-// Chart.js scripts
-// -- Set new default font family and font color to mimic Bootstrap's default styling
-Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-Chart.defaults.global.defaultFontColor = '#292b2c';
-// -- Pie Chart Example
-var ctx = document.getElementById("myPieChart");
-
-var pieOptions = {
-  events: false,
-  animation: {
-    duration: 500,
-    easing: "easeOutQuart",
-    onComplete: function () {
-      var ctx = this.chart.ctx;
-      ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-
-      this.data.datasets.forEach(function (dataset) {
-
-        for (var i = 0; i < dataset.data.length; i++) {
-          var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
-              total = dataset._meta[Object.keys(dataset._meta)[0]].total,
-              mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius)/2,
-              start_angle = model.startAngle,
-              end_angle = model.endAngle,
-              mid_angle = start_angle + (end_angle - start_angle)/2;
-
-          var x = mid_radius * Math.cos(mid_angle);
-          var y = mid_radius * Math.sin(mid_angle);
-
-          ctx.fillStyle = '#fff';
-          if (i == 3){ // Darker text color for lighter background
-            ctx.fillStyle = '#444';
-          }
-          var percent = String(Math.round(dataset.data[i]/total*100)) + "%";
-          ctx.fillText(dataset.data[i], model.x + x, model.y + y);
-          // Display percent in another line, line break doesn't work for fillText
-          ctx.fillText(percent, model.x + x, model.y + y + 15);
+    // Configure options here, using nested notation
+    imtables.configure({
+        TableCell: {
+            PreviewTrigger: 'click'
         }
-      });               
-    }
-  }
-};
+    });
 
-var numberGenes = 0;
-var numberDiseases = 0;
-var numberProteins = 0;
-var numberGoAnnotations = 0;
-  // Fetch number of genes
-  var service = new imjs.Service({
-         root: 'http://www.humanmine.org/humanmine/service'
-  });
-  
-  var query = {
-    "from": "Gene",
-    "select": ["primaryIdentifier"]
-  };
-  
-  service.count(query).then(function(response) {
-    numberGenes = response;
-	  // Fetch number of proteins
-  var service = new imjs.Service({
-         root: 'http://www.humanmine.org/humanmine/service'
-  });
-  
-  var query = {
-    "from": "Protein",
-    "select": ["primaryIdentifier"]
-  };
-  
-  service.count(query).then(function(response) {
-    numberProteins = response;
-	var myPieChart = new Chart(ctx, {
-  type: 'pie',
-  data: {
-    labels: ["Genes", "Proteins"],
-    datasets: [{
-      data: [numberGenes, numberProteins],
-      backgroundColor: ['#007bff', '#ffc107'],
-    }],
-  },
-  options: pieOptions
-});
+    // Or using path names:
+    imtables.configure('TableResults.CacheFactor', 20);
 
-var ctx2 = document.getElementById("myPieChart2");
-var myPieChart2 = new Chart(ctx2, {
-  type: 'pie',
-  data: {
-    labels: ["Genes", "Proteins"],
-    datasets: [{
-      data: [numberGenes, numberProteins],
-      backgroundColor: ['#007bff', '#ffc107'],
-    }],
-  },
-  options: pieOptions
-});
-  });
-  });
 
+    imtables.loadDash(
+        selector, // Can also be an element, or a jQuery object.
+        {
+            "start": 0,
+            "size": 25
+        }, // May be null
+        {
+            service: service,
+            query: query
+        } // May be an imjs.Query
+    ).then(
+        function(table) {
+            console.log('Table loaded', table);
+        },
+        function(error) {
+            console.error('Could not load table', error);
+        }
+    );
+
+    var ctx = document.getElementById("proteinsViewPieChart1");
+
+    $.when(getItemsInClass()).done(function(result) {
+        var countData = [];
+        var labelsData = [];
+        var colorsData = getColorsArray(result[0].response['results'].length);
+
+        for (var i = 0; i < result[0].response['results'].length; i++) {
+            countData.push(result[0].response['results'][i]['count']);
+            labelsData.push(result[0].response['results'][i]['item']);
+        }
+
+        // Plot
+        var pieOptions = {
+            elements: {
+                center: {
+                    text: '90%',
+                    color: '#FF6384', // Default is #000000
+                    fontStyle: 'Arial', // Default is Arial
+                    sidePadding: 20 // Defualt is 20 (as a percentage)
+                }
+            }
+        };
+
+
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labelsData,
+                datasets: [{
+                    data: countData,
+                    backgroundColor: colorsData,
+                }],
+            },
+            options: pieOptions
+        });
+
+    });
 });
