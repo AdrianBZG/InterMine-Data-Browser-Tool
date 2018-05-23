@@ -69,7 +69,7 @@ $(document).ready(function() {
                     text: '90%',
                     color: '#FF6384', // Default is #000000
                     fontStyle: 'Arial', // Default is Arial
-                    sidePadding: 20 // Defualt is 20 (as a percentage)
+                    sidePadding: 20 // Default is 20 (as a percentage)
                 }
             }
         };
@@ -85,6 +85,19 @@ $(document).ready(function() {
             },
             options: pieOptions
         });
+		
+		var resultantElements = result[0].response['results'].length;
 
+		if(resultantElements > 5) {
+			resultantElements = 5;
+		}
+	
+		// Fill the organism short name dropdown with top 5 organisms according to count
+		for(var i = 0; i < resultantElements; i++) {
+			var textToAppend = result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")";
+			$("#organismshortnamelist").append('<li class="list-group-item"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="stretch">' + textToAppend + '</p></a></li>');
+		}
     });
+	
+	
 });

@@ -1,7 +1,8 @@
 // Navigation
 nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
-	a.navbar-brand(href='index.html') InterMine Data Browser
-	div#headerButtons.col-md-8.text-center
+	a.navbar-brand(href='/')
+		img(src="/img/intermine-logo.png")
+	div#headerButtons.col-md-10.text-center
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
 			button.btn.btn-primary.btn-space(type="button") Genes
 		a(href="/proteins" data-toggle="tooltip" title="Change to Proteins view")
@@ -20,19 +21,4 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					a(data-toggle="collapse" href="#organismshortnameblock" aria-controls="organismshortnameblock")
 						i.fa.fa-caret-down  Organism short name
 				#organismshortnameblock.collapse.card-block(style="overflow: auto;")
-					ul.list-group.list-group-flush
-						li.list-group-item
-							a.nav-link(href='#', style='color:black; text-align:center;')
-								p.stretch M. musculus (80280)
-						li.list-group-item
-							a.nav-link(href='#', style='color:black; text-align:center;')
-								p.stretch H. sapiens (60092)
-						li.list-group-item
-							a.nav-link(href='#', style='color:black; text-align:center;')
-								p.stretch R. norvegicus (44997)
-						li.list-group-item
-							a.nav-link(href='#', style='color:black; text-align:center;')
-								p.stretch D. rerio (18156)
-						li.list-group-item
-							a.nav-link(href='#', style='color:black; text-align:center;')
-								p.stretch C. elegans (8833)
+					#organismshortnamelist.ul.list-group.list-group-flush
