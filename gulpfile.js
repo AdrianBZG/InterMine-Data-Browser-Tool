@@ -56,6 +56,14 @@ gulp.task('vendor', function() {
     ])
     .pipe(gulp.dest('./public/vendor/imjs'))
 });
+
+gulp.task('images', function() {
+  gulp.src([
+      './src/img/*'
+    ])
+    .pipe(gulp.dest('./public/img/'))
+});
+
 // Compile SCSS
 gulp.task('css:compile', function() {
   return gulp.src('./src/scss/**/*.scss')
@@ -96,4 +104,4 @@ gulp.task('js:minify', function() {
 gulp.task('js', ['js:minify']);
 
 // Default task
-gulp.task('default', ['css', 'js', 'vendor']);
+gulp.task('default', ['css', 'js', 'vendor', 'images']);
