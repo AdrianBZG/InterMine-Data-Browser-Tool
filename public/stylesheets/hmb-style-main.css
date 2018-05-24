@@ -15,6 +15,10 @@ body.sticky-footer .content-wrapper {
   min-height: calc(100vh - 56px - 56px);
 }
 
+.checked {
+  background-color: #a4eafc;
+}
+
 body.fixed-nav {
   padding-top: 56px;
 }

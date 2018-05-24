@@ -1,6 +1,6 @@
 function getItemsInClass() {
     return $.ajax({
-        url: '/statistics/count/items/humanmine/Gene',
+        url: '/statistics/count/items/humanmine/Protein',
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -10,14 +10,13 @@ function getItemsInClass() {
 }
 
 $(document).ready(function() {
-
     var selector = '#dataTable';
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
     };
     var query = {
         select: ['*'],
-        from: 'Gene'
+        from: 'Protein'
     };
 
     // Configure options here, using nested notation
@@ -50,7 +49,7 @@ $(document).ready(function() {
         }
     );
 
-    var ctx = document.getElementById("genesViewPieChart1");
+    var ctx = document.getElementById("proteinsViewPieChart1");
 
     $.when(getItemsInClass()).done(function(result) {
         var countData = [];
@@ -69,10 +68,11 @@ $(document).ready(function() {
                     text: '90%',
                     color: '#FF6384', // Default is #000000
                     fontStyle: 'Arial', // Default is Arial
-                    sidePadding: 20 // Default is 20 (as a percentage)
+                    sidePadding: 20 // Defualt is 20 (as a percentage)
                 }
             }
         };
+
 
         var myPieChart = new Chart(ctx, {
             type: 'pie',
@@ -97,7 +97,8 @@ $(document).ready(function() {
 			var textToAppend = result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")";
 			$("#organismshortnamelist").append('<li class="list-group-item"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="stretch">' + textToAppend + '</p></a></li>');
 		}
+		
+		createSidebarEvents();
+
     });
-	
-	
 });
