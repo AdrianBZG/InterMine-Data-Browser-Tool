@@ -11,6 +11,8 @@ function getItemsInClass() {
 
 $(document).ready(function() {
 
+    window.currentClassView = "Gene";
+
     var selector = '#dataTable';
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
@@ -85,19 +87,19 @@ $(document).ready(function() {
             },
             options: pieOptions
         });
-		
-		var resultantElements = result[0].response['results'].length;
 
-		if(resultantElements > 5) {
-			resultantElements = 5;
-		}
-	
-		// Fill the organism short name dropdown with top 5 organisms according to count
-		for(var i = 0; i < resultantElements; i++) {
-			var textToAppend = result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")";
-			$("#organismshortnamelist").append('<li class="list-group-item"><a class="nav-link" href="#" style="color:black; text-align:center;"><p>' + textToAppend + '</p></a></li>');
-		}
-		
-		createSidebarEvents();
-    });	
+        var resultantElements = result[0].response['results'].length;
+
+        if (resultantElements > 5) {
+            resultantElements = 5;
+        }
+
+        // Fill the organism short name dropdown with top 5 organisms according to count
+        for (var i = 0; i < resultantElements; i++) {
+            var textToAppend = result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")";
+            $("#organismshortnamelist").append('<li class="list-group-item"><a class="nav-link" href="#" style="color:black; text-align:center;"><p>' + textToAppend + '</p></a></li>');
+        }
+
+        createSidebarEvents();
+    });
 });
