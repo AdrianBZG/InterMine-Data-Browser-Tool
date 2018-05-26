@@ -31,7 +31,6 @@ function createSidebarEvents() {
             $(this).removeClass("checked");
         } else {
             $(this).addClass("checked");
-            filterTableByOrganismShortname($(this).find('p').text().split("(")[0].trim());
         }
 
         // Filter by the selected organisms
