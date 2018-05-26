@@ -36,5 +36,5 @@ You can contact the developers by opening an issue in this repo.
 
 ## SCREENSHOTS
 
-Genes view (Pre-release 0.0.1)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/JJWiyUA.png" /></div>
+Genes view with some organisms filtered (Pre-release 0.0.2)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/FO5KdWC.png" /></div>
