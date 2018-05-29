@@ -1,3 +1,4 @@
+// Method to get the different items inside Gene (count per organism) in order to feed the sidebar
 function getItemsInClass() {
     return $.ajax({
         url: '/statistics/count/items/humanmine/Gene',
@@ -13,6 +14,7 @@ $(document).ready(function() {
 
     window.currentClassView = "Gene";
 
+	// Instantiate the im-table with all the data available in Gene from HumanMine
     var selector = '#dataTable';
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
@@ -22,27 +24,25 @@ $(document).ready(function() {
         from: 'Gene'
     };
 
-    // Configure options here, using nested notation
     imtables.configure({
         TableCell: {
             PreviewTrigger: 'click'
         }
     });
 
-    // Or using path names:
     imtables.configure('TableResults.CacheFactor', 20);
 
 
     imtables.loadDash(
-        selector, // Can also be an element, or a jQuery object.
+        selector,
         {
             "start": 0,
             "size": 25
-        }, // May be null
+        },
         {
             service: service,
             query: query
-        } // May be an imjs.Query
+        }
     ).then(
         function(table) {
             console.log('Table loaded', table);
@@ -52,6 +52,7 @@ $(document).ready(function() {
         }
     );
 
+	// Build the pie chart showing the distribution of the data among the different organisms
     var ctx = document.getElementById("genesViewPieChart1");
 
     $.when(getItemsInClass()).done(function(result) {
@@ -90,6 +91,7 @@ $(document).ready(function() {
 
         var resultantElements = result[0].response['results'].length;
 
+		// At most, 5 elements, which are ordered (top 5)
         if (resultantElements > 5) {
             resultantElements = 5;
         }

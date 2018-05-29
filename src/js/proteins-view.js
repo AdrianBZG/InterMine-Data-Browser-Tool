@@ -1,3 +1,4 @@
+// Method to get the different items inside Protein (count per organism) in order to feed the sidebar
 function getItemsInClass() {
     return $.ajax({
         url: '/statistics/count/items/humanmine/Protein',
@@ -13,6 +14,7 @@ $(document).ready(function() {
 
     window.currentClassView = "Protein";
 
+	// Instantiate the im-table with all the data available in Protein from HumanMine
     var selector = '#dataTable';
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
@@ -22,27 +24,25 @@ $(document).ready(function() {
         from: 'Protein'
     };
 
-    // Configure options here, using nested notation
     imtables.configure({
         TableCell: {
             PreviewTrigger: 'click'
         }
     });
 
-    // Or using path names:
     imtables.configure('TableResults.CacheFactor', 20);
 
 
     imtables.loadDash(
-        selector, // Can also be an element, or a jQuery object.
+        selector,
         {
             "start": 0,
             "size": 25
-        }, // May be null
+        },
         {
             service: service,
             query: query
-        } // May be an imjs.Query
+        }
     ).then(
         function(table) {
             console.log('Table loaded', table);
@@ -52,6 +52,7 @@ $(document).ready(function() {
         }
     );
 
+	// Build the pie chart showing the distribution of the data among the different organisms
     var ctx = document.getElementById("proteinsViewPieChart1");
 
     $.when(getItemsInClass()).done(function(result) {
@@ -71,7 +72,7 @@ $(document).ready(function() {
                     text: '90%',
                     color: '#FF6384', // Default is #000000
                     fontStyle: 'Arial', // Default is Arial
-                    sidePadding: 20 // Defualt is 20 (as a percentage)
+                    sidePadding: 20 // Default is 20 (as a percentage)
                 }
             }
         };
@@ -91,6 +92,7 @@ $(document).ready(function() {
 
         var resultantElements = result[0].response['results'].length;
 
+		// At most, 5 elements, which are ordered (top 5)
         if (resultantElements > 5) {
             resultantElements = 5;
         }

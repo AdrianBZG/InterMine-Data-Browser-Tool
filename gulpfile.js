@@ -23,13 +23,6 @@ gulp.task('vendor', function() {
       './node_modules/chart.js/dist/*.js'
     ])
     .pipe(gulp.dest('./public/vendor/chart.js'))
-  // DataTables
-  gulp.src([
-      './node_modules/datatables.net/js/*.js',
-      './node_modules/datatables.net-bs4/js/*.js',
-      './node_modules/datatables.net-bs4/css/*.css'
-    ])
-    .pipe(gulp.dest('./public/vendor/datatables/'))
   // Font Awesome
   gulp.src([
       './node_modules/font-awesome/**/*',
@@ -57,6 +50,7 @@ gulp.task('vendor', function() {
     .pipe(gulp.dest('./public/vendor/imjs'))
 });
 
+// Move the images in the src folder to the public folder
 gulp.task('images', function() {
   gulp.src([
       './src/img/*'
@@ -72,6 +66,7 @@ gulp.task('css:compile', function() {
     }).on('error', sass.logError))
     .pipe(gulp.dest('./public/stylesheets'))
 });
+
 // Minify CSS
 gulp.task('css:minify', ['css:compile'], function() {
   return gulp.src([
@@ -85,8 +80,10 @@ gulp.task('css:minify', ['css:compile'], function() {
     .pipe(gulp.dest('./public/stylesheets'))
     .pipe(browserSync.stream());
 });
+
 // CSS
 gulp.task('css', ['css:compile', 'css:minify']);
+
 // Minify JavaScript
 gulp.task('js:minify', function() {
   return gulp.src([
@@ -100,8 +97,9 @@ gulp.task('js:minify', function() {
     .pipe(gulp.dest('./public/javascripts'))
     .pipe(browserSync.stream());
 });
+
 // JS
 gulp.task('js', ['js:minify']);
 
-// Default task
+// Default task: CSS + JS + Vendor + images
 gulp.task('default', ['css', 'js', 'vendor', 'images']);
