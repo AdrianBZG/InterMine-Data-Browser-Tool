@@ -4,9 +4,9 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 		img(src="/img/intermine-logo.png")
 	div#headerButtons.col-md-10.text-center
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
-			button.btn.btn-primary.btn-space(type="button") Genes
+			button.btn.btn-primary.btn-space(id="genesButton" type="button") Genes
 		a(href="/proteins" data-toggle="tooltip" title="Change to Proteins view")
-			button.btn.btn-primary.btn-space(type="button") Proteins
+			button.btn.btn-default.btn-space(id="proteinsButton" type="button") Proteins
 		select.form-control(style="width: 150px; position: fixed; top: 10px; right: 75px;")
 			option(value="HumanMine") HumanMine
 	#navbarResponsive.navbar-collapse

@@ -14,6 +14,8 @@ $(document).ready(function() {
 
     window.currentClassView = "Gene";
 	document.title = window.currentClassView + " in HumanMine";
+	$("#proteinsButton").removeClass("btn-primary").addClass("btn-default");    
+	$("#genesButton").removeClass("btn-default").addClass("btn-primary");
 
 	// Instantiate the im-table with all the data available in Gene from HumanMine
     var selector = '#dataTable';
