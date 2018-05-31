@@ -13,11 +13,11 @@ function getItemsInClass() {
 $(document).ready(function() {
 
     window.currentClassView = "Gene";
-	document.title = window.currentClassView + " in HumanMine";
-	$("#proteinsButton").removeClass("btn-primary").addClass("btn-default");    
-	$("#genesButton").removeClass("btn-default").addClass("btn-primary");
+    document.title = window.currentClassView + " in HumanMine";
+    $("#proteinsButton").removeClass("btn-primary").addClass("btn-default");
+    $("#genesButton").removeClass("btn-default").addClass("btn-primary");
 
-	// Instantiate the im-table with all the data available in Gene from HumanMine
+    // Instantiate the im-table with all the data available in Gene from HumanMine
     var selector = '#dataTable';
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
@@ -37,12 +37,10 @@ $(document).ready(function() {
 
 
     imtables.loadDash(
-        selector,
-        {
+        selector, {
             "start": 0,
             "size": 25
-        },
-        {
+        }, {
             service: service,
             query: query
         }
@@ -55,7 +53,7 @@ $(document).ready(function() {
         }
     );
 
-	// Build the pie chart showing the distribution of the data among the different organisms
+    // Build the pie chart showing the distribution of the data among the different organisms
     var ctx = document.getElementById("genesViewPieChart1");
 
     $.when(getItemsInClass()).done(function(result) {
@@ -77,6 +75,24 @@ $(document).ready(function() {
                     fontStyle: 'Arial', // Default is Arial
                     sidePadding: 20 // Default is 20 (as a percentage)
                 }
+            },
+            legend: {
+                display: true,
+                onClick: function(e) {
+                    e.stopPropagation();
+                }
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            tooltips: {
+                custom: function(tooltip) {
+                    if (!tooltip.opacity) {
+                        document.getElementById("genesViewPieChart1").style.cursor = 'default';
+                        return;
+                    }
+                }
             }
         };
 
@@ -94,7 +110,7 @@ $(document).ready(function() {
 
         var resultantElements = result[0].response['results'].length;
 
-		// At most, 5 elements, which are ordered (top 5)
+        // At most, 5 elements, which are ordered (top 5)
         if (resultantElements > 5) {
             resultantElements = 5;
         }
