@@ -13,6 +13,7 @@ function getItemsInClass() {
 $(document).ready(function() {
 
     window.currentClassView = "Protein";
+	document.title = window.currentClassView + " in HumanMine";
 
 	// Instantiate the im-table with all the data available in Protein from HumanMine
     var selector = '#dataTable';
