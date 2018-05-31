@@ -50,6 +50,10 @@ function filterTableByOrganismShortname(constraint, logic) {
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
     };
+	console.log('probando');
+	
+	console.log(constraint);
+	
     var query = {
         constraintLogic: logic,
         select: ['*'],
