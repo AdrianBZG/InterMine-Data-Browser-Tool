@@ -93,6 +93,23 @@ $(document).ready(function() {
                         return;
                     }
                 }
+            },
+            onClick: function(evt, elements) {
+                var datasetIndex;
+                var dataset;
+
+                if (elements.length) {
+                    var index = elements[0]._index;
+
+                    selectedSegment = myPieChart.data.labels[index];
+
+                    // Filter by the selected segment in the pie chart
+                    var formattedConstraint = formatChartClickedSegmentAsConstraintForFilter(selectedSegment);
+                    filterTableByOrganismShortname(formattedConstraint[0], formattedConstraint[1]);
+
+                }
+
+                myPieChart.update();
             }
         };
 
