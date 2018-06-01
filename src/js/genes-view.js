@@ -118,8 +118,8 @@ $(document).ready(function() {
         // Fill the organism short name dropdown with top 5 organisms according to count
         for (var i = 0; i < resultantElements; i++) {
             var organismName = result[0].response['results'][i]['item'];
-			var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-            $("#organismshortnamelist").append('<li class="list-group-item"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+            var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 6px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
         }
 
         createSidebarEvents();
