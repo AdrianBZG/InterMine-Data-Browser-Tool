@@ -119,7 +119,7 @@ $(document).ready(function() {
         for (var i = 0; i < resultantElements; i++) {
             var organismName = result[0].response['results'][i]['item'];
             var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 6px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
         }
 
         createSidebarEvents();
