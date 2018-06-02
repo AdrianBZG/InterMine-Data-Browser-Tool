@@ -60,7 +60,6 @@ var myPieChart;
 function updateElements(constraints, pieChartID) {
     $.when(getItemsInClass(constraints)).done(function(result) {
         // First remove the li elements
-
         $('#organismshortnamelist').parent().find('li').remove();
 
         var countData = [];
@@ -163,4 +162,51 @@ function updateElements(constraints, pieChartID) {
             options: pieOptions
         });
     });
+}
+
+// This method receives the formatted constraints and the logic to apply to them, and queries the im-tables appropriately to update it
+function filterTableByOrganismShortname(constraint, logic) {
+    $('#dataTable').empty();
+
+    var selector = '#dataTable';
+    var service = {
+        root: 'http://www.humanmine.org/humanmine/service'
+    };
+	
+    var query = {
+        constraintLogic: logic,
+        select: ['*'],
+        from: window.currentClassView,
+        where: constraint
+    };
+
+    imtables.configure({
+        TableCell: {
+            PreviewTrigger: 'click'
+        },
+        TableResults: {
+            CacheFactor: 20
+        }
+    });
+
+	var imtable = imtables.loadTable(
+        selector, {
+            "start": 0,
+            "size": 25
+        }, {
+            service: service,
+            query: query
+        }
+    ).then(
+        function(table) {
+            //console.log('Table loaded', table);
+            //this .on listener will do something when someone interacts with the table. 
+            table.on("all", function(changeDetail) {
+                updateElements([table.history.currentQuery.constraints.pop()], "PieChart");
+            });
+        },
+        function(error) {
+            console.error('Could not load table', error);
+        }
+    );
 }

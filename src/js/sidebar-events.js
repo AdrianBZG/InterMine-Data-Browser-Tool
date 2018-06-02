@@ -39,48 +39,6 @@ function createSidebarEvents() {
         // Filter by the selected organisms
         var formattedConstraint = formatAsConstraintForFilter($('.checked a p').toArray());
         filterTableByOrganismShortname(formattedConstraint[0], formattedConstraint[1]);
+		//updateElements(formattedConstraint[0], "PieChart");
     });
-}
-
-// This method receives the formatted constraints and the logic to apply to them, and queries the im-tables appropriately to update it
-function filterTableByOrganismShortname(constraint, logic) {
-    $('#dataTable').empty();
-
-    var selector = '#dataTable';
-    var service = {
-        root: 'http://www.humanmine.org/humanmine/service'
-    };
-	
-    var query = {
-        constraintLogic: logic,
-        select: ['*'],
-        from: window.currentClassView,
-        where: constraint
-    };
-
-    imtables.configure({
-        TableCell: {
-            PreviewTrigger: 'click'
-        },
-        TableResults: {
-            CacheFactor: 20
-        }
-    });
-
-    imtables.loadDash(
-        selector, {
-            "start": 0,
-            "size": 25
-        }, {
-            service: service,
-            query: query
-        }
-    ).then(
-        function(table) {
-            console.log('Table loaded', table);
-        },
-        function(error) {
-            console.error('Could not load table', error);
-        }
-    );
 }

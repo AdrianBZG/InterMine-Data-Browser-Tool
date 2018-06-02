@@ -36,7 +36,7 @@ $(document).ready(function() {
             //console.log('Table loaded', table);
             //this .on listener will do something when someone interacts with the table. 
             table.on("all", function(changeDetail) {
-                updateElements(table.history.currentQuery.constraints, "genesViewPieChart1");
+                updateElements(table.history.currentQuery.constraints, "PieChart");
             });
         },
         function(error) {
