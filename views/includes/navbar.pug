@@ -16,6 +16,11 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					i.fa.fa-fw.fa-search
 					span.nav-link-text
 					| Search
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters')
+				a.nav-link(href='javascript:location.reload();', style='color:black')
+					i.fa.fa-fw.fa-trash
+					span.nav-link-text
+					| Clear filters
 			.card(style="width: 100%; max-width: 250px")
 				.card-header
 					a(data-toggle="collapse" href="#organismshortnameblock" aria-controls="organismshortnameblock")
