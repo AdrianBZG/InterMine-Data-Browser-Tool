@@ -39,3 +39,128 @@ function getColorsArray(size) {
 
     return rainbow;
 };
+
+// Method to get the different items inside Gene (count per organism) in order to feed the sidebar
+function getItemsInClass(constraints) {
+    return $.ajax({
+        url: '/statistics/count/items/humanmine/' + window.currentClassView,
+        type: 'POST',
+        data: JSON.stringify(constraints),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+var myPieChart;
+
+function updateElements(constraints, pieChartID) {
+    $.when(getItemsInClass(constraints)).done(function(result) {
+        // First remove the li elements
+
+        $('#organismshortnamelist').parent().find('li').remove();
+
+        var countData = [];
+        var labelsData = [];
+        var colorsData = getColorsArray(result[0].response['results'].length);
+
+        for (var i = 0; i < result[0].response['results'].length; i++) {
+            countData.push(result[0].response['results'][i]['count']);
+            labelsData.push(result[0].response['results'][i]['item']);
+        }
+
+        var resultantElements = result[0].response['results'].length;
+
+        // At most, 5 elements, which are ordered (top 5)
+        if (resultantElements > 5) {
+            resultantElements = 5;
+        }
+
+        // Fill the organism short name dropdown with top 5 organisms according to count
+        for (var i = 0; i < resultantElements; i++) {
+            var organismName = result[0].response['results'][i]['item'];
+            var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+        }
+
+        createSidebarEvents();
+
+        // Update pie
+        if (myPieChart) {
+            myPieChart.destroy();
+        }
+
+        var ctx = document.getElementById(pieChartID);
+
+        var countData = [];
+        var labelsData = [];
+        var colorsData = getColorsArray(result[0].response['results'].length);
+
+        for (var i = 0; i < result[0].response['results'].length; i++) {
+            countData.push(result[0].response['results'][i]['count']);
+            labelsData.push(result[0].response['results'][i]['item']);
+        }
+
+        // Plot
+        var pieOptions = {
+            elements: {
+                center: {
+                    text: '90%',
+                    color: '#FF6384', // Default is #000000
+                    fontStyle: 'Arial', // Default is Arial
+                    sidePadding: 20 // Default is 20 (as a percentage)
+                }
+            },
+            legend: {
+                display: true,
+                onClick: function(e) {
+                    e.stopPropagation();
+                }
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            tooltips: {
+                custom: function(tooltip) {
+                    if (!tooltip.opacity) {
+                        document.getElementById(pieChartID).style.cursor = 'default';
+                        return;
+                    }
+                }
+            },
+            onClick: function(evt, elements) {
+                var datasetIndex;
+                var dataset;
+
+                if (elements.length) {
+                    var index = elements[0]._index;
+
+                    selectedSegment = myPieChart.data.labels[index];
+
+                    // Filter by the selected segment in the pie chart
+                    var formattedConstraint = formatChartClickedSegmentAsConstraintForFilter(selectedSegment);
+                    filterTableByOrganismShortname(formattedConstraint[0], formattedConstraint[1]);
+
+                }
+
+                myPieChart.update();
+            }
+        };
+
+        myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labelsData,
+                datasets: [{
+                    data: countData,
+                    backgroundColor: colorsData,
+                }],
+            },
+            options: pieOptions
+        });
+    });
+}
