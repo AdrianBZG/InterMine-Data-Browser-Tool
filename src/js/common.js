@@ -57,6 +57,7 @@ function getItemsInClass(constraints) {
 
 var myPieChart;
 
+// This methods updates the piechart and sidebar elements according to the received constraints
 function updateElements(constraints, pieChartID) {
     $.when(getItemsInClass(constraints)).done(function(result) {
         // First remove the li elements

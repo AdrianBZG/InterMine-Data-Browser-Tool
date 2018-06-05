@@ -18,7 +18,7 @@ Check [package.json](package.json)
 
 ## BUILDING
 
-See [INSTALL.md](INSTALL.md)
+See [BUILD.md](BUILD.md)
 
 
 ## CONTRIBUTING
