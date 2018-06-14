@@ -112,6 +112,8 @@ function updateElements(constraints, pieChartID) {
 
         // Plot
         var pieOptions = {
+			responsive: true,
+    maintainAspectRatio: false,
             elements: {
                 center: {
                     text: '90%',
@@ -122,6 +124,7 @@ function updateElements(constraints, pieChartID) {
             },
             legend: {
                 display: true,
+				position: 'top',
                 onClick: function(e) {
                     e.stopPropagation();
                 }
