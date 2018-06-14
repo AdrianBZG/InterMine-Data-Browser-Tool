@@ -1,3 +1,9 @@
+$(document).ready(function() {
+	if(!window.location.protocol.includes("https")) {
+		$("#httpsAlert").hide();
+	}
+});
+
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
 function getColorsArray(size) {
     var rainbow = [

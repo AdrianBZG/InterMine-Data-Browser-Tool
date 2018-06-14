@@ -1,5 +1,35 @@
 // Global styling for this template
 
+/* The alert message box */
+.alert {
+    background-color: #f44336; /* Red */
+    color: white;
+	position:absolute;
+	top: 100px;
+  left: 50%;
+  margin-left: -300px;
+  width: 600px;
+  transform: translateY(-50%);
+	z-index:1000;
+}
+
+/* The close button */
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+    color: black;
+}
+
 html {
   position: relative;
   min-height: 100%;

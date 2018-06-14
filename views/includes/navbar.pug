@@ -1,7 +1,7 @@
 // Navigation
 nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	a.navbar-brand(href='/')
-		img(src="/img/intermine-logo.png")
+		img(src="/img/intermine-logo.png" style="width: 80%; height: 50%;")
 	div#headerButtons.col-md-10.text-center
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
 			button.btn.btn-primary.btn-space(id="genesButton" type="button") Genes
@@ -10,6 +10,10 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 		select.form-control(style="width: 150px; position: fixed; top: 10px; right: 75px;")
 			option(value="HumanMine") HumanMine
 	#navbarResponsive.navbar-collapse
+		#httpsAlert.alert
+			span.closebtn(onclick="this.parentElement.style.display='none';") ×
+			| You're currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href="#organismshortnameblock">reload this site</a> via HTTP.
+		br
 		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Search')
 				a.nav-link(href='/search', style='color:black')
