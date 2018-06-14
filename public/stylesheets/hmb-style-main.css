@@ -54,6 +54,12 @@ body.fixed-nav {
   padding-top: 56px;
 }
 
+@media screen and (max-width: 800px) {
+  body.fixed-nav {
+    padding-top: calc(56px * 3);
+  }
+}
+
 .content-wrapper {
   min-height: calc(100vh - 56px);
   padding-top: 1rem;

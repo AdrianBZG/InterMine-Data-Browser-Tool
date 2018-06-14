@@ -52,6 +52,9 @@ body.sticky-footer {
 
 body.fixed-nav {
   padding-top: $navbar-base-height;
+  @media screen and (max-width: 800px) {
+    padding-top: calc(#{$navbar-base-height} * 3);
+  }
 }
 
 .content-wrapper {
