@@ -16,11 +16,16 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 			| You're currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href="#organismshortnameblock">reload this site</a> via HTTP.
 		br
 		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Search')
-				a.nav-link(href='/search', style='color:black')
-					i.fa.fa-fw.fa-search
-					span.nav-link-text
-					| Search
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation')
+					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-search
+						span.nav-link-text
+						| GO Annotation
+					.card(style="width: 100%; max-width: 250px")
+						#goAnnotationSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							form-group.ui-front
+								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. Something")
+								button.btn.btn-default(type="button" style='width:100%') Go!
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters')
 				a.nav-link(href='javascript:location.reload();', style='color:black')
 					i.fa.fa-fw.fa-trash

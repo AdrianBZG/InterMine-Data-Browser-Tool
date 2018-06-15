@@ -2,6 +2,14 @@ $(document).ready(function() {
 	if(!window.location.protocol.includes("https")) {
 		$("#httpsAlert").hide();
 	}
+	
+	var availableTags = [
+    "Something",
+    "Thingsome"
+  ];
+  $("#goAnnotationSearchInput").autocomplete({
+    source: availableTags
+  });
 });
 
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
@@ -170,7 +178,7 @@ function updateElements(constraints, pieChartID) {
                 }],
             },
             options: pieOptions
-        });
+        });  
     });
 }
 
