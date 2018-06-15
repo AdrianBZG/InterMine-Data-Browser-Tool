@@ -106,7 +106,7 @@ body.fixed-nav {
   padding-top: 56px;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 991px) {
   body.fixed-nav {
     padding-top: calc(56px * 3);
   }
