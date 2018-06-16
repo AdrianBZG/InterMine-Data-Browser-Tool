@@ -2,7 +2,7 @@
     "title": "InterMine Data Brpwser",
     "name": "intermine-data-browser",
     "version": "0.0.1",
-    "description": "A simple web-based data browser for InterMine",
+    "description": "A web-based data browser for InterMine",
     "homepage": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool",
     "bugs": {
         "url": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues",
