@@ -1,19 +1,11 @@
 $(document).ready(function() {
-	if(window.location.protocol.includes("https")) {
-		$("#navbarResponsive" ).prepend("<div class='alert' id='httpsAlert'><span class='closebtn' id='closeHttpsMessage'>×</span>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP.</div><br/>" );
-		
-		$( "#closeHttpsMessage" ).click(function() {
-				$("#httpsAlert").hide();
-		});
-	}
-	
-	var availableTags = [
-    "Something",
-    "Thingsome"
-  ];
-  $("#goAnnotationSearchInput").autocomplete({
-    source: availableTags
-  });
+    if (window.location.protocol.includes("https")) {
+        $("#navbarResponsive").prepend("<div class='alert' id='httpsAlert'><span class='closebtn' id='closeHttpsMessage'>×</span>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP.</div><br/>");
+
+        $("#closeHttpsMessage").click(function() {
+            $("#httpsAlert").hide();
+        });
+    }
 });
 
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
@@ -58,7 +50,19 @@ function getColorsArray(size) {
     return rainbow;
 };
 
-// Method to get the different items inside Gene (count per organism) in order to feed the sidebar
+// Method to get the different ontology terms inside a class in order to feed the typeahead
+function getOntologyTermsInClass() {
+    return $.ajax({
+        url: '/fetch/ontologyterms/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+// Method to get the different items inside a class (count per organism) in order to feed the sidebar
 function getItemsInClass(constraints) {
     return $.ajax({
         url: '/statistics/count/items/humanmine/' + window.currentClassView,
@@ -73,10 +77,36 @@ function getItemsInClass(constraints) {
     })
 }
 
+function flatten(arr) {
+    return arr.reduce(function(flat, toFlatten) {
+        return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+    }, []);
+}
+
 var myPieChart;
 
 // This methods updates the piechart and sidebar elements according to the received constraints
 function updateElements(constraints, pieChartID) {
+    $.when(getOntologyTermsInClass()).done(function(result) {
+
+        var availableGoTerms = [];
+
+        for (var i = 0; i < result.length; i++) {
+            if (result[i][0] != null) {
+                availableGoTerms.push(result[i][0]);
+            }
+        }
+
+        $("#goAnnotationSearchInput").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
+                response(results.slice(0, 15));
+            }
+        });
+
+    });
+
     $.when(getItemsInClass(constraints)).done(function(result) {
         // First remove the li elements
         $('#organismshortnamelist').parent().find('li').remove();
@@ -124,8 +154,8 @@ function updateElements(constraints, pieChartID) {
 
         // Plot
         var pieOptions = {
-			responsive: true,
-    maintainAspectRatio: false,
+            responsive: true,
+            maintainAspectRatio: false,
             elements: {
                 center: {
                     text: '90%',
@@ -136,7 +166,7 @@ function updateElements(constraints, pieChartID) {
             },
             legend: {
                 display: true,
-				position: 'top',
+                position: 'top',
                 onClick: function(e) {
                     e.stopPropagation();
                 }
@@ -182,7 +212,7 @@ function updateElements(constraints, pieChartID) {
                 }],
             },
             options: pieOptions
-        });  
+        });
     });
 }
 
@@ -194,7 +224,7 @@ function filterTableByOrganismShortname(constraint, logic) {
     var service = {
         root: 'http://www.humanmine.org/humanmine/service'
     };
-	
+
     var query = {
         constraintLogic: logic,
         select: ['*'],
@@ -211,7 +241,7 @@ function filterTableByOrganismShortname(constraint, logic) {
         }
     });
 
-	var imtable = imtables.loadTable(
+    var imtable = imtables.loadTable(
         selector, {
             "start": 0,
             "size": 25
