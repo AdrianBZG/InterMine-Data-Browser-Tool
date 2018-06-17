@@ -31,6 +31,28 @@ describe('Fetch', () => {
 				done();
             });
       });
+	  
+	  it('it should GET the listing of dataset names inside class Protein in HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/datasets/humanmine/Protein')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('array');
+				res.body.length.should.be.at.least(1);
+				done();
+            });
+      });
+	  
+	  it('it should GET the listing of dataset names inside class Gene in HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/datasets/humanmine/Gene')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('array');
+				res.body.length.should.be.at.least(1);
+				done();
+            });
+      });
   });
 
 });
