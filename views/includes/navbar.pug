@@ -30,8 +30,18 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					.card(style="width: 100%; max-width: 250px")
 						#datasetNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
 							form-group.ui-front
-								input(type="text" class="form-control" id="datasetNameSearchInput" placeholder="A dataset name...")
+								input(type="text" class="form-control" id="datasetNameSearchInput" placeholder="Some dataset name...")
 								button.btn.btn-default(type="button" style='width:100%' id="datasetNameSearchButton") Go!
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
+					a.nav-link(data-toggle="collapse", href="#pathwayNameSearchCardBlock", aria-controls="pathwayNameSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-code-fork
+						span.nav-link-text
+						| Pathway Name
+					.card(style="width: 100%; max-width: 250px")
+						#pathwayNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							form-group.ui-front
+								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="Some pathway name...")
+								button.btn.btn-default(type="button" style='width:100%' id="pathwayNameSearchButton") Go!
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters')
 				a.nav-link(href='javascript:location.reload();', style='color:black')
 					i.fa.fa-fw.fa-trash
