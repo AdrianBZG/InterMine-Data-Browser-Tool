@@ -45,11 +45,19 @@ function createSidebarEvents() {
     $('#goAnnotationSearchButton').click(function() {
         var writtenText = $('#goAnnotationSearchInput').val();
 
-        window.imTable.query.addConstraint({
-            "path": "goAnnotation.ontologyTerm.name",
-            "op": "==",
-            "value": writtenText
-        });
+		if(window.currentClassView == "Gene") {
+			window.imTable.query.addConstraint({
+				"path": "goAnnotation.ontologyTerm.name",
+				"op": "==",
+				"value": writtenText
+			});
+		} else {
+			window.imTable.query.addConstraint({
+				"path": "ontologyAnnotations.ontologyTerm.name",
+				"op": "==",
+				"value": writtenText
+			});
+		}
     });
 	
 	$('#datasetNameSearchButton').click(function() {
