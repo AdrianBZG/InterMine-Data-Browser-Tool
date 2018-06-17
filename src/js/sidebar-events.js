@@ -43,12 +43,20 @@ function createSidebarEvents() {
     });
 
     $('#goAnnotationSearchButton').click(function() {
-        // Method that receives the Ontology Term and creates a constraint depending on current class view, then update with that
-
         var writtenText = $('#goAnnotationSearchInput').val();
 
         window.imTable.query.addConstraint({
             "path": "goAnnotation.ontologyTerm.name",
+            "op": "==",
+            "value": writtenText
+        });
+    });
+	
+	$('#datasetNameSearchButton').click(function() {
+        var writtenText = $('#datasetNameSearchInput').val();
+
+        window.imTable.query.addConstraint({
+            "path": "dataSets.name",
             "op": "==",
             "value": writtenText
         });

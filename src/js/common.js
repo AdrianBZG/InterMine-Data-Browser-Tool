@@ -62,6 +62,18 @@ function getOntologyTermsInClass() {
     })
 }
 
+// Method to get the different dataset names inside a class in order to feed the typeahead
+function getDatasetNamesInClass() {
+    return $.ajax({
+        url: '/fetch/datasets/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
 // Method to get the different items inside a class (count per organism) in order to feed the sidebar
 function getItemsInClass(constraints) {
     return $.ajax({
@@ -101,6 +113,26 @@ function updateElements(constraints, pieChartID) {
             minLength: 3,
             source: function(request, response) {
                 var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
+                response(results.slice(0, 15));
+            }
+        });
+
+    });
+	
+	$.when(getDatasetNamesInClass()).done(function(result) {
+
+        var availableDatasetNames = [];
+
+        for (var i = 0; i < result.length; i++) {
+            if (result[i][0] != null) {
+                availableDatasetNames.push(result[i][0]);
+            }
+        }
+
+        $("#datasetNameSearchInput").autocomplete({
+            minLength: 2,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableDatasetNames, request.term);
                 response(results.slice(0, 15));
             }
         });
