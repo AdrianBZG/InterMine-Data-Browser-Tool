@@ -61,4 +61,14 @@ function createSidebarEvents() {
             "value": writtenText
         });
     });
+	
+	$('#pathwayNameSearchButton').click(function() {
+        var writtenText = $('#pathwayNameSearchInput').val();
+
+        window.imTable.query.addConstraint({
+            "path": "pathways.name",
+            "op": "==",
+            "value": writtenText
+        });
+    });
 }

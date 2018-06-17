@@ -74,6 +74,18 @@ function getDatasetNamesInClass() {
     })
 }
 
+// Method to get the different pathway names inside a class in order to feed the typeahead
+function getPathwayNamesInClass() {
+    return $.ajax({
+        url: '/fetch/pathways/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
 // Method to get the different items inside a class (count per organism) in order to feed the sidebar
 function getItemsInClass(constraints) {
     return $.ajax({
@@ -133,6 +145,26 @@ function updateElements(constraints, pieChartID) {
             minLength: 2,
             source: function(request, response) {
                 var results = $.ui.autocomplete.filter(availableDatasetNames, request.term);
+                response(results.slice(0, 15));
+            }
+        });
+
+    });
+	
+	$.when(getPathwayNamesInClass()).done(function(result) {
+
+        var availablePathwayNames = [];
+
+        for (var i = 0; i < result.length; i++) {
+            if (result[i][0] != null) {
+                availablePathwayNames.push(result[i][0]);
+            }
+        }
+
+        $("#pathwayNameSearchInput").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
                 response(results.slice(0, 15));
             }
         });
