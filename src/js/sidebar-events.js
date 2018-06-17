@@ -17,7 +17,7 @@ function formatAsConstraintForFilter(selection) {
         result[1].push(alphabet[i]);
     }
 
-	// Build the logic (OR)
+    // Build the logic (OR)
     if (result[1].length > 1) {
         result[1] = result[1].join(" or ");
     } else {
@@ -38,7 +38,19 @@ function createSidebarEvents() {
 
         // Filter by the selected organisms
         var formattedConstraint = formatAsConstraintForFilter($('.checked a p').toArray());
-        filterTableByOrganismShortname(formattedConstraint[0], formattedConstraint[1]);
-		//updateElements(formattedConstraint[0], "PieChart");
+        filterTableByConstraints(formattedConstraint[0], formattedConstraint[1]);
+        //updateElements(formattedConstraint[0], "PieChart");
+    });
+
+    $('#goAnnotationSearchButton').click(function() {
+        // Method that receives the Ontology Term and creates a constraint depending on current class view, then update with that
+
+        var writtenText = $('#goAnnotationSearchInput').val();
+
+        window.imTable.query.addConstraint({
+            "path": "goAnnotation.ontologyTerm.name",
+            "op": "==",
+            "value": writtenText
+        });
     });
 }

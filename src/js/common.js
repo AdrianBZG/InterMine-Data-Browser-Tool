@@ -194,7 +194,7 @@ function updateElements(constraints, pieChartID) {
 
                     // Filter by the selected segment in the pie chart
                     var formattedConstraint = formatChartClickedSegmentAsConstraintForFilter(selectedSegment);
-                    filterTableByOrganismShortname(formattedConstraint[0], formattedConstraint[1]);
+                    filterTableByConstraints(formattedConstraint[0], formattedConstraint[1]);
 
                 }
 
@@ -217,7 +217,7 @@ function updateElements(constraints, pieChartID) {
 }
 
 // This method receives the formatted constraints and the logic to apply to them, and queries the im-tables appropriately to update it
-function filterTableByOrganismShortname(constraint, logic) {
+function filterTableByConstraints(constraint, logic) {
     $('#dataTable').empty();
 
     var selector = '#dataTable';
@@ -251,11 +251,12 @@ function filterTableByOrganismShortname(constraint, logic) {
         }
     ).then(
         function(table) {
-            //console.log('Table loaded', table);
+            console.log('Table loaded', table);
             //this .on listener will do something when someone interacts with the table. 
             table.on("all", function(changeDetail) {
                 updateElements([table.history.currentQuery.constraints.pop()], "PieChart");
             });
+			window.imTable = table;
         },
         function(error) {
             console.error('Could not load table', error);
