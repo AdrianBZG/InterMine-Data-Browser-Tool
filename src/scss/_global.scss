@@ -106,7 +106,7 @@ body.sticky-footer {
 body.fixed-nav {
   padding-top: $navbar-base-height;
   @media screen and (max-width: 991px) {
-    padding-top: calc(#{$navbar-base-height} * 5.5);
+    padding-top: calc(#{$navbar-base-height} * 6);
   }
 }
 
@@ -169,4 +169,13 @@ body.fixed-nav {
 	background-image: -o-linear-gradient(top, #0088cc, #0044cc);
 	background-image: linear-gradient(to bottom, #0088cc, #0044cc);
 	background-repeat: repeat-x;
+}
+
+#clearFilterButton {
+	background-color: #c1c1c1;
+}
+
+#sidebarSeparator {
+	width: 100%;
+	background-color: rgba(0,0,0,.0);
 }

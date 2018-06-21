@@ -108,7 +108,7 @@ body.fixed-nav {
 
 @media screen and (max-width: 991px) {
   body.fixed-nav {
-    padding-top: calc(56px * 5.5);
+    padding-top: calc(56px * 6);
   }
 }
 
@@ -168,6 +168,15 @@ body.fixed-nav {
   background-image: -o-linear-gradient(top, #0088cc, #0044cc);
   background-image: linear-gradient(to bottom, #0088cc, #0044cc);
   background-repeat: repeat-x;
+}
+
+#clearFilterButton {
+  background-color: #c1c1c1;
+}
+
+#sidebarSeparator {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .smaller {
