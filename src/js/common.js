@@ -115,9 +115,12 @@ function updateElements(constraints, pieChartID) {
 
         var availableGoTerms = [];
 
-        for (var i = 0; i < result.length; i++) {
-            if (result[i][0] != null) {
-                availableGoTerms.push(result[i][0]);
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableGoTerms.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
             }
         }
 
@@ -126,18 +129,38 @@ function updateElements(constraints, pieChartID) {
             source: function(request, response) {
                 var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
                 response(results.slice(0, 15));
+            },
+            updater: function(item) {
+
+                //item = selected item
+                //do your stuff.
+                alert(item);
+
+                //dont forget to return the item to reflect them into input
+                return item;
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#goAnnotationSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#goAnnotationSearchInput").val(ui.item.value);
             }
         });
 
     });
-	
-	$.when(getDatasetNamesInClass()).done(function(result) {
+
+    $.when(getDatasetNamesInClass()).done(function(result) {
 
         var availableDatasetNames = [];
 
-        for (var i = 0; i < result.length; i++) {
-            if (result[i][0] != null) {
-                availableDatasetNames.push(result[i][0]);
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableDatasetNames.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
             }
         }
 
@@ -146,18 +169,29 @@ function updateElements(constraints, pieChartID) {
             source: function(request, response) {
                 var results = $.ui.autocomplete.filter(availableDatasetNames, request.term);
                 response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#datasetNameSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#datasetNameSearchInput").val(ui.item.value);
             }
         });
 
     });
-	
-	$.when(getPathwayNamesInClass()).done(function(result) {
+
+    $.when(getPathwayNamesInClass()).done(function(result) {
 
         var availablePathwayNames = [];
 
-        for (var i = 0; i < result.length; i++) {
-            if (result[i][0] != null) {
-                availablePathwayNames.push(result[i][0]);
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availablePathwayNames.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
             }
         }
 
@@ -166,6 +200,14 @@ function updateElements(constraints, pieChartID) {
             source: function(request, response) {
                 var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
                 response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#pathwayNameSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#pathwayNameSearchInput").val(ui.item.value);
             }
         });
 
@@ -320,7 +362,7 @@ function filterTableByConstraints(constraint, logic) {
             table.on("all", function(changeDetail) {
                 updateElements([table.history.currentQuery.constraints.pop()], "PieChart");
             });
-			window.imTable = table;
+            window.imTable = table;
         },
         function(error) {
             console.error('Could not load table', error);
