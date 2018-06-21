@@ -39,14 +39,17 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						#pathwayNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
 							form-group.ui-front
 								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="Some pathway name...")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters')
-				a.nav-link(href='javascript:location.reload();', style='color:black')
-					i.fa.fa-fw.fa-trash
-					span.nav-link-text
-					| Clear filters
 			.card(style="width: 100%; max-width: 250px")
 				.card-header
 					a(data-toggle="collapse" href="#organismshortnameblock" aria-controls="organismshortnameblock")
 						i.fa.fa-caret-down  Organism short name
 				#organismshortnameblock.collapse.card-block(style="overflow: auto;")
 					#organismshortnamelist.ul.list-group.list-group-flush
+			.card(style="width: 100%; max-width: 250px; border-style: ridge; border-color: #6d6e72; border-width: 3px; background-color: #ffffff; border-radius: 0px;")
+				.card-header
+					a(data-toggle="collapse" href="#" aria-controls="")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters' style="background-color: #c1c1c1;")
+				a.nav-link(href='javascript:location.reload();', style='color:black')
+					i.fa.fa-fw.fa-trash
+					span.nav-link-text
+					| Clear filters
