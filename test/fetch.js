@@ -15,8 +15,8 @@ describe('Fetch', () => {
             .get('/fetch/ontologyterms/humanmine/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-				res.body.length.should.be.at.least(1);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
 				done();
             });
       });
@@ -26,8 +26,8 @@ describe('Fetch', () => {
             .get('/fetch/ontologyterms/humanmine/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-				res.body.length.should.be.at.least(1);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
 				done();
             });
       });
@@ -37,8 +37,8 @@ describe('Fetch', () => {
             .get('/fetch/datasets/humanmine/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-				res.body.length.should.be.at.least(1);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
 				done();
             });
       });
@@ -48,8 +48,8 @@ describe('Fetch', () => {
             .get('/fetch/datasets/humanmine/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-				res.body.length.should.be.at.least(1);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
 				done();
             });
       });
@@ -59,8 +59,8 @@ describe('Fetch', () => {
             .get('/fetch/pathways/humanmine/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-				res.body.length.should.be.at.least(1);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
 				done();
             });
       });
@@ -70,8 +70,8 @@ describe('Fetch', () => {
             .get('/fetch/pathways/humanmine/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a('array');
-				res.body.length.should.be.at.least(1);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
 				done();
             });
       });
