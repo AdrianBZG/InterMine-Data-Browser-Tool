@@ -6,6 +6,12 @@ $(document).ready(function() {
             $("#httpsAlert").hide();
         });
     }
+	
+	if($(window).width() < 992) {
+		$("#pathwayNameSearchCardBlock").removeClass("show");
+		$("#datasetNameSearchCardBlock").removeClass("show");
+		$("#goAnnotationSearchCardBlock").removeClass("show");
+	}
 });
 
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)

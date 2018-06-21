@@ -18,7 +18,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						span.nav-link-text
 						| GO Annotation
 					.card(style="width: 100%;")
-						#goAnnotationSearchCardBlock.collapse.card-block(style="overflow: auto;")
+						#goAnnotationSearchCardBlock.show.collapse.card-block(style="overflow: auto;")
 							form-group.ui-front
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name')
@@ -27,7 +27,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						span.nav-link-text
 						| Dataset Name
 					.card(style="width: 100%;")
-						#datasetNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
+						#datasetNameSearchCardBlock.collapse.show.card-block(style="overflow: auto;")
 							form-group.ui-front
 								input(type="text" class="form-control" id="datasetNameSearchInput" placeholder="Some dataset name...")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
@@ -36,7 +36,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						span.nav-link-text
 						| Pathway Name
 					.card(style="width: 100%;")
-						#pathwayNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
+						#pathwayNameSearchCardBlock.collapse.show.card-block(style="overflow: auto;")
 							form-group.ui-front
 								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="Some pathway name...")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
