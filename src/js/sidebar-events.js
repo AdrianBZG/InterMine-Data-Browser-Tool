@@ -41,42 +41,4 @@ function createSidebarEvents() {
         filterTableByConstraints(formattedConstraint[0], formattedConstraint[1]);
         //updateElements(formattedConstraint[0], "PieChart");
     });
-
-    $('#goAnnotationSearchButton').click(function() {
-        var writtenText = $('#goAnnotationSearchInput').val();
-
-		if(window.currentClassView == "Gene") {
-			window.imTable.query.addConstraint({
-				"path": "goAnnotation.ontologyTerm.name",
-				"op": "==",
-				"value": writtenText
-			});
-		} else {
-			window.imTable.query.addConstraint({
-				"path": "ontologyAnnotations.ontologyTerm.name",
-				"op": "==",
-				"value": writtenText
-			});
-		}
-    });
-	
-	$('#datasetNameSearchButton').click(function() {
-        var writtenText = $('#datasetNameSearchInput').val();
-
-        window.imTable.query.addConstraint({
-            "path": "dataSets.name",
-            "op": "==",
-            "value": writtenText
-        });
-    });
-	
-	$('#pathwayNameSearchButton').click(function() {
-        var writtenText = $('#pathwayNameSearchInput').val();
-
-        window.imTable.query.addConstraint({
-            "path": "pathways.name",
-            "op": "==",
-            "value": writtenText
-        });
-    });
 }

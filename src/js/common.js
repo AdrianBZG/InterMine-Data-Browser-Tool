@@ -142,6 +142,20 @@ function updateElements(constraints, pieChartID) {
             select: function(event, ui) {
                 event.preventDefault();
                 $("#goAnnotationSearchInput").val(ui.item.value);
+
+                if (window.currentClassView == "Gene") {
+                    window.imTable.query.addConstraint({
+                        "path": "goAnnotation.ontologyTerm.name",
+                        "op": "==",
+                        "value": ui.item.value
+                    });
+                } else {
+                    window.imTable.query.addConstraint({
+                        "path": "ontologyAnnotations.ontologyTerm.name",
+                        "op": "==",
+                        "value": ui.item.value
+                    });
+                }
             },
             focus: function(event, ui) {
                 event.preventDefault();
@@ -173,6 +187,13 @@ function updateElements(constraints, pieChartID) {
             select: function(event, ui) {
                 event.preventDefault();
                 $("#datasetNameSearchInput").val(ui.item.value);
+
+                // Filter the table
+                window.imTable.query.addConstraint({
+                    "path": "dataSets.name",
+                    "op": "==",
+                    "value": ui.item.value
+                });
             },
             focus: function(event, ui) {
                 event.preventDefault();
@@ -204,6 +225,13 @@ function updateElements(constraints, pieChartID) {
             select: function(event, ui) {
                 event.preventDefault();
                 $("#pathwayNameSearchInput").val(ui.item.value);
+
+                // Filter the table
+                window.imTable.query.addConstraint({
+                    "path": "pathways.name",
+                    "op": "==",
+                    "value": ui.item.value
+                });
             },
             focus: function(event, ui) {
                 event.preventDefault();
