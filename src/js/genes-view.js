@@ -12,6 +12,7 @@ $(document).ready(function() {
     };
     var query = {
         select: ['*'],
+		//select: ['*','goAnnotation.ontologyTerm.name','pathways.name'],
         from: 'Gene'
     };
 

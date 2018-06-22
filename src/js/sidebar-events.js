@@ -37,8 +37,12 @@ function createSidebarEvents() {
         }
 
         // Filter by the selected organisms
-        var formattedConstraint = formatAsConstraintForFilter($('.checked a p').toArray());
-        filterTableByConstraints(formattedConstraint[0], formattedConstraint[1]);
+        window.imTable.query.addConstraint({
+            "path": "organism.shortName",
+            "op": "==",
+            "value": $('.checked a p').toArray()[0].innerHTML
+        });
         //updateElements(formattedConstraint[0], "PieChart");
+
     });
 }
