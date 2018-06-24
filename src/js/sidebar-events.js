@@ -45,6 +45,14 @@ function createSidebarEvents() {
         //updateElements(formattedConstraint[0], "PieChart");
 
     });
+	
+	$('#btnDatasetViewMore').click(function() {
+		if(!window.showingMoreDatasets) {
+			window.showingMoreDatasets = true;
+			showMoreDatasetNames();
+			$('#btnDatasetViewMore').remove();
+		}
+    });
 }
 
 // This method adds a dataset constraint to the im-table

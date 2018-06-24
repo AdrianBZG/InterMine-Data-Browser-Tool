@@ -174,6 +174,54 @@ function remove(arr, what) {
     }
 }
 
+function showMoreDatasetNames() {
+    $.when(getDatasetNamesInClass()).done(function(result) {
+            var availableDatasetNames = [];
+
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    availableDatasetNames.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
+			
+            var resultantElementsArray = [];
+			
+			for(var i = 0; i < result.results.length; i++) {
+				resultantElementsArray.push(result.results[i]["item"]);
+			}
+			
+			resultantElementsArray.sort();
+
+            // Remove first 5 elements (already in the sidebar)
+            resultantElementsArray = resultantElementsArray.slice(5);
+			console.log(resultantElementsArray);
+			
+			var resultantElementsNumber = resultantElementsArray.length;
+
+            for (var i = 0; i < resultantElementsNumber; i++) {
+                var datasetName = resultantElementsArray[i];
+                //var datasetCount = "(" + result.results[i]["count"] + ")";
+                $("#datasetsSelector").append(
+                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/ /g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+                console.log(datasetName.replace(/ /g, ''));
+                $('#' + datasetName.replace(/ /g, '')).change(function() {
+                    if ($(this).is(":checked")) {
+                        var checkboxValue = $(this).val();
+                        window.imTableConstraint[1].push(checkboxValue);
+                        updateTableWithConstraints();
+                    } else {
+                        var checkboxValue = $(this).val();
+                        remove(window.imTableConstraint[1], checkboxValue);
+                        updateTableWithConstraints();
+                    }
+                });
+            }
+    });
+}
+
 // This methods updates the piechart and sidebar elements according to the received constraints
 function updateElements(constraints, pieChartID) {
     $.when(getOntologyTermsInClass()).done(function(result) {
@@ -234,7 +282,6 @@ function updateElements(constraints, pieChartID) {
 
             // First remove the form-check elements
             $('#datasetsSelector').empty();
-
 			
 			var resultantElementsNumber = result.results.length;
             var resultantElementsArray = [];

@@ -11,8 +11,8 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 			option(value="HumanMine") HumanMine
 	
 	#navbarResponsive.navbar-collapse
-		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation')
+		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation' style="overflow: auto;")
 					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-search
 						span.nav-link-text
@@ -21,16 +21,17 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						#goAnnotationSearchCardBlock.show.collapse.card-block(style="overflow: auto;")
 							form-group.ui-front
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name')
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name' style="overflow: auto;")
 					a.nav-link(data-toggle="collapse", href="#datasetNameSearchCardBlock", aria-controls="datasetNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-database
 						span.nav-link-text
 						| Dataset Name
 					.card(style="width: 100%;")
-						#datasetNameSearchCardBlock.collapse.show.card-block(style="overflow: auto;")
+						#datasetNameSearchCardBlock.collapse.show.card-block
 							form-group.ui-front
 								#datasetsSelector
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
+							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name' style="overflow: auto;")
 					a.nav-link(data-toggle="collapse", href="#pathwayNameSearchCardBlock", aria-controls="pathwayNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-code-fork
 						span.nav-link-text
