@@ -12,6 +12,12 @@ $(document).ready(function() {
         $("#datasetNameSearchCardBlock").removeClass("show");
         $("#goAnnotationSearchCardBlock").removeClass("show");
     }
+
+    window.imTableConstraint = [
+        [],
+        [],
+        []
+    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name
 });
 
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
@@ -115,6 +121,59 @@ function flatten(arr) {
 
 var myPieChart;
 
+function updateTableWithConstraints() {
+
+    while (window.imTable.query.constraints.length > 0) {
+        window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
+    }
+
+    // GO Annotation
+    if (window.imTableConstraint[0].length > 0) {
+        window.imTable.query.addConstraint({
+            "path": "pathways.name",
+            "op": "ONE OF",
+            "values": window.imTableConstraint[0]
+        });
+    }
+
+    // Dataset Name
+    if (window.imTableConstraint[1].length > 0) {
+        window.imTable.query.addConstraint({
+            "path": "dataSets.name",
+            "op": "ONE OF",
+            "values": window.imTableConstraint[1]
+        });
+    }
+
+    // Pathway Name
+    if (window.imTableConstraint[2].length > 0) {
+        if (window.currentClassView == "Gene") {
+            window.imTable.query.addConstraint({
+                "path": "goAnnotation.ontologyTerm.name",
+                "op": "ONE OF",
+                "values": window.imTableConstraint[2]
+            });
+        } else {
+            window.imTable.query.addConstraint({
+                "path": "ontologyAnnotations.ontologyTerm.name",
+                "op": "ONE OF",
+                "values": window.imTableConstraint[2]
+            });
+        }
+
+    }
+}
+
+// Auxiliary function to remove an element from an array
+function remove(arr, what) {
+    var found = arr.indexOf(what);
+
+    while (found !== -1) {
+        arr.splice(found, 1);
+        found = arr.indexOf(what);
+    }
+}
+
 // This methods updates the piechart and sidebar elements according to the received constraints
 function updateElements(constraints, pieChartID) {
     $.when(getOntologyTermsInClass()).done(function(result) {
@@ -149,19 +208,8 @@ function updateElements(constraints, pieChartID) {
                 event.preventDefault();
                 $("#goAnnotationSearchInput").val(ui.item.value);
 
-                if (window.currentClassView == "Gene") {
-                    window.imTable.query.addConstraint({
-                        "path": "goAnnotation.ontologyTerm.name",
-                        "op": "==",
-                        "value": ui.item.value
-                    });
-                } else {
-                    window.imTable.query.addConstraint({
-                        "path": "ontologyAnnotations.ontologyTerm.name",
-                        "op": "==",
-                        "value": ui.item.value
-                    });
-                }
+                window.imTableConstraint[0].push(ui.item.value);
+                updateTableWithConstraints();
             },
             focus: function(event, ui) {
                 event.preventDefault();
@@ -172,40 +220,58 @@ function updateElements(constraints, pieChartID) {
     });
 
     $.when(getDatasetNamesInClass()).done(function(result) {
+        if (!window.datasetNamesLoaded) {
+            var availableDatasetNames = [];
 
-        var availableDatasetNames = [];
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    availableDatasetNames.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
 
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availableDatasetNames.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
+            // First remove the form-check elements
+            $('#datasetsSelector').empty();
+
+			
+			var resultantElementsNumber = result.results.length;
+            var resultantElementsArray = [];
+			
+			for(var i = 0; i < result.results.length; i++) {
+				resultantElementsArray.push(result.results[i]["item"]);
+			}
+			
+			resultantElementsArray.sort();
+
+            // At most, 5 elements, which are ordered (top 5)
+            if (resultantElementsNumber > 5) {
+                resultantElementsNumber = 5;
+            }
+
+            // Fill the organism short name dropdown with top 5 organisms according to count
+            for (var i = 0; i < resultantElementsNumber; i++) {
+                var datasetName = resultantElementsArray[i];
+                //var datasetCount = "(" + result.results[i]["count"] + ")";
+                $("#datasetsSelector").append(
+                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/ /g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+                console.log(datasetName.replace(/ /g, ''));
+                $('#' + datasetName.replace(/ /g, '')).change(function() {
+                    if ($(this).is(":checked")) {
+                        var checkboxValue = $(this).val();
+                        window.imTableConstraint[1].push(checkboxValue);
+                        updateTableWithConstraints();
+                    } else {
+                        var checkboxValue = $(this).val();
+                        remove(window.imTableConstraint[1], checkboxValue);
+                        updateTableWithConstraints();
+                    }
                 });
             }
+
+            window.datasetNamesLoaded = true;
         }
-
-        $("#datasetNameSearchInput").autocomplete({
-            minLength: 2,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availableDatasetNames, request.term);
-                response(results.slice(0, 15));
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#datasetNameSearchInput").val(ui.item.value);
-
-                // Filter the table
-                window.imTable.query.addConstraint({
-                    "path": "dataSets.name",
-                    "op": "==",
-                    "value": ui.item.value
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#datasetNameSearchInput").val(ui.item.value);
-            }
-        });
 
     });
 
@@ -233,11 +299,8 @@ function updateElements(constraints, pieChartID) {
                 $("#pathwayNameSearchInput").val(ui.item.value);
 
                 // Filter the table
-                window.imTable.query.addConstraint({
-                    "path": "pathways.name",
-                    "op": "==",
-                    "value": ui.item.value
-                });
+                window.imTableConstraint[2].push(ui.item.value);
+                updateTableWithConstraints();
             },
             focus: function(event, ui) {
                 event.preventDefault();

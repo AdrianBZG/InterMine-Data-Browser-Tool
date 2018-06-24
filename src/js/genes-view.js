@@ -12,7 +12,7 @@ $(document).ready(function() {
     };
     var query = {
         select: ['*'],
-		//select: ['*','goAnnotation.ontologyTerm.name','pathways.name'],
+        //select: ['*','goAnnotation.ontologyTerm.name','pathways.name'],
         from: 'Gene'
     };
 
@@ -39,8 +39,8 @@ $(document).ready(function() {
             table.on("all", function(changeDetail) {
                 updateElements(table.history.currentQuery.constraints, "PieChart");
             });
-			
-			window.imTable = table;
+
+            window.imTable = table;
         },
         function(error) {
             console.error('Could not load table', error);

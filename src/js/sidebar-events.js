@@ -46,3 +46,25 @@ function createSidebarEvents() {
 
     });
 }
+
+// This method adds a dataset constraint to the im-table
+function addDatasetConstraint(datasetName) {
+    // Filter by the selected dataset name
+    window.imTable.query.addConstraint({
+        "path": "dataSets.name",
+        "op": "==",
+        "value": datasetName,
+        "code": datasetName.replace(/ /g, '')
+    });
+    console.log(window.imTable);
+}
+
+// This method removes a dataset constraint from the im-table
+function removeDatasetConstraint(datasetName) {
+    // Filter by the selected dataset name
+    window.imTable.query.removeConstraint({
+        "path": "dataSets.name",
+        "op": "==",
+        "value": datasetName
+    });
+}
