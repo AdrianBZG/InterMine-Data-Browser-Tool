@@ -261,7 +261,7 @@ function updateElements(constraints, pieChartID) {
 				var buttonId = ui.item.value.replace(/ /g, '') + "button";
 				
 				$("#goAnnotationFilterList").append(
-					'<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+					'<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0,22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
 				
 				$("#" + buttonId).click(function() {
 					remove(window.imTableConstraint[0], ui.item.value);
@@ -354,10 +354,21 @@ function updateElements(constraints, pieChartID) {
             select: function(event, ui) {
                 event.preventDefault();
                 $("#pathwayNameSearchInput").val(ui.item.value);
-
-                // Filter the table
+				
+				// Filter the table
                 window.imTableConstraint[2].push(ui.item.value);
                 updateTableWithConstraints();
+				
+				var buttonId = ui.item.value.replace(/ /g, '') + "button";
+				
+				$("#pathwayFilterList").append(
+					'<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0,22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+				
+				$("#" + buttonId).click(function() {
+					remove(window.imTableConstraint[2], ui.item.value);
+                    updateTableWithConstraints();
+					$("#" + ui.item.value.replace(/ /g, '')).remove();					
+				});
             },
             focus: function(event, ui) {
                 event.preventDefault();
