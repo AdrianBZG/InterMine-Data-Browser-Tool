@@ -129,11 +129,19 @@ function updateTableWithConstraints() {
 
     // GO Annotation
     if (window.imTableConstraint[0].length > 0) {
-        window.imTable.query.addConstraint({
-            "path": "pathways.name",
-            "op": "ONE OF",
-            "values": window.imTableConstraint[0]
-        });
+		if (window.currentClassView == "Gene") {
+            window.imTable.query.addConstraint({
+                "path": "goAnnotation.ontologyTerm.name",
+                "op": "ONE OF",
+                "values": window.imTableConstraint[0]
+            });
+        } else {
+            window.imTable.query.addConstraint({
+                "path": "ontologyAnnotations.ontologyTerm.name",
+                "op": "ONE OF",
+                "values": window.imTableConstraint[0]
+            });
+        }
     }
 
     // Dataset Name
@@ -147,20 +155,11 @@ function updateTableWithConstraints() {
 
     // Pathway Name
     if (window.imTableConstraint[2].length > 0) {
-        if (window.currentClassView == "Gene") {
-            window.imTable.query.addConstraint({
-                "path": "goAnnotation.ontologyTerm.name",
-                "op": "ONE OF",
-                "values": window.imTableConstraint[2]
-            });
-        } else {
-            window.imTable.query.addConstraint({
-                "path": "ontologyAnnotations.ontologyTerm.name",
-                "op": "ONE OF",
-                "values": window.imTableConstraint[2]
-            });
-        }
-
+        window.imTable.query.addConstraint({
+            "path": "pathways.name",
+            "op": "ONE OF",
+            "values": window.imTableConstraint[2]
+        });
     }
 }
 
@@ -258,7 +257,18 @@ function updateElements(constraints, pieChartID) {
 
                 window.imTableConstraint[0].push(ui.item.value);
                 updateTableWithConstraints();
-            },
+				
+				var buttonId = ui.item.value.replace(/ /g, '') + "button";
+				
+				$("#goAnnotationFilterList").append(
+					'<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+				
+				$("#" + buttonId).click(function() {
+					remove(window.imTableConstraint[0], ui.item.value);
+                    updateTableWithConstraints();
+					$("#" + ui.item.value.replace(/ /g, '')).remove();					
+				});
+			},
             focus: function(event, ui) {
                 event.preventDefault();
                 $("#goAnnotationSearchInput").val(ui.item.value);

@@ -12,13 +12,14 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	
 	#navbarResponsive.navbar-collapse
 		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation' style="overflow: auto;")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation')
 					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-search
 						span.nav-link-text
 						| GO Annotation
 					.card(style="width: 100%;")
 						#goAnnotationSearchCardBlock.show.collapse.card-block(style="overflow: auto;")
+							#goAnnotationFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name' style="overflow: auto;")
@@ -31,7 +32,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							form-group.ui-front
 								#datasetsSelector
 							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name' style="overflow: auto;")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
 					a.nav-link(data-toggle="collapse", href="#pathwayNameSearchCardBlock", aria-controls="pathwayNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-code-fork
 						span.nav-link-text
