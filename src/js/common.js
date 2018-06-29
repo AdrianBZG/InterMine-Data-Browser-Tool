@@ -204,9 +204,9 @@ function showMoreDatasetNames() {
                 var datasetName = resultantElementsArray[i];
                 //var datasetCount = "(" + result.results[i]["count"] + ")";
                 $("#datasetsSelector").append(
-                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/ /g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-                console.log(datasetName.replace(/ /g, ''));
-                $('#' + datasetName.replace(/ /g, '')).change(function() {
+                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+
+                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                     if ($(this).is(":checked")) {
                         var checkboxValue = $(this).val();
                         window.imTableConstraint[1].push(checkboxValue);
@@ -312,9 +312,9 @@ function updateElements(constraints, pieChartID) {
                 var datasetName = resultantElementsArray[i];
                 //var datasetCount = "(" + result.results[i]["count"] + ")";
                 $("#datasetsSelector").append(
-                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/ /g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-                console.log(datasetName.replace(/ /g, ''));
-                $('#' + datasetName.replace(/ /g, '')).change(function() {
+                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+	
+                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                     if ($(this).is(":checked")) {
                         var checkboxValue = $(this).val();
                         window.imTableConstraint[1].push(checkboxValue);
