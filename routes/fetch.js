@@ -120,4 +120,32 @@ router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
     }
 });
 
+/* GET Protein Domain Name from HumanMine. */
+router.get('/proteindomainname/humanmine', function(req, res, next) {
+    var service = new imjs.Service({
+        root: 'http://www.humanmine.org/humanmine/service'
+    });
+
+
+    var query = {
+        "from": "Gene",
+        "select": ["proteins.proteinDomainRegions.proteinDomain.name", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "proteins.proteinDomainRegions.proteinDomain.name",
+            "direction": "ASC"
+        }]
+    };
+
+    var protdomname = new imjs.Query(query, service),
+        protdomnamePath = [query.from, query.select[0]].join('.');
+    protdomname.summarize(protdomnamePath).then(function(protdomnameSummary) {
+        res.json(protdomnameSummary);
+    });
+
+
+});
+
 module.exports = router;
