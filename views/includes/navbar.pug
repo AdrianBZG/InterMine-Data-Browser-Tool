@@ -42,6 +42,20 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#pathwayFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="Some pathway name...")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Location')
+					a.nav-link(data-toggle="collapse", href="#locationSearchCardBlock", aria-controls="locationSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-location-arrow
+						span.nav-link-text
+						| Location
+					.card(style="width: 100%;")
+						#locationSearchCardBlock.collapse.show.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							#locationFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;")
+									input(type="text" class="form-control" id="locationEndSearchInput" placeholder="End" style="width: 45%;")
+								button.btn.btn-success(type="button" style='width:100%' id="locationSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="locationSearchButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-bug
@@ -52,7 +66,6 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#organismshortnamelist.ul.list-group.list-group-flush
 			#sidebarSeparator.card
 				.card-header
-					a(data-toggle="collapse" href="#" aria-controls="")
 			#clearFilterButton.li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters')
 				a.nav-link(href='javascript:location.reload();', style='color:black')
 					i.fa.fa-fw.fa-trash
