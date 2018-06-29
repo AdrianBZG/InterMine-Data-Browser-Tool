@@ -18,6 +18,8 @@ $(document).ready(function() {
         [],
         []
     ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name
+
+    window.locationFilter = null;
 });
 
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
@@ -129,7 +131,7 @@ function updateTableWithConstraints() {
 
     // GO Annotation
     if (window.imTableConstraint[0].length > 0) {
-		if (window.currentClassView == "Gene") {
+        if (window.currentClassView == "Gene") {
             window.imTable.query.addConstraint({
                 "path": "goAnnotation.ontologyTerm.name",
                 "op": "ONE OF",
@@ -175,49 +177,49 @@ function remove(arr, what) {
 
 function showMoreDatasetNames() {
     $.when(getDatasetNamesInClass()).done(function(result) {
-            var availableDatasetNames = [];
+        var availableDatasetNames = [];
 
-            for (var i = 0; i < result.results.length; i++) {
-                if (result.results[i]["item"] != null) {
-                    availableDatasetNames.push({
-                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                        value: result.results[i]["item"]
-                    });
-                }
-            }
-			
-            var resultantElementsArray = [];
-			
-			for(var i = 0; i < result.results.length; i++) {
-				resultantElementsArray.push(result.results[i]["item"]);
-			}
-			
-			resultantElementsArray.sort();
-
-            // Remove first 5 elements (already in the sidebar)
-            resultantElementsArray = resultantElementsArray.slice(5);
-			console.log(resultantElementsArray);
-			
-			var resultantElementsNumber = resultantElementsArray.length;
-
-            for (var i = 0; i < resultantElementsNumber; i++) {
-                var datasetName = resultantElementsArray[i];
-                //var datasetCount = "(" + result.results[i]["count"] + ")";
-                $("#datasetsSelector").append(
-                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-
-                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
-                    if ($(this).is(":checked")) {
-                        var checkboxValue = $(this).val();
-                        window.imTableConstraint[1].push(checkboxValue);
-                        updateTableWithConstraints();
-                    } else {
-                        var checkboxValue = $(this).val();
-                        remove(window.imTableConstraint[1], checkboxValue);
-                        updateTableWithConstraints();
-                    }
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableDatasetNames.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
                 });
             }
+        }
+
+        var resultantElementsArray = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            resultantElementsArray.push(result.results[i]["item"]);
+        }
+
+        resultantElementsArray.sort();
+
+        // Remove first 5 elements (already in the sidebar)
+        resultantElementsArray = resultantElementsArray.slice(5);
+        console.log(resultantElementsArray);
+
+        var resultantElementsNumber = resultantElementsArray.length;
+
+        for (var i = 0; i < resultantElementsNumber; i++) {
+            var datasetName = resultantElementsArray[i];
+            //var datasetCount = "(" + result.results[i]["count"] + ")";
+            $("#datasetsSelector").append(
+                '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+
+            $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
+                if ($(this).is(":checked")) {
+                    var checkboxValue = $(this).val();
+                    window.imTableConstraint[1].push(checkboxValue);
+                    updateTableWithConstraints();
+                } else {
+                    var checkboxValue = $(this).val();
+                    remove(window.imTableConstraint[1], checkboxValue);
+                    updateTableWithConstraints();
+                }
+            });
+        }
     });
 }
 
@@ -257,18 +259,18 @@ function updateElements(constraints, pieChartID) {
 
                 window.imTableConstraint[0].push(ui.item.value);
                 updateTableWithConstraints();
-				
-				var buttonId = ui.item.value.replace(/ /g, '') + "button";
-				
-				$("#goAnnotationFilterList").append(
-					'<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0,22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-				
-				$("#" + buttonId).click(function() {
-					remove(window.imTableConstraint[0], ui.item.value);
+
+                var buttonId = ui.item.value.replace(/ /g, '') + "button";
+
+                $("#goAnnotationFilterList").append(
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+
+                $("#" + buttonId).click(function() {
+                    remove(window.imTableConstraint[0], ui.item.value);
                     updateTableWithConstraints();
-					$("#" + ui.item.value.replace(/ /g, '')).remove();					
-				});
-			},
+                    $("#" + ui.item.value.replace(/ /g, '')).remove();
+                });
+            },
             focus: function(event, ui) {
                 event.preventDefault();
                 $("#goAnnotationSearchInput").val(ui.item.value);
@@ -292,15 +294,15 @@ function updateElements(constraints, pieChartID) {
 
             // First remove the form-check elements
             $('#datasetsSelector').empty();
-			
-			var resultantElementsNumber = result.results.length;
+
+            var resultantElementsNumber = result.results.length;
             var resultantElementsArray = [];
-			
-			for(var i = 0; i < result.results.length; i++) {
-				resultantElementsArray.push(result.results[i]["item"]);
-			}
-			
-			resultantElementsArray.sort();
+
+            for (var i = 0; i < result.results.length; i++) {
+                resultantElementsArray.push(result.results[i]["item"]);
+            }
+
+            resultantElementsArray.sort();
 
             // At most, 5 elements, which are ordered (top 5)
             if (resultantElementsNumber > 5) {
@@ -313,7 +315,7 @@ function updateElements(constraints, pieChartID) {
                 //var datasetCount = "(" + result.results[i]["count"] + ")";
                 $("#datasetsSelector").append(
                     '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-	
+
                 $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                     if ($(this).is(":checked")) {
                         var checkboxValue = $(this).val();
@@ -354,21 +356,21 @@ function updateElements(constraints, pieChartID) {
             select: function(event, ui) {
                 event.preventDefault();
                 $("#pathwayNameSearchInput").val(ui.item.value);
-				
-				// Filter the table
+
+                // Filter the table
                 window.imTableConstraint[2].push(ui.item.value);
                 updateTableWithConstraints();
-				
-				var buttonId = ui.item.value.replace(/ /g, '') + "button";
-				
-				$("#pathwayFilterList").append(
-					'<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0,22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-				
-				$("#" + buttonId).click(function() {
-					remove(window.imTableConstraint[2], ui.item.value);
+
+                var buttonId = ui.item.value.replace(/ /g, '') + "button";
+
+                $("#pathwayFilterList").append(
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+
+                $("#" + buttonId).click(function() {
+                    remove(window.imTableConstraint[2], ui.item.value);
                     updateTableWithConstraints();
-					$("#" + ui.item.value.replace(/ /g, '')).remove();					
-				});
+                    $("#" + ui.item.value.replace(/ /g, '')).remove();
+                });
             },
             focus: function(event, ui) {
                 event.preventDefault();

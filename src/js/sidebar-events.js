@@ -45,14 +45,80 @@ function createSidebarEvents() {
         //updateElements(formattedConstraint[0], "PieChart");
 
     });
-	
-	$('#btnDatasetViewMore').click(function() {
-		if(!window.showingMoreDatasets) {
-			window.showingMoreDatasets = true;
-			showMoreDatasetNames();
-			$('#btnDatasetViewMore').remove();
-		}
+
+    $('#btnDatasetViewMore').click(function() {
+        if (!window.showingMoreDatasets) {
+            window.showingMoreDatasets = true;
+            showMoreDatasetNames();
+            $('#btnDatasetViewMore').remove();
+        }
     });
+
+    $('#locationSearchButton').click(function() {
+        if (window.locationFilter) clearLocationConstraint();
+
+        var startLocationInput = $('#locationStartSearchInput').val();
+        var endLocationInput = $('#locationEndSearchInput').val();
+
+        if (!$.isNumeric(startLocationInput) || !$.isNumeric(endLocationInput)) {
+            if ($("#locationFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, write a integer number in both the 'Start' and 'End' input fields.</div><br/>");
+
+                $("#closeLocationFilterAlert").click(function() {
+                    $("#locationFilterAlert").hide();
+                });
+            } else {
+                $("#locationFilterAlert").show();
+            }
+
+            return;
+
+        }
+
+        if (parseInt(startLocationInput) > parseInt(endLocationInput)) {
+            if ($("#locationFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>The location start position must be less or equal to the end position.</div><br/>");
+
+                $("#closeLocationFilterAlert").click(function() {
+                    $("#locationFilterAlert").hide();
+                });
+            } else {
+                $("#locationFilterAlert").show();
+            }
+
+            return;
+        }
+
+        window.imTable.query.addConstraint({
+            "path": "locations.start",
+            "op": "==",
+            "value": startLocationInput
+        });
+
+        var imTableLocationStartConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
+
+        window.imTable.query.addConstraint({
+            "path": "locations.end",
+            "op": "==",
+            "value": endLocationInput
+        });
+
+        var imTableLocationEndConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
+
+        window.locationFilter = [imTableLocationStartConstraint, imTableLocationEndConstraint];
+    });
+
+    $('#locationResetButton').click(function() {
+        if (window.locationFilter) clearLocationConstraint();
+        $("#locationStartSearchInput").val('');
+        $("#locationEndSearchInput").val('');
+    });
+}
+
+function clearLocationConstraint() {
+    window.imTable.query.removeConstraint(window.locationFilter[0]);
+    window.imTable.query.removeConstraint(window.locationFilter[1]);
+    window.locationFilter = null;
 }
 
 // This method adds a dataset constraint to the im-table
@@ -65,14 +131,4 @@ function addDatasetConstraint(datasetName) {
         "code": datasetName.replace(/ /g, '')
     });
     console.log(window.imTable);
-}
-
-// This method removes a dataset constraint from the im-table
-function removeDatasetConstraint(datasetName) {
-    // Filter by the selected dataset name
-    window.imTable.query.removeConstraint({
-        "path": "dataSets.name",
-        "op": "==",
-        "value": datasetName
-    });
 }
