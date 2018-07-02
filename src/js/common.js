@@ -292,15 +292,15 @@ function updateElements(constraints, pieChartID) {
                 window.imTableConstraint[0].push(ui.item.value);
                 updateTableWithConstraints();
 
-                var buttonId = ui.item.value.replace(/ /g, '') + "button";
+                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                 $("#goAnnotationFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
 
                 $("#" + buttonId).click(function() {
                     remove(window.imTableConstraint[0], ui.item.value);
                     updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/ /g, '')).remove();
+                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                 });
             },
             focus: function(event, ui) {
@@ -439,15 +439,15 @@ function updateElements(constraints, pieChartID) {
                 window.imTableConstraint[3].push(ui.item.value);
                 updateTableWithConstraints();
 
-                var buttonId = ui.item.value.replace(/ /g, '') + "button";
+                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                 $("#proteinDomainNameFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
 
                 $("#" + buttonId).click(function() {
                     remove(window.imTableConstraint[3], ui.item.value);
                     updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/ /g, '')).remove();
+                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                 });
             },
             focus: function(event, ui) {
