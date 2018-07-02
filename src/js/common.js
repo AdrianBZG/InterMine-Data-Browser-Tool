@@ -334,9 +334,9 @@ function updateElements(constraints, pieChartID) {
 
             resultantElementsArray.sort();
 
-            // At most, 5 elements, which are ordered (top 5)
-            if (resultantElementsNumber > 5) {
-                resultantElementsNumber = 5;
+            // At most, 5 elements, which are ordered (top 3)
+            if (resultantElementsNumber > 3) {
+                resultantElementsNumber = 3;
             }
 
             // Fill the organism short name dropdown with top 5 organisms according to count
