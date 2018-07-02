@@ -16,8 +16,9 @@ $(document).ready(function() {
     window.imTableConstraint = [
         [],
         [],
-        []
-    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name
+        [],
+		[]
+    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name
 
     window.locationFilter = null;
 });
@@ -100,6 +101,18 @@ function getPathwayNamesInClass() {
     })
 }
 
+// Method to get the different protein domain names inside a class in order to feed the typeahead
+function getProteinDomainNamesInClass() {
+    return $.ajax({
+        url: '/fetch/proteindomainname/humanmine',
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
 // Method to get the different items inside a class (count per organism) in order to feed the sidebar
 function getItemsInClass(constraints) {
     return $.ajax({
@@ -162,6 +175,23 @@ function updateTableWithConstraints() {
             "op": "ONE OF",
             "values": window.imTableConstraint[2]
         });
+    }
+	
+	// Protein Domain Name
+    if (window.imTableConstraint[3].length > 0) {
+		if (window.currentClassView == "Gene") {
+            window.imTable.query.addConstraint({
+				"path": "proteins.proteinDomainRegions.proteinDomain.name",
+				"op": "ONE OF",
+				"values": window.imTableConstraint[3]
+			});
+        } else {
+            window.imTable.query.addConstraint({
+				"path": "proteinDomainRegions.proteinDomain.name",
+				"op": "ONE OF",
+				"values": window.imTableConstraint[3]
+			});
+        }
     }
 }
 
@@ -361,20 +391,66 @@ function updateElements(constraints, pieChartID) {
                 window.imTableConstraint[2].push(ui.item.value);
                 updateTableWithConstraints();
 
-                var buttonId = ui.item.value.replace(/ /g, '') + "button";
+                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                 $("#pathwayFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
 
                 $("#" + buttonId).click(function() {
                     remove(window.imTableConstraint[2], ui.item.value);
+                    updateTableWithConstraints();
+                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                });
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#pathwayNameSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+	
+	 $.when(getProteinDomainNamesInClass()).done(function(result) {
+
+        var availableProteinDomainNames = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableProteinDomainNames.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#proteinDomainNameSearchInput").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableProteinDomainNames, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#proteinDomainNameSearchInput").val(ui.item.value);
+
+                // Filter the table
+                window.imTableConstraint[3].push(ui.item.value);
+                updateTableWithConstraints();
+
+                var buttonId = ui.item.value.replace(/ /g, '') + "button";
+
+                $("#proteinDomainNameFilterList").append(
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/ /g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+
+                $("#" + buttonId).click(function() {
+                    remove(window.imTableConstraint[3], ui.item.value);
                     updateTableWithConstraints();
                     $("#" + ui.item.value.replace(/ /g, '')).remove();
                 });
             },
             focus: function(event, ui) {
                 event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
+                $("#proteinDomainNameSearchInput").val(ui.item.value);
             }
         });
 
