@@ -11,6 +11,8 @@ $(document).ready(function() {
         $("#pathwayNameSearchCardBlock").removeClass("show");
         $("#datasetNameSearchCardBlock").removeClass("show");
         $("#goAnnotationSearchCardBlock").removeClass("show");
+		$("#locationSearchCardBlock").removeClass("show");
+		$("#proteinDomainNameSearchCardBlock").removeClass("show");
     }
 
     window.imTableConstraint = [
