@@ -75,6 +75,17 @@ describe('Fetch', () => {
 				done();
             });
       });
+	  
+	  it('it should GET the listing of protein domain names inside HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/proteindomainname/humanmine')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
+				done();
+            });
+      });
   });
 
 });
