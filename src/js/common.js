@@ -23,6 +23,7 @@ $(document).ready(function() {
     ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name
 
     window.locationFilter = null;
+	window.interactionsFilter = null;
 });
 
 // This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)

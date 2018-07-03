@@ -102,13 +102,15 @@ function createSidebarEvents() {
             return;
         }
 
+		window.locationFilter = [];
+		
         window.imTable.query.addConstraint({
             "path": "locations.start",
             "op": "==",
             "value": startLocationInput
         });
 
-        var imTableLocationStartConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
+        window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
 
         window.imTable.query.addConstraint({
             "path": "locations.end",
@@ -116,7 +118,7 @@ function createSidebarEvents() {
             "value": endLocationInput
         });
 
-        var imTableLocationEndConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
+        window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
 		
 		window.imTable.query.addConstraint({
             "path": "locations.locatedOn.primaryIdentifier",
@@ -124,9 +126,7 @@ function createSidebarEvents() {
             "value": chromosomeInput
         });
 
-        var imTableLocationChromosomeConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
-
-        window.locationFilter = [imTableLocationStartConstraint, imTableLocationEndConstraint, imTableLocationChromosomeConstraint];
+        window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
     });
 
     $('#locationResetButton').click(function() {
@@ -135,13 +135,65 @@ function createSidebarEvents() {
         $("#locationEndSearchInput").val('');
 		$("#locationChromosomeSearchInput").val('');
     });
+	
+	$('#interactionsSearchButton').click(function() {
+        if (window.interactionsFilter) clearInteractionsConstraint();
+
+		var participant2Input = $('#interactionsParticipant2SearchInput').val();
+        var interactionsTypeSel = $('#interactionsTypeSelector').val();
+        var interactionsDatasetSel = $('#interactionsDatasetSelector').val();
+
+		window.interactionsFilter = [];
+		
+		if(participant2Input) {
+			window.imTable.query.addConstraint({
+				"path": "interactions.participant2.name",
+				"op": "==",
+				"value": participant2Input
+			});
+
+			window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		}
+
+		if(interactionsTypeSel != "All") {
+			window.imTable.query.addConstraint({
+				"path": "interactions.details.type",
+				"op": "==",
+				"value": interactionsTypeSel
+			});
+
+			window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		}
+		
+		if(interactionsDatasetSel != "All") {
+			window.imTable.query.addConstraint({
+				"path": "dataSets.name",
+				"op": "==",
+				"value": interactionsDatasetSel
+			});
+
+			window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		}
+    });
+
+    $('#interactionsResetButton').click(function() {
+        if (window.interactionsFilter) clearInteractionsConstraint();
+        $("#interactionsParticipant2SearchInput").val('');
+    });
 }
 
 function clearLocationConstraint() {
-    window.imTable.query.removeConstraint(window.locationFilter[0]);
-    window.imTable.query.removeConstraint(window.locationFilter[1]);
-	window.imTable.query.removeConstraint(window.locationFilter[2]);
+	for(var i = 0; i < window.locationFilter.length; i++) {
+		window.imTable.query.removeConstraint(window.locationFilter[i]);
+	}
     window.locationFilter = null;
+}
+
+function clearInteractionsConstraint() {
+	for(var i = 0; i < window.interactionsFilter.length; i++) {
+		window.imTable.query.removeConstraint(window.interactionsFilter[i]);
+	}
+    window.interactionsFilter = null;
 }
 
 // This method adds a dataset constraint to the im-table

@@ -81,13 +81,13 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 									input(type="text" class="form-control" id="interactionsParticipant2SearchInput" placeholder="Participant 2 (name)" style="width: 100%; float:left; margin-left: 15px;")
 								div.row(style="align: center;")
 									select#interactionsTypeSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
-										option All (Type)
-										option Physical
-										option Genetic
+										option(value="All") All (Type)
+										option(value="physical") Physical
+										option(value="genetic") Genetic
 									select#interactionsDatasetSelector.form-control(style="width: 45%;")
-										option All (Set)
-										option BioGrid
-										option intAct
+										option(value="All") All (Set)
+										option(value="BioGRID interaction data set") BioGRID
+										option(value="IntAct interactions data set") IntAct
 								button.btn.btn-success(type="button" style='width:100%' id="interactionsSearchButton") Go!
 								button.btn.btn-danger(type="button" style='width:100%' id="interactionsResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
