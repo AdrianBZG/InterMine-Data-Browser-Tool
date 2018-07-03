@@ -213,7 +213,7 @@ function showMoreDatasetNames() {
 
         for (var i = 0; i < result.results.length; i++) {
             if (result.results[i]["item"] != null) {
-				if(result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers") {
+				if(result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
 					continue;
 				}
                 availableDatasetNames.push({
@@ -320,6 +320,9 @@ function updateElements(constraints, pieChartID) {
 
             for (var i = 0; i < result.results.length; i++) {
                 if (result.results[i]["item"] != null) {
+					if(result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
+						continue;
+					}
                     availableDatasetNames.push({
                         label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
                         value: result.results[i]["item"]
@@ -333,8 +336,8 @@ function updateElements(constraints, pieChartID) {
             var resultantElementsNumber = result.results.length;
             var resultantElementsArray = [];
 
-            for (var i = 0; i < result.results.length; i++) {
-                resultantElementsArray.push(result.results[i]["item"]);
+            for (var i = 0; i < availableDatasetNames.length; i++) {
+                resultantElementsArray.push(availableDatasetNames[i]["value"]);
             }
 
             resultantElementsArray.sort();
