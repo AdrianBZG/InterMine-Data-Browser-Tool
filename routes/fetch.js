@@ -148,4 +148,32 @@ router.get('/proteindomainname/humanmine', function(req, res, next) {
 
 });
 
+/* GET Interaction Participant 2 Gene Names from HumanMine. */
+router.get('/participant2genenames/humanmine', function(req, res, next) {
+    var service = new imjs.Service({
+        root: 'http://www.humanmine.org/humanmine/service'
+    });
+
+
+    var query = {
+        "from": "Gene",
+        "select": ["interactions.participant2.name", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "interactions.participant2.name",
+            "direction": "ASC"
+        }]
+    };
+
+    var part2genename = new imjs.Query(query, service),
+        part2genenamePath = [query.from, query.select[0]].join('.');
+    part2genename.summarize(part2genenamePath).then(function(part2genenameSummary) {
+        res.json(part2genenameSummary);
+    });
+
+
+});
+
 module.exports = router;
