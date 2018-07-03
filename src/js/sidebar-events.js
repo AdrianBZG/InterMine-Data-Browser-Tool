@@ -167,7 +167,7 @@ function createSidebarEvents() {
 		
 		if(interactionsDatasetSel != "All") {
 			window.imTable.query.addConstraint({
-				"path": "dataSets.name",
+				"path": "interactions.details.dataSets.name",
 				"op": "==",
 				"value": interactionsDatasetSel
 			});
