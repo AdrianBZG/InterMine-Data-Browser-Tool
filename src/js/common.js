@@ -116,6 +116,18 @@ function getProteinDomainNamesInClass() {
     })
 }
 
+// Method to get the different Participant 2 gene names in order to feed the typeahead
+function getParticipant2NamesInClass() {
+    return $.ajax({
+        url: '/fetch/participant2genenames/humanmine',
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
 // Method to get the different items inside a class (count per organism) in order to feed the sidebar
 function getItemsInClass(constraints) {
     return $.ajax({
@@ -460,6 +472,37 @@ function updateElements(constraints, pieChartID) {
             focus: function(event, ui) {
                 event.preventDefault();
                 $("#proteinDomainNameSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+	
+	$.when(getParticipant2NamesInClass()).done(function(result) {
+
+        var availableParticipant2Names = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableParticipant2Names.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#interactionsParticipant2SearchInput").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableParticipant2Names, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#interactionsParticipant2SearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#interactionsParticipant2SearchInput").val(ui.item.value);
             }
         });
 
