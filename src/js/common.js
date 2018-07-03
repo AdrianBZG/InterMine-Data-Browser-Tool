@@ -116,10 +116,10 @@ function getProteinDomainNamesInClass() {
     })
 }
 
-// Method to get the different Participant 2 gene names in order to feed the typeahead
-function getParticipant2NamesInClass() {
+// Method to get the different Participant 2 gene symbols in order to feed the typeahead
+function getParticipant2SymbolsInClass() {
     return $.ajax({
-        url: '/fetch/participant2genenames/humanmine',
+        url: '/fetch/participant2genesymbols/humanmine',
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -477,13 +477,13 @@ function updateElements(constraints, pieChartID) {
 
     });
 	
-	$.when(getParticipant2NamesInClass()).done(function(result) {
+	$.when(getParticipant2SymbolsInClass()).done(function(result) {
 
-        var availableParticipant2Names = [];
+        var availableParticipant2Symbol = [];
 
         for (var i = 0; i < result.results.length; i++) {
             if (result.results[i]["item"] != null) {
-                availableParticipant2Names.push({
+                availableParticipant2Symbol.push({
                     label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
                     value: result.results[i]["item"]
                 });
@@ -493,7 +493,7 @@ function updateElements(constraints, pieChartID) {
         $("#interactionsParticipant2SearchInput").autocomplete({
             minLength: 3,
             source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availableParticipant2Names, request.term);
+                var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
                 response(results.slice(0, 15));
             },
             select: function(event, ui) {

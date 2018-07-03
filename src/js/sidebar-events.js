@@ -147,7 +147,7 @@ function createSidebarEvents() {
 		
 		if(participant2Input) {
 			window.imTable.query.addConstraint({
-				"path": "interactions.participant2.name",
+				"path": "interactions.participant2.symbol",
 				"op": "==",
 				"value": participant2Input
 			});

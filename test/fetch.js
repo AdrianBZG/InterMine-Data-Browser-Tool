@@ -87,9 +87,9 @@ describe('Fetch', () => {
             });
       });
 	  
-	  it('it should GET the listing of Participant 2 Gene names inside HumanMine', (done) => {
+	  it('it should GET the listing of Participant 2 Gene symbols inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/participant2genenames/humanmine')
+            .get('/fetch/participant2genesymbols/humanmine')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');

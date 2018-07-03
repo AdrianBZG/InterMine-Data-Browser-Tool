@@ -148,28 +148,28 @@ router.get('/proteindomainname/humanmine', function(req, res, next) {
 
 });
 
-/* GET Interaction Participant 2 Gene Names from HumanMine. */
-router.get('/participant2genenames/humanmine', function(req, res, next) {
+/* GET Interaction Participant 2 Gene Symbol from HumanMine. */
+router.get('/participant2genesymbols/humanmine', function(req, res, next) {
     var service = new imjs.Service({
         root: 'http://www.humanmine.org/humanmine/service'
     });
 
     var query = {
         "from": "Gene",
-        "select": ["interactions.participant2.name"],
+        "select": ["interactions.participant2.symbol"],
         "model": {
             "name": "genomic"
         },
         "orderBy": [{
-            "path": "interactions.participant2.name",
+            "path": "interactions.participant2.symbol",
             "direction": "ASC"
         }]
     };
 
-    var part2genename = new imjs.Query(query, service),
-        part2genenamePath = [query.from, query.select[0]].join('.');
-    part2genename.summarize(part2genenamePath).then(function(part2genenameSummary) {
-        res.json(part2genenameSummary);
+    var part2genesymbol = new imjs.Query(query, service),
+        part2genesymbolPath = [query.from, query.select[0]].join('.');
+    part2genesymbol.summarize(part2genesymbolPath).then(function(part2genesymbolSummary) {
+        res.json(part2genesymbolSummary);
     });
 
 
