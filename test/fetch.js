@@ -86,6 +86,17 @@ describe('Fetch', () => {
 				done();
             });
       });
+	  
+	  it('it should GET the listing of Participant 2 Gene names inside HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/participant2genenames/humanmine')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
+				done();
+            });
+      });
   });
 
 });

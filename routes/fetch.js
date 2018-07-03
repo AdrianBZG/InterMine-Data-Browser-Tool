@@ -154,10 +154,9 @@ router.get('/participant2genenames/humanmine', function(req, res, next) {
         root: 'http://www.humanmine.org/humanmine/service'
     });
 
-
     var query = {
         "from": "Gene",
-        "select": ["interactions.participant2.name", "primaryIdentifier"],
+        "select": ["interactions.participant2.name"],
         "model": {
             "name": "genomic"
         },
