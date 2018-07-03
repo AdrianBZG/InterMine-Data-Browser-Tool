@@ -28,7 +28,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						span.nav-link-text
 						| Dataset Name
 					.card(style="width: 100%;")
-						#datasetNameSearchCardBlock.collapse.show.card-block
+						#datasetNameSearchCardBlock.collapse.show.card-block(style="overflow-y: auto; overflow-x:hidden;")
 							form-group.ui-front
 								#datasetsSelector
 							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
@@ -68,6 +68,28 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#proteinDomainNameFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Interactions')
+					a.nav-link(data-toggle="collapse", href="#interactionsSearchCardBlock", aria-controls="interactionsSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-podcast
+						span.nav-link-text
+						| Interactions
+					.card(style="width: 100%;")
+						#interactionsSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							#interactionsFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="interactionsParticipant2SearchInput" placeholder="Participant 2 (name)" style="width: 100%; float:left; margin-left: 15px;")
+								div.row(style="align: center;")
+									select#interactionsTypeSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+										option All (Type)
+										option Physical
+										option Genetic
+									select#interactionsDatasetSelector.form-control(style="width: 45%;")
+										option All (Set)
+										option BioGrid
+										option intAct
+								button.btn.btn-success(type="button" style='width:100%' id="interactionsSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="interactionsResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-bug
