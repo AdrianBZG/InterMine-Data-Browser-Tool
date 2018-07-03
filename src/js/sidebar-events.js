@@ -57,8 +57,21 @@ function createSidebarEvents() {
     $('#locationSearchButton').click(function() {
         if (window.locationFilter) clearLocationConstraint();
 
+		var chromosomeInput = $('#locationChromosomeSearchInput').val();
         var startLocationInput = $('#locationStartSearchInput').val();
         var endLocationInput = $('#locationEndSearchInput').val();
+		
+		if (!chromosomeInput) {
+			if ($("#locationFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, specify a chromosome in the filter input field.</div><br/>");
+
+                $("#closeLocationFilterAlert").click(function() {
+                    $("#locationFilterAlert").hide();
+                });
+            } else {
+                $("#locationFilterAlert").show();
+            }
+		}
 
         if (!$.isNumeric(startLocationInput) || !$.isNumeric(endLocationInput)) {
             if ($("#locationFilterAlert").length == 0) {
@@ -104,20 +117,30 @@ function createSidebarEvents() {
         });
 
         var imTableLocationEndConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
+		
+		window.imTable.query.addConstraint({
+            "path": "locations.locatedOn.primaryIdentifier",
+            "op": "==",
+            "value": chromosomeInput
+        });
 
-        window.locationFilter = [imTableLocationStartConstraint, imTableLocationEndConstraint];
+        var imTableLocationChromosomeConstraint = window.imTable.query.constraints[window.imTable.query.constraints.length - 1];
+
+        window.locationFilter = [imTableLocationStartConstraint, imTableLocationEndConstraint, imTableLocationChromosomeConstraint];
     });
 
     $('#locationResetButton').click(function() {
         if (window.locationFilter) clearLocationConstraint();
         $("#locationStartSearchInput").val('');
         $("#locationEndSearchInput").val('');
+		$("#locationChromosomeSearchInput").val('');
     });
 }
 
 function clearLocationConstraint() {
     window.imTable.query.removeConstraint(window.locationFilter[0]);
     window.imTable.query.removeConstraint(window.locationFilter[1]);
+	window.imTable.query.removeConstraint(window.locationFilter[2]);
     window.locationFilter = null;
 }
 
