@@ -3,7 +3,9 @@ var imjs = require('imjs');
 var request = require('request');
 var router = express.Router();
 
-/* GET Pathway Names from HumanMine inside a class (parameter). */
+/**
+ * GET Pathway Names from HumanMine inside a class (parameter)
+ */
 router.get('/pathways/humanmine/:classname', function(req, res, next) {
     var className = req.params.classname;
 
@@ -35,7 +37,9 @@ router.get('/pathways/humanmine/:classname', function(req, res, next) {
     });
 });
 
-/* GET Datasets Names from HumanMine inside a class (parameter). */
+/**
+ * GET Datasets Names from HumanMine inside a class (parameter)
+ */
 router.get('/datasets/humanmine/:classname', function(req, res, next) {
     var className = req.params.classname;
 
@@ -66,7 +70,9 @@ router.get('/datasets/humanmine/:classname', function(req, res, next) {
     });
 });
 
-/* GET Ontology Terms from HumanMine inside a class (parameter). */
+/**
+ * GET Ontology Terms from HumanMine inside a class (parameter)
+ */
 router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
     var className = req.params.classname;
 
@@ -120,7 +126,9 @@ router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
     }
 });
 
-/* GET Protein Domain Name from HumanMine. */
+/**
+ * GET Protein Domain Name from HumanMine
+ */
 router.get('/proteindomainname/humanmine', function(req, res, next) {
     var service = new imjs.Service({
         root: 'http://www.humanmine.org/humanmine/service'
@@ -148,7 +156,9 @@ router.get('/proteindomainname/humanmine', function(req, res, next) {
 
 });
 
-/* GET Interaction Participant 2 Gene Symbol from HumanMine. */
+/**
+ * GET Interaction Participant 2 Gene Symbol from HumanMine
+ */
 router.get('/participant2genesymbols/humanmine', function(req, res, next) {
     var service = new imjs.Service({
         root: 'http://www.humanmine.org/humanmine/service'

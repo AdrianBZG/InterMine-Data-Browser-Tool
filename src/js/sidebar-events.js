@@ -1,4 +1,8 @@
-// This method takes the selection made in the sidebar and formats it accordingly to feed the logic constraint in the im-table query
+/**
+ * This method takes the selection made in the sidebar and formats it accordingly to feed the logic constraint in the im-table query
+ * @param {string} input the selection made in the sidebar
+ * @returns {string} constraint in im-table format and logic constraint
+ */
 function formatAsConstraintForFilter(selection) {
     var result = [
         [],
@@ -27,7 +31,9 @@ function formatAsConstraintForFilter(selection) {
     return result;
 }
 
-// This method adds the event handling to the sidebar
+/**
+ * This method adds the event handling to the sidebar
+ */
 function createSidebarEvents() {
     $('#organismshortnamelist li').click(function() {
         if ($(this).hasClass("checked")) {
@@ -182,6 +188,9 @@ function createSidebarEvents() {
     });
 }
 
+/**
+ * This method removes any constraint that has been applied to the Locations filter
+ */
 function clearLocationConstraint() {
 	for(var i = 0; i < window.locationFilter.length; i++) {
 		window.imTable.query.removeConstraint(window.locationFilter[i]);
@@ -189,6 +198,9 @@ function clearLocationConstraint() {
     window.locationFilter = null;
 }
 
+/**
+ * This method removes any constraint that has been applied to the Interactions filter
+ */
 function clearInteractionsConstraint() {
 	for(var i = 0; i < window.interactionsFilter.length; i++) {
 		window.imTable.query.removeConstraint(window.interactionsFilter[i]);
@@ -196,7 +208,10 @@ function clearInteractionsConstraint() {
     window.interactionsFilter = null;
 }
 
-// This method adds a dataset constraint to the im-table
+/**
+ * This method adds a dataset constraint to the im-table.
+ * @param {string} input the dataset name to be added as a filter
+ */
 function addDatasetConstraint(datasetName) {
     // Filter by the selected dataset name
     window.imTable.query.addConstraint({

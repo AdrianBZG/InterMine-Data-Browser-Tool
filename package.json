@@ -1,7 +1,7 @@
 {
     "title": "InterMine Data Brpwser",
     "name": "intermine-data-browser",
-    "version": "0.0.1",
+    "version": "0.0.4",
     "description": "A web-based data browser for InterMine",
     "homepage": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool",
     "bugs": {
@@ -13,9 +13,10 @@
         "dev": "gulp && webpack --config webpack.config.js",
         "test": "mocha --timeout 100000"
     },
-    "author": "Adrian Rodriguez Bazaga",
+    "author": "Adrian Rodriguez-Bazaga",
     "contributors": [
-        ""
+        "Yo Yehudi",
+		"Rachel Lyne"
     ],
     "repository": {
         "type": "git",

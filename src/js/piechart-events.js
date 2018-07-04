@@ -1,4 +1,8 @@
-// This method takes the selection made in the sidebar and formats it accordingly to feed the logic constraint in the im-table query
+/**
+ * This method takes the selection made in the sidebar and formats it accordingly to feed the logic constraint in the im-table query.
+ * @param {string} input the selection made in the sidebar
+ * @returns {string} constraint in im-table format and logic constraint
+ */
 function formatChartClickedSegmentAsConstraintForFilter(selection) {
     var result = [
         [],

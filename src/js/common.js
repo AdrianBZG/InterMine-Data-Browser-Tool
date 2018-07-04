@@ -26,7 +26,11 @@ $(document).ready(function() {
 	window.interactionsFilter = null;
 });
 
-// This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
+/**
+ * This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
+ * @param {number} input the size of the array of colors
+ * @returns {array} an array of hexadecimal colors with the specific size, following a rainbow pattern
+ */
 function getColorsArray(size) {
     var rainbow = [
         "#fbb735", "#e98931", "#eb403b", "#b32E37", "#6c2a6a",
@@ -68,7 +72,10 @@ function getColorsArray(size) {
     return rainbow;
 };
 
-// Method to get the different ontology terms inside a class in order to feed the typeahead
+/**
+ * Method to get the different ontology terms inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different ontology terms
+ */
 function getOntologyTermsInClass() {
     return $.ajax({
         url: '/fetch/ontologyterms/humanmine/' + window.currentClassView,
@@ -80,7 +87,10 @@ function getOntologyTermsInClass() {
     })
 }
 
-// Method to get the different dataset names inside a class in order to feed the typeahead
+/**
+ * Method to get the different dataset names inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different dataset names
+ */
 function getDatasetNamesInClass() {
     return $.ajax({
         url: '/fetch/datasets/humanmine/' + window.currentClassView,
@@ -92,7 +102,10 @@ function getDatasetNamesInClass() {
     })
 }
 
-// Method to get the different pathway names inside a class in order to feed the typeahead
+/**
+ * Method to get the different pathway names inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different pathway names
+ */
 function getPathwayNamesInClass() {
     return $.ajax({
         url: '/fetch/pathways/humanmine/' + window.currentClassView,
@@ -104,7 +117,10 @@ function getPathwayNamesInClass() {
     })
 }
 
-// Method to get the different protein domain names inside a class in order to feed the typeahead
+/**
+ * Method to get the different protein domain names inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different protein domain names
+ */
 function getProteinDomainNamesInClass() {
     return $.ajax({
         url: '/fetch/proteindomainname/humanmine',
@@ -116,7 +132,10 @@ function getProteinDomainNamesInClass() {
     })
 }
 
-// Method to get the different Participant 2 gene symbols in order to feed the typeahead
+/**
+ * Method to get the different Participant 2 gene symbols in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different participant 2 gene symbols in Interactions
+ */
 function getParticipant2SymbolsInClass() {
     return $.ajax({
         url: '/fetch/participant2genesymbols/humanmine',
@@ -128,7 +147,11 @@ function getParticipant2SymbolsInClass() {
     })
 }
 
-// Method to get the different items inside a class (count per organism) in order to feed the sidebar
+/**
+ * Method to get the different items inside a class (count per organism) in order to feed the sidebar
+ * @param {array} constraints: the constraints for the endpoint call
+ * @returns {array} an array with the server response containing the different items in a class
+ */
 function getItemsInClass(constraints) {
     return $.ajax({
         url: '/statistics/count/items/humanmine/' + window.currentClassView,
@@ -143,6 +166,11 @@ function getItemsInClass(constraints) {
     })
 }
 
+/**
+ * Auxiliary function to flatten an array
+ * @param {array} arr: the array to be flattened
+ * @returns {array} the flattened array
+ */
 function flatten(arr) {
     return arr.reduce(function(flat, toFlatten) {
         return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
@@ -151,6 +179,9 @@ function flatten(arr) {
 
 var myPieChart;
 
+/**
+ * Method to update the im-table with the filters selected in the sidebar
+ */
 function updateTableWithConstraints() {
 
     while (window.imTable.query.constraints.length > 0) {
@@ -210,7 +241,9 @@ function updateTableWithConstraints() {
     }
 }
 
-// Auxiliary function to remove an element from an array
+/**
+ * Auxiliary function to remove an element from an array
+ */
 function remove(arr, what) {
     var found = arr.indexOf(what);
 
@@ -220,6 +253,9 @@ function remove(arr, what) {
     }
 }
 
+/**
+ * Method to expand the dataset names filter, showing the remaining ones and adding the appropriate event handling to them
+ */
 function showMoreDatasetNames() {
     $.when(getDatasetNamesInClass()).done(function(result) {
         var availableDatasetNames = [];
@@ -271,7 +307,11 @@ function showMoreDatasetNames() {
     });
 }
 
-// This methods updates the piechart and sidebar elements according to the received constraints
+/**
+ * Method updates the piechart and sidebar elements according to the received constraints
+ * @param {string} constraints: the new constraints that the im-table is using
+ * @param {string} pieChartID: the div id of the pie chart, in order to update it
+ */
 function updateElements(constraints, pieChartID) {
     $.when(getOntologyTermsInClass()).done(function(result) {
 
@@ -293,12 +333,6 @@ function updateElements(constraints, pieChartID) {
                 response(results.slice(0, 15));
             },
             updater: function(item) {
-
-                //item = selected item
-                //do your stuff.
-                alert(item);
-
-                //dont forget to return the item to reflect them into input
                 return item;
             },
             select: function(event, ui) {
