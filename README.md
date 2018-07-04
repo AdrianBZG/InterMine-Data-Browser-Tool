@@ -20,6 +20,10 @@ Check [package.json](package.json)
 
 See [BUILD.md](BUILD.md)
 
+## DOCUMENTATION
+
+Apart from the in-line comments in the code, documentation generated with documentation.js is available in [https://adrianbzg.github.io/InterMine-Data-Browser-Tool/](https://adrianbzg.github.io/InterMine-Data-Browser-Tool/). To update the documentation, the 'gulp documentation' is available.
+
 
 ## CONTRIBUTING
 
