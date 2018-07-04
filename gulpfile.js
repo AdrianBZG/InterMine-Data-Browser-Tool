@@ -117,6 +117,14 @@ gulp.task('js:minify', function() {
 gulp.task('js', ['js:minify']);
 
 /**
+ * Gulp task for launching the documentation on src/ files and save it as HTML in the docs folder
+ */
+gulp.task('documentation', function (cb) {
+  exec('documentation build src/** -f html -o docs', function (err, stdout, stderr) {
+  });
+})
+
+/**
  * Gulp default task: CSS + JS + Vendor + images
  */
 gulp.task('default', ['css', 'js', 'vendor', 'images']);
