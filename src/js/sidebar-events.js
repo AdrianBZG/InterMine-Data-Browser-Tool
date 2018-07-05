@@ -112,7 +112,7 @@ function createSidebarEvents() {
 		
         window.imTable.query.addConstraint({
             "path": "locations.start",
-            "op": "==",
+            "op": ">=",
             "value": startLocationInput
         });
 
@@ -120,7 +120,7 @@ function createSidebarEvents() {
 
         window.imTable.query.addConstraint({
             "path": "locations.end",
-            "op": "==",
+            "op": "<=",
             "value": endLocationInput
         });
 
