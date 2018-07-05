@@ -180,6 +180,10 @@ body.fixed-nav {
   border-radius: 0px;
 }
 
+.im-empty-apology .alert .btn {
+  display: none;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
