@@ -11,19 +11,19 @@ $(document).ready(function() {
         $("#pathwayNameSearchCardBlock").removeClass("show");
         $("#datasetNameSearchCardBlock").removeClass("show");
         $("#goAnnotationSearchCardBlock").removeClass("show");
-		$("#locationSearchCardBlock").removeClass("show");
-		$("#proteinDomainNameSearchCardBlock").removeClass("show");
+        $("#locationSearchCardBlock").removeClass("show");
+        $("#proteinDomainNameSearchCardBlock").removeClass("show");
     }
 
     window.imTableConstraint = [
         [],
         [],
         [],
-		[]
+        []
     ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name
 
     window.locationFilter = null;
-	window.interactionsFilter = null;
+    window.interactionsFilter = null;
 });
 
 /**
@@ -222,21 +222,21 @@ function updateTableWithConstraints() {
             "values": window.imTableConstraint[2]
         });
     }
-	
-	// Protein Domain Name
+
+    // Protein Domain Name
     if (window.imTableConstraint[3].length > 0) {
-		if (window.currentClassView == "Gene") {
+        if (window.currentClassView == "Gene") {
             window.imTable.query.addConstraint({
-				"path": "proteins.proteinDomainRegions.proteinDomain.name",
-				"op": "ONE OF",
-				"values": window.imTableConstraint[3]
-			});
+                "path": "proteins.proteinDomainRegions.proteinDomain.name",
+                "op": "ONE OF",
+                "values": window.imTableConstraint[3]
+            });
         } else {
             window.imTable.query.addConstraint({
-				"path": "proteinDomainRegions.proteinDomain.name",
-				"op": "ONE OF",
-				"values": window.imTableConstraint[3]
-			});
+                "path": "proteinDomainRegions.proteinDomain.name",
+                "op": "ONE OF",
+                "values": window.imTableConstraint[3]
+            });
         }
     }
 }
@@ -262,9 +262,9 @@ function showMoreDatasetNames() {
 
         for (var i = 0; i < result.results.length; i++) {
             if (result.results[i]["item"] != null) {
-				if(result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
-					continue;
-				}
+                if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
+                    continue;
+                }
                 availableDatasetNames.push({
                     label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
                     value: result.results[i]["item"]
@@ -367,9 +367,9 @@ function updateElements(constraints, pieChartID) {
 
             for (var i = 0; i < result.results.length; i++) {
                 if (result.results[i]["item"] != null) {
-					if(result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
-						continue;
-					}
+                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
+                        continue;
+                    }
                     availableDatasetNames.push({
                         label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
                         value: result.results[i]["item"]
@@ -464,8 +464,8 @@ function updateElements(constraints, pieChartID) {
         });
 
     });
-	
-	 $.when(getProteinDomainNamesInClass()).done(function(result) {
+
+    $.when(getProteinDomainNamesInClass()).done(function(result) {
 
         var availableProteinDomainNames = [];
 
@@ -510,8 +510,8 @@ function updateElements(constraints, pieChartID) {
         });
 
     });
-	
-	$.when(getParticipant2SymbolsInClass()).done(function(result) {
+
+    $.when(getParticipant2SymbolsInClass()).done(function(result) {
 
         var availableParticipant2Symbol = [];
 
@@ -584,7 +584,7 @@ function updateElements(constraints, pieChartID) {
 
         for (var i = 0; i < result[0].response['results'].length; i++) {
             countData.push(result[0].response['results'][i]['count']);
-            labelsData.push(result[0].response['results'][i]['item']);
+            labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
         }
 
         // Plot
@@ -611,6 +611,11 @@ function updateElements(constraints, pieChartID) {
                 intersect: true,
             },
             tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return data.labels[tooltipItem.index];
+                    }
+                },
                 custom: function(tooltip) {
                     if (!tooltip.opacity) {
                         document.getElementById(pieChartID).style.cursor = 'default';
@@ -625,7 +630,7 @@ function updateElements(constraints, pieChartID) {
                 if (elements.length) {
                     var index = elements[0]._index;
 
-                    selectedSegment = myPieChart.data.labels[index];
+                    selectedSegment = myPieChart.data.labels[index].split("(")[0].trim();
 
                     // Filter the table
                     window.imTable.query.addConstraint({
