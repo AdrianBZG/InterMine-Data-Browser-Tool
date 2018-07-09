@@ -40,7 +40,7 @@ router.get('/pathways/humanmine/:classname', function(req, res, next) {
 /**
  * GET Diseases Names from HumanMine inside a class (parameter)
  */
-router.get('/pathways/humanmine/:classname', function(req, res, next) {
+router.get('/diseases/humanmine/:classname', function(req, res, next) {
     var className = req.params.classname;
 
     if (className != "Protein" && className != "Gene") {
