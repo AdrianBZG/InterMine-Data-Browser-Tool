@@ -90,6 +90,16 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 										option(value="IntAct interactions data set") IntAct
 								button.btn.btn-success(type="button" style='width:100%' id="interactionsSearchButton") Go!
 								button.btn.btn-danger(type="button" style='width:100%' id="interactionsResetButton") Reset
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Diseases (OMIM)')
+					a.nav-link(data-toggle="collapse", href="#diseasesSearchCardBlock", aria-controls="diseasesSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-product-hunt
+						span.nav-link-text
+						| Diseases (OMIM)
+					.card(style="width: 100%;")
+						#diseasesSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							#diseasesFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								input(type="text" class="form-control" id="diseasesSearchInput" placeholder="e.g. alzheimer disease")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-bug

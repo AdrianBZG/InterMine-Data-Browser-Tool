@@ -38,6 +38,40 @@ router.get('/pathways/humanmine/:classname', function(req, res, next) {
 });
 
 /**
+ * GET Diseases Names from HumanMine inside a class (parameter)
+ */
+router.get('/pathways/humanmine/:classname', function(req, res, next) {
+    var className = req.params.classname;
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: 'http://www.humanmine.org/humanmine/service'
+    });
+
+    var query = {
+        "from": className,
+        "select": ["diseases.name", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "diseases.name",
+            "direction": "ASC"
+        }]
+    };
+
+    var diseases = new imjs.Query(query, service),
+        diseasesPath = [query.from, query.select[0]].join('.');
+    diseases.summarize(diseasesPath).then(function(diseasesSummary) {
+        //This returns the pathway name and the number of gene rows associated with the pathway
+        res.json(diseasesSummary);
+    });
+});
+
+/**
  * GET Datasets Names from HumanMine inside a class (parameter)
  */
 router.get('/datasets/humanmine/:classname', function(req, res, next) {
