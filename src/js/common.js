@@ -19,8 +19,9 @@ $(document).ready(function() {
         [],
         [],
         [],
-        []
-    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name
+        [],
+		[]
+    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.locationFilter = null;
     window.interactionsFilter = null;
@@ -253,6 +254,15 @@ function updateTableWithConstraints() {
                 "values": window.imTableConstraint[3]
             });
         }
+    }
+	
+	// Disease Name
+    if (window.imTableConstraint[4].length > 0) {
+        window.imTable.query.addConstraint({
+            "path": "diseases.name",
+            "op": "ONE OF",
+            "values": window.imTableConstraint[4]
+        });
     }
 }
 
@@ -504,7 +514,7 @@ function updateElements(constraints, pieChartID) {
                 $("#diseasesSearchInput").val(ui.item.value);
 
                 // Filter the table
-                window.imTableConstraint[2].push(ui.item.value);
+                window.imTableConstraint[4].push(ui.item.value);
                 updateTableWithConstraints();
 
                 var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -513,7 +523,7 @@ function updateElements(constraints, pieChartID) {
                     '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
 
                 $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[2], ui.item.value);
+                    remove(window.imTableConstraint[4], ui.item.value);
                     updateTableWithConstraints();
                     $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                 });
