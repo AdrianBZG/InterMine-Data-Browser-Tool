@@ -100,6 +100,19 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#diseasesFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="diseasesSearchInput" placeholder="e.g. alzheimer disease")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='ClinVar')
+					a.nav-link(data-toggle="collapse", href="#clinvarSearchCardBlock", aria-controls="clinvarSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-eyedropper
+						span.nav-link-text
+						| ClinVar
+					.card(style="width: 100%;")
+						#clinvarSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							form-group.ui-front
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Clinical significance" style="width: 45%; float:left; margin-left: 15px;")
+									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type" style="width: 45%;")
+								button.btn.btn-success(type="button" style='width:100%' id="clinvarSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="clinvarResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-bug
