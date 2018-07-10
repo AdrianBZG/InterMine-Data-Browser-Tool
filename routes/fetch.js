@@ -72,6 +72,40 @@ router.get('/clinicalsignificance/humanmine/:classname', function(req, res, next
 });
 
 /**
+ * GET Alleles Type values from HumanMine inside a class (parameter)
+ */
+router.get('/allelestype/humanmine/:classname', function(req, res, next) {
+    var className = req.params.classname;
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: 'http://www.humanmine.org/humanmine/service'
+    });
+
+    var query = {
+        "from": className,
+        "select": ["alleles.type", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "alleles.type",
+            "direction": "ASC"
+        }]
+    };
+
+    var theQuery = new imjs.Query(query, service),
+        queryPath = [query.from, query.select[0]].join('.');
+    theQuery.summarize(queryPath).then(function(querySummary) {
+        //This returns the pathway name and the number of gene rows associated with the pathway
+        res.json(querySummary);
+    });
+});
+
+/**
  * GET Diseases Names from HumanMine inside a class (parameter)
  */
 router.get('/diseases/humanmine/:classname', function(req, res, next) {
