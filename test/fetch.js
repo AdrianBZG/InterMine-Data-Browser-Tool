@@ -108,6 +108,28 @@ describe('Fetch', () => {
 				done();
             });
       });
+	  
+	  it('it should GET the listing of Alleles types inside HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/allelestype/humanmine/Gene')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
+				done();
+            });
+      });
+	  
+	  it('it should GET the listing of Alleles Clinical Significance inside HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/clinicalsignificance/humanmine/Gene')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.be.a('array');
+				res.body.results.length.should.be.at.least(1);
+				done();
+            });
+      });
   });
 
 });
