@@ -89,6 +89,36 @@ function getOntologyTermsInClass() {
 }
 
 /**
+ * Method to get the different alleles clinical significance inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different alleles clinical significances
+ */
+function getAllelesClinicalSignifanceInClass() {
+    return $.ajax({
+        url: '/fetch/clinicalsignificance/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+/**
+ * Method to get the different alleles types inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different alleles types
+ */
+function getAllelesTypesInClass() {
+    return $.ajax({
+        url: '/fetch/allelestype/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+/**
  * Method to get the different dataset names inside a class in order to feed the typeahead
  * @returns {array} an array with the server response containing the different dataset names
  */
@@ -531,6 +561,68 @@ function updateElements(constraints, pieChartID) {
             focus: function(event, ui) {
                 event.preventDefault();
                 $("#diseasesSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+	
+	$.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
+
+        var availableData = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableData.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#clinvarClinicalSignificanceSearchInput").autocomplete({
+            minLength: 2,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableData, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#clinvarClinicalSignificanceSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#clinvarClinicalSignificanceSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+	
+	$.when(getAllelesTypesInClass()).done(function(result) {
+
+        var availableData = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableData.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#clinvarTypeSearchInput").autocomplete({
+            minLength: 2,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableData, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#clinvarTypeSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#clinvarTypeSearchInput").val(ui.item.value);
             }
         });
 

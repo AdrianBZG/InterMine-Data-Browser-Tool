@@ -108,9 +108,9 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					.card(style="width: 100%;")
 						#clinvarSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
 							form-group.ui-front
-								div.row(style="align: center;")
-									input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Clinical significance" style="width: 45%; float:left; margin-left: 15px;")
-									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type" style="width: 45%;")
+								div(style="align: center;")
+									input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Clinical significance" style="width: 100%;")
+									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type" style="width: 100%;")
 								button.btn.btn-success(type="button" style='width:100%' id="clinvarSearchButton") Go!
 								button.btn.btn-danger(type="button" style='width:100%' id="clinvarResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
