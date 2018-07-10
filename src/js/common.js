@@ -318,7 +318,7 @@ function showMoreDatasetNames() {
 
         for (var i = 0; i < result.results.length; i++) {
             if (result.results[i]["item"] != null) {
-                if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
+                if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
                     continue;
                 }
                 availableDatasetNames.push({
@@ -423,7 +423,7 @@ function updateElements(constraints, pieChartID) {
 
             for (var i = 0; i < result.results.length; i++) {
                 if (result.results[i]["item"] != null) {
-                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set") {
+                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
                         continue;
                     }
                     availableDatasetNames.push({
