@@ -186,6 +186,52 @@ function createSidebarEvents() {
         if (window.interactionsFilter) clearInteractionsConstraint();
         $("#interactionsParticipant2SearchInput").val('');
     });
+	
+	$('#clinvarSearchButton').click(function() {
+        if (window.clinVarFilter) clearClinVarConstraint();
+
+		var clinVarSignificanceSel = $('#clinvarClinicalSignificanceSearchInput').val();
+        var clinVarTypeSel = $('#clinvarTypeSearchInput').val();
+		
+		if (!clinVarSignificanceSel || !clinVarTypeSel) {
+			if ($("#clinvarFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='clinvarFilterAlert'><span class='closebtn' id='closeClinVarFilterAlert'>×</span>Please, specify a clinical significante and type in the filter input field.</div><br/>");
+
+                $("#closeClinVarFilterAlert").click(function() {
+                    $("#clinvarFilterAlert").hide();
+                });
+            } else {
+                $("#clinvarFilterAlert").show();
+            }
+			return;
+		}
+
+		window.clinVarFilter = [];
+		
+
+		window.imTable.query.addConstraint({
+			"path": "alleles.clinicalSignificance",
+			"op": "==",
+			"value": clinVarSignificanceSel
+		});
+
+		window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		
+		window.imTable.query.addConstraint({
+			"path": "alleles.type",
+			"op": "==",
+			"value": clinVarTypeSel
+		});
+
+		window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+    });
+
+    $('#clinvarResetButton').click(function() {
+        if (window.clinVarFilter) clearClinVarConstraint();
+        $("#clinvarClinicalSignificanceSearchInput").val('');
+		$("#clinvarTypeSearchInput").val('');
+    });
 }
 
 /**
@@ -206,6 +252,16 @@ function clearInteractionsConstraint() {
 		window.imTable.query.removeConstraint(window.interactionsFilter[i]);
 	}
     window.interactionsFilter = null;
+}
+
+/**
+ * This method removes any constraint that has been applied to the ClinVar filter
+ */
+function clearClinVarConstraint() {
+	for(var i = 0; i < window.clinVarFilter.length; i++) {
+		window.imTable.query.removeConstraint(window.clinVarFilter[i]);
+	}
+    window.clinVarFilter = null;
 }
 
 /**

@@ -25,6 +25,7 @@ $(document).ready(function() {
 
     window.locationFilter = null;
     window.interactionsFilter = null;
+	window.clinVarFilter = null;
 });
 
 /**
