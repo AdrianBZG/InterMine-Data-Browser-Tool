@@ -41,7 +41,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						#pathwayNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
 							#pathwayFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
-								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="Some pathway name...")
+								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="e.g. Signal Transduction")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Location')
 					a.nav-link(data-toggle="collapse", href="#locationSearchCardBlock", aria-controls="locationSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-location-arrow
@@ -109,8 +109,8 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						#clinvarSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
 							form-group.ui-front
 								div(style="align: center;")
-									input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Clinical significance" style="width: 100%;")
-									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type" style="width: 100%;")
+									input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;")
+									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;")
 								button.btn.btn-success(type="button" style='width:100%' id="clinvarSearchButton") Go!
 								button.btn.btn-danger(type="button" style='width:100%' id="clinvarResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
