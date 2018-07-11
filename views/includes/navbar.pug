@@ -1,7 +1,7 @@
 // Navigation
 nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	a.navbar-brand(href='/')
-		img(src="/img/intermine-logo.png")
+		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
 	div#headerButtons.col-md-10.text-center
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
 			button.btn.btn-primary.btn-space(id="genesButton" type="button") Genes
@@ -9,21 +9,115 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 			button.btn.btn-default.btn-space(id="proteinsButton" type="button") Proteins
 		select.form-control(style="width: 150px; position: fixed; top: 10px; right: 75px;")
 			option(value="HumanMine") HumanMine
+	
 	#navbarResponsive.navbar-collapse
-		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Search')
-				a.nav-link(href='/search', style='color:black')
-					i.fa.fa-fw.fa-search
-					span.nav-link-text
-					| Search
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Clear filters')
-				a.nav-link(href='javascript:location.reload();', style='color:black')
-					i.fa.fa-fw.fa-trash
-					span.nav-link-text
-					| Clear filters
-			.card(style="width: 100%; max-width: 250px")
-				.card-header
-					a(data-toggle="collapse" href="#organismshortnameblock" aria-controls="organismshortnameblock")
-						i.fa.fa-caret-down  Organism short name
-				#organismshortnameblock.collapse.card-block(style="overflow: auto;")
-					#organismshortnamelist.ul.list-group.list-group-flush
+		ul#exampleAccordion.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation')
+					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-search
+						span.nav-link-text
+						| GO Annotation
+					.card(style="width: 100%;")
+						#goAnnotationSearchCardBlock.show.collapse.card-block(style="overflow: auto;")
+							#goAnnotationFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name' style="overflow: auto;")
+					a.nav-link(data-toggle="collapse", href="#datasetNameSearchCardBlock", aria-controls="datasetNameSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-database
+						span.nav-link-text
+						| Dataset Name
+					.card(style="width: 100%;")
+						#datasetNameSearchCardBlock.collapse.show.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							form-group.ui-front
+								#datasetsSelector
+							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
+					a.nav-link(data-toggle="collapse", href="#pathwayNameSearchCardBlock", aria-controls="pathwayNameSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-code-fork
+						span.nav-link-text
+						| Pathway Name
+					.card(style="width: 100%;")
+						#pathwayNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							#pathwayFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="Some pathway name...")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Location')
+					a.nav-link(data-toggle="collapse", href="#locationSearchCardBlock", aria-controls="locationSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-location-arrow
+						span.nav-link-text
+						| Location
+					.card(style="width: 100%;")
+						#locationSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							#locationFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;")
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;")
+									input(type="text" class="form-control" id="locationEndSearchInput" placeholder="End" style="width: 45%;")
+								button.btn.btn-success(type="button" style='width:100%' id="locationSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="locationResetButton") Reset
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Protein Domain Name')
+					a.nav-link(data-toggle="collapse", href="#proteinDomainNameSearchCardBlock", aria-controls="proteinDomainNameSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-product-hunt
+						span.nav-link-text
+						| Protein Domain Name
+					.card(style="width: 100%;")
+						#proteinDomainNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							#proteinDomainNameFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								input(type="text" class="form-control" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Interactions')
+					a.nav-link(data-toggle="collapse", href="#interactionsSearchCardBlock", aria-controls="interactionsSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-podcast
+						span.nav-link-text
+						| Interactions
+					.card(style="width: 100%;")
+						#interactionsSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							#interactionsFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;")
+								div.row(style="align: center;")
+									select#interactionsTypeSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+										option(value="All") All (Type)
+										option(value="physical") Physical
+										option(value="genetic") Genetic
+									select#interactionsDatasetSelector.form-control(style="width: 45%;")
+										option(value="All") All (Set)
+										option(value="BioGRID interaction data set") BioGRID
+										option(value="IntAct interactions data set") IntAct
+								button.btn.btn-success(type="button" style='width:100%' id="interactionsSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="interactionsResetButton") Reset
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Diseases (OMIM)')
+					a.nav-link(data-toggle="collapse", href="#diseasesSearchCardBlock", aria-controls="diseasesSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-certificate
+						span.nav-link-text
+						| Diseases (OMIM)
+					.card(style="width: 100%;")
+						#diseasesSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							#diseasesFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								input(type="text" class="form-control" id="diseasesSearchInput" placeholder="e.g. alzheimer disease")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='ClinVar')
+					a.nav-link(data-toggle="collapse", href="#clinvarSearchCardBlock", aria-controls="clinvarSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-eyedropper
+						span.nav-link-text
+						| ClinVar
+					.card(style="width: 100%;")
+						#clinvarSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							form-group.ui-front
+								div(style="align: center;")
+									input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Clinical significance" style="width: 100%;")
+									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type" style="width: 100%;")
+								button.btn.btn-success(type="button" style='width:100%' id="clinvarSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="clinvarResetButton") Reset
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
+					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
+						i.fa.fa-fw.fa-bug
+						span.nav-link-text
+						| Organism short name
+					.card(style="width: 100%;")
+						#organismshortnameblock.collapse.card-block(style="overflow: auto;")
+							#organismshortnamelist.ul.list-group.list-group-flush

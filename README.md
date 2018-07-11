@@ -20,6 +20,10 @@ Check [package.json](package.json)
 
 See [BUILD.md](BUILD.md)
 
+## DOCUMENTATION
+
+Apart from the in-line comments in the code, documentation generated with documentation.js is available in [https://adrianbzg.github.io/InterMine-Data-Browser-Tool/](https://adrianbzg.github.io/InterMine-Data-Browser-Tool/). To update the documentation, the 'gulp documentation' is available.
+
 
 ## CONTRIBUTING
 
@@ -36,5 +40,5 @@ You can contact the developers by opening an issue in this repo.
 
 ## SCREENSHOTS
 
-Genes view with some organisms filtered (Pre-release 0.0.2)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/FO5KdWC.png" /></div>
+Browser screenshot (Pre-release 0.0.3)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/jVNizUC.png" /></div>

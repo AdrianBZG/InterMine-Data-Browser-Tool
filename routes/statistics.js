@@ -3,7 +3,9 @@ var imjs = require('imjs');
 var request = require('request');
 var router = express.Router();
 
-/* GET count of items per class in HumanMine. */
+/**
+ * GET endpoint to retrieve the count of items per class in HumanMine.
+ */
 router.get('/count/primary/humanmine', function(req, res, next) {
     var result = []
 
@@ -36,7 +38,9 @@ router.get('/count/primary/humanmine', function(req, res, next) {
     })
 });
 
-/* POST count of items inside a class (parameter) using custom constraints in HumanMine. */
+/**
+ * POST count of items inside a class (parameter) using custom constraints in HumanMine
+ */
 router.post('/count/items/humanmine/:classname', function(req, res, next) {	
 	var constraints = req.body;	
     var className = req.params.classname;
@@ -104,7 +108,9 @@ router.post('/count/items/humanmine/:classname', function(req, res, next) {
 
 });
 
-/* GET count of items inside a class (parameter) in HumanMine. */
+/**
+ * GET count of items inside a class (parameter) in HumanMine
+ */
 router.get('/count/items/humanmine/:classname', function(req, res, next) {	
     var className = req.params.classname;
 

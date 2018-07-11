@@ -8,8 +8,11 @@ var pug = require('gulp-pug');
 var beautify = require('gulp-html-beautify');
 var pkg = require('./package.json');
 var browserSync = require('browser-sync').create();
+var exec = require('child_process').exec;
 
-// Copy third party libraries from /node_modules into /vendor
+/**
+ * Gulp task to copy third party libraries from /node_modules into /vendor
+ */
 gulp.task('vendor', function() {
   // Bootstrap
   gulp.src([
@@ -50,7 +53,9 @@ gulp.task('vendor', function() {
     .pipe(gulp.dest('./public/vendor/imjs'))
 });
 
-// Move the images in the src folder to the public folder
+/**
+ * Gulp task to move the images in the src folder to the public folder
+ */
 gulp.task('images', function() {
   gulp.src([
       './src/img/*'
@@ -58,7 +63,9 @@ gulp.task('images', function() {
     .pipe(gulp.dest('./public/img/'))
 });
 
-// Compile SCSS
+/**
+ * Gulp task to compile SCSS
+ */
 gulp.task('css:compile', function() {
   return gulp.src('./src/scss/**/*.scss')
     .pipe(sass.sync({
@@ -67,7 +74,9 @@ gulp.task('css:compile', function() {
     .pipe(gulp.dest('./public/stylesheets'))
 });
 
-// Minify CSS
+/**
+ * Gulp task to minify CSS
+ */
 gulp.task('css:minify', ['css:compile'], function() {
   return gulp.src([
       './src/css/*.css',
@@ -81,10 +90,14 @@ gulp.task('css:minify', ['css:compile'], function() {
     .pipe(browserSync.stream());
 });
 
-// CSS
+/**
+ * Gulp task for CSS
+ */
 gulp.task('css', ['css:compile', 'css:minify']);
 
-// Minify JavaScript
+/**
+ * Gulp task to minify JavaScript
+ */
 gulp.task('js:minify', function() {
   return gulp.src([
       './src/js/*.js',
@@ -98,8 +111,20 @@ gulp.task('js:minify', function() {
     .pipe(browserSync.stream());
 });
 
-// JS
+/**
+ * Gulp task for JS
+ */
 gulp.task('js', ['js:minify']);
 
-// Default task: CSS + JS + Vendor + images
+/**
+ * Gulp task for launching the documentation on src/ files and save it as HTML in the docs folder
+ */
+gulp.task('documentation', function (cb) {
+  exec('documentation build src/** -f html -o docs', function (err, stdout, stderr) {
+  });
+})
+
+/**
+ * Gulp default task: CSS + JS + Vendor + images
+ */
 gulp.task('default', ['css', 'js', 'vendor', 'images']);

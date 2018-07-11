@@ -23,15 +23,14 @@ html(lang='en')
 			.container-fluid
 				.row
 				
-				.col-lg-12
-					.card.mb-3
+				.col-xs-12
+					.card(style="width: 100%; height: 100%;")
 						.card-header
 							i.fa.fa-pie-chart
 							|  Number of results for Protein by organism
-						.card-body(height='100px')
+						.card-body
 							.row
-								.col-xl-12.col-sm-6.mb-3
-									canvas#PieChart(width='300%', height='50%')
+								canvas#PieChart(width='100%', height='150%')
 					
 				
 				.row

@@ -12,6 +12,7 @@ $(document).ready(function() {
     };
     var query = {
         select: ['*'],
+        //select: ['*','goAnnotation.ontologyTerm.name','pathways.name'],
         from: 'Gene'
     };
 
@@ -33,11 +34,13 @@ $(document).ready(function() {
         }
     ).then(
         function(table) {
-            //console.log('Table loaded', table);
+            console.log('Table loaded', table);
             //this .on listener will do something when someone interacts with the table. 
             table.on("all", function(changeDetail) {
                 updateElements(table.history.currentQuery.constraints, "PieChart");
             });
+
+            window.imTable = table;
         },
         function(error) {
             console.error('Could not load table', error);

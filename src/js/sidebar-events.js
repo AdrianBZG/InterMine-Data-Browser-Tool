@@ -1,4 +1,8 @@
-// This method takes the selection made in the sidebar and formats it accordingly to feed the logic constraint in the im-table query
+/**
+ * This method takes the selection made in the sidebar and formats it accordingly to feed the logic constraint in the im-table query
+ * @param {string} input the selection made in the sidebar
+ * @returns {string} constraint in im-table format and logic constraint
+ */
 function formatAsConstraintForFilter(selection) {
     var result = [
         [],
@@ -17,7 +21,7 @@ function formatAsConstraintForFilter(selection) {
         result[1].push(alphabet[i]);
     }
 
-	// Build the logic (OR)
+    // Build the logic (OR)
     if (result[1].length > 1) {
         result[1] = result[1].join(" or ");
     } else {
@@ -27,7 +31,9 @@ function formatAsConstraintForFilter(selection) {
     return result;
 }
 
-// This method adds the event handling to the sidebar
+/**
+ * This method adds the event handling to the sidebar
+ */
 function createSidebarEvents() {
     $('#organismshortnamelist li').click(function() {
         if ($(this).hasClass("checked")) {
@@ -37,8 +43,238 @@ function createSidebarEvents() {
         }
 
         // Filter by the selected organisms
-        var formattedConstraint = formatAsConstraintForFilter($('.checked a p').toArray());
-        filterTableByOrganismShortname(formattedConstraint[0], formattedConstraint[1]);
-		//updateElements(formattedConstraint[0], "PieChart");
+        window.imTable.query.addConstraint({
+            "path": "organism.shortName",
+            "op": "==",
+            "value": $('.checked a p').toArray()[0].innerHTML
+        });
+        //updateElements(formattedConstraint[0], "PieChart");
+
     });
+
+    $('#btnDatasetViewMore').click(function() {
+        if (!window.showingMoreDatasets) {
+            window.showingMoreDatasets = true;
+            showMoreDatasetNames();
+            $('#btnDatasetViewMore').remove();
+        }
+    });
+
+    $('#locationSearchButton').click(function() {
+        if (window.locationFilter) clearLocationConstraint();
+
+		var chromosomeInput = $('#locationChromosomeSearchInput').val();
+        var startLocationInput = $('#locationStartSearchInput').val();
+        var endLocationInput = $('#locationEndSearchInput').val();
+		
+		if (!chromosomeInput) {
+			if ($("#locationFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, specify a chromosome in the filter input field.</div><br/>");
+
+                $("#closeLocationFilterAlert").click(function() {
+                    $("#locationFilterAlert").hide();
+                });
+            } else {
+                $("#locationFilterAlert").show();
+            }
+		}
+
+        if (!$.isNumeric(startLocationInput) || !$.isNumeric(endLocationInput)) {
+            if ($("#locationFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, write a integer number in both the 'Start' and 'End' input fields.</div><br/>");
+
+                $("#closeLocationFilterAlert").click(function() {
+                    $("#locationFilterAlert").hide();
+                });
+            } else {
+                $("#locationFilterAlert").show();
+            }
+
+            return;
+
+        }
+
+        if (parseInt(startLocationInput) > parseInt(endLocationInput)) {
+            if ($("#locationFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>The location start position must be less or equal to the end position.</div><br/>");
+
+                $("#closeLocationFilterAlert").click(function() {
+                    $("#locationFilterAlert").hide();
+                });
+            } else {
+                $("#locationFilterAlert").show();
+            }
+
+            return;
+        }
+
+		window.locationFilter = [];
+		
+        window.imTable.query.addConstraint({
+            "path": "locations.start",
+            "op": ">=",
+            "value": startLocationInput
+        });
+
+        window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+        window.imTable.query.addConstraint({
+            "path": "locations.end",
+            "op": "<=",
+            "value": endLocationInput
+        });
+
+        window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		
+		window.imTable.query.addConstraint({
+            "path": "locations.locatedOn.primaryIdentifier",
+            "op": "==",
+            "value": chromosomeInput
+        });
+
+        window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+    });
+
+    $('#locationResetButton').click(function() {
+        if (window.locationFilter) clearLocationConstraint();
+        $("#locationStartSearchInput").val('');
+        $("#locationEndSearchInput").val('');
+		$("#locationChromosomeSearchInput").val('');
+    });
+	
+	$('#interactionsSearchButton').click(function() {
+        if (window.interactionsFilter) clearInteractionsConstraint();
+
+		var participant2Input = $('#interactionsParticipant2SearchInput').val();
+        var interactionsTypeSel = $('#interactionsTypeSelector').val();
+        var interactionsDatasetSel = $('#interactionsDatasetSelector').val();
+
+		window.interactionsFilter = [];
+		
+		if(participant2Input) {
+			window.imTable.query.addConstraint({
+				"path": "interactions.participant2.symbol",
+				"op": "==",
+				"value": participant2Input
+			});
+
+			window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		}
+
+		if(interactionsTypeSel != "All") {
+			window.imTable.query.addConstraint({
+				"path": "interactions.details.type",
+				"op": "==",
+				"value": interactionsTypeSel
+			});
+
+			window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		}
+		
+		if(interactionsDatasetSel != "All") {
+			window.imTable.query.addConstraint({
+				"path": "interactions.details.dataSets.name",
+				"op": "==",
+				"value": interactionsDatasetSel
+			});
+
+			window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		}
+    });
+
+    $('#interactionsResetButton').click(function() {
+        if (window.interactionsFilter) clearInteractionsConstraint();
+        $("#interactionsParticipant2SearchInput").val('');
+    });
+	
+	$('#clinvarSearchButton').click(function() {
+        if (window.clinVarFilter) clearClinVarConstraint();
+
+		var clinVarSignificanceSel = $('#clinvarClinicalSignificanceSearchInput').val();
+        var clinVarTypeSel = $('#clinvarTypeSearchInput').val();
+		
+		if (!clinVarSignificanceSel || !clinVarTypeSel) {
+			if ($("#clinvarFilterAlert").length == 0) {
+                $("#navbarResponsive").prepend("<div class='alert' id='clinvarFilterAlert'><span class='closebtn' id='closeClinVarFilterAlert'>×</span>Please, specify a clinical significante and type in the filter input field.</div><br/>");
+
+                $("#closeClinVarFilterAlert").click(function() {
+                    $("#clinvarFilterAlert").hide();
+                });
+            } else {
+                $("#clinvarFilterAlert").show();
+            }
+			return;
+		}
+
+		window.clinVarFilter = [];
+		
+
+		window.imTable.query.addConstraint({
+			"path": "alleles.clinicalSignificance",
+			"op": "==",
+			"value": clinVarSignificanceSel
+		});
+
+		window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+		
+		window.imTable.query.addConstraint({
+			"path": "alleles.type",
+			"op": "==",
+			"value": clinVarTypeSel
+		});
+
+		window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+    });
+
+    $('#clinvarResetButton').click(function() {
+        if (window.clinVarFilter) clearClinVarConstraint();
+        $("#clinvarClinicalSignificanceSearchInput").val('');
+		$("#clinvarTypeSearchInput").val('');
+    });
+}
+
+/**
+ * This method removes any constraint that has been applied to the Locations filter
+ */
+function clearLocationConstraint() {
+	for(var i = 0; i < window.locationFilter.length; i++) {
+		window.imTable.query.removeConstraint(window.locationFilter[i]);
+	}
+    window.locationFilter = null;
+}
+
+/**
+ * This method removes any constraint that has been applied to the Interactions filter
+ */
+function clearInteractionsConstraint() {
+	for(var i = 0; i < window.interactionsFilter.length; i++) {
+		window.imTable.query.removeConstraint(window.interactionsFilter[i]);
+	}
+    window.interactionsFilter = null;
+}
+
+/**
+ * This method removes any constraint that has been applied to the ClinVar filter
+ */
+function clearClinVarConstraint() {
+	for(var i = 0; i < window.clinVarFilter.length; i++) {
+		window.imTable.query.removeConstraint(window.clinVarFilter[i]);
+	}
+    window.clinVarFilter = null;
+}
+
+/**
+ * This method adds a dataset constraint to the im-table.
+ * @param {string} input the dataset name to be added as a filter
+ */
+function addDatasetConstraint(datasetName) {
+    // Filter by the selected dataset name
+    window.imTable.query.addConstraint({
+        "path": "dataSets.name",
+        "op": "==",
+        "value": datasetName,
+        "code": datasetName.replace(/ /g, '')
+    });
+    console.log(window.imTable);
 }
