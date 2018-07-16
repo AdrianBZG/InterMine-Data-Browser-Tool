@@ -232,6 +232,71 @@ function createSidebarEvents() {
         $("#clinvarClinicalSignificanceSearchInput").val('');
 		$("#clinvarTypeSearchInput").val('');
     });
+
+    $('#expressionSearchButton').click(function() {
+        if (window.expressionFilter) clearExpressionFilterConstraint();
+
+        var expressionPvalue = $('#expressionPvalueSearchInput').val();
+        var expressionTstatistic = $('#expressionTstatisticSearchInput').val();
+        var expressionExpressionSelector = $('#expressionExpressionSelector').val();
+        var expressionDatasetSelector = $('#expressionDatasetSelector').val();
+        
+        window.expressionFilter = [];
+
+        if (expressionPvalue) {
+            window.imTable.query.addConstraint({
+                "path": "atlasExpression.pValue",
+                "op": ">=",
+                "value": expressionPvalue
+             });
+
+            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (expressionTstatistic) {
+            window.imTable.query.addConstraint({
+                "path": "atlasExpression.tStatistic",
+                "op": ">=",
+                "value": expressionTstatistic
+             });
+
+            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        window.imTable.query.addConstraint({
+            "path": "atlasExpression.expression",
+            "op": "==",
+            "value": expressionExpressionSelector
+        });
+
+        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        
+        if (expressionDatasetSelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "atlasExpression.dataSets.name",
+                "op": "==",
+                "value": expressionDatasetSelector
+            });
+
+            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+    });
+
+    $('#expressionResetButton').click(function() {
+        if (window.expressionFilter) clearExpressionFilterConstraint();
+        $("#expressionTstatisticSearchInput").val('');
+        $("#expressionPvalueSearchInput").val('');
+    });
+}
+
+/**
+ * This method removes any constraint that has been applied to the Expression filter
+ */
+function clearExpressionFilterConstraint() {
+    for(var i = 0; i < window.expressionFilter.length; i++) {
+        window.imTable.query.removeConstraint(window.expressionFilter[i]);
+    }
+    window.expressionFilter = null;
 }
 
 /**

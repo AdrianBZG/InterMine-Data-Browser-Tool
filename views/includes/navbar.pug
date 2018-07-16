@@ -18,17 +18,17 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 						span.nav-link-text
 						| GO Annotation
 					.card(style="width: 100%;")
-						#goAnnotationSearchCardBlock.show.collapse.card-block(style="overflow: auto;")
+						#goAnnotationSearchCardBlock.collapse.card-block(style="overflow: auto;")
 							#goAnnotationFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name' style="overflow: auto;")
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name')
 					a.nav-link(data-toggle="collapse", href="#datasetNameSearchCardBlock", aria-controls="datasetNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-database
 						span.nav-link-text
 						| Dataset Name
 					.card(style="width: 100%;")
-						#datasetNameSearchCardBlock.collapse.show.card-block(style="overflow-y: auto; overflow-x:hidden;")
+						#datasetNameSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
 							form-group.ui-front
 								#datasetsSelector
 							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
@@ -113,6 +113,29 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 									input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;")
 								button.btn.btn-success(type="button" style='width:100%' id="clinvarSearchButton") Go!
 								button.btn.btn-danger(type="button" style='width:100%' id="clinvarResetButton") Reset
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Expression')
+					a.nav-link(data-toggle="collapse", href="#expressionSearchCardBlock", aria-controls="expressionSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-tasks
+						span.nav-link-text
+						| Expression
+					.card(style="width: 100%;")
+						#expressionSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							#expressionFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								div.row(style="align: center;")
+									select#expressionExpressionSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+										option(value="UP") UP
+										option(value="DOWN") DOWN
+										option(value="NONDE") NONDE
+									select#expressionDatasetSelector.form-control(style="width: 45%;")
+										option(value="All") All (Set)
+										option(value="ArrayExpress accession: E-MTAB-62") E-MTAB-62
+										option(value="E-MTAB-513 illumina body map") Illumina bodymap
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;")
+									input(type="text" class="form-control" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;")
+								button.btn.btn-success(type="button" style='width:100%' id="expressionSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="expressionResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-bug
