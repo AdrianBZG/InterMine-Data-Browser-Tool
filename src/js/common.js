@@ -27,6 +27,7 @@ $(document).ready(function() {
     window.interactionsFilter = null;
 	window.clinVarFilter = null;
     window.expressionFilter = null;
+    window.proteinLocalisationFilter = null;
 });
 
 /**
@@ -97,6 +98,36 @@ function getOntologyTermsInClass() {
 function getAllelesClinicalSignifanceInClass() {
     return $.ajax({
         url: '/fetch/clinicalsignificance/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+/**
+ * Method to get the different protein atlas expression cell types inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different protein atlas expression cell types
+ */
+function getProteinAtlasExpressionCellTypesInClass() {
+    return $.ajax({
+        url: '/fetch/proteinatlascelltypes/humanmine/' + window.currentClassView,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+/**
+ * Method to get the different protein atlas expression tissue names inside a class in order to feed the typeahead
+ * @returns {array} an array with the server response containing the different protein atlas expression tissue names
+ */
+function getProteinAtlasExpressionTissueNamesInClass() {
+    return $.ajax({
+        url: '/fetch/proteinatlastissuenames/humanmine/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -625,6 +656,68 @@ function updateElements(constraints, pieChartID) {
             focus: function(event, ui) {
                 event.preventDefault();
                 $("#clinvarTypeSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+
+    $.when(getProteinAtlasExpressionCellTypesInClass()).done(function(result) {
+
+        var availableData = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableData.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#proteinLocalisationCellTypeSearchInput").autocomplete({
+            minLength: 2,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableData, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#proteinLocalisationCellTypeSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#proteinLocalisationCellTypeSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+
+    $.when(getProteinAtlasExpressionTissueNamesInClass()).done(function(result) {
+
+        var availableData = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableData.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#proteinLocalisationTissueSearchInput").autocomplete({
+            minLength: 2,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableData, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#proteinLocalisationTissueSearchInput").val(ui.item.value);
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#proteinLocalisationTissueSearchInput").val(ui.item.value);
             }
         });
 

@@ -287,6 +287,84 @@ function createSidebarEvents() {
         $("#expressionTstatisticSearchInput").val('');
         $("#expressionPvalueSearchInput").val('');
     });
+
+    $('#proteinLocalisationSearchButton').click(function() {
+        if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+
+        var proteinLocalisationCellTypeSearchInput = $('#proteinLocalisationCellTypeSearchInput').val();
+        var proteinLocalisationExpressionTypeSelector = $('#proteinLocalisationExpressionTypeSelector').val();
+        var proteinLocalisationLevelSelector = $('#proteinLocalisationLevelSelector').val();
+        var proteinLocalisationTissueSearchInput = $('#proteinLocalisationTissueSearchInput').val();
+        var proteinLocalisationRealibilitySelector = $('#proteinLocalisationRealibilitySelector').val();
+
+        window.proteinLocalisationFilter = [];
+
+        if (proteinLocalisationCellTypeSearchInput) {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.cellType",
+                "op": "==",
+                "value": proteinLocalisationCellTypeSearchInput
+             });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationTissueSearchInput) {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.tissue.name",
+                "op": "==",
+                "value": proteinLocalisationTissueSearchInput
+             });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationExpressionTypeSelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.expressionType",
+                "op": "==",
+                "value": proteinLocalisationExpressionTypeSelector
+            });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationLevelSelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.level",
+                "op": "==",
+                "value": proteinLocalisationLevelSelector
+            });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationRealibilitySelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.reliability",
+                "op": "==",
+                "value": proteinLocalisationRealibilitySelector
+            });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+    });
+
+    $('#proteinLocalisationResetButton').click(function() {
+        if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+        $("#proteinLocalisationCellTypeSearchInput").val('');
+        $("#proteinLocalisationTissueSearchInput").val('');
+    });
+}
+
+/**
+ * This method removes any constraint that has been applied to the Protein Localisation filter
+ */
+function clearProteinLocalisationFilterConstraint() {
+    for(var i = 0; i < window.proteinLocalisationFilter.length; i++) {
+        window.imTable.query.removeConstraint(window.proteinLocalisationFilter[i]);
+    }
+    window.expressionFilter = null;
 }
 
 /**
