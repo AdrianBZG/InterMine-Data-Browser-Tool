@@ -130,6 +130,28 @@ describe('Fetch', () => {
 				done();
             });
       });
+
+      it('it should GET the listing of Protein Atlas Expression Cell Types inside HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/proteinatlascelltypes/humanmine/Gene')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.be.a('array');
+                res.body.results.length.should.be.at.least(1);
+                done();
+            });
+      });
+
+      it('it should GET the listing of Protein Atlas Expression Tissue Names inside HumanMine', (done) => {
+        chai.request(server)
+            .get('/fetch/proteinatlastissuenames/humanmine/Gene')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.be.a('array');
+                res.body.results.length.should.be.at.least(1);
+                done();
+            });
+      });
   });
 
 });

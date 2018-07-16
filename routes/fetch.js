@@ -38,6 +38,72 @@ router.get('/pathways/humanmine/:classname', function(req, res, next) {
 });
 
 /**
+ * GET Protein Atlas Expression Tissue Names from HumanMine inside a class (parameter)
+ */
+router.get('/proteinatlastissuenames/humanmine/:classname', function(req, res, next) {
+    var className = req.params.classname;
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: 'http://www.humanmine.org/humanmine/service'
+    });
+
+    var query = {
+        "from": className,
+        "select": ["proteinAtlasExpression.tissue.name", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "proteinAtlasExpression.tissue.name",
+            "direction": "ASC"
+        }]
+    };
+
+    var theQuery = new imjs.Query(query, service),
+        queryPath = [query.from, query.select[0]].join('.');
+    theQuery.summarize(queryPath).then(function(querySummary) {
+        res.json(querySummary);
+    });
+});
+
+/**
+ * GET Protein Atlas Expression Cell Types from HumanMine inside a class (parameter)
+ */
+router.get('/proteinatlascelltypes/humanmine/:classname', function(req, res, next) {
+    var className = req.params.classname;
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: 'http://www.humanmine.org/humanmine/service'
+    });
+
+    var query = {
+        "from": className,
+        "select": ["proteinAtlasExpression.cellType", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "proteinAtlasExpression.cellType",
+            "direction": "ASC"
+        }]
+    };
+
+    var theQuery = new imjs.Query(query, service),
+        queryPath = [query.from, query.select[0]].join('.');
+    theQuery.summarize(queryPath).then(function(querySummary) {
+        res.json(querySummary);
+    });
+});
+
+/**
  * GET Clinical Significance values from HumanMine inside a class (parameter)
  */
 router.get('/clinicalsignificance/humanmine/:classname', function(req, res, next) {

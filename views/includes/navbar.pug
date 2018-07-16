@@ -136,6 +136,38 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 									input(type="text" class="form-control" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;")
 								button.btn.btn-success(type="button" style='width:100%' id="expressionSearchButton") Go!
 								button.btn.btn-danger(type="button" style='width:100%' id="expressionResetButton") Reset
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Protein Localisation')
+					a.nav-link(data-toggle="collapse", href="#proteinLocalisationSearchCardBlock", aria-controls="proteinLocalisationSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-trello
+						span.nav-link-text
+						| Protein Localisation
+					.card(style="width: 100%;")
+						#proteinLocalisationSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+							#proteinLocalisationFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								div.row
+									input(type="text" class="form-control" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;")
+								div.row(style="align: center;")
+									select#proteinLocalisationExpressionTypeSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+										option(value="All") All (Type)
+										option(value="APE - two or more antibodies") Two or more antibodies
+										option(value="Staining - one antibody only") One antibody only
+									select#proteinLocalisationLevelSelector.form-control(style="width: 45%;")
+										option(value="All") All (Level)
+										option(value="Low") Low
+										option(value="Medium") Medium
+										option(value="High") High
+										option(value="Not detected") Not detected
+								div.row(style="align: center;")
+									input(type="text" class="form-control" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;")
+									select#proteinLocalisationRealibilitySelector.form-control(style="width: 45%;")
+										option(value="All") All (Realibility)
+										option(value="Low") Low
+										option(value="Uncertain") Uncertain
+										option(value="Supportive") Supportive
+										option(value="High") High
+								button.btn.btn-success(type="button" style='width:100%' id="proteinLocalisationSearchButton") Go!
+								button.btn.btn-danger(type="button" style='width:100%' id="proteinLocalisationResetButton") Reset
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-bug
