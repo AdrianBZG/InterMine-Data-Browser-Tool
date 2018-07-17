@@ -6,11 +6,13 @@ var router = express.Router();
 /**
  * GET endpoint to retrieve the count of items per class in HumanMine.
  */
-router.get('/count/primary/humanmine', function(req, res, next) {
+router.get('/count/primary/:mineUrl', function(req, res, next) {
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
+
     var result = []
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -41,9 +43,10 @@ router.get('/count/primary/humanmine', function(req, res, next) {
 /**
  * POST count of items inside a class (parameter) using custom constraints in HumanMine
  */
-router.post('/count/items/humanmine/:classname', function(req, res, next) {	
+router.post('/count/items/:mineUrl/:classname', function(req, res, next) {	
 	var constraints = req.body;	
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -52,7 +55,7 @@ router.post('/count/items/humanmine/:classname', function(req, res, next) {
     var result = []
 
     var service = new imjs.Service({
-        root: "http://www.humanmine.org/humanmine/service"
+        root: mineUrl
     });
 
     if (className == "Gene") {
@@ -111,8 +114,9 @@ router.post('/count/items/humanmine/:classname', function(req, res, next) {
 /**
  * GET count of items inside a class (parameter) in HumanMine
  */
-router.get('/count/items/humanmine/:classname', function(req, res, next) {	
+router.get('/count/items/:mineUrl/:classname', function(req, res, next) {	
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -121,7 +125,7 @@ router.get('/count/items/humanmine/:classname', function(req, res, next) {
     var result = []
 
     var service = new imjs.Service({
-        root: "http://www.humanmine.org/humanmine/service"
+        root: mineUrl
     });
 
     if (className == "Gene") {

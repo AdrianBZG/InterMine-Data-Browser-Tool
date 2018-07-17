@@ -6,15 +6,16 @@ var router = express.Router();
 /**
  * GET Pathway Names from HumanMine inside a class (parameter)
  */
-router.get('/pathways/humanmine/:classname', function(req, res, next) {
+router.get('/pathways/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -40,15 +41,16 @@ router.get('/pathways/humanmine/:classname', function(req, res, next) {
 /**
  * GET Protein Atlas Expression Tissue Names from HumanMine inside a class (parameter)
  */
-router.get('/proteinatlastissuenames/humanmine/:classname', function(req, res, next) {
+router.get('/proteinatlastissuenames/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -73,15 +75,16 @@ router.get('/proteinatlastissuenames/humanmine/:classname', function(req, res, n
 /**
  * GET Protein Atlas Expression Cell Types from HumanMine inside a class (parameter)
  */
-router.get('/proteinatlascelltypes/humanmine/:classname', function(req, res, next) {
+router.get('/proteinatlascelltypes/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -106,15 +109,16 @@ router.get('/proteinatlascelltypes/humanmine/:classname', function(req, res, nex
 /**
  * GET Clinical Significance values from HumanMine inside a class (parameter)
  */
-router.get('/clinicalsignificance/humanmine/:classname', function(req, res, next) {
+router.get('/clinicalsignificance/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -140,15 +144,16 @@ router.get('/clinicalsignificance/humanmine/:classname', function(req, res, next
 /**
  * GET Alleles Type values from HumanMine inside a class (parameter)
  */
-router.get('/allelestype/humanmine/:classname', function(req, res, next) {
+router.get('/allelestype/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -174,15 +179,16 @@ router.get('/allelestype/humanmine/:classname', function(req, res, next) {
 /**
  * GET Diseases Names from HumanMine inside a class (parameter)
  */
-router.get('/diseases/humanmine/:classname', function(req, res, next) {
+router.get('/diseases/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -208,15 +214,16 @@ router.get('/diseases/humanmine/:classname', function(req, res, next) {
 /**
  * GET Datasets Names from HumanMine inside a class (parameter)
  */
-router.get('/datasets/humanmine/:classname', function(req, res, next) {
+router.get('/datasets/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -241,15 +248,16 @@ router.get('/datasets/humanmine/:classname', function(req, res, next) {
 /**
  * GET Ontology Terms from HumanMine inside a class (parameter)
  */
-router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
+router.get('/ontologyterms/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     if (className == "Gene") {
@@ -297,9 +305,11 @@ router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
 /**
  * GET Protein Domain Name from HumanMine
  */
-router.get('/proteindomainname/humanmine', function(req, res, next) {
+router.get('/proteindomainname/:mineUrl', function(req, res, next) {
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
+
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
 
@@ -327,9 +337,11 @@ router.get('/proteindomainname/humanmine', function(req, res, next) {
 /**
  * GET Interaction Participant 2 Gene Symbol from HumanMine
  */
-router.get('/participant2genesymbols/humanmine', function(req, res, next) {
+router.get('/participant2genesymbols/:mineUrl', function(req, res, next) {
+    var mineUrl = req.params.mineUrl.replace(/_/g,":").replace(/-/g,"/");
+
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {

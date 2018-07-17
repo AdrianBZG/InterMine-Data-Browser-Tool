@@ -8,7 +8,7 @@ $(document).ready(function() {
     // Instantiate the im-table with all the data available in Protein from HumanMine
     var selector = '#dataTable';
     var service = {
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: window.mineUrl.replace(/_/g,":").replace(/-/g,"/")
     };
     var query = {
         select: ['*'],

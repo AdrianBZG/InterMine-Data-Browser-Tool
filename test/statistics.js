@@ -12,7 +12,7 @@ describe('Statistics', () => {
   describe('/GET count of HumanMine primary classes', () => {
       it('it should GET the count of HumanMine primary classes', (done) => {
         chai.request(server)
-            .get('/statistics/count/primary/humanmine')
+            .get('/statistics/count/primary/http_--www.humanmine.org-humanmine-service')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
@@ -27,7 +27,7 @@ describe('Statistics', () => {
 	  
 	  it('it should GET the count of items inside class Protein in HumanMine', (done) => {
         chai.request(server)
-            .get('/statistics/count/items/humanmine/Protein')
+            .get('/statistics/count/items/http_--www.humanmine.org-humanmine-service/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
@@ -40,7 +40,7 @@ describe('Statistics', () => {
 	  
 	  it('it should GET the count of items inside class Gene in HumanMine', (done) => {
         chai.request(server)
-            .get('/statistics/count/items/humanmine/Gene')
+            .get('/statistics/count/items/http_--www.humanmine.org-humanmine-service/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');

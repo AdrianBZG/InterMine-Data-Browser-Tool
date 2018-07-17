@@ -28,6 +28,9 @@ $(document).ready(function() {
 	window.clinVarFilter = null;
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
+
+    // Initial mine service url (HumanMine)
+    window.mineUrl = "http_--www.humanmine.org-humanmine-service";
 });
 
 /**
@@ -82,7 +85,7 @@ function getColorsArray(size) {
  */
 function getOntologyTermsInClass() {
     return $.ajax({
-        url: '/fetch/ontologyterms/humanmine/' + window.currentClassView,
+        url: '/fetch/ontologyterms/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -97,7 +100,7 @@ function getOntologyTermsInClass() {
  */
 function getAllelesClinicalSignifanceInClass() {
     return $.ajax({
-        url: '/fetch/clinicalsignificance/humanmine/' + window.currentClassView,
+        url: '/fetch/clinicalsignificance/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -112,7 +115,7 @@ function getAllelesClinicalSignifanceInClass() {
  */
 function getProteinAtlasExpressionCellTypesInClass() {
     return $.ajax({
-        url: '/fetch/proteinatlascelltypes/humanmine/' + window.currentClassView,
+        url: '/fetch/proteinatlascelltypes/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -127,7 +130,7 @@ function getProteinAtlasExpressionCellTypesInClass() {
  */
 function getProteinAtlasExpressionTissueNamesInClass() {
     return $.ajax({
-        url: '/fetch/proteinatlastissuenames/humanmine/' + window.currentClassView,
+        url: '/fetch/proteinatlastissuenames/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -142,7 +145,7 @@ function getProteinAtlasExpressionTissueNamesInClass() {
  */
 function getAllelesTypesInClass() {
     return $.ajax({
-        url: '/fetch/allelestype/humanmine/' + window.currentClassView,
+        url: '/fetch/allelestype/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -157,7 +160,7 @@ function getAllelesTypesInClass() {
  */
 function getDatasetNamesInClass() {
     return $.ajax({
-        url: '/fetch/datasets/humanmine/' + window.currentClassView,
+        url: '/fetch/datasets/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -172,7 +175,7 @@ function getDatasetNamesInClass() {
  */
 function getPathwayNamesInClass() {
     return $.ajax({
-        url: '/fetch/pathways/humanmine/' + window.currentClassView,
+        url: '/fetch/pathways/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -187,7 +190,7 @@ function getPathwayNamesInClass() {
  */
 function getDiseasesNamesInClass() {
     return $.ajax({
-        url: '/fetch/diseases/humanmine/' + window.currentClassView,
+        url: '/fetch/diseases/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -202,7 +205,7 @@ function getDiseasesNamesInClass() {
  */
 function getProteinDomainNamesInClass() {
     return $.ajax({
-        url: '/fetch/proteindomainname/humanmine',
+        url: '/fetch/proteindomainname/' + window.mineUrl,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -217,7 +220,7 @@ function getProteinDomainNamesInClass() {
  */
 function getParticipant2SymbolsInClass() {
     return $.ajax({
-        url: '/fetch/participant2genesymbols/humanmine',
+        url: '/fetch/participant2genesymbols/' + window.mineUrl,
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -233,7 +236,7 @@ function getParticipant2SymbolsInClass() {
  */
 function getItemsInClass(constraints) {
     return $.ajax({
-        url: '/statistics/count/items/humanmine/' + window.currentClassView,
+        url: '/statistics/count/items/' + window.mineUrl + '/' + window.currentClassView,
         type: 'POST',
         data: JSON.stringify(constraints),
         contentType: "application/json; charset=utf-8",
