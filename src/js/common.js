@@ -193,7 +193,7 @@ function getPathwayNamesInClass() {
         url: '/fetch/pathways/' + window.mineUrl + '/' + window.currentClassView,
         type: 'GET',
         error: function(e) {
-            console.log(e);
+            console.log('Error');
         },
         success: function(data) {}
     })
@@ -413,238 +413,138 @@ function showMoreDatasetNames() {
     });
 }
 
-/**
- * Method updates the piechart and sidebar elements according to the received constraints
- * @param {string} constraints: the new constraints that the im-table is using
- * @param {string} pieChartID: the div id of the pie chart, in order to update it
- */
-function updateElements(constraints, pieChartID) {
-    if ($('#mineSelector option').length == 0) {
-        $.when(getIntermines()).done(function(result) {
-            $('#mineSelector').find('option').remove().end().append('<option value="http_--www.humanmine.org-humanmine-service">HumanMine</option>').val('http_--www.humanmine.org-humanmine-service');
-
-            for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].name == "HumanMine") continue;
-
-                var mineUrl = result.instances[i].url;
-                if (mineUrl[mineUrl.length - 1] == "/") {
-                    mineUrl += "service";
-                } else {
-                    mineUrl += "/service";
-                }
-
-                mineUrl = mineUrl.replace(/:/g, "_").replace(/\//g, "-");
-
-                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
-            }
-
-            $("#mineSelector").val($("#mineSelector option:first").val());
-
-            // Event handling
-            $("#mineSelector").change(function() {
-                window.mineUrl = $(this).val();
-                var selectedMineName = $("#mineSelector option:selected").text();
-                document.title = window.currentClassView + " in " + selectedMineName;
-
-                // Update the imTable
-                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
-
-                // Instantiate the im-table with all the data available in Gene from HumanMine
-                var selector = '#dataTable';
-                var service = {
-                    root: window.mineUrl.replace(/_/g, ":").replace(/-/g, "/")
-                };
-                var query = {
-                    select: ['*'],
-                    from: window.currentClassView
-                };
-
-                imtables.configure({
-                    TableCell: {
-                        PreviewTrigger: 'click'
-                    }
-                });
-
-                imtables.configure('TableResults.CacheFactor', 20);
-
-                var imtable = imtables.loadTable(
-                    selector, {
-                        "start": 0,
-                        "size": 25
-                    }, {
-                        service: service,
-                        query: query
-                    }
-                ).then(
-                    function(table) {
-                        console.log('Table loaded', table);
-                        //this .on listener will do something when someone interacts with the table. 
-                        table.on("all", function(changeDetail) {
-                            updateElements(table.history.currentQuery.constraints, "PieChart");
-                        });
-
-                        window.imTable = table;
-                    },
-                    function(error) {
-                        console.error('Could not load table', error);
-                    }
-                );
-            });
-        });
-    }
-
-    $.when(getOntologyTermsInClass()).done(function(result) {
-
-        var availableGoTerms = [];
-
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availableGoTerms.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
-                });
-            }
-        }
-
-        $("#goAnnotationSearchInput").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
-                response(results.slice(0, 15));
-            },
-            updater: function(item) {
-                return item;
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#goAnnotationSearchInput").val(ui.item.value);
-
-                window.imTableConstraint[0].push(ui.item.value);
-                updateTableWithConstraints();
-
-                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                $("#goAnnotationFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
-                $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[0], ui.item.value);
-                    updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#goAnnotationSearchInput").val(ui.item.value);
-            }
-        });
-
-    });
-
-    $.when(getDatasetNamesInClass()).done(function(result) {
-        if (!window.datasetNamesLoaded) {
-            var availableDatasetNames = [];
-
-            for (var i = 0; i < result.results.length; i++) {
-                if (result.results[i]["item"] != null) {
-                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
-                        continue;
-                    }
-                    availableDatasetNames.push({
-                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                        value: result.results[i]["item"]
-                    });
-                }
-            }
-
-            // First remove the form-check elements
-            $('#datasetsSelector').empty();
-
-            var resultantElementsNumber = result.results.length;
-            var resultantElementsArray = [];
-
-            for (var i = 0; i < availableDatasetNames.length; i++) {
-                resultantElementsArray.push(availableDatasetNames[i]["value"]);
-            }
-
-            resultantElementsArray.sort();
-
-            // At most, 5 elements, which are ordered (top 3)
-            if (resultantElementsNumber > 3) {
-                resultantElementsNumber = 3;
-            }
-
-            // Fill the organism short name dropdown with top 5 organisms according to count
-            for (var i = 0; i < resultantElementsNumber; i++) {
-                var datasetName = resultantElementsArray[i];
-                //var datasetCount = "(" + result.results[i]["count"] + ")";
-                $("#datasetsSelector").append(
-                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-
-                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
-                    if ($(this).is(":checked")) {
-                        var checkboxValue = $(this).val();
-                        window.imTableConstraint[1].push(checkboxValue);
-                        updateTableWithConstraints();
-                    } else {
-                        var checkboxValue = $(this).val();
-                        remove(window.imTableConstraint[1], checkboxValue);
-                        updateTableWithConstraints();
-                    }
-                });
-            }
-
-            window.datasetNamesLoaded = true;
-        }
-
-    });
-
-    $.when(getPathwayNamesInClass()).done(function(result) {
-
-        var availablePathwayNames = [];
-
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availablePathwayNames.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
-                });
-            }
-        }
-
-        $("#pathwayNameSearchInput").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
-                response(results.slice(0, 15));
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
-
-                // Filter the table
-                window.imTableConstraint[2].push(ui.item.value);
-                updateTableWithConstraints();
-
-                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                $("#pathwayFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
-                $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[2], ui.item.value);
-                    updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
-            }
-        });
-
-    });
-
+function addExtraFilters() {
+    //organism, GO annotation, Dataset, and maybe pathway
+    /*
+    li.nav-item(data-toggle='tooltip', data-placement='right', title='Location')
+                    a.nav-link(data-toggle="collapse", href="#locationSearchCardBlock", aria-controls="locationSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-location-arrow
+                        span.nav-link-text
+                        | Location
+                    .card(style="width: 100%;")
+                        #locationSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+                            #locationFilterList.ul.list-group.list-group-flush
+                            form-group.ui-front
+                                div.row(style="align: center;")
+                                    input(type="text" class="form-control" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;")
+                                div.row(style="align: center;")
+                                    input(type="text" class="form-control" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;")
+                                    input(type="text" class="form-control" id="locationEndSearchInput" placeholder="End" style="width: 45%;")
+                                button.btn.btn-success(type="button" style='width:100%' id="locationSearchButton") Go!
+                                button.btn.btn-danger(type="button" style='width:100%' id="locationResetButton") Reset
+            li.nav-item(data-toggle='tooltip', data-placement='right', title='Protein Domain Name')
+                    a.nav-link(data-toggle="collapse", href="#proteinDomainNameSearchCardBlock", aria-controls="proteinDomainNameSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-product-hunt
+                        span.nav-link-text
+                        | Protein Domain Name
+                    .card(style="width: 100%;")
+                        #proteinDomainNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
+                            #proteinDomainNameFilterList.ul.list-group.list-group-flush
+                            form-group.ui-front
+                                input(type="text" class="form-control" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype")
+            li.nav-item(data-toggle='tooltip', data-placement='right', title='Interactions')
+                    a.nav-link(data-toggle="collapse", href="#interactionsSearchCardBlock", aria-controls="interactionsSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-podcast
+                        span.nav-link-text
+                        | Interactions
+                    .card(style="width: 100%;")
+                        #interactionsSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+                            #interactionsFilterList.ul.list-group.list-group-flush
+                            form-group.ui-front
+                                div.row(style="align: center;")
+                                    input(type="text" class="form-control" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;")
+                                div.row(style="align: center;")
+                                    select#interactionsTypeSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+                                        option(value="All") All (Type)
+                                        option(value="physical") Physical
+                                        option(value="genetic") Genetic
+                                    select#interactionsDatasetSelector.form-control(style="width: 45%;")
+                                        option(value="All") All (Set)
+                                        option(value="BioGRID interaction data set") BioGRID
+                                        option(value="IntAct interactions data set") IntAct
+                                button.btn.btn-success(type="button" style='width:100%' id="interactionsSearchButton") Go!
+                                button.btn.btn-danger(type="button" style='width:100%' id="interactionsResetButton") Reset
+            li.nav-item(data-toggle='tooltip', data-placement='right', title='Diseases (OMIM)')
+                    a.nav-link(data-toggle="collapse", href="#diseasesSearchCardBlock", aria-controls="diseasesSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-certificate
+                        span.nav-link-text
+                        | Diseases (OMIM)
+                    .card(style="width: 100%;")
+                        #diseasesSearchCardBlock.collapse.card-block(style="overflow: auto;")
+                            #diseasesFilterList.ul.list-group.list-group-flush
+                            form-group.ui-front
+                                input(type="text" class="form-control" id="diseasesSearchInput" placeholder="e.g. alzheimer disease")
+            li.nav-item(data-toggle='tooltip', data-placement='right', title='ClinVar')
+                    a.nav-link(data-toggle="collapse", href="#clinvarSearchCardBlock", aria-controls="clinvarSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-eyedropper
+                        span.nav-link-text
+                        | ClinVar
+                    .card(style="width: 100%;")
+                        #clinvarSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+                            form-group.ui-front
+                                div(style="align: center;")
+                                    input(type="text" class="form-control" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;")
+                                    input(type="text" class="form-control" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;")
+                                button.btn.btn-success(type="button" style='width:100%' id="clinvarSearchButton") Go!
+                                button.btn.btn-danger(type="button" style='width:100%' id="clinvarResetButton") Reset
+            li.nav-item(data-toggle='tooltip', data-placement='right', title='Expression')
+                    a.nav-link(data-toggle="collapse", href="#expressionSearchCardBlock", aria-controls="expressionSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-tasks
+                        span.nav-link-text
+                        | Expression
+                    .card(style="width: 100%;")
+                        #expressionSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+                            #expressionFilterList.ul.list-group.list-group-flush
+                            form-group.ui-front
+                                div.row(style="align: center;")
+                                    select#expressionExpressionSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+                                        option(value="UP") UP
+                                        option(value="DOWN") DOWN
+                                        option(value="NONDE") NONDE
+                                    select#expressionDatasetSelector.form-control(style="width: 45%;")
+                                        option(value="All") All (Set)
+                                        option(value="ArrayExpress accession: E-MTAB-62") E-MTAB-62
+                                        option(value="E-MTAB-513 illumina body map") Illumina bodymap
+                                div.row(style="align: center;")
+                                    input(type="text" class="form-control" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;")
+                                    input(type="text" class="form-control" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;")
+                                button.btn.btn-success(type="button" style='width:100%' id="expressionSearchButton") Go!
+                                button.btn.btn-danger(type="button" style='width:100%' id="expressionResetButton") Reset
+            li.nav-item(data-toggle='tooltip', data-placement='right', title='Protein Localisation')
+                    a.nav-link(data-toggle="collapse", href="#proteinLocalisationSearchCardBlock", aria-controls="proteinLocalisationSearchCardBlock", style='color:black')
+                        i.fa.fa-fw.fa-trello
+                        span.nav-link-text
+                        | Protein Localisation
+                    .card(style="width: 100%;")
+                        #proteinLocalisationSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
+                            #proteinLocalisationFilterList.ul.list-group.list-group-flush
+                            form-group.ui-front
+                                div.row
+                                    input(type="text" class="form-control" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;")
+                                div.row(style="align: center;")
+                                    select#proteinLocalisationExpressionTypeSelector.form-control(style="width: 45%; float:left; margin-left: 15px;")
+                                        option(value="All") All (Type)
+                                        option(value="APE - two or more antibodies") Two or more antibodies
+                                        option(value="Staining - one antibody only") One antibody only
+                                    select#proteinLocalisationLevelSelector.form-control(style="width: 45%;")
+                                        option(value="All") All (Level)
+                                        option(value="Low") Low
+                                        option(value="Medium") Medium
+                                        option(value="High") High
+                                        option(value="Not detected") Not detected
+                                div.row(style="align: center;")
+                                    input(type="text" class="form-control" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;")
+                                    select#proteinLocalisationRealibilitySelector.form-control(style="width: 45%;")
+                                        option(value="All") All (Realibility)
+                                        option(value="Low") Low
+                                        option(value="Uncertain") Uncertain
+                                        option(value="Supportive") Supportive
+                                        option(value="High") High
+                                button.btn.btn-success(type="button" style='width:100%' id="proteinLocalisationSearchButton") Go!
+                                button.btn.btn-danger(type="button" style='width:100%' id="proteinLocalisationResetButton") Reset
+    */
+    // update code
+    
     $.when(getDiseasesNamesInClass()).done(function(result) {
 
         var availableDiseasesNames = [];
@@ -691,7 +591,7 @@ function updateElements(constraints, pieChartID) {
 
     });
 
-    /*$.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
+    $.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
 
         var availableData = [];
 
@@ -813,7 +713,7 @@ function updateElements(constraints, pieChartID) {
             }
         });
 
-    });*/
+    });
 
     $.when(getProteinDomainNamesInClass()).done(function(result) {
 
@@ -887,6 +787,243 @@ function updateElements(constraints, pieChartID) {
             focus: function(event, ui) {
                 event.preventDefault();
                 $("#interactionsParticipant2SearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+}
+
+/**
+ * Method updates the piechart and sidebar elements according to the received constraints
+ * @param {string} constraints: the new constraints that the im-table is using
+ * @param {string} pieChartID: the div id of the pie chart, in order to update it
+ */
+function updateElements(constraints, pieChartID) {
+    if ($('#mineSelector option').length == 0) {
+        $.when(getIntermines()).done(function(result) {
+            $('#mineSelector').find('option').remove().end().append('<option value="http_--www.humanmine.org-humanmine-service">HumanMine</option>').val('http_--www.humanmine.org-humanmine-service');
+
+            for (var i = 0; i < result.instances.length; i++) {
+                if (result.instances[i].name == "HumanMine") continue;
+
+                var mineUrl = result.instances[i].url;
+                if (mineUrl[mineUrl.length - 1] == "/") {
+                    mineUrl += "service";
+                } else {
+                    mineUrl += "/service";
+                }
+
+                mineUrl = mineUrl.replace(/:/g, "_").replace(/\//g, "-");
+
+                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+            }
+
+            $("#mineSelector").val($("#mineSelector option:first").val());
+
+            // Event handling
+            $("#mineSelector").change(function() {
+                window.mineUrl = $(this).val();
+                var selectedMineName = $("#mineSelector option:selected").text();
+                document.title = window.currentClassView + " in " + selectedMineName;
+
+                // Update the imTable
+                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+
+                // Instantiate the im-table with all the data available in Gene from HumanMine
+                var selector = '#dataTable';
+                var service = {
+                    root: window.mineUrl.replace(/_/g, ":").replace(/-/g, "/")
+                };
+                var query = {
+                    select: ['*'],
+                    from: window.currentClassView
+                };
+
+                imtables.configure({
+                    TableCell: {
+                        PreviewTrigger: 'click'
+                    }
+                });
+
+                imtables.configure('TableResults.CacheFactor', 20);
+
+                var imtable = imtables.loadTable(
+                    selector, {
+                        "start": 0,
+                        "size": 25
+                    }, {
+                        service: service,
+                        query: query
+                    }
+                ).then(
+                    function(table) {
+                        console.log('Table loaded', table);
+                        //this .on listener will do something when someone interacts with the table. 
+                        table.on("all", function(changeDetail) {
+                            window.datasetNamesLoaded = false;
+                            updateElements(table.history.currentQuery.constraints, "PieChart");
+                        });
+
+                        window.imTable = table;
+                    },
+                    function(error) {
+                        console.error('Could not load table', error);
+                    }
+                );
+            });
+        });
+    }
+
+    console.log("Update1");
+
+    $.when(getOntologyTermsInClass()).done(function(result) {
+
+        var availableGoTerms = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availableGoTerms.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#goAnnotationSearchInput").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
+                response(results.slice(0, 15));
+            },
+            updater: function(item) {
+                return item;
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#goAnnotationSearchInput").val(ui.item.value);
+
+                window.imTableConstraint[0].push(ui.item.value);
+                updateTableWithConstraints();
+
+                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                $("#goAnnotationFilterList").append(
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+
+                $("#" + buttonId).click(function() {
+                    remove(window.imTableConstraint[0], ui.item.value);
+                    updateTableWithConstraints();
+                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                });
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#goAnnotationSearchInput").val(ui.item.value);
+            }
+        });
+
+    });
+
+    console.log("UpdateDS");
+    $.when(getDatasetNamesInClass()).done(function(result) {
+        if (!window.datasetNamesLoaded) {
+            var availableDatasetNames = [];
+
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
+                        continue;
+                    }
+                    availableDatasetNames.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
+
+            // First remove the form-check elements
+            $('#datasetsSelector').empty();
+
+            var resultantElementsNumber = result.results.length;
+            var resultantElementsArray = [];
+
+            for (var i = 0; i < availableDatasetNames.length; i++) {
+                resultantElementsArray.push(availableDatasetNames[i]["value"]);
+            }
+
+            resultantElementsArray.sort();
+
+            // At most, 5 elements, which are ordered (top 3)
+            if (resultantElementsNumber > 3) {
+                resultantElementsNumber = 3;
+            }
+
+            // Fill the organism short name dropdown with top 5 organisms according to count
+            for (var i = 0; i < resultantElementsNumber; i++) {
+                var datasetName = resultantElementsArray[i];
+                //var datasetCount = "(" + result.results[i]["count"] + ")";
+                $("#datasetsSelector").append(
+                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+
+                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
+                    if ($(this).is(":checked")) {
+                        var checkboxValue = $(this).val();
+                        window.imTableConstraint[1].push(checkboxValue);
+                        updateTableWithConstraints();
+                    } else {
+                        var checkboxValue = $(this).val();
+                        remove(window.imTableConstraint[1], checkboxValue);
+                        updateTableWithConstraints();
+                    }
+                });
+            }
+
+            window.datasetNamesLoaded = true;
+        }
+
+    });
+
+    $.when(getPathwayNamesInClass()).done(function(result) {
+
+        var availablePathwayNames = [];
+
+        for (var i = 0; i < result.results.length; i++) {
+            if (result.results[i]["item"] != null) {
+                availablePathwayNames.push({
+                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                    value: result.results[i]["item"]
+                });
+            }
+        }
+
+        $("#pathwayNameSearchInput").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
+                response(results.slice(0, 15));
+            },
+            select: function(event, ui) {
+                event.preventDefault();
+                $("#pathwayNameSearchInput").val(ui.item.value);
+
+                // Filter the table
+                window.imTableConstraint[2].push(ui.item.value);
+                updateTableWithConstraints();
+
+                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                $("#pathwayFilterList").append(
+                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+
+                $("#" + buttonId).click(function() {
+                    remove(window.imTableConstraint[2], ui.item.value);
+                    updateTableWithConstraints();
+                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                });
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                $("#pathwayNameSearchInput").val(ui.item.value);
             }
         });
 
