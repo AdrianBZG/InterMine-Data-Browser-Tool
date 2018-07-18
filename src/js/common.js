@@ -20,12 +20,12 @@ $(document).ready(function() {
         [],
         [],
         [],
-		[]
+        []
     ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.locationFilter = null;
     window.interactionsFilter = null;
-	window.clinVarFilter = null;
+    window.clinVarFilter = null;
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
 
@@ -78,6 +78,21 @@ function getColorsArray(size) {
 
     return rainbow;
 };
+
+/**
+ * Method to get the different intermines names and URLs from the registry
+ * @returns {array} an array with the server response containing the different intermines with their URLs
+ */
+function getIntermines() {
+    return $.ajax({
+        url: 'http://registry.intermine.org/service/instances?mines=%27prod%27',
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
 
 /**
  * Method to get the different ontology terms inside a class in order to feed the typeahead
@@ -321,8 +336,8 @@ function updateTableWithConstraints() {
             });
         }
     }
-	
-	// Disease Name
+
+    // Disease Name
     if (window.imTableConstraint[4].length > 0) {
         window.imTable.query.addConstraint({
             "path": "diseases.name",
@@ -404,6 +419,80 @@ function showMoreDatasetNames() {
  * @param {string} pieChartID: the div id of the pie chart, in order to update it
  */
 function updateElements(constraints, pieChartID) {
+    if ($('#mineSelector option').length == 0) {
+        $.when(getIntermines()).done(function(result) {
+            $('#mineSelector').find('option').remove().end().append('<option value="http_--www.humanmine.org-humanmine-service">HumanMine</option>').val('http_--www.humanmine.org-humanmine-service');
+
+            for (var i = 0; i < result.instances.length; i++) {
+                if (result.instances[i].name == "HumanMine") continue;
+
+                var mineUrl = result.instances[i].url;
+                if (mineUrl[mineUrl.length - 1] == "/") {
+                    mineUrl += "service";
+                } else {
+                    mineUrl += "/service";
+                }
+
+                mineUrl = mineUrl.replace(/:/g, "_").replace(/\//g, "-");
+
+                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+            }
+
+            $("#mineSelector").val($("#mineSelector option:first").val());
+
+            // Event handling
+            $("#mineSelector").change(function() {
+                window.mineUrl = $(this).val();
+                var selectedMineName = $("#mineSelector option:selected").text();
+                document.title = window.currentClassView + " in " + selectedMineName;
+
+                // Update the imTable
+                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+
+                // Instantiate the im-table with all the data available in Gene from HumanMine
+                var selector = '#dataTable';
+                var service = {
+                    root: window.mineUrl.replace(/_/g, ":").replace(/-/g, "/")
+                };
+                var query = {
+                    select: ['*'],
+                    from: window.currentClassView
+                };
+
+                imtables.configure({
+                    TableCell: {
+                        PreviewTrigger: 'click'
+                    }
+                });
+
+                imtables.configure('TableResults.CacheFactor', 20);
+
+                var imtable = imtables.loadTable(
+                    selector, {
+                        "start": 0,
+                        "size": 25
+                    }, {
+                        service: service,
+                        query: query
+                    }
+                ).then(
+                    function(table) {
+                        console.log('Table loaded', table);
+                        //this .on listener will do something when someone interacts with the table. 
+                        table.on("all", function(changeDetail) {
+                            updateElements(table.history.currentQuery.constraints, "PieChart");
+                        });
+
+                        window.imTable = table;
+                    },
+                    function(error) {
+                        console.error('Could not load table', error);
+                    }
+                );
+            });
+        });
+    }
+
     $.when(getOntologyTermsInClass()).done(function(result) {
 
         var availableGoTerms = [];
@@ -555,8 +644,8 @@ function updateElements(constraints, pieChartID) {
         });
 
     });
-	
-	$.when(getDiseasesNamesInClass()).done(function(result) {
+
+    $.when(getDiseasesNamesInClass()).done(function(result) {
 
         var availableDiseasesNames = [];
 
@@ -601,8 +690,8 @@ function updateElements(constraints, pieChartID) {
         });
 
     });
-	
-	$.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
+
+    /*$.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
 
         var availableData = [];
 
@@ -632,8 +721,8 @@ function updateElements(constraints, pieChartID) {
         });
 
     });
-	
-	$.when(getAllelesTypesInClass()).done(function(result) {
+    
+    $.when(getAllelesTypesInClass()).done(function(result) {
 
         var availableData = [];
 
@@ -724,7 +813,7 @@ function updateElements(constraints, pieChartID) {
             }
         });
 
-    });
+    });*/
 
     $.when(getProteinDomainNamesInClass()).done(function(result) {
 
