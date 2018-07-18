@@ -804,14 +804,23 @@ function updateElements(constraints, pieChartID) {
             $('#mineSelector').find('option').remove().end().append('<option value="http_--www.humanmine.org-humanmine-service">HumanMine</option>').val('http_--www.humanmine.org-humanmine-service');
 
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].name == "HumanMine") continue;
+                if (result.instances[i].name == "HumanMine" || result.instances[i].url.startsWith("https")) continue;
+
+                // Temporarily skiping mines with missing concepts for the default filters
+                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine") continue;
+
+                // Mines giving error when querying the API or not responding
+                if (result.instances[i].name == "MitoMiner" || result.instances[i].name == "ModMine") continue;
 
                 var mineUrl = result.instances[i].url;
+
+                // Check for mines not requiring to format the URL
                 if (mineUrl[mineUrl.length - 1] == "/") {
                     mineUrl += "service";
                 } else {
                     mineUrl += "/service";
                 }
+                
 
                 mineUrl = mineUrl.replace(/:/g, "_").replace(/\//g, "-");
 
