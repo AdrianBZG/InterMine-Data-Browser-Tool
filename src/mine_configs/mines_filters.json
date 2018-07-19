@@ -1,3 +1,4 @@
 {
-  "HumanMine": { "extra_filters":[ "location", "diseases", "clinvar", "protein-localisation", "protein-domain", "interactions" ] }
+  "HumanMine": { "extra_filters":[ "location", "diseases", "clinvar", "protein-localisation", "protein-domain", "interactions", "expression" ] },
+  "HumanMine Beta": { "extra_filters":[ "location", "diseases", "clinvar", "protein-localisation", "protein-domain", "interactions", "expression" ] }
 }
