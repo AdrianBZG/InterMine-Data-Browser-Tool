@@ -29,8 +29,19 @@ $(document).ready(function() {
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
 
-    // Initial mine service url (HumanMine)
+    window.minesConfigs = null;
+
+    readTextFile("./mine_configs/mines_filters.json", function(text){
+        window.minesConfigs = JSON.parse(text);
+        console.log(window.minesConfigs);
+    });
+
+
+
+    // Initial mine service url (HumanMine), name and view
     window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
+    window.selectedMineName = "HumanMine";
+    window.currentClassView = "Gene";
 });
 
 /**
@@ -414,7 +425,25 @@ function showMoreDatasetNames() {
     });
 }
 
+function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
+
 function addExtraFilters() {
+    // Read the JSON config file
+    if(!window.extraFiltersAdded) {
+        console.log(mine_configs[window.selectedMineName].extra_filters);
+    }
+
+
     //organism, GO annotation, Dataset, and maybe pathway
     /*
     li.nav-item(data-toggle='tooltip', data-placement='right', title='Location')
@@ -546,7 +575,7 @@ function addExtraFilters() {
     */
     // update code
     
-    $.when(getDiseasesNamesInClass()).done(function(result) {
+    /*$.when(getDiseasesNamesInClass()).done(function(result) {
 
         var availableDiseasesNames = [];
 
@@ -791,7 +820,7 @@ function addExtraFilters() {
             }
         });
 
-    });
+    });*/
 }
 
 /**
@@ -833,8 +862,8 @@ function updateElements(constraints, pieChartID) {
             // Event handling
             $("#mineSelector").change(function() {
                 window.mineUrl = $(this).val();
-                var selectedMineName = $("#mineSelector option:selected").text();
-                document.title = window.currentClassView + " in " + selectedMineName;
+                window.selectedMineName = $("#mineSelector option:selected").text();
+                document.title = window.currentClassView + " in " + window.selectedMineName;
 
                 // Update the imTable
                 updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
@@ -871,6 +900,7 @@ function updateElements(constraints, pieChartID) {
                         //this .on listener will do something when someone interacts with the table. 
                         table.on("all", function(changeDetail) {
                             window.datasetNamesLoaded = false;
+                            window.extraFiltersAdded = false;
                             updateElements(table.history.currentQuery.constraints, "PieChart");
                         });
 
@@ -885,6 +915,13 @@ function updateElements(constraints, pieChartID) {
     }
 
     console.log("Update1");
+
+    if(!window.extraFiltersAdded) {
+        if(window.minesConfigs[window.selectedMineName]) {
+            addExtraFilters();
+            window.extraFiltersAdded = true;
+        }
+    }
 
     $.when(getOntologyTermsInClass()).done(function(result) {
 
