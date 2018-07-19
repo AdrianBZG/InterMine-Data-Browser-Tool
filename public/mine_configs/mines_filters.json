@@ -1,0 +1,5 @@
+{
+  "mines_extra_filters": [
+    { "minename":"HumanMine", "extra_filters":[ "diseases", "clinvar", "protein-localisation", "protein-domain", "interactions" ] }
+  ]
+}

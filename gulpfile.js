@@ -64,6 +64,16 @@ gulp.task('images', function() {
 });
 
 /**
+ * Gulp task to move the JSON mine configs in the src folder to the public folder
+ */
+gulp.task('mine_configs', function() {
+  gulp.src([
+      './src/mine_configs/*'
+    ])
+    .pipe(gulp.dest('./public/mine_configs/'))
+});
+
+/**
  * Gulp task to compile SCSS
  */
 gulp.task('css:compile', function() {
@@ -127,4 +137,4 @@ gulp.task('documentation', function (cb) {
 /**
  * Gulp default task: CSS + JS + Vendor + images
  */
-gulp.task('default', ['css', 'js', 'vendor', 'images']);
+gulp.task('default', ['css', 'js', 'vendor', 'images', 'mine_configs']);
