@@ -12,7 +12,7 @@ describe('Fetch', () => {
   describe('/GET listing of ontology terms of HumanMine primary classes', () => {	  
 	  it('it should GET the listing of ontology terms inside class Protein in HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/ontologyterms/http_--www.humanmine.org-humanmine-service/Protein')
+            .get('/fetch/ontologyterms/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -23,7 +23,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of ontology terms inside class Gene in HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/ontologyterms/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/ontologyterms/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -34,7 +34,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of dataset names inside class Protein in HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/datasets/http_--www.humanmine.org-humanmine-service/Protein')
+            .get('/fetch/datasets/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -45,7 +45,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of dataset names inside class Gene in HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/datasets/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/datasets/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -56,7 +56,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of pathway names inside class Protein in HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/pathways/http_--www.humanmine.org-humanmine-service/Protein')
+            .get('/fetch/pathways/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Protein')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -67,7 +67,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of pathway names inside class Gene in HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/pathways/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/pathways/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -78,7 +78,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of protein domain names inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/proteindomainname/http_--www.humanmine.org-humanmine-service')
+            .get('/fetch/proteindomainname/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -89,7 +89,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of Participant 2 Gene symbols inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/participant2genesymbols/http_--www.humanmine.org-humanmine-service')
+            .get('/fetch/participant2genesymbols/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -100,7 +100,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of Diseases Names inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/diseases/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/diseases/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -111,7 +111,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of Alleles types inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/allelestype/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/allelestype/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -122,7 +122,7 @@ describe('Fetch', () => {
 	  
 	  it('it should GET the listing of Alleles Clinical Significance inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/clinicalsignificance/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/clinicalsignificance/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -133,7 +133,7 @@ describe('Fetch', () => {
 
       it('it should GET the listing of Protein Atlas Expression Cell Types inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/proteinatlascelltypes/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/proteinatlascelltypes/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
@@ -144,7 +144,7 @@ describe('Fetch', () => {
 
       it('it should GET the listing of Protein Atlas Expression Tissue Names inside HumanMine', (done) => {
         chai.request(server)
-            .get('/fetch/proteinatlastissuenames/http_--www.humanmine.org-humanmine-service/Gene')
+            .get('/fetch/proteinatlastissuenames/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.results.should.be.a('array');
