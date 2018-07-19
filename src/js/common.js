@@ -293,7 +293,12 @@ var myPieChart;
 function updateTableWithConstraints() {
 
     while (window.imTable.query.constraints.length > 0) {
-        window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
+        try {
+            window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
+        }
+        catch(err) {
+            continue;
+        }
     }
 
     // GO Annotation

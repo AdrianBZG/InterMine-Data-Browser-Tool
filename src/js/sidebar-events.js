@@ -362,7 +362,12 @@ function createSidebarEvents() {
  */
 function clearProteinLocalisationFilterConstraint() {
     for(var i = 0; i < window.proteinLocalisationFilter.length; i++) {
-        window.imTable.query.removeConstraint(window.proteinLocalisationFilter[i]);
+        try {
+            window.imTable.query.removeConstraint(window.proteinLocalisationFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
     }
     window.expressionFilter = null;
 }
@@ -372,7 +377,12 @@ function clearProteinLocalisationFilterConstraint() {
  */
 function clearExpressionFilterConstraint() {
     for(var i = 0; i < window.expressionFilter.length; i++) {
-        window.imTable.query.removeConstraint(window.expressionFilter[i]);
+        try {
+            window.imTable.query.removeConstraint(window.expressionFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
     }
     window.expressionFilter = null;
 }
@@ -382,7 +392,12 @@ function clearExpressionFilterConstraint() {
  */
 function clearLocationConstraint() {
 	for(var i = 0; i < window.locationFilter.length; i++) {
-		window.imTable.query.removeConstraint(window.locationFilter[i]);
+        try {
+            window.imTable.query.removeConstraint(window.locationFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
 	}
     window.locationFilter = null;
 }
@@ -392,7 +407,12 @@ function clearLocationConstraint() {
  */
 function clearInteractionsConstraint() {
 	for(var i = 0; i < window.interactionsFilter.length; i++) {
-		window.imTable.query.removeConstraint(window.interactionsFilter[i]);
+        try {
+            window.imTable.query.removeConstraint(window.interactionsFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
 	}
     window.interactionsFilter = null;
 }
@@ -402,8 +422,13 @@ function clearInteractionsConstraint() {
  */
 function clearClinVarConstraint() {
 	for(var i = 0; i < window.clinVarFilter.length; i++) {
-		window.imTable.query.removeConstraint(window.clinVarFilter[i]);
-	}
+        try {
+            window.imTable.query.removeConstraint(window.clinVarFilter[i]);
+	    }
+        catch(err) {
+            continue;
+        }
+    }
     window.clinVarFilter = null;
 }
 
