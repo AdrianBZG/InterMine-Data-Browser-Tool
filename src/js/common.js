@@ -810,7 +810,7 @@ function updateElements(constraints, pieChartID) {
                 if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine") continue;
 
                 // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "MitoMiner" || result.instances[i].name == "ModMine") continue;
+                if (result.instances[i].name == "MitoMiner" || result.instances[i].name == "ModMine" || result.instances[i].name == "PlanMine") continue;
 
                 var mineUrl = result.instances[i].url;
 
