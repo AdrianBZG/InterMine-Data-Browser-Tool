@@ -30,7 +30,7 @@ $(document).ready(function() {
     window.proteinLocalisationFilter = null;
 
     // Initial mine service url (HumanMine)
-    window.mineUrl = "http_--www.humanmine.org-humanmine-service";
+    window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
 });
 
 /**
@@ -386,8 +386,9 @@ function showMoreDatasetNames() {
 
         resultantElementsArray.sort();
 
-        // Remove first 5 elements (already in the sidebar)
-        resultantElementsArray = resultantElementsArray.slice(5);
+        // Remove first 3 elements (already in the sidebar)
+        if(resultantElementsArray.length < 4) return;
+        resultantElementsArray = resultantElementsArray.slice(3);
         console.log(resultantElementsArray);
 
         var resultantElementsNumber = resultantElementsArray.length;
@@ -801,16 +802,16 @@ function addExtraFilters() {
 function updateElements(constraints, pieChartID) {
     if ($('#mineSelector option').length == 0) {
         $.when(getIntermines()).done(function(result) {
-            $('#mineSelector').find('option').remove().end().append('<option value="http_--www.humanmine.org-humanmine-service">HumanMine</option>').val('http_--www.humanmine.org-humanmine-service');
+            $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
 
             for (var i = 0; i < result.instances.length; i++) {
                 if (result.instances[i].name == "HumanMine" || result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
-                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine") continue;
+                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
 
                 // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "MitoMiner" || result.instances[i].name == "ModMine" || result.instances[i].name == "PlanMine") continue;
+                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
 
                 var mineUrl = result.instances[i].url;
 
@@ -822,7 +823,7 @@ function updateElements(constraints, pieChartID) {
                 }
                 
 
-                mineUrl = mineUrl.replace(/:/g, "_").replace(/\//g, "-");
+                mineUrl = mineUrl.replace(/:/g, "COLON").replace(/\//g, "SLASH");
 
                 $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
             }
@@ -841,7 +842,7 @@ function updateElements(constraints, pieChartID) {
                 // Instantiate the im-table with all the data available in Gene from HumanMine
                 var selector = '#dataTable';
                 var service = {
-                    root: window.mineUrl.replace(/_/g, ":").replace(/-/g, "/")
+                    root: window.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/")
                 };
                 var query = {
                     select: ['*'],
@@ -962,7 +963,7 @@ function updateElements(constraints, pieChartID) {
 
             resultantElementsArray.sort();
 
-            // At most, 5 elements, which are ordered (top 3)
+            // At most, 3 elements, which are ordered (top 3)
             if (resultantElementsNumber > 3) {
                 resultantElementsNumber = 3;
             }

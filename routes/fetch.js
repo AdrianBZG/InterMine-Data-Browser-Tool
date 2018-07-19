@@ -18,7 +18,7 @@ var $ = require('jquery');
  */
 router.get('/pathways/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -53,7 +53,7 @@ router.get('/pathways/:mineUrl/:classname', function(req, res, next) {
  */
 router.get('/proteinatlastissuenames/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -87,7 +87,7 @@ router.get('/proteinatlastissuenames/:mineUrl/:classname', function(req, res, ne
  */
 router.get('/proteinatlascelltypes/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -121,7 +121,7 @@ router.get('/proteinatlascelltypes/:mineUrl/:classname', function(req, res, next
  */
 router.get('/clinicalsignificance/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -156,7 +156,7 @@ router.get('/clinicalsignificance/:mineUrl/:classname', function(req, res, next)
  */
 router.get('/allelestype/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -191,7 +191,7 @@ router.get('/allelestype/:mineUrl/:classname', function(req, res, next) {
  */
 router.get('/diseases/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -226,7 +226,7 @@ router.get('/diseases/:mineUrl/:classname', function(req, res, next) {
  */
 router.get('/datasets/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -260,7 +260,7 @@ router.get('/datasets/:mineUrl/:classname', function(req, res, next) {
  */
 router.get('/ontologyterms/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
@@ -316,7 +316,7 @@ router.get('/ontologyterms/:mineUrl/:classname', function(req, res, next) {
  * GET Protein Domain Name from HumanMine
  */
 router.get('/proteindomainname/:mineUrl', function(req, res, next) {
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     var service = new imjs.Service({
         root: mineUrl
@@ -348,7 +348,7 @@ router.get('/proteindomainname/:mineUrl', function(req, res, next) {
  * GET Interaction Participant 2 Gene Symbol from HumanMine
  */
 router.get('/participant2genesymbols/:mineUrl', function(req, res, next) {
-    var mineUrl = req.params.mineUrl.replace(/_/g, ":").replace(/-/g, "/");
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     var service = new imjs.Service({
         root: mineUrl
