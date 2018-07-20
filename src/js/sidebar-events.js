@@ -232,6 +232,159 @@ function createSidebarEvents() {
         $("#clinvarClinicalSignificanceSearchInput").val('');
 		$("#clinvarTypeSearchInput").val('');
     });
+
+    $('#expressionSearchButton').click(function() {
+        if (window.expressionFilter) clearExpressionFilterConstraint();
+
+        var expressionPvalue = $('#expressionPvalueSearchInput').val();
+        var expressionTstatistic = $('#expressionTstatisticSearchInput').val();
+        var expressionExpressionSelector = $('#expressionExpressionSelector').val();
+        var expressionDatasetSelector = $('#expressionDatasetSelector').val();
+        
+        window.expressionFilter = [];
+
+        if (expressionPvalue) {
+            window.imTable.query.addConstraint({
+                "path": "atlasExpression.pValue",
+                "op": ">=",
+                "value": expressionPvalue
+             });
+
+            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (expressionTstatistic) {
+            window.imTable.query.addConstraint({
+                "path": "atlasExpression.tStatistic",
+                "op": ">=",
+                "value": expressionTstatistic
+             });
+
+            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        window.imTable.query.addConstraint({
+            "path": "atlasExpression.expression",
+            "op": "==",
+            "value": expressionExpressionSelector
+        });
+
+        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        
+        if (expressionDatasetSelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "atlasExpression.dataSets.name",
+                "op": "==",
+                "value": expressionDatasetSelector
+            });
+
+            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+    });
+
+    $('#expressionResetButton').click(function() {
+        if (window.expressionFilter) clearExpressionFilterConstraint();
+        $("#expressionTstatisticSearchInput").val('');
+        $("#expressionPvalueSearchInput").val('');
+    });
+
+    $('#proteinLocalisationSearchButton').click(function() {
+        if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+
+        var proteinLocalisationCellTypeSearchInput = $('#proteinLocalisationCellTypeSearchInput').val();
+        var proteinLocalisationExpressionTypeSelector = $('#proteinLocalisationExpressionTypeSelector').val();
+        var proteinLocalisationLevelSelector = $('#proteinLocalisationLevelSelector').val();
+        var proteinLocalisationTissueSearchInput = $('#proteinLocalisationTissueSearchInput').val();
+        var proteinLocalisationRealibilitySelector = $('#proteinLocalisationRealibilitySelector').val();
+
+        window.proteinLocalisationFilter = [];
+
+        if (proteinLocalisationCellTypeSearchInput) {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.cellType",
+                "op": "==",
+                "value": proteinLocalisationCellTypeSearchInput
+             });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationTissueSearchInput) {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.tissue.name",
+                "op": "==",
+                "value": proteinLocalisationTissueSearchInput
+             });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationExpressionTypeSelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.expressionType",
+                "op": "==",
+                "value": proteinLocalisationExpressionTypeSelector
+            });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationLevelSelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.level",
+                "op": "==",
+                "value": proteinLocalisationLevelSelector
+            });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+
+        if (proteinLocalisationRealibilitySelector != "All") {
+            window.imTable.query.addConstraint({
+                "path": "proteinAtlasExpression.reliability",
+                "op": "==",
+                "value": proteinLocalisationRealibilitySelector
+            });
+
+            window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+        }
+    });
+
+    $('#proteinLocalisationResetButton').click(function() {
+        if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+        $("#proteinLocalisationCellTypeSearchInput").val('');
+        $("#proteinLocalisationTissueSearchInput").val('');
+    });
+}
+
+/**
+ * This method removes any constraint that has been applied to the Protein Localisation filter
+ */
+function clearProteinLocalisationFilterConstraint() {
+    for(var i = 0; i < window.proteinLocalisationFilter.length; i++) {
+        try {
+            window.imTable.query.removeConstraint(window.proteinLocalisationFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
+    }
+    window.expressionFilter = null;
+}
+
+/**
+ * This method removes any constraint that has been applied to the Expression filter
+ */
+function clearExpressionFilterConstraint() {
+    for(var i = 0; i < window.expressionFilter.length; i++) {
+        try {
+            window.imTable.query.removeConstraint(window.expressionFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
+    }
+    window.expressionFilter = null;
 }
 
 /**
@@ -239,7 +392,12 @@ function createSidebarEvents() {
  */
 function clearLocationConstraint() {
 	for(var i = 0; i < window.locationFilter.length; i++) {
-		window.imTable.query.removeConstraint(window.locationFilter[i]);
+        try {
+            window.imTable.query.removeConstraint(window.locationFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
 	}
     window.locationFilter = null;
 }
@@ -249,7 +407,12 @@ function clearLocationConstraint() {
  */
 function clearInteractionsConstraint() {
 	for(var i = 0; i < window.interactionsFilter.length; i++) {
-		window.imTable.query.removeConstraint(window.interactionsFilter[i]);
+        try {
+            window.imTable.query.removeConstraint(window.interactionsFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
 	}
     window.interactionsFilter = null;
 }
@@ -259,8 +422,13 @@ function clearInteractionsConstraint() {
  */
 function clearClinVarConstraint() {
 	for(var i = 0; i < window.clinVarFilter.length; i++) {
-		window.imTable.query.removeConstraint(window.clinVarFilter[i]);
-	}
+        try {
+            window.imTable.query.removeConstraint(window.clinVarFilter[i]);
+	    }
+        catch(err) {
+            continue;
+        }
+    }
     window.clinVarFilter = null;
 }
 

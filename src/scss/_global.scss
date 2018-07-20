@@ -106,7 +106,7 @@ body.sticky-footer {
 body.fixed-nav {
   padding-top: $navbar-base-height;
   @media screen and (max-width: 991px) {
-    padding-top: calc(#{$navbar-base-height} * 6.5);
+    padding-top: calc(#{$navbar-base-height} * 7.5);
   }
 }
 

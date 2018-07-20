@@ -8,7 +8,7 @@ $(document).ready(function() {
     // Instantiate the im-table with all the data available in Gene from HumanMine
     var selector = '#dataTable';
     var service = {
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: window.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/")
     };
     var query = {
         select: ['*'],

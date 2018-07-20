@@ -2,19 +2,30 @@ var express = require('express');
 var imjs = require('imjs');
 var request = require('request');
 var router = express.Router();
+var jsdom = require("jsdom");
+const {
+    JSDOM
+} = jsdom;
+const {
+    document
+} = (new JSDOM('<!doctype html><html><body></body></html>')).window;
+global.document = document;
+global.window = document.defaultView;
+var $ = require('jquery');
 
 /**
  * GET Pathway Names from HumanMine inside a class (parameter)
  */
-router.get('/pathways/humanmine/:classname', function(req, res, next) {
+router.get('/pathways/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -38,17 +49,86 @@ router.get('/pathways/humanmine/:classname', function(req, res, next) {
 });
 
 /**
- * GET Clinical Significance values from HumanMine inside a class (parameter)
+ * GET Protein Atlas Expression Tissue Names from HumanMine inside a class (parameter)
  */
-router.get('/clinicalsignificance/humanmine/:classname', function(req, res, next) {
+router.get('/proteinatlastissuenames/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
+    });
+
+    var query = {
+        "from": className,
+        "select": ["proteinAtlasExpression.tissue.name", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "proteinAtlasExpression.tissue.name",
+            "direction": "ASC"
+        }]
+    };
+
+    var theQuery = new imjs.Query(query, service),
+        queryPath = [query.from, query.select[0]].join('.');
+    theQuery.summarize(queryPath).then(function(querySummary) {
+        res.json(querySummary);
+    });
+});
+
+/**
+ * GET Protein Atlas Expression Cell Types from HumanMine inside a class (parameter)
+ */
+router.get('/proteinatlascelltypes/:mineUrl/:classname', function(req, res, next) {
+    var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: mineUrl
+    });
+
+    var query = {
+        "from": className,
+        "select": ["proteinAtlasExpression.cellType", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "proteinAtlasExpression.cellType",
+            "direction": "ASC"
+        }]
+    };
+
+    var theQuery = new imjs.Query(query, service),
+        queryPath = [query.from, query.select[0]].join('.');
+    theQuery.summarize(queryPath).then(function(querySummary) {
+        res.json(querySummary);
+    });
+});
+
+/**
+ * GET Clinical Significance values from HumanMine inside a class (parameter)
+ */
+router.get('/clinicalsignificance/:mineUrl/:classname', function(req, res, next) {
+    var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: mineUrl
     });
 
     var query = {
@@ -74,15 +154,16 @@ router.get('/clinicalsignificance/humanmine/:classname', function(req, res, next
 /**
  * GET Alleles Type values from HumanMine inside a class (parameter)
  */
-router.get('/allelestype/humanmine/:classname', function(req, res, next) {
+router.get('/allelestype/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -108,15 +189,16 @@ router.get('/allelestype/humanmine/:classname', function(req, res, next) {
 /**
  * GET Diseases Names from HumanMine inside a class (parameter)
  */
-router.get('/diseases/humanmine/:classname', function(req, res, next) {
+router.get('/diseases/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -142,15 +224,16 @@ router.get('/diseases/humanmine/:classname', function(req, res, next) {
 /**
  * GET Datasets Names from HumanMine inside a class (parameter)
  */
-router.get('/datasets/humanmine/:classname', function(req, res, next) {
+router.get('/datasets/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {
@@ -175,15 +258,16 @@ router.get('/datasets/humanmine/:classname', function(req, res, next) {
 /**
  * GET Ontology Terms from HumanMine inside a class (parameter)
  */
-router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
+router.get('/ontologyterms/:mineUrl/:classname', function(req, res, next) {
     var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     if (className != "Protein" && className != "Gene") {
         res.status(500).send('You need to specify a valid class: Protein, Gene');
     }
 
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     if (className == "Gene") {
@@ -231,9 +315,11 @@ router.get('/ontologyterms/humanmine/:classname', function(req, res, next) {
 /**
  * GET Protein Domain Name from HumanMine
  */
-router.get('/proteindomainname/humanmine', function(req, res, next) {
+router.get('/proteindomainname/:mineUrl', function(req, res, next) {
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
 
@@ -261,9 +347,11 @@ router.get('/proteindomainname/humanmine', function(req, res, next) {
 /**
  * GET Interaction Participant 2 Gene Symbol from HumanMine
  */
-router.get('/participant2genesymbols/humanmine', function(req, res, next) {
+router.get('/participant2genesymbols/:mineUrl', function(req, res, next) {
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+
     var service = new imjs.Service({
-        root: 'http://www.humanmine.org/humanmine/service'
+        root: mineUrl
     });
 
     var query = {

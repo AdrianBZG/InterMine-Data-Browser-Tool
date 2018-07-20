@@ -16,22 +16,19 @@
     "author": "Adrian Rodriguez-Bazaga",
     "contributors": [
         "Yo Yehudi",
-		"Rachel Lyne"
+        "Rachel Lyne"
     ],
     "repository": {
         "type": "git",
         "url": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool"
     },
     "dependencies": {
-        "cookie-parser": "~1.4.3",
-        "debug": "~2.6.9",
-        "http-errors": "~1.6.2",
-        "morgan": "~1.9.0",
-        "pug": "2.0.0-beta11",
         "bootstrap": "4.0.0",
         "browser-sync": "2.23.6",
         "chart.js": "2.7.1",
+        "cookie-parser": "~1.4.3",
         "datatables.net-bs4": "1.10.16",
+        "debug": "~2.6.9",
         "express": "^4.16.3",
         "font-awesome": "4.7.0",
         "gulp-clean-css": "3.9.2",
@@ -41,8 +38,12 @@
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
         "gulp-uglify": "3.0.0",
+        "http-errors": "~1.6.2",
         "jquery": "3.3.1",
-        "jquery.easing": "^1.4.1"
+        "jquery.easing": "^1.4.1",
+        "jsdom": "^11.11.0",
+        "morgan": "~1.9.0",
+        "pug": "2.0.0-beta11"
     },
     "devDependencies": {
         "browser-sync": "2.23.6",
