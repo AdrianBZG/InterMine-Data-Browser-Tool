@@ -34,6 +34,7 @@ function initializeStartupConfiguration() {
     window.clinVarFilter = null;
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
+    window.pieChartObject = null;
 
     window.minesConfigs = null;
 
@@ -290,8 +291,6 @@ function flatten(arr) {
         return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
     }, []);
 }
-
-var myPieChart;
 
 /**
  * Method to update the im-table with the filters selected in the sidebar
@@ -814,8 +813,8 @@ function escapeMineURL(mineURL) {
 function updatePieChart(result, pieChartID) {
 
     // Update pie
-    if (myPieChart) {
-        myPieChart.destroy();
+    if (window.pieChartObject) {
+        window.pieChartObject.destroy();
     }
 
     var ctx = document.getElementById(pieChartID);
@@ -872,7 +871,7 @@ function updatePieChart(result, pieChartID) {
             if (elements.length) {
                 var index = elements[0]._index;
 
-                selectedSegment = myPieChart.data.labels[index].split("(")[0].trim();
+                selectedSegment = window.pieChartObject.data.labels[index].split("(")[0].trim();
 
                 // Filter the table
                 window.imTable.query.addConstraint({
@@ -883,11 +882,11 @@ function updatePieChart(result, pieChartID) {
 
             }
 
-            myPieChart.update();
+            window.pieChartObject.update();
         }
     };
 
-    myPieChart = new Chart(ctx, {
+    window.pieChartObject = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: labelsData,
