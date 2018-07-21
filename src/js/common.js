@@ -49,6 +49,14 @@ function initializeStartupConfiguration() {
     window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
     window.currentClassView = "Gene";
+
+    // Check if there is a saved mine in LocalStorage
+    if (typeof(Storage) !== "undefined") {
+        if(localStorage.getItem("selectedMineName") && localStorage.getItem("mineUrl")) {
+            window.mineUrl = localStorage.getItem("mineUrl");
+            window.selectedMineName = localStorage.getItem("selectedMineName");
+        }
+    }
 }
 
 /**
@@ -1118,11 +1126,18 @@ function fillMineSelector() {
 
             // Event handling
             $("#mineSelector").change(function() {
+                // Update settings
                 window.mineUrl = $(this).val();
                 window.selectedMineName = $("#mineSelector option:selected").text();
                 document.title = window.currentClassView + " in " + window.selectedMineName;
                 window.datasetNamesLoaded = false;
                 window.extraFiltersAdded = false;
+
+                // Update LocalStorage if its available
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.setItem("mineUrl", window.mineUrl);
+                    localStorage.setItem("selectedMineName", window.selectedMineName);
+                }
 
                 // Update the imTable
                 clearExtraFilters();
