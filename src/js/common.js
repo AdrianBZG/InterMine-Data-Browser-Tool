@@ -516,8 +516,8 @@ function addExtraFilters() {
                         var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                         $("#diseasesFilterList").append(
-                            '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
+                            '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+                
                         $("#" + buttonId).click(function() {
                             remove(window.imTableConstraint[4], ui.item.value);
                             updateTableWithConstraints();
@@ -704,8 +704,8 @@ function addExtraFilters() {
                         var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                         $("#proteinDomainNameFilterList").append(
-                            '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
+                            '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+                
                         $("#" + buttonId).click(function() {
                             remove(window.imTableConstraint[3], ui.item.value);
                             updateTableWithConstraints();
@@ -952,8 +952,8 @@ function addDefaultFilters() {
                 var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                 $("#goAnnotationFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
+                    '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+                
                 $("#" + buttonId).click(function() {
                     remove(window.imTableConstraint[0], ui.item.value);
                     updateTableWithConstraints();
@@ -1056,8 +1056,8 @@ function addDefaultFilters() {
                 var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                 $("#pathwayFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
+                    '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+                
                 $("#" + buttonId).click(function() {
                     remove(window.imTableConstraint[2], ui.item.value);
                     updateTableWithConstraints();
