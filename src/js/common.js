@@ -1,4 +1,4 @@
-$(document).ready(function() {    
+$(document).ready(function() {
     checkForHTTPS();
     initializeStartupConfiguration();
 });
@@ -808,7 +808,7 @@ function formatMineURL(mineURL) {
 /**
  * Method that escapes a mine URL (to valid URL format)
  * @param {string} mineURL: the mine URL
-* @returns {string} the formatted mine URL
+ * @returns {string} the formatted mine URL
  */
 function escapeMineURL(mineURL) {
     return mineURL.replace(/COLON/g, ":").replace(/SLASH/g, "/");
@@ -1070,6 +1070,8 @@ function addDefaultFilters() {
  */
 function fillMineSelector() {
     if ($('#mineSelector option').length == 0) {
+        var windowUrl = new URL(window.location.href);
+
         $.when(getIntermines()).done(function(result) {
             $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
 
@@ -1095,9 +1097,24 @@ function fillMineSelector() {
                 mineUrl = formatMineURL(mineUrl);
 
                 $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+
+                // In case that the user gave a mine to be rendered, set it here
+                if (windowUrl.searchParams.get("givenMine") && result.instances[i].name == windowUrl.searchParams.get("givenMine")) {
+                    window.mineUrl = mineUrl;
+                    window.selectedMineName = result.instances[i].name;
+                    document.title = window.currentClassView + " in " + window.selectedMineName;
+
+                    // Update the imTable
+                    clearExtraFilters();
+                    updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                }
+
             }
 
-            $("#mineSelector").val($("#mineSelector option:first").val());
+            // Select the correct option from the dropdown
+            $("#mineSelector option").filter(function() {
+                return $(this).text() == window.selectedMineName;
+            }).prop("selected", true);
 
             // Event handling
             $("#mineSelector").change(function() {
