@@ -1171,6 +1171,9 @@ function fillMineSelector() {
                     }
                 );
             });
+
+            // And now fire change event for the dropdown
+            $('#mineSelector').trigger('change');
         });
     }
 }
