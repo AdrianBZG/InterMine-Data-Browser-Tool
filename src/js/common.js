@@ -1,4 +1,12 @@
-$(document).ready(function() {
+$(document).ready(function() {    
+    checkForHTTPS();
+    initializeStartupConfiguration();
+});
+
+/**
+ * This method checks if the user is using HTTPS protocol to access the browser in order to show an informative warning
+ */
+function checkForHTTPS() {
     if (window.location.protocol.includes("https")) {
         $("#navbarResponsive").prepend("<div class='alert' id='httpsAlert'><span class='closebtn' id='closeHttpsMessage'>×</span>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP.</div><br/>");
 
@@ -6,15 +14,13 @@ $(document).ready(function() {
             $("#httpsAlert").hide();
         });
     }
+}
 
-    if ($(window).width() < 992) {
-        $("#pathwayNameSearchCardBlock").removeClass("show");
-        $("#datasetNameSearchCardBlock").removeClass("show");
-        $("#goAnnotationSearchCardBlock").removeClass("show");
-        $("#locationSearchCardBlock").removeClass("show");
-        $("#proteinDomainNameSearchCardBlock").removeClass("show");
-    }
-
+/**
+ * This method initialies the global variables used for the filters, reads the JSON filters config
+ * and handles the default mine view.
+ */
+function initializeStartupConfiguration() {
     window.imTableConstraint = [
         [],
         [],
@@ -42,7 +48,7 @@ $(document).ready(function() {
     window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
     window.currentClassView = "Gene";
-});
+}
 
 /**
  * This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
@@ -428,6 +434,9 @@ function showMoreDatasetNames() {
     });
 }
 
+/**
+ * Method to read a json file from a given location
+ */
 function readTextFile(file, callback) {
     var rawFile = new XMLHttpRequest();
     rawFile.overrideMimeType("application/json");
@@ -440,6 +449,9 @@ function readTextFile(file, callback) {
     rawFile.send(null);
 }
 
+/**
+ * Method to remove the current extra filters in the sidebar
+ */
 function clearExtraFilters() {
     $("#locationFilterLi").remove();
     $("#diseasesFilterLi").remove();
@@ -889,97 +901,9 @@ function updatePieChart(result, pieChartID) {
 }
 
 /**
- * Method updates the piechart and sidebar elements according to the received constraints
- * @param {string} constraints: the new constraints that the im-table is using
- * @param {string} pieChartID: the div id of the pie chart, in order to update it
+ * Method to add the default filters for all mines
  */
-function updateElements(constraints, pieChartID) {
-    if ($('#mineSelector option').length == 0) {
-        $.when(getIntermines()).done(function(result) {
-            $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
-
-            for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].name == "HumanMine" || result.instances[i].url.startsWith("https")) continue;
-
-                // Temporarily skiping mines with missing concepts for the default filters
-                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
-
-                // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
-
-                var mineUrl = result.instances[i].url;
-
-                // Check for mines not requiring to format the URL
-                if (mineUrl[mineUrl.length - 1] == "/") {
-                    mineUrl += "service";
-                } else {
-                    mineUrl += "/service";
-                }
-
-
-                mineUrl = escapeMineURL(mineUrl);
-
-                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
-            }
-
-            $("#mineSelector").val($("#mineSelector option:first").val());
-
-            // Event handling
-            $("#mineSelector").change(function() {
-                window.mineUrl = $(this).val();
-                window.selectedMineName = $("#mineSelector option:selected").text();
-                document.title = window.currentClassView + " in " + window.selectedMineName;
-                window.datasetNamesLoaded = false;
-                window.extraFiltersAdded = false;
-
-                // Update the imTable
-                clearExtraFilters();
-                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
-
-                // Instantiate the im-table with all the data available in Gene from HumanMine
-                var selector = '#dataTable';
-                var service = {
-                    root: escapeMineURL(window.mineUrl)
-                };
-                var query = {
-                    select: ['*'],
-                    from: window.currentClassView
-                };
-
-                imtables.configure({
-                    TableCell: {
-                        PreviewTrigger: 'click'
-                    }
-                });
-
-                imtables.configure('TableResults.CacheFactor', 20);
-
-                var imtable = imtables.loadTable(
-                    selector, {
-                        "start": 0,
-                        "size": 25
-                    }, {
-                        service: service,
-                        query: query
-                    }
-                ).then(
-                    function(table) {
-                        console.log('Table loaded', table);
-                        //this .on listener will do something when someone interacts with the table. 
-                        table.on("all", function(changeDetail) {
-                            updateElements(table.history.currentQuery.constraints, "PieChart");
-                        });
-
-                        window.imTable = table;
-                    },
-                    function(error) {
-                        console.error('Could not load table', error);
-                    }
-                );
-            });
-        });
-    }
-
+function addDefaultFilters() {
     $.when(getOntologyTermsInClass()).done(function(result) {
 
         var availableGoTerms = [];
@@ -1131,13 +1055,120 @@ function updateElements(constraints, pieChartID) {
         });
 
     });
+}
 
+/**
+ * Method to fill the mine selector and add the proper event handling
+ */
+function fillMineSelector() {
+    if ($('#mineSelector option').length == 0) {
+        $.when(getIntermines()).done(function(result) {
+            $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
+
+            for (var i = 0; i < result.instances.length; i++) {
+                if (result.instances[i].name == "HumanMine" || result.instances[i].url.startsWith("https")) continue;
+
+                // Temporarily skiping mines with missing concepts for the default filters
+                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+
+                // Mines giving error when querying the API or not responding
+                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+
+                var mineUrl = result.instances[i].url;
+
+                // Check for mines not requiring to format the URL
+                if (mineUrl[mineUrl.length - 1] == "/") {
+                    mineUrl += "service";
+                } else {
+                    mineUrl += "/service";
+                }
+
+
+                mineUrl = escapeMineURL(mineUrl);
+
+                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+            }
+
+            $("#mineSelector").val($("#mineSelector option:first").val());
+
+            // Event handling
+            $("#mineSelector").change(function() {
+                window.mineUrl = $(this).val();
+                window.selectedMineName = $("#mineSelector option:selected").text();
+                document.title = window.currentClassView + " in " + window.selectedMineName;
+                window.datasetNamesLoaded = false;
+                window.extraFiltersAdded = false;
+
+                // Update the imTable
+                clearExtraFilters();
+                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+
+                // Instantiate the im-table with all the data available in Gene from HumanMine
+                var selector = '#dataTable';
+                var service = {
+                    root: escapeMineURL(window.mineUrl)
+                };
+                var query = {
+                    select: ['*'],
+                    from: window.currentClassView
+                };
+
+                imtables.configure({
+                    TableCell: {
+                        PreviewTrigger: 'click'
+                    }
+                });
+
+                imtables.configure('TableResults.CacheFactor', 20);
+
+                var imtable = imtables.loadTable(
+                    selector, {
+                        "start": 0,
+                        "size": 25
+                    }, {
+                        service: service,
+                        query: query
+                    }
+                ).then(
+                    function(table) {
+                        console.log('Table loaded', table);
+                        //this .on listener will do something when someone interacts with the table. 
+                        table.on("all", function(changeDetail) {
+                            updateElements(table.history.currentQuery.constraints, "PieChart");
+                        });
+
+                        window.imTable = table;
+                    },
+                    function(error) {
+                        console.error('Could not load table', error);
+                    }
+                );
+            });
+        });
+    }
+}
+
+/**
+ * Method to handle the extra filters available in the current selected mine
+ */
+function handleExtraFilters() {
     if (!window.extraFiltersAdded) {
         if (window.minesConfigs[window.selectedMineName]) {
             addExtraFilters();
             window.extraFiltersAdded = true;
         }
     }
+}
+
+/**
+ * Method updates the piechart and sidebar elements according to the received constraints
+ * @param {string} constraints: the new constraints that the im-table is using
+ * @param {string} pieChartID: the div id of the pie chart, in order to update it
+ */
+function updateElements(constraints, pieChartID) {
+    fillMineSelector();
+    addDefaultFilters();
+    handleExtraFilters();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
         displayItemsInClass(result);
