@@ -797,12 +797,21 @@ function displayItemsInClass(result) {
 }
 
 /**
- * Method that escapes a mine URL
+ * Method that escapes a mine URL (to not valid URL format)
  * @param {string} mineURL: the mine URL
  * @returns {string} the escapped mine URL
  */
+function formatMineURL(mineURL) {
+    return mineURL.replace(/:/g, "COLON").replace(/\//g, "SLASH");
+}
+
+/**
+ * Method that escapes a mine URL (to valid URL format)
+ * @param {string} mineURL: the mine URL
+* @returns {string} the formatted mine URL
+ */
 function escapeMineURL(mineURL) {
-    return mineUrl.replace(/:/g, "COLON").replace(/\//g, "SLASH");
+    return mineURL.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 }
 
 /**
@@ -1083,7 +1092,7 @@ function fillMineSelector() {
                 }
 
 
-                mineUrl = escapeMineURL(mineUrl);
+                mineUrl = formatMineURL(mineUrl);
 
                 $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
             }
@@ -1130,9 +1139,11 @@ function fillMineSelector() {
                     }
                 ).then(
                     function(table) {
-                        console.log('Table loaded', table);
+                        //console.log('Table loaded', table);
                         //this .on listener will do something when someone interacts with the table. 
-                        table.on("all", function(changeDetail) {
+                        table.on("rendered", function(changeDetail) {
+                            console.log("Rendered table");
+                            console.log(changeDetail);
                             updateElements(table.history.currentQuery.constraints, "PieChart");
                         });
 
