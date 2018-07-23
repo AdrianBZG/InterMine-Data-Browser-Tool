@@ -48,7 +48,7 @@ function initializeStartupConfiguration() {
 
     // Check if there is a saved mine in LocalStorage
     if (typeof(Storage) !== "undefined") {
-        if(localStorage.getItem("selectedMineName") && localStorage.getItem("mineUrl")) {
+        if (localStorage.getItem("selectedMineName") && localStorage.getItem("mineUrl")) {
             window.mineUrl = localStorage.getItem("mineUrl");
             window.selectedMineName = localStorage.getItem("selectedMineName");
         }
@@ -513,7 +513,7 @@ function addExtraFilters() {
 
                         $("#diseasesFilterList").append(
                             '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
-                
+
                         $("#" + buttonId).click(function() {
                             remove(window.imTableConstraint[4], ui.item.value);
                             updateTableWithConstraints();
@@ -701,7 +701,7 @@ function addExtraFilters() {
 
                         $("#proteinDomainNameFilterList").append(
                             '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
-                
+
                         $("#" + buttonId).click(function() {
                             remove(window.imTableConstraint[3], ui.item.value);
                             updateTableWithConstraints();
@@ -916,157 +916,172 @@ function updatePieChart(result, pieChartID) {
  * Method to add the default filters for all mines
  */
 function addDefaultFilters() {
-    $.when(getOntologyTermsInClass()).done(function(result) {
+    try {
+        $.when(getOntologyTermsInClass()).done(function(result) {
 
-        var availableGoTerms = [];
-
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availableGoTerms.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
-                });
-            }
-        }
-
-        $("#goAnnotationSearchInput").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
-                response(results.slice(0, 15));
-            },
-            updater: function(item) {
-                return item;
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#goAnnotationSearchInput").val(ui.item.value);
-
-                window.imTableConstraint[0].push(ui.item.value);
-                updateTableWithConstraints();
-
-                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                $("#goAnnotationFilterList").append(
-                    '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
-                
-                $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[0], ui.item.value);
-                    updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#goAnnotationSearchInput").val(ui.item.value);
-            }
-        });
-
-    });
-
-    $.when(getDatasetNamesInClass()).done(function(result) {
-        if (!window.datasetNamesLoaded) {
-            var availableDatasetNames = [];
+            var availableGoTerms = [];
 
             for (var i = 0; i < result.results.length; i++) {
                 if (result.results[i]["item"] != null) {
-                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
-                        continue;
-                    }
-                    availableDatasetNames.push({
+                    availableGoTerms.push({
                         label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
                         value: result.results[i]["item"]
                     });
                 }
             }
 
-            // First remove the form-check elements
-            $('#datasetsSelector').empty();
+            $("#goAnnotationSearchInput").autocomplete({
+                minLength: 3,
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
+                    response(results.slice(0, 15));
+                },
+                updater: function(item) {
+                    return item;
+                },
+                select: function(event, ui) {
+                    event.preventDefault();
+                    $("#goAnnotationSearchInput").val(ui.item.value);
 
-            var resultantElementsNumber = result.results.length;
-            var resultantElementsArray = [];
-
-            for (var i = 0; i < availableDatasetNames.length; i++) {
-                resultantElementsArray.push(availableDatasetNames[i]["value"]);
-            }
-
-            resultantElementsArray.sort();
-
-            // At most, 3 elements, which are ordered (top 3)
-            if (resultantElementsNumber > 3) {
-                resultantElementsNumber = 3;
-            }
-
-            // Fill the organism short name dropdown with top 5 organisms according to count
-            for (var i = 0; i < resultantElementsNumber; i++) {
-                var datasetName = resultantElementsArray[i];
-                //var datasetCount = "(" + result.results[i]["count"] + ")";
-                $("#datasetsSelector").append(
-                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-
-                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
-                    if ($(this).is(":checked")) {
-                        var checkboxValue = $(this).val();
-                        window.imTableConstraint[1].push(checkboxValue);
-                        updateTableWithConstraints();
-                    } else {
-                        var checkboxValue = $(this).val();
-                        remove(window.imTableConstraint[1], checkboxValue);
-                        updateTableWithConstraints();
-                    }
-                });
-            }
-
-            window.datasetNamesLoaded = true;
-        }
-
-    });
-
-    $.when(getPathwayNamesInClass()).done(function(result) {
-
-        var availablePathwayNames = [];
-
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availablePathwayNames.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
-                });
-            }
-        }
-
-        $("#pathwayNameSearchInput").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
-                response(results.slice(0, 15));
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
-
-                // Filter the table
-                window.imTableConstraint[2].push(ui.item.value);
-                updateTableWithConstraints();
-
-                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                $("#pathwayFilterList").append(
-                    '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
-                
-                $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[2], ui.item.value);
+                    window.imTableConstraint[0].push(ui.item.value);
                     updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
-            }
-        });
 
-    });
+                    var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                    $("#goAnnotationFilterList").append(
+                        '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                    $("#" + buttonId).click(function() {
+                        remove(window.imTableConstraint[0], ui.item.value);
+                        updateTableWithConstraints();
+                        $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                    });
+                },
+                focus: function(event, ui) {
+                    event.preventDefault();
+                    $("#goAnnotationSearchInput").val(ui.item.value);
+                }
+            });
+
+        });
+    } catch (err) {
+        $("#goAnnotationFilterLi").remove();
+        console.log(err);
+    }
+
+    try {
+        $.when(getDatasetNamesInClass()).done(function(result) {
+            if (!window.datasetNamesLoaded) {
+                var availableDatasetNames = [];
+
+                for (var i = 0; i < result.results.length; i++) {
+                    if (result.results[i]["item"] != null) {
+                        if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
+                            continue;
+                        }
+                        availableDatasetNames.push({
+                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                            value: result.results[i]["item"]
+                        });
+                    }
+                }
+
+                // First remove the form-check elements
+                $('#datasetsSelector').empty();
+
+                var resultantElementsNumber = result.results.length;
+                var resultantElementsArray = [];
+
+                for (var i = 0; i < availableDatasetNames.length; i++) {
+                    resultantElementsArray.push(availableDatasetNames[i]["value"]);
+                }
+
+                resultantElementsArray.sort();
+
+                // At most, 3 elements, which are ordered (top 3)
+                if (resultantElementsNumber > 3) {
+                    resultantElementsNumber = 3;
+                }
+
+                // Fill the organism short name dropdown with top 5 organisms according to count
+                for (var i = 0; i < resultantElementsNumber; i++) {
+                    var datasetName = resultantElementsArray[i];
+                    //var datasetCount = "(" + result.results[i]["count"] + ")";
+                    $("#datasetsSelector").append(
+                        '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+
+                    $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
+                        if ($(this).is(":checked")) {
+                            var checkboxValue = $(this).val();
+                            window.imTableConstraint[1].push(checkboxValue);
+                            updateTableWithConstraints();
+                        } else {
+                            var checkboxValue = $(this).val();
+                            remove(window.imTableConstraint[1], checkboxValue);
+                            updateTableWithConstraints();
+                        }
+                    });
+                }
+
+                window.datasetNamesLoaded = true;
+            }
+
+        });
+    } catch (err) {
+        $("#datasetFilterLi").remove();
+        console.log(err);
+    }
+
+    try {
+        $.when(getPathwayNamesInClass()).done(function(result) {
+
+            var availablePathwayNames = [];
+
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    availablePathwayNames.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
+
+            $("#pathwayNameSearchInput").autocomplete({
+                minLength: 3,
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
+                    response(results.slice(0, 15));
+                },
+                select: function(event, ui) {
+                    event.preventDefault();
+                    $("#pathwayNameSearchInput").val(ui.item.value);
+
+                    // Filter the table
+                    window.imTableConstraint[2].push(ui.item.value);
+                    updateTableWithConstraints();
+
+                    var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                    $("#pathwayFilterList").append(
+                        '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                    $("#" + buttonId).click(function() {
+                        remove(window.imTableConstraint[2], ui.item.value);
+                        updateTableWithConstraints();
+                        $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                    });
+                },
+                focus: function(event, ui) {
+                    event.preventDefault();
+                    $("#pathwayNameSearchInput").val(ui.item.value);
+                }
+            });
+
+        });
+    } catch (err) {
+        $("#pathwayNameFilterLi").remove();
+        console.log(err);
+    }
 }
 
 /**

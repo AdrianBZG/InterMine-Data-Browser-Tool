@@ -11,7 +11,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation')
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation' id='goAnnotationFilterLi')
 					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-search
 						span.nav-link-text
@@ -21,7 +21,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#goAnnotationFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name')
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name' id='datasetFilterLi')
 					a.nav-link(data-toggle="collapse", href="#datasetNameSearchCardBlock", aria-controls="datasetNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-database
 						span.nav-link-text
@@ -31,7 +31,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							form-group.ui-front
 								#datasetsSelector
 							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name' id='pathwayNameFilterLi')
 					a.nav-link(data-toggle="collapse", href="#pathwayNameSearchCardBlock", aria-controls="pathwayNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-code-fork
 						span.nav-link-text
@@ -41,7 +41,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#pathwayFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="e.g. Signal Transduction")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name' id='organismFilterLi')
 					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
 						i.fa.fa-fw.fa-lemon-o
 						span.nav-link-text
