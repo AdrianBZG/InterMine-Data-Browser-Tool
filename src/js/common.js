@@ -912,10 +912,7 @@ function updatePieChart(result, pieChartID) {
     });
 }
 
-/**
- * Method to add the default filters for all mines
- */
-function addDefaultFilters() {
+function createGoAnnotationFilter() {
     try {
         $.when(getOntologyTermsInClass()).done(function(result) {
 
@@ -968,8 +965,10 @@ function addDefaultFilters() {
         $("#goAnnotationFilterLi").remove();
         console.log(err);
     }
+}
 
-    try {
+function createDatasetFilter() {
+try {
         $.when(getDatasetNamesInClass()).done(function(result) {
             if (!window.datasetNamesLoaded) {
                 var availableDatasetNames = [];
@@ -1031,8 +1030,10 @@ function addDefaultFilters() {
         $("#datasetFilterLi").remove();
         console.log(err);
     }
+}
 
-    try {
+function createPathwaysNameFilter() {
+try {
         $.when(getPathwayNamesInClass()).done(function(result) {
 
             var availablePathwayNames = [];
@@ -1082,6 +1083,15 @@ function addDefaultFilters() {
         $("#pathwayNameFilterLi").remove();
         console.log(err);
     }
+}
+
+/**
+ * Method to add the default filters for all mines
+ */
+function addDefaultFilters() {
+    createGoAnnotationFilter();
+    createDatasetFilter();
+    createPathwaysNameFilter();
 }
 
 /**
