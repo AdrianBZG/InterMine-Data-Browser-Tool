@@ -463,6 +463,7 @@ function clearExtraFilters() {
     $("#proteinDomainFilterLi").remove();
     $("#interactionsFilterLi").remove();
     $("#expressionFilterLi").remove();
+    $("#datasetFilterLi").remove();
     window.extraFiltersAdded = false;
 }
 
@@ -475,6 +476,50 @@ function addExtraFilters() {
         if (extraFiltersAvailable.includes('location')) {
             $("#sidebarUl").append(
                 '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Location" id="locationFilterLi"><a class="nav-link" data-toggle="collapse" href="#locationSearchCardBlock" aria-controls="locationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-location-arrow"></i><span class="nav-link-text"></span>Location</a>    <div class="card" style="width: 100%;">        <div class="collapse card-block" id="locationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <div class="ul list-group list-group-flush" id="locationFilterList"></div>            <form-group class="ui-front">                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;" /></div>                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;" /><input class="form-control" type="text" id="locationEndSearchInput" placeholder="End" style="width: 45%;"                    /></div><button class="btn btn-success" type="button" style="width:100%;" id="locationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="locationResetButton">Reset</button></form-group>        </div>    </div></li>');
+        }
+
+        // Expression filter
+        if (extraFiltersAvailable.includes('expression')) {
+            $("#sidebarUl").append(
+                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
+
+        }
+
+        // Interactions filter
+        if (extraFiltersAvailable.includes('interactions')) {
+            $("#sidebarUl").append(
+                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
+
+            $.when(getParticipant2SymbolsInClass()).done(function(result) {
+
+                var availableParticipant2Symbol = [];
+
+                for (var i = 0; i < result.results.length; i++) {
+                    if (result.results[i]["item"] != null) {
+                        availableParticipant2Symbol.push({
+                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                            value: result.results[i]["item"]
+                        });
+                    }
+                }
+
+                $("#interactionsParticipant2SearchInput").autocomplete({
+                    minLength: 3,
+                    source: function(request, response) {
+                        var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
+                        response(results.slice(0, 15));
+                    },
+                    select: function(event, ui) {
+                        event.preventDefault();
+                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
+                    },
+                    focus: function(event, ui) {
+                        event.preventDefault();
+                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
+                    }
+                });
+
+            });
         }
 
         // Diseases filter
@@ -717,49 +762,7 @@ function addExtraFilters() {
             });
         }
 
-        // Interactions filter
-        if (extraFiltersAvailable.includes('interactions')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
-
-            $.when(getParticipant2SymbolsInClass()).done(function(result) {
-
-                var availableParticipant2Symbol = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableParticipant2Symbol.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
-                    }
-                }
-
-                $("#interactionsParticipant2SearchInput").autocomplete({
-                    minLength: 3,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
-                    }
-                });
-
-            });
-        }
-
-        // Expression filter
-        if (extraFiltersAvailable.includes('expression')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
-
-        }
+        createDatasetFilter(); // Dataset filter should be the last one
 
         window.extraFiltersAdded = true;
     }
@@ -969,6 +972,11 @@ function createGoAnnotationFilter() {
 
 function createDatasetFilter() {
 try {
+        if($("#datasetFilterLi").length == 0) {
+            $("#sidebarUl").append(
+                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dataset Name" id="datasetFilterLi"><a class="nav-link" data-toggle="collapse" href="#datasetNameSearchCardBlock" aria-controls="datasetNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-database"></i><span class="nav-link-text"></span>Dataset Name</a><div class="card" style="width: 100%;">        <div class="collapse card-block" id="datasetNameSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <form-group class="ui-front">                <div id="datasetsSelector"></div>            </form-group><button class="btn btn-block btn-warning" id="btnDatasetViewMore" type="button">View more</button></div>    </div></li>');
+        }
+        
         $.when(getDatasetNamesInClass()).done(function(result) {
             if (!window.datasetNamesLoaded) {
                 var availableDatasetNames = [];
@@ -1089,9 +1097,8 @@ try {
  * Method to add the default filters for all mines
  */
 function addDefaultFilters() {
-    createGoAnnotationFilter();
-    createDatasetFilter();
     createPathwaysNameFilter();
+    createGoAnnotationFilter();
 }
 
 /**
@@ -1221,7 +1228,12 @@ function handleExtraFilters() {
     if (!window.extraFiltersAdded) {
         if (window.minesConfigs[window.selectedMineName]) {
             addExtraFilters();
+            console.log("Hi1");
             window.extraFiltersAdded = true;
+        } else {
+            // Dataset filter should be the last one
+            console.log("Hi2");
+            createDatasetFilter();
         }
     }
 }
