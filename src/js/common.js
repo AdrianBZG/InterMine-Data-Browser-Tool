@@ -1,7 +1,48 @@
 $(document).ready(function() {
     checkForHTTPS();
     initializeStartupConfiguration();
+    handleResponsiveness();
 });
+
+/**
+ * This method checks if there has been any window resize event to change the navbar padding accordingly
+ */
+function handleResponsiveness() {
+    var width = $(window).width();
+
+    // Initial sizing
+    if(width < 992) {
+        var navbarHeight = $("#navbarResponsive").height();
+        if(width < 770) {
+            $("body.fixed-nav").css("padding-top", navbarHeight + 75);
+        } else {
+            $("body.fixed-nav").css("padding-top", navbarHeight + 56);
+        }
+    }
+    else {
+        $("body.fixed-nav").css("padding-top", "56px");
+    }
+
+    // Event handling
+    $(window).on('resize', function() {
+        if($(this).width() != width) {
+            width = $(this).width();
+            // Regular device
+            if(width < 992) {
+                var navbarHeight = $("#navbarResponsive").height();
+                if(width < 770) {
+                    $("body.fixed-nav").css("padding-top", navbarHeight + 75);
+                } else {
+                    $("body.fixed-nav").css("padding-top", navbarHeight + 56);
+                }
+            }
+            // Small device
+            else {
+                $("body.fixed-nav").css("padding-top", "56px");
+            }
+        }
+    });
+}
 
 /**
  * This method checks if the user is using HTTPS protocol to access the browser in order to show an informative warning
@@ -1228,11 +1269,9 @@ function handleExtraFilters() {
     if (!window.extraFiltersAdded) {
         if (window.minesConfigs[window.selectedMineName]) {
             addExtraFilters();
-            console.log("Hi1");
             window.extraFiltersAdded = true;
         } else {
             // Dataset filter should be the last one
-            console.log("Hi2");
             createDatasetFilter();
         }
     }
