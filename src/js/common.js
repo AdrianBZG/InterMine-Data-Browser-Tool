@@ -11,26 +11,25 @@ function handleResponsiveness() {
     var width = $(window).width();
 
     // Initial sizing
-    if(width < 992) {
+    if (width < 992) {
         var navbarHeight = $("#navbarResponsive").height();
-        if(width < 770) {
+        if (width < 770) {
             $("body.fixed-nav").css("padding-top", navbarHeight + 75);
         } else {
             $("body.fixed-nav").css("padding-top", navbarHeight + 56);
         }
-    }
-    else {
+    } else {
         $("body.fixed-nav").css("padding-top", "56px");
     }
 
     // Event handling
     $(window).on('resize', function() {
-        if($(this).width() != width) {
+        if ($(this).width() != width) {
             width = $(this).width();
             // Regular device
-            if(width < 992) {
+            if (width < 992) {
                 var navbarHeight = $("#navbarResponsive").height();
-                if(width < 770) {
+                if (width < 770) {
                     $("body.fixed-nav").css("padding-top", navbarHeight + 75);
                 } else {
                     $("body.fixed-nav").css("padding-top", navbarHeight + 56);
@@ -1012,12 +1011,12 @@ function createGoAnnotationFilter() {
 }
 
 function createDatasetFilter() {
-try {
-        if($("#datasetFilterLi").length == 0) {
+    try {
+        if ($("#datasetFilterLi").length == 0) {
             $("#sidebarUl").append(
                 '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dataset Name" id="datasetFilterLi"><a class="nav-link" data-toggle="collapse" href="#datasetNameSearchCardBlock" aria-controls="datasetNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-database"></i><span class="nav-link-text"></span>Dataset Name</a><div class="card" style="width: 100%;">        <div class="collapse card-block" id="datasetNameSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <form-group class="ui-front">                <div id="datasetsSelector"></div>            </form-group><button class="btn btn-block btn-warning" id="btnDatasetViewMore" type="button">View more</button></div>    </div></li>');
         }
-        
+
         $.when(getDatasetNamesInClass()).done(function(result) {
             if (!window.datasetNamesLoaded) {
                 var availableDatasetNames = [];
@@ -1082,7 +1081,7 @@ try {
 }
 
 function createPathwaysNameFilter() {
-try {
+    try {
         $.when(getPathwayNamesInClass()).done(function(result) {
 
             var availablePathwayNames = [];
@@ -1194,70 +1193,108 @@ function fillMineSelector() {
             }).prop("selected", true);
 
             // Event handling
-            $("#mineSelector").change(function() {
-                // Update settings
-                window.mineUrl = $(this).val();
-                window.selectedMineName = $("#mineSelector option:selected").text();
-                document.title = window.currentClassView + " in " + window.selectedMineName;
-                window.datasetNamesLoaded = false;
-                window.extraFiltersAdded = false;
+            $("#mineSelector").change(function(e) {
+                // Sanity check
+                var sanity = true;
+                var selectedOption = $("#mineSelector option:selected").text();
+                var selectedOptionUrl = $(this).val();
 
-                // Update LocalStorage if its available
-                if (typeof(Storage) !== "undefined") {
-                    localStorage.setItem("mineUrl", window.mineUrl);
-                    localStorage.setItem("selectedMineName", window.selectedMineName);
-                }
+                $.ajax({
+                    'url': escapeMineURL(selectedOptionUrl),
+                    data: {},
+                    async: false,
+                    error: function(xhr, status) {
+                        // Check for error and cancel mine switching if an error appeared
 
-                // Update the imTable
-                clearExtraFilters();
-                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                        // Server or Client errors
+                        if ((xhr.status >= 500 && xhr.status <= 511) || (xhr.status >= 400 && xhr.status <= 431)) {
+                            // Show error
+                            if ($("#unavailableMineAlert").length == 0) {
+                                $("#navbarResponsive").prepend("<div class='alert' id='unavailableMineAlert'><span class='closebtn' id='closeUnavailableMineAlert'>×</span>Sorry, it looks like the " + selectedOption + " server is having problems right now. You can try coming back later, or try browsing a different mine using the mine selector in the top-left corner.</div><br/>");
 
-                // Instantiate the im-table with all the data available in Gene from HumanMine
-                var selector = '#dataTable';
-                var service = {
-                    root: escapeMineURL(window.mineUrl)
-                };
-                var query = {
-                    select: ['*'],
-                    from: window.currentClassView
-                };
+                                $("#closeUnavailableMineAlert").click(function() {
+                                    $("#unavailableMineAlert").hide();
+                                });
+                            } else {
+                                $("#unavailableMineAlert").show();
+                            }
 
-                imtables.configure({
-                    TableCell: {
-                        PreviewTrigger: 'click'
+                            // Handle error
+                            sanity = false;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            return false;
+                        }
                     }
                 });
 
-                imtables.configure('TableResults.CacheFactor', 20);
+                if (sanity) {
+                    // Update settings
+                    window.mineUrl = selectedOptionUrl;
+                    window.selectedMineName = selectedOption;
+                    document.title = window.currentClassView + " in " + window.selectedMineName;
+                    window.datasetNamesLoaded = false;
+                    window.extraFiltersAdded = false;
 
-                var imtable = imtables.loadTable(
-                    selector, {
-                        "start": 0,
-                        "size": 25
-                    }, {
-                        service: service,
-                        query: query
+                    // Update LocalStorage if its available
+                    if (typeof(Storage) !== "undefined") {
+                        localStorage.setItem("mineUrl", window.mineUrl);
+                        localStorage.setItem("selectedMineName", window.selectedMineName);
                     }
-                ).then(
-                    function(table) {
-                        //console.log('Table loaded', table);
-                        //this .on listener will do something when someone interacts with the table. 
-                        table.on("rendered", function(changeDetail) {
-                            console.log("Rendered table");
-                            console.log(changeDetail);
-                            updateElements(table.history.currentQuery.constraints, "PieChart");
-                        });
 
-                        window.imTable = table;
-                    },
-                    function(error) {
-                        console.error('Could not load table', error);
-                    }
-                );
+                    // Update the imTable
+                    clearExtraFilters();
+                    updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+
+                    // Instantiate the im-table with all the data available in Gene from HumanMine
+                    var selector = '#dataTable';
+                    var service = {
+                        root: escapeMineURL(window.mineUrl)
+                    };
+                    var query = {
+                        select: ['*'],
+                        from: window.currentClassView
+                    };
+
+                    imtables.configure({
+                        TableCell: {
+                            PreviewTrigger: 'click'
+                        }
+                    });
+
+                    imtables.configure('TableResults.CacheFactor', 20);
+
+                    var imtable = imtables.loadTable(
+                        selector, {
+                            "start": 0,
+                            "size": 25
+                        }, {
+                            service: service,
+                            query: query
+                        }
+                    ).then(
+                        function(table) {
+                            //console.log('Table loaded', table);
+                            //this .on listener will do something when someone interacts with the table. 
+                            table.on("rendered", function(changeDetail) {
+                                console.log("Rendered table");
+                                console.log(changeDetail);
+                                updateElements(table.history.currentQuery.constraints, "PieChart");
+                            });
+
+                            window.imTable = table;
+                        },
+                        function(error) {
+                            console.error('Could not load table', error);
+                        }
+                    );
+                }
             });
 
             // And now fire change event for the dropdown
             $('#mineSelector').trigger('change');
+
         });
     }
 }
