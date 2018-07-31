@@ -2,12 +2,12 @@
 nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	a.navbar-brand(href='/')
 		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
+	select#mineSelector.form-control(style="width: 200px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 	div#headerButtons.col-md-10.text-center
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
 			button.btn.btn-primary.btn-space(id="genesButton" type="button") Genes
 		a(href="/proteins" data-toggle="tooltip" title="Change to Proteins view")
 			button.btn.btn-default.btn-space(id="proteinsButton" type="button") Proteins
-		select#mineSelector.form-control(style="width: 150px; position: fixed; top: 10px; right: 75px;")
 	
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
