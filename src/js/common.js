@@ -1,20 +1,62 @@
 $(document).ready(function() {
+    checkForHTTPS();
+    initializeStartupConfiguration();
+    handleResponsiveness();
+});
+
+/**
+ * This method checks if there has been any window resize event to change the navbar padding accordingly
+ */
+function handleResponsiveness() {
+    var width = $(window).width();
+
+    // Initial sizing
+    if (width < 992) {
+        var navbarHeight = $("#navbarResponsive").height();
+        if (width < 770) {
+            $("body.fixed-nav").css("padding-top", navbarHeight + 75);
+        } else {
+            $("body.fixed-nav").css("padding-top", navbarHeight + 56);
+        }
+    } else {
+        $("body.fixed-nav").css("padding-top", "56px");
+    }
+
+    // Event handling
+    $(window).on('resize', function() {
+        if ($(this).width() != width) {
+            width = $(this).width();
+            // Regular device
+            if (width < 992) {
+                var navbarHeight = $("#navbarResponsive").height();
+                if (width < 770) {
+                    $("body.fixed-nav").css("padding-top", navbarHeight + 75);
+                } else {
+                    $("body.fixed-nav").css("padding-top", navbarHeight + 56);
+                }
+            }
+            // Small device
+            else {
+                $("body.fixed-nav").css("padding-top", "56px");
+            }
+        }
+    });
+}
+
+/**
+ * This method checks if the user is using HTTPS protocol to access the browser in order to show an informative warning
+ */
+function checkForHTTPS() {
     if (window.location.protocol.includes("https")) {
-        $("#navbarResponsive").prepend("<div class='alert' id='httpsAlert'><span class='closebtn' id='closeHttpsMessage'>×</span>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP.</div><br/>");
-
-        $("#closeHttpsMessage").click(function() {
-            $("#httpsAlert").hide();
-        });
+        $("#navbarResponsive").prepend("<div class='alert' id='httpsAlert'>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP, and/or allow unsafe scripts to run.</div><br/>");
     }
+}
 
-    if ($(window).width() < 992) {
-        $("#pathwayNameSearchCardBlock").removeClass("show");
-        $("#datasetNameSearchCardBlock").removeClass("show");
-        $("#goAnnotationSearchCardBlock").removeClass("show");
-        $("#locationSearchCardBlock").removeClass("show");
-        $("#proteinDomainNameSearchCardBlock").removeClass("show");
-    }
-
+/**
+ * This method initialies the global variables used for the filters, reads the JSON filters config
+ * and handles the default mine view.
+ */
+function initializeStartupConfiguration() {
     window.imTableConstraint = [
         [],
         [],
@@ -28,6 +70,7 @@ $(document).ready(function() {
     window.clinVarFilter = null;
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
+    window.pieChartObject = null;
 
     window.minesConfigs = null;
 
@@ -42,7 +85,15 @@ $(document).ready(function() {
     window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
     window.currentClassView = "Gene";
-});
+
+    // Check if there is a saved mine in LocalStorage
+    if (typeof(Storage) !== "undefined") {
+        if (localStorage.getItem("selectedMineName") && localStorage.getItem("mineUrl")) {
+            window.mineUrl = localStorage.getItem("mineUrl");
+            window.selectedMineName = localStorage.getItem("selectedMineName");
+        }
+    }
+}
 
 /**
  * This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
@@ -285,8 +336,6 @@ function flatten(arr) {
     }, []);
 }
 
-var myPieChart;
-
 /**
  * Method to update the im-table with the filters selected in the sidebar
  */
@@ -295,8 +344,7 @@ function updateTableWithConstraints() {
     while (window.imTable.query.constraints.length > 0) {
         try {
             window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
-        }
-        catch(err) {
+        } catch (err) {
             continue;
         }
     }
@@ -429,6 +477,9 @@ function showMoreDatasetNames() {
     });
 }
 
+/**
+ * Method to read a json file from a given location
+ */
 function readTextFile(file, callback) {
     var rawFile = new XMLHttpRequest();
     rawFile.overrideMimeType("application/json");
@@ -441,6 +492,9 @@ function readTextFile(file, callback) {
     rawFile.send(null);
 }
 
+/**
+ * Method to remove the current extra filters in the sidebar
+ */
 function clearExtraFilters() {
     $("#locationFilterLi").remove();
     $("#diseasesFilterLi").remove();
@@ -449,6 +503,7 @@ function clearExtraFilters() {
     $("#proteinDomainFilterLi").remove();
     $("#interactionsFilterLi").remove();
     $("#expressionFilterLi").remove();
+    $("#datasetFilterLi").remove();
     window.extraFiltersAdded = false;
 }
 
@@ -461,6 +516,50 @@ function addExtraFilters() {
         if (extraFiltersAvailable.includes('location')) {
             $("#sidebarUl").append(
                 '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Location" id="locationFilterLi"><a class="nav-link" data-toggle="collapse" href="#locationSearchCardBlock" aria-controls="locationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-location-arrow"></i><span class="nav-link-text"></span>Location</a>    <div class="card" style="width: 100%;">        <div class="collapse card-block" id="locationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <div class="ul list-group list-group-flush" id="locationFilterList"></div>            <form-group class="ui-front">                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;" /></div>                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;" /><input class="form-control" type="text" id="locationEndSearchInput" placeholder="End" style="width: 45%;"                    /></div><button class="btn btn-success" type="button" style="width:100%;" id="locationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="locationResetButton">Reset</button></form-group>        </div>    </div></li>');
+        }
+
+        // Expression filter
+        if (extraFiltersAvailable.includes('expression')) {
+            $("#sidebarUl").append(
+                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
+
+        }
+
+        // Interactions filter
+        if (extraFiltersAvailable.includes('interactions')) {
+            $("#sidebarUl").append(
+                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
+
+            $.when(getParticipant2SymbolsInClass()).done(function(result) {
+
+                var availableParticipant2Symbol = [];
+
+                for (var i = 0; i < result.results.length; i++) {
+                    if (result.results[i]["item"] != null) {
+                        availableParticipant2Symbol.push({
+                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                            value: result.results[i]["item"]
+                        });
+                    }
+                }
+
+                $("#interactionsParticipant2SearchInput").autocomplete({
+                    minLength: 3,
+                    source: function(request, response) {
+                        var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
+                        response(results.slice(0, 15));
+                    },
+                    select: function(event, ui) {
+                        event.preventDefault();
+                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
+                    },
+                    focus: function(event, ui) {
+                        event.preventDefault();
+                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
+                    }
+                });
+
+            });
         }
 
         // Diseases filter
@@ -498,7 +597,7 @@ function addExtraFilters() {
                         var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                         $("#diseasesFilterList").append(
-                            '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+                            '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                         $("#" + buttonId).click(function() {
                             remove(window.imTableConstraint[4], ui.item.value);
@@ -686,7 +785,7 @@ function addExtraFilters() {
                         var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                         $("#proteinDomainNameFilterList").append(
-                            '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
+                            '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                         $("#" + buttonId).click(function() {
                             remove(window.imTableConstraint[3], ui.item.value);
@@ -703,61 +802,352 @@ function addExtraFilters() {
             });
         }
 
-        // Interactions filter
-        if (extraFiltersAvailable.includes('interactions')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
-
-            $.when(getParticipant2SymbolsInClass()).done(function(result) {
-
-                var availableParticipant2Symbol = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableParticipant2Symbol.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
-                    }
-                }
-
-                $("#interactionsParticipant2SearchInput").autocomplete({
-                    minLength: 3,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
-                    }
-                });
-
-            });
-        }
-
-        // Expression filter
-        if (extraFiltersAvailable.includes('expression')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
-
-        }
+        createDatasetFilter(); // Dataset filter should be the last one
 
         window.extraFiltersAdded = true;
     }
 }
 
 /**
- * Method updates the piechart and sidebar elements according to the received constraints
- * @param {string} constraints: the new constraints that the im-table is using
- * @param {string} pieChartID: the div id of the pie chart, in order to update it
+ * Method updates the organisms filter based upon the organisms present in the
+ * current query
+ * @param {string} results: the organism query results from the InterMine server
  */
-function updateElements(constraints, pieChartID) {
+function displayItemsInClass(result) {
+
+    // First remove the li elements
+    $('#organismshortnamelist').parent().find('li').remove();
+
+    var countData = [];
+    var labelsData = [];
+    var colorsData = getColorsArray(result[0].response['results'].length);
+
+    for (var i = 0; i < result[0].response['results'].length; i++) {
+        countData.push(result[0].response['results'][i]['count']);
+        labelsData.push(result[0].response['results'][i]['item']);
+    }
+
+    var resultantElements = result[0].response['results'].length;
+
+    // At most, 5 elements, which are ordered (top 5)
+    if (resultantElements > 5) {
+        resultantElements = 5;
+    }
+
+    // Fill the organism short name dropdown with top 5 organisms according to count
+    for (var i = 0; i < resultantElements; i++) {
+        var organismName = result[0].response['results'][i]['item'];
+        var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+        $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+    }
+
+}
+
+/**
+ * Method that escapes a mine URL (to not valid URL format)
+ * @param {string} mineURL: the mine URL
+ * @returns {string} the escapped mine URL
+ */
+function formatMineURL(mineURL) {
+    return mineURL.replace(/:/g, "COLON").replace(/\//g, "SLASH");
+}
+
+/**
+ * Method that escapes a mine URL (to valid URL format)
+ * @param {string} mineURL: the mine URL
+ * @returns {string} the formatted mine URL
+ */
+function escapeMineURL(mineURL) {
+    return mineURL.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+}
+
+/**
+ * Method updates the pie chart based on the organisms present
+ * in the current query
+ * @param {string} results: the organism query results from the InterMine server
+ */
+function updatePieChart(result, pieChartID) {
+
+    // Update pie
+    if (window.pieChartObject) {
+        window.pieChartObject.destroy();
+    }
+
+    var ctx = document.getElementById(pieChartID);
+
+    var countData = [];
+    var labelsData = [];
+    var colorsData = getColorsArray(result[0].response['results'].length);
+
+    for (var i = 0; i < result[0].response['results'].length; i++) {
+        countData.push(result[0].response['results'][i]['count']);
+        labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+    }
+
+    // Plot
+    var pieOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+            center: {
+                text: '90%',
+                color: '#FF6384', // Default is #000000
+                fontStyle: 'Arial', // Default is Arial
+                sidePadding: 20 // Default is 20 (as a percentage)
+            }
+        },
+        legend: {
+            display: true,
+            position: 'top',
+            onClick: function(e) {
+                e.stopPropagation();
+            }
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true,
+        },
+        tooltips: {
+            callbacks: {
+                label: function(tooltipItem, data) {
+                    return data.labels[tooltipItem.index];
+                }
+            },
+            custom: function(tooltip) {
+                if (!tooltip.opacity) {
+                    document.getElementById(pieChartID).style.cursor = 'default';
+                    return;
+                }
+            }
+        },
+        onClick: function(evt, elements) {
+            var datasetIndex;
+            var dataset;
+
+            if (elements.length) {
+                var index = elements[0]._index;
+
+                selectedSegment = window.pieChartObject.data.labels[index].split("(")[0].trim();
+
+                // Filter the table
+                window.imTable.query.addConstraint({
+                    "path": "organism.shortName",
+                    "op": "==",
+                    "value": selectedSegment
+                });
+
+            }
+
+            window.pieChartObject.update();
+        }
+    };
+
+    window.pieChartObject = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labelsData,
+            datasets: [{
+                data: countData,
+                backgroundColor: colorsData,
+            }],
+        },
+        options: pieOptions
+    });
+}
+
+function createGoAnnotationFilter() {
+    try {
+        $.when(getOntologyTermsInClass()).done(function(result) {
+
+            var availableGoTerms = [];
+
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    availableGoTerms.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
+
+            $("#goAnnotationSearchInput").autocomplete({
+                minLength: 3,
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
+                    response(results.slice(0, 15));
+                },
+                updater: function(item) {
+                    return item;
+                },
+                select: function(event, ui) {
+                    event.preventDefault();
+                    $("#goAnnotationSearchInput").val(ui.item.value);
+
+                    window.imTableConstraint[0].push(ui.item.value);
+                    updateTableWithConstraints();
+
+                    var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                    $("#goAnnotationFilterList").append(
+                        '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                    $("#" + buttonId).click(function() {
+                        remove(window.imTableConstraint[0], ui.item.value);
+                        updateTableWithConstraints();
+                        $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                    });
+                },
+                focus: function(event, ui) {
+                    event.preventDefault();
+                    $("#goAnnotationSearchInput").val(ui.item.value);
+                }
+            });
+
+        });
+    } catch (err) {
+        $("#goAnnotationFilterLi").remove();
+        console.log(err);
+    }
+}
+
+function createDatasetFilter() {
+    try {
+        if ($("#datasetFilterLi").length == 0) {
+            $("#sidebarUl").append(
+                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dataset Name" id="datasetFilterLi"><a class="nav-link" data-toggle="collapse" href="#datasetNameSearchCardBlock" aria-controls="datasetNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-database"></i><span class="nav-link-text"></span>Dataset Name</a><div class="card" style="width: 100%;">        <div class="collapse card-block" id="datasetNameSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <form-group class="ui-front">                <div id="datasetsSelector"></div>            </form-group><button class="btn btn-block btn-warning" id="btnDatasetViewMore" type="button">View more</button></div>    </div></li>');
+        }
+
+        $.when(getDatasetNamesInClass()).done(function(result) {
+            if (!window.datasetNamesLoaded) {
+                var availableDatasetNames = [];
+
+                for (var i = 0; i < result.results.length; i++) {
+                    if (result.results[i]["item"] != null) {
+                        if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
+                            continue;
+                        }
+                        availableDatasetNames.push({
+                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                            value: result.results[i]["item"]
+                        });
+                    }
+                }
+
+                // First remove the form-check elements
+                $('#datasetsSelector').empty();
+
+                var resultantElementsNumber = result.results.length;
+                var resultantElementsArray = [];
+
+                for (var i = 0; i < availableDatasetNames.length; i++) {
+                    resultantElementsArray.push(availableDatasetNames[i]["value"]);
+                }
+
+                resultantElementsArray.sort();
+
+                // At most, 3 elements, which are ordered (top 3)
+                if (resultantElementsNumber > 3) {
+                    resultantElementsNumber = 3;
+                }
+
+                // Fill the organism short name dropdown with top 5 organisms according to count
+                for (var i = 0; i < resultantElementsNumber; i++) {
+                    var datasetName = resultantElementsArray[i];
+                    //var datasetCount = "(" + result.results[i]["count"] + ")";
+                    $("#datasetsSelector").append(
+                        '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
+
+                    $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
+                        if ($(this).is(":checked")) {
+                            var checkboxValue = $(this).val();
+                            window.imTableConstraint[1].push(checkboxValue);
+                            updateTableWithConstraints();
+                        } else {
+                            var checkboxValue = $(this).val();
+                            remove(window.imTableConstraint[1], checkboxValue);
+                            updateTableWithConstraints();
+                        }
+                    });
+                }
+
+                window.datasetNamesLoaded = true;
+            }
+
+        });
+    } catch (err) {
+        $("#datasetFilterLi").remove();
+        console.log(err);
+    }
+}
+
+function createPathwaysNameFilter() {
+    try {
+        $.when(getPathwayNamesInClass()).done(function(result) {
+
+            var availablePathwayNames = [];
+
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    availablePathwayNames.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
+
+            $("#pathwayNameSearchInput").autocomplete({
+                minLength: 3,
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
+                    response(results.slice(0, 15));
+                },
+                select: function(event, ui) {
+                    event.preventDefault();
+                    $("#pathwayNameSearchInput").val(ui.item.value);
+
+                    // Filter the table
+                    window.imTableConstraint[2].push(ui.item.value);
+                    updateTableWithConstraints();
+
+                    var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                    $("#pathwayFilterList").append(
+                        '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                    $("#" + buttonId).click(function() {
+                        remove(window.imTableConstraint[2], ui.item.value);
+                        updateTableWithConstraints();
+                        $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                    });
+                },
+                focus: function(event, ui) {
+                    event.preventDefault();
+                    $("#pathwayNameSearchInput").val(ui.item.value);
+                }
+            });
+
+        });
+    } catch (err) {
+        $("#pathwayNameFilterLi").remove();
+        console.log(err);
+    }
+}
+
+/**
+ * Method to add the default filters for all mines
+ */
+function addDefaultFilters() {
+    createPathwaysNameFilter();
+    createGoAnnotationFilter();
+}
+
+/**
+ * Method to fill the mine selector and add the proper event handling
+ */
+function fillMineSelector() {
     if ($('#mineSelector option').length == 0) {
+        var windowUrl = new URL(window.location.href);
+
         $.when(getIntermines()).done(function(result) {
             $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
 
@@ -780,341 +1170,163 @@ function updateElements(constraints, pieChartID) {
                 }
 
 
-                mineUrl = mineUrl.replace(/:/g, "COLON").replace(/\//g, "SLASH");
+                mineUrl = formatMineURL(mineUrl);
 
                 $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+
+                // In case that the user gave a mine to be rendered, set it here
+                if (windowUrl.searchParams.get("givenMine") && result.instances[i].name == windowUrl.searchParams.get("givenMine")) {
+                    window.mineUrl = mineUrl;
+                    window.selectedMineName = result.instances[i].name;
+                    document.title = window.currentClassView + " in " + window.selectedMineName;
+
+                    // Update the imTable
+                    clearExtraFilters();
+                    updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                }
+
             }
 
-            $("#mineSelector").val($("#mineSelector option:first").val());
+            // Select the correct option from the dropdown
+            $("#mineSelector option").filter(function() {
+                return $(this).text() == window.selectedMineName;
+            }).prop("selected", true);
 
             // Event handling
-            $("#mineSelector").change(function() {
-                window.mineUrl = $(this).val();
-                window.selectedMineName = $("#mineSelector option:selected").text();
-                document.title = window.currentClassView + " in " + window.selectedMineName;
-                window.datasetNamesLoaded = false;
-                window.extraFiltersAdded = false;
+            $("#mineSelector").change(function(e) {
+                // Sanity check
+                var sanity = true;
+                var selectedOption = $("#mineSelector option:selected").text();
+                var selectedOptionUrl = $(this).val();
 
-                // Update the imTable
-                clearExtraFilters();
-                updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                $.ajax({
+                    'url': escapeMineURL(selectedOptionUrl),
+                    data: {},
+                    async: false,
+                    error: function(xhr, status) {
+                        // Check for error and cancel mine switching if an error appeared
 
-                // Instantiate the im-table with all the data available in Gene from HumanMine
-                var selector = '#dataTable';
-                var service = {
-                    root: window.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/")
-                };
-                var query = {
-                    select: ['*'],
-                    from: window.currentClassView
-                };
+                        // Server or Client errors
+                        if ((xhr.status >= 500 && xhr.status <= 511) || (xhr.status >= 400 && xhr.status <= 431)) {
+                            // Show error
+                            if ($("#unavailableMineAlert").length == 0) {
+                                $("#navbarResponsive").prepend("<div class='alert' id='unavailableMineAlert'><span class='closebtn' id='closeUnavailableMineAlert'>×</span>Sorry, it looks like the " + selectedOption + " server is having problems right now. You can try coming back later, or try browsing a different mine using the mine selector in the top-left corner.</div><br/>");
 
-                imtables.configure({
-                    TableCell: {
-                        PreviewTrigger: 'click'
+                                $("#closeUnavailableMineAlert").click(function() {
+                                    $("#unavailableMineAlert").hide();
+                                });
+                            } else {
+                                $("#unavailableMineAlert").show();
+                            }
+
+                            // Handle error
+                            sanity = false;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            return false;
+                        }
                     }
                 });
 
-                imtables.configure('TableResults.CacheFactor', 20);
+                if (sanity) {
+                    // Update settings
+                    window.mineUrl = selectedOptionUrl;
+                    window.selectedMineName = selectedOption;
+                    document.title = window.currentClassView + " in " + window.selectedMineName;
+                    window.datasetNamesLoaded = false;
+                    window.extraFiltersAdded = false;
 
-                var imtable = imtables.loadTable(
-                    selector, {
-                        "start": 0,
-                        "size": 25
-                    }, {
-                        service: service,
-                        query: query
+                    // Update LocalStorage if its available
+                    if (typeof(Storage) !== "undefined") {
+                        localStorage.setItem("mineUrl", window.mineUrl);
+                        localStorage.setItem("selectedMineName", window.selectedMineName);
                     }
-                ).then(
-                    function(table) {
-                        console.log('Table loaded', table);
-                        //this .on listener will do something when someone interacts with the table. 
-                        table.on("all", function(changeDetail) {
-                            updateElements(table.history.currentQuery.constraints, "PieChart");
-                        });
 
-                        window.imTable = table;
-                    },
-                    function(error) {
-                        console.error('Could not load table', error);
-                    }
-                );
+                    // Update the imTable
+                    clearExtraFilters();
+                    updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+
+                    // Instantiate the im-table with all the data available in Gene from HumanMine
+                    var selector = '#dataTable';
+                    var service = {
+                        root: escapeMineURL(window.mineUrl)
+                    };
+                    var query = {
+                        select: ['*'],
+                        from: window.currentClassView
+                    };
+
+                    imtables.configure({
+                        TableCell: {
+                            PreviewTrigger: 'click'
+                        }
+                    });
+
+                    imtables.configure('TableResults.CacheFactor', 20);
+
+                    var imtable = imtables.loadTable(
+                        selector, {
+                            "start": 0,
+                            "size": 25
+                        }, {
+                            service: service,
+                            query: query
+                        }
+                    ).then(
+                        function(table) {
+                            //console.log('Table loaded', table);
+                            //this .on listener will do something when someone interacts with the table. 
+                            table.on("rendered", function(changeDetail) {
+                                console.log("Rendered table");
+                                console.log(changeDetail);
+                                updateElements(table.history.currentQuery.constraints, "PieChart");
+                            });
+
+                            window.imTable = table;
+                        },
+                        function(error) {
+                            console.error('Could not load table', error);
+                        }
+                    );
+                }
             });
+
+            // And now fire change event for the dropdown
+            $('#mineSelector').trigger('change');
+
         });
     }
+}
 
-    $.when(getOntologyTermsInClass()).done(function(result) {
-
-        var availableGoTerms = [];
-
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availableGoTerms.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
-                });
-            }
-        }
-
-        $("#goAnnotationSearchInput").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availableGoTerms, request.term);
-                response(results.slice(0, 15));
-            },
-            updater: function(item) {
-                return item;
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#goAnnotationSearchInput").val(ui.item.value);
-
-                window.imTableConstraint[0].push(ui.item.value);
-                updateTableWithConstraints();
-
-                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                $("#goAnnotationFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
-                $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[0], ui.item.value);
-                    updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#goAnnotationSearchInput").val(ui.item.value);
-            }
-        });
-
-    });
-
-    $.when(getDatasetNamesInClass()).done(function(result) {
-        if (!window.datasetNamesLoaded) {
-            var availableDatasetNames = [];
-
-            for (var i = 0; i < result.results.length; i++) {
-                if (result.results[i]["item"] != null) {
-                    if (result.results[i]["item"] == "KEGG pathways data set" || result.results[i]["item"] == "HGNC identifiers" || result.results[i]["item"] == "BioGRID interaction data set" || result.results[i]["item"] == "IntAct interactions data set" || result.results[i]["item"] == "ClinVar data set" || result.results[i]["item"] == "OMIM diseases") {
-                        continue;
-                    }
-                    availableDatasetNames.push({
-                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                        value: result.results[i]["item"]
-                    });
-                }
-            }
-
-            // First remove the form-check elements
-            $('#datasetsSelector').empty();
-
-            var resultantElementsNumber = result.results.length;
-            var resultantElementsArray = [];
-
-            for (var i = 0; i < availableDatasetNames.length; i++) {
-                resultantElementsArray.push(availableDatasetNames[i]["value"]);
-            }
-
-            resultantElementsArray.sort();
-
-            // At most, 3 elements, which are ordered (top 3)
-            if (resultantElementsNumber > 3) {
-                resultantElementsNumber = 3;
-            }
-
-            // Fill the organism short name dropdown with top 5 organisms according to count
-            for (var i = 0; i < resultantElementsNumber; i++) {
-                var datasetName = resultantElementsArray[i];
-                //var datasetCount = "(" + result.results[i]["count"] + ")";
-                $("#datasetsSelector").append(
-                    '<div class="form-check" style="margin-left: 10px;"><input class="form-check-input" type="checkbox" id="' + datasetName.replace(/[^a-zA-Z0-9]/g, '') + '" value="' + datasetName + '"><label class="form-check-label" for="' + datasetName + '"><p>' + datasetName + '</p></label></div>');
-
-                $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
-                    if ($(this).is(":checked")) {
-                        var checkboxValue = $(this).val();
-                        window.imTableConstraint[1].push(checkboxValue);
-                        updateTableWithConstraints();
-                    } else {
-                        var checkboxValue = $(this).val();
-                        remove(window.imTableConstraint[1], checkboxValue);
-                        updateTableWithConstraints();
-                    }
-                });
-            }
-
-            window.datasetNamesLoaded = true;
-        }
-
-    });
-
-    $.when(getPathwayNamesInClass()).done(function(result) {
-
-        var availablePathwayNames = [];
-
-        for (var i = 0; i < result.results.length; i++) {
-            if (result.results[i]["item"] != null) {
-                availablePathwayNames.push({
-                    label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                    value: result.results[i]["item"]
-                });
-            }
-        }
-
-        $("#pathwayNameSearchInput").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                var results = $.ui.autocomplete.filter(availablePathwayNames, request.term);
-                response(results.slice(0, 15));
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
-
-                // Filter the table
-                window.imTableConstraint[2].push(ui.item.value);
-                updateTableWithConstraints();
-
-                var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                $("#pathwayFilterList").append(
-                    '<li class="list-group-item" style="height: 50px; padding: 10px 15px;" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><span class="float-md-left">' + ui.item.value.slice(0, 22) + '</span><div class="input-group-append float-md-right"><button class="btn btn-sm btn-outline-secondary" type="button" id="' + buttonId + '">x</button></li>');
-
-                $("#" + buttonId).click(function() {
-                    remove(window.imTableConstraint[2], ui.item.value);
-                    updateTableWithConstraints();
-                    $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                });
-            },
-            focus: function(event, ui) {
-                event.preventDefault();
-                $("#pathwayNameSearchInput").val(ui.item.value);
-            }
-        });
-
-    });
-
+/**
+ * Method to handle the extra filters available in the current selected mine
+ */
+function handleExtraFilters() {
     if (!window.extraFiltersAdded) {
         if (window.minesConfigs[window.selectedMineName]) {
             addExtraFilters();
             window.extraFiltersAdded = true;
+        } else {
+            // Dataset filter should be the last one
+            createDatasetFilter();
         }
     }
+}
+
+/**
+ * Method updates the piechart and sidebar elements according to the received constraints
+ * @param {string} constraints: the new constraints that the im-table is using
+ * @param {string} pieChartID: the div id of the pie chart, in order to update it
+ */
+function updateElements(constraints, pieChartID) {
+    fillMineSelector();
+    addDefaultFilters();
+    handleExtraFilters();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
-        // First remove the li elements
-        $('#organismshortnamelist').parent().find('li').remove();
-
-        var countData = [];
-        var labelsData = [];
-        var colorsData = getColorsArray(result[0].response['results'].length);
-
-        for (var i = 0; i < result[0].response['results'].length; i++) {
-            countData.push(result[0].response['results'][i]['count']);
-            labelsData.push(result[0].response['results'][i]['item']);
-        }
-
-        var resultantElements = result[0].response['results'].length;
-
-        // At most, 5 elements, which are ordered (top 5)
-        if (resultantElements > 5) {
-            resultantElements = 5;
-        }
-
-        // Fill the organism short name dropdown with top 5 organisms according to count
-        for (var i = 0; i < resultantElements; i++) {
-            var organismName = result[0].response['results'][i]['item'];
-            var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
-        }
-
+        displayItemsInClass(result);
         createSidebarEvents();
-
-        // Update pie
-        if (myPieChart) {
-            myPieChart.destroy();
-        }
-
-        var ctx = document.getElementById(pieChartID);
-
-        var countData = [];
-        var labelsData = [];
-        var colorsData = getColorsArray(result[0].response['results'].length);
-
-        for (var i = 0; i < result[0].response['results'].length; i++) {
-            countData.push(result[0].response['results'][i]['count']);
-            labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
-        }
-
-        // Plot
-        var pieOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            elements: {
-                center: {
-                    text: '90%',
-                    color: '#FF6384', // Default is #000000
-                    fontStyle: 'Arial', // Default is Arial
-                    sidePadding: 20 // Default is 20 (as a percentage)
-                }
-            },
-            legend: {
-                display: true,
-                position: 'top',
-                onClick: function(e) {
-                    e.stopPropagation();
-                }
-            },
-            hover: {
-                mode: 'nearest',
-                intersect: true,
-            },
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        return data.labels[tooltipItem.index];
-                    }
-                },
-                custom: function(tooltip) {
-                    if (!tooltip.opacity) {
-                        document.getElementById(pieChartID).style.cursor = 'default';
-                        return;
-                    }
-                }
-            },
-            onClick: function(evt, elements) {
-                var datasetIndex;
-                var dataset;
-
-                if (elements.length) {
-                    var index = elements[0]._index;
-
-                    selectedSegment = myPieChart.data.labels[index].split("(")[0].trim();
-
-                    // Filter the table
-                    window.imTable.query.addConstraint({
-                        "path": "organism.shortName",
-                        "op": "==",
-                        "value": selectedSegment
-                    });
-
-                }
-
-                myPieChart.update();
-            }
-        };
-
-        myPieChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labelsData,
-                datasets: [{
-                    data: countData,
-                    backgroundColor: colorsData,
-                }],
-            },
-            options: pieOptions
-        });
+        updatePieChart(result, pieChartID);
     });
 }

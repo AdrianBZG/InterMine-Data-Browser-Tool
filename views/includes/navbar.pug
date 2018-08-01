@@ -2,36 +2,24 @@
 nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	a.navbar-brand(href='/')
 		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
+	select#mineSelector.form-control(style="width: 200px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 	div#headerButtons.col-md-10.text-center
 		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
 			button.btn.btn-primary.btn-space(id="genesButton" type="button") Genes
 		a(href="/proteins" data-toggle="tooltip" title="Change to Proteins view")
 			button.btn.btn-default.btn-space(id="proteinsButton" type="button") Proteins
-		select#mineSelector.form-control(style="width: 150px; position: fixed; top: 10px; right: 75px;")
 	
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation')
-					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
-						i.fa.fa-fw.fa-search
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name' id='organismFilterLi')
+					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
+						i.fa.fa-fw.fa-lemon-o
 						span.nav-link-text
-						| GO Annotation
+						| Organism short name
 					.card(style="width: 100%;")
-						#goAnnotationSearchCardBlock.collapse.card-block(style="overflow: auto;")
-							#goAnnotationFilterList.ul.list-group.list-group-flush
-							form-group.ui-front
-								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Dataset Name')
-					a.nav-link(data-toggle="collapse", href="#datasetNameSearchCardBlock", aria-controls="datasetNameSearchCardBlock", style='color:black')
-						i.fa.fa-fw.fa-database
-						span.nav-link-text
-						| Dataset Name
-					.card(style="width: 100%;")
-						#datasetNameSearchCardBlock.collapse.card-block(style="overflow-y: auto; overflow-x:hidden;")
-							form-group.ui-front
-								#datasetsSelector
-							button#btnDatasetViewMore.btn.btn-block.btn-warning(type="button") View more
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name')
+						#organismshortnameblock.collapse.card-block(style="overflow: auto;")
+							#organismshortnamelist.ul.list-group.list-group-flush
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='Pathway Name' id='pathwayNameFilterLi')
 					a.nav-link(data-toggle="collapse", href="#pathwayNameSearchCardBlock", aria-controls="pathwayNameSearchCardBlock", style='color:black')
 						i.fa.fa-fw.fa-code-fork
 						span.nav-link-text
@@ -41,11 +29,13 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#pathwayFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="pathwayNameSearchInput" placeholder="e.g. Signal Transduction")
-			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name')
-					a.nav-link(data-toggle="collapse", href="#organismshortnameblock", aria-controls="organismshortnameblock", style='color:black')
-						i.fa.fa-fw.fa-bug
+			li.nav-item(data-toggle='tooltip', data-placement='right', title='GO Annotation' id='goAnnotationFilterLi')
+					a.nav-link(data-toggle="collapse", href="#goAnnotationSearchCardBlock", aria-controls="goAnnotationSearchCardBlock", style='color:black')
+						i.fa.fa-fw.fa-search
 						span.nav-link-text
-						| Organism short name
+						| GO Annotation
 					.card(style="width: 100%;")
-						#organismshortnameblock.collapse.card-block(style="overflow: auto;")
-							#organismshortnamelist.ul.list-group.list-group-flush
+						#goAnnotationSearchCardBlock.collapse.card-block(style="overflow: auto;")
+							#goAnnotationFilterList.ul.list-group.list-group-flush
+							form-group.ui-front
+								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")

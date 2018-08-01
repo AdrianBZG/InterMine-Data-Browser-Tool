@@ -24,6 +24,21 @@ See [BUILD.md](BUILD.md)
 
 Apart from the in-line comments in the code, documentation generated with documentation.js is available in [https://adrianbzg.github.io/InterMine-Data-Browser-Tool/](https://adrianbzg.github.io/InterMine-Data-Browser-Tool/). To update the documentation, the 'gulp documentation' is available.
 
+## REQUIRED ONTOLOGY CONCEPTS (PER MINE) FOR EACH FILTER
+
+|        Filter        |                                                                                 Ontology concepts                                                                                |
+|:--------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|     GO Annotation    |                                                                          goAnnotation.ontologyTerm.name                                                                          |
+|     Dataset Name     |                                                                                   dataSets.name                                                                                  |
+|     Pathway Name     |                                                                                   pathways.name                                                                                  |
+|  Organism short name |                                                                              Gene.organism.shortName                                                                             |
+|       Location       |                                                      locations.start + locations.end + locations.locatedOn.primaryIdentifier                                                     |
+|    Diseases (OMIM)   |                                                                                   diseases.name                                                                                  |
+|        ClinVar       |                                                                    alleles.clinicalSignificance + alleles.type                                                                   |
+| Protein Localisation | proteinAtlasExpression.cellType + proteinAtlasExpression.tissue.name + proteinAtlasExpression.expressionType + proteinAtlasExpression.level + proteinAtlasExpression.reliability |
+|  Protein Domain Name |                                                                 proteins.proteinDomainRegions.proteinDomain.name                                                                 |
+|     Interactions     |                                         interactions.participant2.symbol + interactions.details.type + interactions.details.dataSets.name                                        |
+|      Expression      |                                 atlasExpression.pValue + atlasExpression.tStatistic + atlasExpression.expression + atlasExpression.dataSets.name                                 |
 
 ## CONTRIBUTING
 
@@ -40,5 +55,14 @@ You can contact the developers by opening an issue in this repo.
 
 ## SCREENSHOTS
 
-Browser screenshot (Pre-release 0.0.3)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/jVNizUC.png" /></div>
+Searching in HumanMine (Release 1.0.8)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/cOELTaQ.png" /></div>
+
+Searching in HumanMine for Alzheimer disease (Release 1.0.8)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/lY6WOZB.png" /></div>
+
+Searching in FlyMine (Release 1.0.8)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/okutJlr.png" /></div>
+
+Searching in HymenopteraMine (Release 1.0.8)<br>
+<div style="text-align:center"><img src ="https://i.imgur.com/tK4hbhS.png" /></div>
