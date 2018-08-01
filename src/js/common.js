@@ -307,6 +307,33 @@ function getParticipant2SymbolsInClass() {
 }
 
 /**
+* Method that returns a valid session API key for the current mine
+*/
+function getSessionToken() {
+    var tokenUrl = escapeMineURL(window.mineUrl);
+    var tokenKey = "";
+
+    if(tokenUrl.slice(-1) == "/") {
+        tokenUrl += "session";
+    } else {
+        tokenUrl += "/session";
+    }
+
+    // Get token
+    $.ajax({
+        'url': tokenUrl,
+        data: {},
+        async: false,
+        error: function(xhr, status) {},
+        success: function(data) {
+            tokenKey = data.token;
+        }
+    });
+
+    return tokenKey;
+}
+
+/**
  * Method to get the different items inside a class (count per organism) in order to feed the sidebar
  * @param {array} constraints: the constraints for the endpoint call
  * @returns {array} an array with the server response containing the different items in a class
@@ -1253,8 +1280,12 @@ function fillMineSelector() {
 
                     // Instantiate the im-table with all the data available in Gene from HumanMine
                     var selector = '#dataTable';
+
+                    $(selector).empty();
+
                     var service = {
-                        root: escapeMineURL(window.mineUrl)
+                        root: escapeMineURL(window.mineUrl),
+                        token: getSessionToken()
                     };
                     var query = {
                         select: ['*'],
@@ -1269,7 +1300,7 @@ function fillMineSelector() {
 
                     imtables.configure('TableResults.CacheFactor', 20);
 
-                    var imtable = imtables.loadTable(
+                    var imtable = imtables.loadDash(
                         selector, {
                             "start": 0,
                             "size": 25
@@ -1281,13 +1312,13 @@ function fillMineSelector() {
                         function(table) {
                             //console.log('Table loaded', table);
                             //this .on listener will do something when someone interacts with the table. 
-                            table.on("rendered", function(changeDetail) {
+                            table.children.table.on("rendered", function(changeDetail) {
                                 console.log("Rendered table");
                                 console.log(changeDetail);
                                 updateElements(table.history.currentQuery.constraints, "PieChart");
                             });
 
-                            window.imTable = table;
+                            window.imTable = table.children.table;
                         },
                         function(error) {
                             console.error('Could not load table', error);

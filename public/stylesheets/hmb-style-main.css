@@ -184,6 +184,22 @@ body.fixed-nav {
   display: none;
 }
 
+.im-join-manager-button .btn {
+  display: none;
+}
+
+.im-filter-dialogue-button .btn {
+  display: none;
+}
+
+.im-column-manager-button .btn {
+  display: none;
+}
+
+.im-history .btn {
+  display: none;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
