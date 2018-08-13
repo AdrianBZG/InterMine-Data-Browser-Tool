@@ -307,6 +307,33 @@ function getParticipant2SymbolsInClass() {
 }
 
 /**
+* Method that returns a valid session API key for the current mine
+*/
+function getSessionToken() {
+    var tokenUrl = escapeMineURL(window.mineUrl);
+    var tokenKey = "";
+
+    if(tokenUrl.slice(-1) == "/") {
+        tokenUrl += "session";
+    } else {
+        tokenUrl += "/session";
+    }
+
+    // Get token
+    $.ajax({
+        'url': tokenUrl,
+        data: {},
+        async: false,
+        error: function(xhr, status) {},
+        success: function(data) {
+            tokenKey = data.token;
+        }
+    });
+
+    return tokenKey;
+}
+
+/**
  * Method to get the different items inside a class (count per organism) in order to feed the sidebar
  * @param {array} constraints: the constraints for the endpoint call
  * @returns {array} an array with the server response containing the different items in a class
@@ -508,303 +535,307 @@ function clearExtraFilters() {
 }
 
 function addExtraFilters() {
-    // Read the JSON config file
     if (!window.extraFiltersAdded) {
-        var extraFiltersAvailable = window.minesConfigs[window.selectedMineName].extra_filters;
+        // Read the JSON config file
+        if (window.currentClassView == "Gene") {
+            var extraFiltersAvailable = window.minesConfigs[window.selectedMineName].extra_filters;
 
-        // Location filter
-        if (extraFiltersAvailable.includes('location')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Location" id="locationFilterLi"><a class="nav-link" data-toggle="collapse" href="#locationSearchCardBlock" aria-controls="locationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-location-arrow"></i><span class="nav-link-text"></span>Location</a>    <div class="card" style="width: 100%;">        <div class="collapse card-block" id="locationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <div class="ul list-group list-group-flush" id="locationFilterList"></div>            <form-group class="ui-front">                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;" /></div>                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;" /><input class="form-control" type="text" id="locationEndSearchInput" placeholder="End" style="width: 45%;"                    /></div><button class="btn btn-success" type="button" style="width:100%;" id="locationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="locationResetButton">Reset</button></form-group>        </div>    </div></li>');
-        }
+            // Location filter
+            if (extraFiltersAvailable.includes('location')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Location" id="locationFilterLi"><a class="nav-link" data-toggle="collapse" href="#locationSearchCardBlock" aria-controls="locationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-location-arrow"></i><span class="nav-link-text"></span>Location</a>    <div class="card" style="width: 100%;">        <div class="collapse card-block" id="locationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <div class="ul list-group list-group-flush" id="locationFilterList"></div>            <form-group class="ui-front">                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;" /></div>                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;" /><input class="form-control" type="text" id="locationEndSearchInput" placeholder="End" style="width: 45%;"                    /></div><button class="btn btn-success" type="button" style="width:100%;" id="locationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="locationResetButton">Reset</button></form-group>        </div>    </div></li>');
+            }
 
-        // Expression filter
-        if (extraFiltersAvailable.includes('expression')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
+            // Expression filter
+            if (extraFiltersAvailable.includes('expression')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
 
-        }
+            }
 
-        // Interactions filter
-        if (extraFiltersAvailable.includes('interactions')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
+            // Interactions filter
+            if (extraFiltersAvailable.includes('interactions')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
 
-            $.when(getParticipant2SymbolsInClass()).done(function(result) {
+                $.when(getParticipant2SymbolsInClass()).done(function(result) {
 
-                var availableParticipant2Symbol = [];
+                    var availableParticipant2Symbol = [];
 
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableParticipant2Symbol.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableParticipant2Symbol.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
-                }
 
-                $("#interactionsParticipant2SearchInput").autocomplete({
-                    minLength: 3,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#interactionsParticipant2SearchInput").val(ui.item.value);
-                    }
+                    $("#interactionsParticipant2SearchInput").autocomplete({
+                        minLength: 3,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableParticipant2Symbol, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#interactionsParticipant2SearchInput").val(ui.item.value);
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#interactionsParticipant2SearchInput").val(ui.item.value);
+                        }
+                    });
+
                 });
+            }
 
-            });
-        }
+            // Diseases filter
+            if (extraFiltersAvailable.includes('diseases')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Diseases (OMIM)" id="diseasesFilterLi"><a class="nav-link" data-toggle="collapse" href="#diseasesSearchCardBlock" aria-controls="diseasesSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-certificate"></i><span class="nav-link-text"></span>Diseases (OMIM)</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="diseasesSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="diseasesFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="diseasesSearchInput" placeholder="e.g. alzheimer disease"/></form-group></div></div></li>');
 
-        // Diseases filter
-        if (extraFiltersAvailable.includes('diseases')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Diseases (OMIM)" id="diseasesFilterLi"><a class="nav-link" data-toggle="collapse" href="#diseasesSearchCardBlock" aria-controls="diseasesSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-certificate"></i><span class="nav-link-text"></span>Diseases (OMIM)</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="diseasesSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="diseasesFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="diseasesSearchInput" placeholder="e.g. alzheimer disease"/></form-group></div></div></li>');
+                $.when(getDiseasesNamesInClass()).done(function(result) {
 
-            $.when(getDiseasesNamesInClass()).done(function(result) {
+                    var availableDiseasesNames = [];
 
-                var availableDiseasesNames = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableDiseasesNames.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableDiseasesNames.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
-                }
 
-                $("#diseasesSearchInput").autocomplete({
-                    minLength: 3,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableDiseasesNames, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#diseasesSearchInput").val(ui.item.value);
+                    $("#diseasesSearchInput").autocomplete({
+                        minLength: 3,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableDiseasesNames, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#diseasesSearchInput").val(ui.item.value);
 
-                        // Filter the table
-                        window.imTableConstraint[4].push(ui.item.value);
-                        updateTableWithConstraints();
-
-                        var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                        $("#diseasesFilterList").append(
-                            '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
-
-                        $("#" + buttonId).click(function() {
-                            remove(window.imTableConstraint[4], ui.item.value);
+                            // Filter the table
+                            window.imTableConstraint[4].push(ui.item.value);
                             updateTableWithConstraints();
-                            $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                        });
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#diseasesSearchInput").val(ui.item.value);
+
+                            var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                            $("#diseasesFilterList").append(
+                                '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                            $("#" + buttonId).click(function() {
+                                remove(window.imTableConstraint[4], ui.item.value);
+                                updateTableWithConstraints();
+                                $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                            });
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#diseasesSearchInput").val(ui.item.value);
+                        }
+                    });
+
+                });
+            }
+
+            // ClinVar filter
+            if (extraFiltersAvailable.includes('clinvar')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="ClinVar" id="clinvarFilterLi"><a class="nav-link" data-toggle="collapse" href="#clinvarSearchCardBlock" aria-controls="clinvarSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-eyedropper"></i><span class="nav-link-text"></span>ClinVar</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="clinvarSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><form-group class="ui-front"><div style="align: center;"><input class="form-control" type="text" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;"/><input class="form-control" type="text" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="clinvarSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="clinvarResetButton">Reset</button></form-group></div></div></li>');
+
+                $.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
+
+                    var availableData = [];
+
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableData.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
+
+                    $("#clinvarClinicalSignificanceSearchInput").autocomplete({
+                        minLength: 2,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableData, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#clinvarClinicalSignificanceSearchInput").val(ui.item.value);
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#clinvarClinicalSignificanceSearchInput").val(ui.item.value);
+                        }
+                    });
+
                 });
 
-            });
-        }
+                $.when(getAllelesTypesInClass()).done(function(result) {
 
-        // ClinVar filter
-        if (extraFiltersAvailable.includes('clinvar')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="ClinVar" id="clinvarFilterLi"><a class="nav-link" data-toggle="collapse" href="#clinvarSearchCardBlock" aria-controls="clinvarSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-eyedropper"></i><span class="nav-link-text"></span>ClinVar</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="clinvarSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><form-group class="ui-front"><div style="align: center;"><input class="form-control" type="text" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;"/><input class="form-control" type="text" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="clinvarSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="clinvarResetButton">Reset</button></form-group></div></div></li>');
+                    var availableData = [];
 
-            $.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
-
-                var availableData = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableData.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableData.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
-                }
 
-                $("#clinvarClinicalSignificanceSearchInput").autocomplete({
-                    minLength: 2,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableData, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#clinvarClinicalSignificanceSearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#clinvarClinicalSignificanceSearchInput").val(ui.item.value);
+                    $("#clinvarTypeSearchInput").autocomplete({
+                        minLength: 2,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableData, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#clinvarTypeSearchInput").val(ui.item.value);
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#clinvarTypeSearchInput").val(ui.item.value);
+                        }
+                    });
+
+                });
+            }
+
+            // Protein localisation filter
+            if (extraFiltersAvailable.includes('protein-localisation')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Localisation" id="proteinLocalisationFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinLocalisationSearchCardBlock" aria-controls="proteinLocalisationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-trello"></i><span class="nav-link-text"></span>Protein Localisation</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinLocalisationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="proteinLocalisationFilterList"></div><form-group class="ui-front"><div class="row"><input class="form-control" type="text" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="proteinLocalisationExpressionTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="APE - two or more antibodies">Two or more antibodies</option><option value="Staining - one antibody only">One antibody only</option></select><select class="form-control" id="proteinLocalisationLevelSelector" style="width: 45%;"><option value="All">All (Level)</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Not detected">Not detected</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;"/><select class="form-control" id="proteinLocalisationRealibilitySelector" style="width: 45%;"><option value="All">All (Realibility)</option><option value="Low">Low</option><option value="Uncertain">Uncertain</option><option value="Supportive">Supportive</option><option value="High">High</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="proteinLocalisationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="proteinLocalisationResetButton">Reset</button></form-group></div></div></li>');
+
+                $.when(getProteinAtlasExpressionCellTypesInClass()).done(function(result) {
+
+                    var availableData = [];
+
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableData.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
+
+                    $("#proteinLocalisationCellTypeSearchInput").autocomplete({
+                        minLength: 2,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableData, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#proteinLocalisationCellTypeSearchInput").val(ui.item.value);
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#proteinLocalisationCellTypeSearchInput").val(ui.item.value);
+                        }
+                    });
+
                 });
 
-            });
+                $.when(getProteinAtlasExpressionTissueNamesInClass()).done(function(result) {
 
-            $.when(getAllelesTypesInClass()).done(function(result) {
+                    var availableData = [];
 
-                var availableData = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableData.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableData.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
-                }
 
-                $("#clinvarTypeSearchInput").autocomplete({
-                    minLength: 2,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableData, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#clinvarTypeSearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#clinvarTypeSearchInput").val(ui.item.value);
-                    }
+                    $("#proteinLocalisationTissueSearchInput").autocomplete({
+                        minLength: 2,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableData, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#proteinLocalisationTissueSearchInput").val(ui.item.value);
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#proteinLocalisationTissueSearchInput").val(ui.item.value);
+                        }
+                    });
+
                 });
+            }
 
-            });
-        }
+            // Protein domain filter
+            if (extraFiltersAvailable.includes('protein-domain')) {
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Domain Name" id="proteinDomainFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinDomainNameSearchCardBlock" aria-controls="proteinDomainNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Protein Domain Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinDomainNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="proteinDomainNameFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype"/></form-group></div></div></li>');
 
-        // Protein localisation filter
-        if (extraFiltersAvailable.includes('protein-localisation')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Localisation" id="proteinLocalisationFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinLocalisationSearchCardBlock" aria-controls="proteinLocalisationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-trello"></i><span class="nav-link-text"></span>Protein Localisation</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinLocalisationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="proteinLocalisationFilterList"></div><form-group class="ui-front"><div class="row"><input class="form-control" type="text" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="proteinLocalisationExpressionTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="APE - two or more antibodies">Two or more antibodies</option><option value="Staining - one antibody only">One antibody only</option></select><select class="form-control" id="proteinLocalisationLevelSelector" style="width: 45%;"><option value="All">All (Level)</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Not detected">Not detected</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;"/><select class="form-control" id="proteinLocalisationRealibilitySelector" style="width: 45%;"><option value="All">All (Realibility)</option><option value="Low">Low</option><option value="Uncertain">Uncertain</option><option value="Supportive">Supportive</option><option value="High">High</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="proteinLocalisationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="proteinLocalisationResetButton">Reset</button></form-group></div></div></li>');
+                $.when(getProteinDomainNamesInClass()).done(function(result) {
 
-            $.when(getProteinAtlasExpressionCellTypesInClass()).done(function(result) {
+                    var availableProteinDomainNames = [];
 
-                var availableData = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableData.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
+                    for (var i = 0; i < result.results.length; i++) {
+                        if (result.results[i]["item"] != null) {
+                            availableProteinDomainNames.push({
+                                label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                value: result.results[i]["item"]
+                            });
+                        }
                     }
-                }
 
-                $("#proteinLocalisationCellTypeSearchInput").autocomplete({
-                    minLength: 2,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableData, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#proteinLocalisationCellTypeSearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#proteinLocalisationCellTypeSearchInput").val(ui.item.value);
-                    }
-                });
+                    $("#proteinDomainNameSearchInput").autocomplete({
+                        minLength: 3,
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableProteinDomainNames, request.term);
+                            response(results.slice(0, 15));
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $("#proteinDomainNameSearchInput").val(ui.item.value);
 
-            });
-
-            $.when(getProteinAtlasExpressionTissueNamesInClass()).done(function(result) {
-
-                var availableData = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableData.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
-                    }
-                }
-
-                $("#proteinLocalisationTissueSearchInput").autocomplete({
-                    minLength: 2,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableData, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#proteinLocalisationTissueSearchInput").val(ui.item.value);
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#proteinLocalisationTissueSearchInput").val(ui.item.value);
-                    }
-                });
-
-            });
-        }
-
-        // Protein domain filter
-        if (extraFiltersAvailable.includes('protein-domain')) {
-            $("#sidebarUl").append(
-                '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Domain Name" id="proteinDomainFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinDomainNameSearchCardBlock" aria-controls="proteinDomainNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Protein Domain Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinDomainNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="proteinDomainNameFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype"/></form-group></div></div></li>');
-
-            $.when(getProteinDomainNamesInClass()).done(function(result) {
-
-                var availableProteinDomainNames = [];
-
-                for (var i = 0; i < result.results.length; i++) {
-                    if (result.results[i]["item"] != null) {
-                        availableProteinDomainNames.push({
-                            label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
-                            value: result.results[i]["item"]
-                        });
-                    }
-                }
-
-                $("#proteinDomainNameSearchInput").autocomplete({
-                    minLength: 3,
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(availableProteinDomainNames, request.term);
-                        response(results.slice(0, 15));
-                    },
-                    select: function(event, ui) {
-                        event.preventDefault();
-                        $("#proteinDomainNameSearchInput").val(ui.item.value);
-
-                        // Filter the table
-                        window.imTableConstraint[3].push(ui.item.value);
-                        updateTableWithConstraints();
-
-                        var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
-
-                        $("#proteinDomainNameFilterList").append(
-                            '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
-
-                        $("#" + buttonId).click(function() {
-                            remove(window.imTableConstraint[3], ui.item.value);
+                            // Filter the table
+                            window.imTableConstraint[3].push(ui.item.value);
                             updateTableWithConstraints();
-                            $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                        });
-                    },
-                    focus: function(event, ui) {
-                        event.preventDefault();
-                        $("#proteinDomainNameSearchInput").val(ui.item.value);
-                    }
+
+                            var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                            $("#proteinDomainNameFilterList").append(
+                                '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                            $("#" + buttonId).click(function() {
+                                remove(window.imTableConstraint[3], ui.item.value);
+                                updateTableWithConstraints();
+                                $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                            });
+                        },
+                        focus: function(event, ui) {
+                            event.preventDefault();
+                            $("#proteinDomainNameSearchInput").val(ui.item.value);
+                        }
+                    });
+
                 });
+            }
 
-            });
+            createDatasetFilter(); // Dataset filter should be the last one
+
+            window.extraFiltersAdded = true;
+        } else {
+            createDatasetFilter(); // Dataset filter should be the last one
         }
-
-        createDatasetFilter(); // Dataset filter should be the last one
-
-        window.extraFiltersAdded = true;
     }
 }
 
@@ -1249,8 +1280,12 @@ function fillMineSelector() {
 
                     // Instantiate the im-table with all the data available in Gene from HumanMine
                     var selector = '#dataTable';
+
+                    $(selector).empty();
+
                     var service = {
-                        root: escapeMineURL(window.mineUrl)
+                        root: escapeMineURL(window.mineUrl),
+                        token: getSessionToken()
                     };
                     var query = {
                         select: ['*'],
@@ -1265,7 +1300,7 @@ function fillMineSelector() {
 
                     imtables.configure('TableResults.CacheFactor', 20);
 
-                    var imtable = imtables.loadTable(
+                    var imtable = imtables.loadDash(
                         selector, {
                             "start": 0,
                             "size": 25
@@ -1277,13 +1312,13 @@ function fillMineSelector() {
                         function(table) {
                             //console.log('Table loaded', table);
                             //this .on listener will do something when someone interacts with the table. 
-                            table.on("rendered", function(changeDetail) {
+                            table.children.table.on("rendered", function(changeDetail) {
                                 console.log("Rendered table");
                                 console.log(changeDetail);
                                 updateElements(table.history.currentQuery.constraints, "PieChart");
                             });
 
-                            window.imTable = table;
+                            window.imTable = table.children.table;
                         },
                         function(error) {
                             console.error('Could not load table', error);
