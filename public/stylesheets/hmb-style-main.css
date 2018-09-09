@@ -200,6 +200,14 @@ body.fixed-nav {
   display: none;
 }
 
+.imtables .dropdown-menu {
+  min-width: 360px;
+}
+
+.imtables .dropdown-toggle::after {
+  display: none;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
