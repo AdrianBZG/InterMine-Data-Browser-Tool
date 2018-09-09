@@ -39,6 +39,7 @@ $(document).ready(function() {
             //this .on listener will do something when someone interacts with the table. 
             table.children.table.on("all", function(changeDetail) {
                 updateElements(table.history.currentQuery.constraints, "PieChart");
+                updateGeneLengthChart(table.history.currentQuery.constraints, "GeneLengthChart");
             });
 			
 			window.imTable = table.children.table;

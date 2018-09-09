@@ -50,6 +50,15 @@ describe('Statistics', () => {
               done();
             });
       });
+
+      it('it should GET the summaries of Gene Lengths inside class Gene in HumanMine', (done) => {
+        chai.request(server)
+            .get('/statistics/genelength/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
+            .end((err, res) => {
+                res.should.have.status(200);
+              done();
+            });
+      });
   });
 
 });

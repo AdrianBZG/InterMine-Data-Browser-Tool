@@ -71,6 +71,7 @@ function initializeStartupConfiguration() {
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
     window.pieChartObject = null;
+    window.geneLengthChartObject = null;
 
     window.minesConfigs = null;
 
@@ -341,6 +342,25 @@ function getSessionToken() {
 function getItemsInClass(constraints) {
     return $.ajax({
         url: '/statistics/count/items/' + window.mineUrl + '/' + window.currentClassView,
+        type: 'POST',
+        data: JSON.stringify(constraints),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+/**
+ * Method to get the summary of gene length inside a class (in buckets) in order to feed the bar graph
+ * @param {array} constraints: the constraints for the endpoint call
+ * @returns {array} an array with the server response containing the summaries
+ */
+function getGeneLengthsInClass(constraints) {
+    return $.ajax({
+        url: '/statistics/genelength/' + window.mineUrl + '/' + window.currentClassView,
         type: 'POST',
         data: JSON.stringify(constraints),
         contentType: "application/json; charset=utf-8",
@@ -938,6 +958,11 @@ function updatePieChart(result, pieChartID) {
             mode: 'nearest',
             intersect: true,
         },
+        title: {
+            display: true,
+            text: 'Number of results for Gene by organism',
+            position: 'bottom'
+        },
         tooltips: {
             callbacks: {
                 label: function(tooltipItem, data) {
@@ -1214,6 +1239,7 @@ function fillMineSelector() {
                     // Update the imTable
                     clearExtraFilters();
                     updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                    updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
                 }
 
             }
@@ -1277,6 +1303,7 @@ function fillMineSelector() {
                     // Update the imTable
                     clearExtraFilters();
                     updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                    updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
 
                     // Instantiate the im-table with all the data available in Gene from HumanMine
                     var selector = '#dataTable';
@@ -1316,6 +1343,7 @@ function fillMineSelector() {
                                 console.log("Rendered table");
                                 console.log(changeDetail);
                                 updateElements(table.history.currentQuery.constraints, "PieChart");
+                                updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
                             });
 
                             window.imTable = table.children.table;
@@ -1363,5 +1391,114 @@ function updateElements(constraints, pieChartID) {
         displayItemsInClass(result);
         createSidebarEvents();
         updatePieChart(result, pieChartID);
+    });
+}
+
+/**
+ * Method that updates the gene length chart
+ * @param {string} geneLengthChartID: the div id of the gene length chart, in order to update it
+ */
+function updateGeneLengthChart(constraints, geneLengthChartID) {
+    $.when(getGeneLengthsInClass(constraints)).done(function(result) {
+        if (window.geneLengthChartObject) {
+            window.geneLengthChartObject.destroy();
+        }
+
+        var ctx = document.getElementById(geneLengthChartID);
+
+        var countData = [];
+        var labelsData = [];
+        var onHoverLabel = [];
+        var colorsData = getColorsArray(result['results'].length);
+
+        // Statistical values
+        var uniqueValues = result['uniqueValues'];
+        var minimumValue = result['results'][0]['min'];
+        var maximumValue = result['results'][0]['max'];
+        var averageValue = result['results'][0]['min'];
+        var stdevValue = parseFloat(result['results'][0]['stdev']).toFixed(3);
+        var chartTitle = "Distribution of " + uniqueValues + " Gene Lengths";
+        var chartSubTitle = "Min: " + minimumValue + ". Max: " + maximumValue + ". Avg: " + averageValue + ". Stdev: " + stdevValue;
+
+        for (var i = 0; i < result['results'].length - 1; i++) {
+            countData.push(result['results'][i]['count']);
+            labelsData.push("");
+            onHoverLabel.push("Bucket " + result['results'][i]['bucket'] + " (" + result['results'][i]['count'] + " values)");
+        }
+
+        // Plot
+        var pieOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            elements: {
+                center: {
+                    text: '90%',
+                    color: '#FF6384', // Default is #000000
+                    fontStyle: 'Arial', // Default is Arial
+                    sidePadding: 20 // Default is 20 (as a percentage)
+                }
+            },
+            legend: {
+                display: false,
+                position: 'top',
+                onClick: function(e) {
+                    e.stopPropagation();
+                }
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            title: {
+                display: true,
+                text: [chartTitle, chartSubTitle],
+                position: 'bottom'
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return onHoverLabel[tooltipItem.index];
+                    }
+                },
+                custom: function(tooltip) {
+                    if (!tooltip.opacity) {
+                        document.getElementById(geneLengthChartID).style.cursor = 'default';
+                        return;
+                    }
+                }
+            },
+            onClick: function(evt, elements) {
+                var datasetIndex;
+                var dataset;
+
+                if (elements.length) {
+                    var index = elements[0]._index;
+
+                    selectedSegment = window.geneLengthChartObject.data.labels[index].split("(")[0].trim();
+
+                    // Filter the table
+                    window.imTable.query.addConstraint({
+                        "path": "organism.shortName",
+                        "op": "==",
+                        "value": selectedSegment
+                    });
+
+                }
+
+                window.geneLengthChartObject.update();
+            }
+        };
+
+        window.geneLengthChartObject = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsData,
+                datasets: [{
+                    data: countData,
+                    backgroundColor: colorsData,
+                }],
+            },
+            options: pieOptions
+        });
     });
 }

@@ -42,6 +42,7 @@ $(document).ready(function() {
                 console.log("Rendered table");
                 console.log(changeDetail);
                 updateElements(table.history.currentQuery.constraints, "PieChart");
+                updateGeneLengthChart(table.history.currentQuery.constraints, "GeneLengthChart");
             });
 
             window.imTable = table.children.table;
