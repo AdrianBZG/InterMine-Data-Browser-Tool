@@ -94,6 +94,15 @@ function initializeStartupConfiguration() {
             window.selectedMineName = localStorage.getItem("selectedMineName");
         }
     }
+
+    // Handle the API Keys manager button
+    $("#apiKeyManagerButton").click(function() {
+        // Update the key manager structures
+        initializeKeyManager();
+
+        // Show the window
+        $('#apiKeyManagerModal').appendTo("body").modal('show');
+    });
 }
 
 /**
@@ -1388,12 +1397,66 @@ function updateElements(constraints, pieChartID) {
     fillMineSelector();
     addDefaultFilters();
     handleExtraFilters();
+    initializeKeyManager();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
         displayItemsInClass(result);
         createSidebarEvents();
         updatePieChart(result, pieChartID);
     });
+}
+
+/**
+ * Method that initializes and manages the key manager keys using LocalStorage and
+ * fills the Key Manager modal accordingly
+ */
+function initializeKeyManager() {
+    // Check if LocalStorage is available
+    if (typeof(Storage) !== "undefined") {
+        var interminesNames = [];
+        $.when(getIntermines()).done(function(result) {
+            // First get the mines
+            for (var i = 0; i < result.instances.length; i++) {
+                if (result.instances[i].url.startsWith("https")) continue;
+
+                // Temporarily skiping mines with missing concepts for the default filters
+                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+
+                // Mines giving error when querying the API or not responding
+                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+
+                var mineName = result.instances[i].name;
+                interminesNames.push({ "mine" : mineName, "apikey" : "Paste your API key here" });
+            }
+
+            // Now check that the API keys in LocalStorage are up-to-date
+            if (localStorage.getItem("api-keys")) {
+                // Maybe there is a new mine since last update, so let's check
+                var currentApiKeysObject = JSON.parse(localStorage.getItem("api-keys"));
+                for (var i = 0; i < interminesNames.length; i++) {
+                    if(!findElementJSONarray(currentApiKeysObject, "mine", interminesNames[i].mine)) {
+                        currentApiKeysObject.push({ "mine" : interminesNames[i].mine, "apikey" : "Paste your API key here" });
+                    }
+                }
+                localStorage.setItem("api-keys", JSON.stringify(currentApiKeysObject));
+            } else {
+                localStorage.setItem("api-keys", JSON.stringify(interminesNames));
+            }
+
+            // Finally, feed the API manager modal
+            $("#apiKeyManagerModalKeysDiv").html("");
+            var uptodateAPIkeysArray = JSON.parse(localStorage.getItem("api-keys"));
+            for (var i = 0; i < uptodateAPIkeysArray.length; i++) {
+                $("#apiKeyManagerModalKeysDiv").append('<div class="apiKeyElement"><p class="float-md-left">' + uptodateAPIkeysArray[i].mine + '</p><p class="float-md-right"><input type="text" value="' + uptodateAPIkeysArray[i].apikey + '"></p></div><br><br>');
+            }
+        });
+    }
+}
+
+function findElementJSONarray(arr, propName, propValue) {
+    for (var i=0; i < arr.length; i++)
+        if (arr[i][propName] == propValue)
+            return arr[i];
 }
 
 /**
