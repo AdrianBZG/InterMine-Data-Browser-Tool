@@ -95,13 +95,30 @@ function initializeStartupConfiguration() {
         }
     }
 
-    // Handle the API Keys manager button
+    // Handle the API Keys manager buttons
     $("#apiKeyManagerButton").click(function() {
         // Update the key manager structures
         initializeKeyManager();
 
         // Show the window
         $('#apiKeyManagerModal').appendTo("body").modal('show');
+    });
+
+    $("#apiKeyManagerSaveButton").click(function() {
+        var newApiKeysObject = [];
+        
+        // Iterate through the elements in the div containing the keys and update the LocalStorage object
+        $('#apiKeyManagerModalKeysDiv').children('div').each(function () {
+            var mineName = $(this).children("p").first()[0].innerHTML;
+            var mineAPIkey = $(this).children("p").children("input").val(); // "this" is the current element in the loop
+            newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
+        });
+
+        // Save to Local Storage
+        localStorage.setItem("api-keys", JSON.stringify(newApiKeysObject));
+
+        // Hide the window
+        $('#apiKeyManagerModal').modal('toggle');
     });
 }
 
