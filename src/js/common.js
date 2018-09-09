@@ -935,6 +935,8 @@ function updatePieChart(result, pieChartID) {
         labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
     }
 
+    var plotTitle = "Number of results for " + window.currentClassView + " by organism";
+
     // Plot
     var pieOptions = {
         responsive: true,
@@ -960,7 +962,7 @@ function updatePieChart(result, pieChartID) {
         },
         title: {
             display: true,
-            text: 'Number of results for Gene by organism',
+            text: plotTitle,
             position: 'bottom'
         },
         tooltips: {
