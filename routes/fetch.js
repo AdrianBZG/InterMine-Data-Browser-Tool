@@ -23,6 +23,41 @@ function formatMineURL(mineURL) {
 }
 
 /**
+ * GET Gene Lengths from a mine inside a class (parameter)
+ */
+router.get('/genelength/:mineUrl/:classname', function(req, res, next) {
+    var className = req.params.classname;
+    var mineUrl = formatMineURL(req.params.mineUrl);
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: mineUrl
+    });
+
+    var query = {
+        "from": className,
+        "select": ["length", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "length",
+            "direction": "ASC"
+        }]
+    };
+
+    var genelengths = new imjs.Query(query, service),
+    genelengthsPath = [query.from, query.select[0]].join('.');
+        genelengths.summarize(genelengthsPath).then(function(genelengthsSummary) {
+        //This returns the gene length and the number of gene rows associated with the gene length
+        res.json(genelengthsSummary);
+    });
+});
+
+/**
  * GET Pathway Names from HumanMine inside a class (parameter)
  */
 router.get('/pathways/:mineUrl/:classname', function(req, res, next) {
