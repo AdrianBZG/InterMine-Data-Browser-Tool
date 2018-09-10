@@ -119,6 +119,8 @@ function initializeStartupConfiguration() {
 
         // Hide the window
         $('#apiKeyManagerModal').modal('toggle');
+
+        location.reload();
     });
 }
 
@@ -337,6 +339,21 @@ function getParticipant2SymbolsInClass() {
 * Method that returns a valid session API key for the current mine
 */
 function getSessionToken() {
+
+    // Check if the user has a session token in Local Storage, for this mine
+    if (typeof(Storage) !== "undefined") {
+        if (localStorage.getItem("api-keys")) {
+            var apiKeysObject = JSON.parse(localStorage.getItem("api-keys"));
+            if(findElementJSONarray(apiKeysObject, "mine", window.selectedMineName)) {
+                var apiKeyForThisMine = findElementJSONarray(apiKeysObject, "mine", window.selectedMineName)["apikey"];
+                if(apiKeyForThisMine && apiKeyForThisMine != "" && apiKeyForThisMine != "Paste your API key here") {
+                    return apiKeyForThisMine;
+                }
+            }
+        }
+    }
+
+    // Otherwise get a public one from the session route
     var tokenUrl = escapeMineURL(window.mineUrl);
     var tokenKey = "";
 
