@@ -109,8 +109,8 @@ function initializeStartupConfiguration() {
         
         // Iterate through the elements in the div containing the keys and update the LocalStorage object
         $('#apiKeyManagerModalKeysDiv').children('div').each(function () {
-            var mineName = $(this).children("p").first()[0].innerHTML;
-            var mineAPIkey = $(this).children("p").children("input").val(); // "this" is the current element in the loop
+            var mineName = $(this).children("label").text();
+            var mineAPIkey = $(this).children("input").val(); // "this" is the current element in the loop
             newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
         });
 
@@ -1464,7 +1464,15 @@ function initializeKeyManager() {
             $("#apiKeyManagerModalKeysDiv").html("");
             var uptodateAPIkeysArray = JSON.parse(localStorage.getItem("api-keys"));
             for (var i = 0; i < uptodateAPIkeysArray.length; i++) {
-                $("#apiKeyManagerModalKeysDiv").append('<div class="apiKeyElement"><p class="float-md-left">' + uptodateAPIkeysArray[i].mine + '</p><p class="float-md-right"><input type="text" value="' + uptodateAPIkeysArray[i].apikey + '"></p></div><br><br>');
+                var htmlToAdd = '<div class="apiKeyElement"><label>' + uptodateAPIkeysArray[i].mine + '</label>';
+                
+                if(uptodateAPIkeysArray[i].apikey != "Paste your API key here" && uptodateAPIkeysArray[i].apikey != "") {
+                    htmlToAdd += '<input type="text" value="' + uptodateAPIkeysArray[i].apikey + '"></div>';
+                } else {
+                    htmlToAdd += '<input type="text" placeholder="Paste your API key here"></div>';
+                }
+
+                $("#apiKeyManagerModalKeysDiv").append(htmlToAdd);
             }
         });
     }

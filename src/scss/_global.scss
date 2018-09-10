@@ -194,3 +194,33 @@ body.fixed-nav {
 .imtables .dropdown-menu {min-width: 360px}
 
 .imtables .dropdown-toggle::after {display:none}
+
+.aligned_form {
+  display: flex;
+  flex-flow: column wrap;
+  align-content: flex-start;
+  height: 75px;
+}
+
+label, input {
+  height: 25px;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.container {
+  /* Flex Properties */
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+}
+
+.apiKeyElement {
+  display: flex;
+  align-items: center;
+}
+
+label {
+  width: 200px;
+}
