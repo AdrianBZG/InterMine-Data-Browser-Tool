@@ -236,6 +236,22 @@ button {
   padding: 5px;
 }
 
+#graphsBoxBody {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+}
+
+@media (max-width: 991px) {
+  #graphsBoxBody {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .smaller {
   font-size: 0.7rem;
 }

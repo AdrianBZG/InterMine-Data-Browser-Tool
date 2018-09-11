@@ -18,16 +18,15 @@ html(lang='en')
 				.row
 				
 				.col-xs-12(style="padding-left: 25px; padding-bottom: 15px; padding-right: 25px;")
-					.card(style="width: 100%; height: 100%;")
-						.card-header
+					#graphsBoxBody.card
+						.card-header(style="width: 100%; height: 100%;")
 							i.fa.fa-pie-chart
 							|  Graphs
 						.card-body
-							.row
-								#PieChartHolder.col-xs-6(style='float:left; width: 50%;')
-									canvas#PieChart(width='200px', height='250px')
-								#PieChart2Holder.col-xs-6(style='float:right; width: 50%;')
-									canvas#GeneLengthChart(width='200px', height='250px')
+							#PieChartHolder(style='float:left; width: 50%;')
+								canvas#PieChart(width='200px', height='250px')
+							#PieChart2Holder(style='float:right; width: 50%;')
+								canvas#GeneLengthChart(width='200px', height='250px')
 					
 				
 				.row.row-centered
