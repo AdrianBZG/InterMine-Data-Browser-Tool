@@ -232,6 +232,10 @@ label {
   width: 200px;
 }
 
+button {
+  padding: 5px;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
