@@ -1575,26 +1575,6 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
                         return;
                     }
                 }
-            },
-            onClick: function(evt, elements) {
-                var datasetIndex;
-                var dataset;
-
-                if (elements.length) {
-                    var index = elements[0]._index;
-
-                    selectedSegment = window.geneLengthChartObject.data.labels[index].split("(")[0].trim();
-
-                    // Filter the table
-                    window.imTable.query.addConstraint({
-                        "path": "organism.shortName",
-                        "op": "==",
-                        "value": selectedSegment
-                    });
-
-                }
-
-                window.geneLengthChartObject.update();
             }
         };
 
