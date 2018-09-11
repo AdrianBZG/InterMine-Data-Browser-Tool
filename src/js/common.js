@@ -1,8 +1,32 @@
 $(document).ready(function() {
     checkForHTTPS();
     initializeStartupConfiguration();
+    initializeViewButtons();
     handleResponsiveness();
 });
+
+/**
+ * This method initializes the default view buttons and adds others depending on the mine and user-specific configuration
+ */
+function initializeViewButtons() {
+    var currentClassView = sessionStorage.getItem('currentClassView');
+    var defaultViews = ['Gene','Protein'];
+
+    for (var i = 0; i < defaultViews.length; i++) {
+        if(currentClassView === defaultViews[i]) {
+            $("#headerButtons").append(
+                '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-primary btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
+        } else {
+            $("#headerButtons").append(
+                '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-default btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
+        }
+
+        $('#' + defaultViews[i] + 'Button').click(function(event) {
+            sessionStorage.setItem('currentClassView', String(this.id).split('Button')[0]);
+            location.reload();
+        });
+    }
+}
 
 /**
  * This method checks if there has been any window resize event to change the navbar padding accordingly
@@ -1602,13 +1626,3 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
         });
     });
 }
-
-$('#genesButton').click(function() {
-    sessionStorage.setItem('currentClassView', 'Gene');
-    location.reload();
-});
-
-$('#proteinsButton').click(function() {
-    sessionStorage.setItem('currentClassView', 'Protein');
-    location.reload();
-});
