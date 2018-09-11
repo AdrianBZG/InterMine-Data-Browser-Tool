@@ -1511,12 +1511,14 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
             window.geneLengthChartObject.destroy();
         }
 
+        console.log(result);
+
         var ctx = document.getElementById(geneLengthChartID);
 
         var countData = [];
         var labelsData = [];
         var onHoverLabel = [];
-        var colorsData = getColorsArray(result['results'].length);
+        var colorsData = Array(result['results'].length).fill("#337ab7");
 
         // Statistical values
         var uniqueValues = result['uniqueValues'];
