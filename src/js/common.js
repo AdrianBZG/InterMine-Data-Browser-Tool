@@ -26,6 +26,40 @@ function initializeViewButtons() {
             location.reload();
         });
     }
+
+    // Add classes with preferredBagType tag for the current mine
+    var mineURL = escapeMineURL(window.mineUrl);
+
+    if(mineURL.slice(-1) != "/") {
+        mineURL += "/";
+    }
+
+    mineURL += "model?format=json";
+
+    $.when(getMineModel(mineURL)).done(function(result) {
+        var mineClasses = JSON.parse(JSON.stringify(result.model.classes));
+        var mineClassesArray = [];
+        for(var x in mineClasses){
+            mineClassesArray.push(mineClasses[x]);
+        }
+
+        for (var i = 0; i < mineClassesArray.length; i++) {
+            if(mineClassesArray[i].tags.includes("im:preferredBagType") && !defaultViews.includes(mineClassesArray[i].name)) {
+                if(currentClassView === mineClassesArray[i].name) {
+                    $("#headerButtons").append(
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-primary btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+                } else {
+                    $("#headerButtons").append(
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-default btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+                }
+
+                $('#' + mineClassesArray[i].name + 'Button').click(function(event) {
+                    sessionStorage.setItem('currentClassView', String(this.id).split('Button')[0]);
+                    location.reload();
+                });
+            }
+        }
+    });
 }
 
 /**
@@ -399,6 +433,23 @@ function getSessionToken() {
     });
 
     return tokenKey;
+}
+
+/**
+ * Method to get the model of a mine given its query service
+ * @returns {array} an array with the server response with the mine model
+ */
+function getMineModel(serviceUrl) {
+    return $.ajax({
+        url: serviceUrl,
+        type: 'GET',
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
 }
 
 /**
