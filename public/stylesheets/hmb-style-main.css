@@ -215,12 +215,6 @@ body.fixed-nav {
   height: 75px;
 }
 
-label, input {
-  height: 25px;
-  padding: 5px;
-  box-sizing: border-box;
-}
-
 .container {
   /* Flex Properties */
   display: flex;
