@@ -80,12 +80,12 @@ function initializeStartupConfiguration() {
         console.log(window.minesConfigs);
     });
 
-
-
     // Initial mine service url (HumanMine), name and view
     window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
-    window.currentClassView = "Gene";
+    if(!sessionStorage.getItem('currentClassView')) {
+        sessionStorage.setItem('currentClassView', 'Gene');
+    }
 
     // Check if there is a saved mine in LocalStorage
     if (typeof(Storage) !== "undefined") {
@@ -191,7 +191,7 @@ function getIntermines() {
  */
 function getOntologyTermsInClass() {
     return $.ajax({
-        url: '/fetch/ontologyterms/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/ontologyterms/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -206,7 +206,7 @@ function getOntologyTermsInClass() {
  */
 function getAllelesClinicalSignifanceInClass() {
     return $.ajax({
-        url: '/fetch/clinicalsignificance/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/clinicalsignificance/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -221,7 +221,7 @@ function getAllelesClinicalSignifanceInClass() {
  */
 function getProteinAtlasExpressionCellTypesInClass() {
     return $.ajax({
-        url: '/fetch/proteinatlascelltypes/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/proteinatlascelltypes/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -236,7 +236,7 @@ function getProteinAtlasExpressionCellTypesInClass() {
  */
 function getProteinAtlasExpressionTissueNamesInClass() {
     return $.ajax({
-        url: '/fetch/proteinatlastissuenames/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/proteinatlastissuenames/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -251,7 +251,7 @@ function getProteinAtlasExpressionTissueNamesInClass() {
  */
 function getAllelesTypesInClass() {
     return $.ajax({
-        url: '/fetch/allelestype/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/allelestype/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -266,7 +266,7 @@ function getAllelesTypesInClass() {
  */
 function getDatasetNamesInClass() {
     return $.ajax({
-        url: '/fetch/datasets/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/datasets/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -281,7 +281,7 @@ function getDatasetNamesInClass() {
  */
 function getPathwayNamesInClass() {
     return $.ajax({
-        url: '/fetch/pathways/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/pathways/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log('Error');
@@ -296,7 +296,7 @@ function getPathwayNamesInClass() {
  */
 function getDiseasesNamesInClass() {
     return $.ajax({
-        url: '/fetch/diseases/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/fetch/diseases/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -384,7 +384,7 @@ function getSessionToken() {
  */
 function getItemsInClass(constraints) {
     return $.ajax({
-        url: '/statistics/count/items/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/statistics/count/items/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'POST',
         data: JSON.stringify(constraints),
         contentType: "application/json; charset=utf-8",
@@ -403,7 +403,7 @@ function getItemsInClass(constraints) {
  */
 function getGeneLengthsInClass(constraints) {
     return $.ajax({
-        url: '/statistics/genelength/' + window.mineUrl + '/' + window.currentClassView,
+        url: '/statistics/genelength/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'POST',
         data: JSON.stringify(constraints),
         contentType: "application/json; charset=utf-8",
@@ -441,7 +441,7 @@ function updateTableWithConstraints() {
 
     // GO Annotation
     if (window.imTableConstraint[0].length > 0) {
-        if (window.currentClassView == "Gene") {
+        if (sessionStorage.getItem('currentClassView') == "Gene") {
             window.imTable.query.addConstraint({
                 "path": "goAnnotation.ontologyTerm.name",
                 "op": "ONE OF",
@@ -476,7 +476,7 @@ function updateTableWithConstraints() {
 
     // Protein Domain Name
     if (window.imTableConstraint[3].length > 0) {
-        if (window.currentClassView == "Gene") {
+        if (sessionStorage.getItem('currentClassView') == "Gene") {
             window.imTable.query.addConstraint({
                 "path": "proteins.proteinDomainRegions.proteinDomain.name",
                 "op": "ONE OF",
@@ -600,7 +600,7 @@ function clearExtraFilters() {
 function addExtraFilters() {
     if (!window.extraFiltersAdded) {
         // Read the JSON config file
-        if (window.currentClassView == "Gene") {
+        if (sessionStorage.getItem('currentClassView') == "Gene") {
             var extraFiltersAvailable = window.minesConfigs[window.selectedMineName].extra_filters;
 
             // Location filter
@@ -978,7 +978,7 @@ function updatePieChart(result, pieChartID) {
         labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
     }
 
-    var plotTitle = "Number of results for " + window.currentClassView + " by organism";
+    var plotTitle = "Number of results for " + sessionStorage.getItem('currentClassView') + " by organism";
 
     // Plot
     var pieOptions = {
@@ -1250,10 +1250,13 @@ function fillMineSelector() {
         var windowUrl = new URL(window.location.href);
 
         $.when(getIntermines()).done(function(result) {
-            $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
+            //$('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
 
+            // Need to store current mine to append it at the end, or there are some problems with selector events
+            var currentMineNameTemp;
+            var currentMineUrlTemp;
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].name == "HumanMine" || result.instances[i].url.startsWith("https")) continue;
+                if (result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
                 if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
@@ -1273,13 +1276,19 @@ function fillMineSelector() {
 
                 mineUrl = formatMineURL(mineUrl);
 
-                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+                if(result.instances[i].name === window.selectedMineName) {
+                    currentMineNameTemp = result.instances[i].name;
+                    currentMineUrlTemp = mineUrl;
+                } else {
+                    $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+                }
 
                 // In case that the user gave a mine to be rendered, set it here
                 if (windowUrl.searchParams.get("givenMine") && result.instances[i].name == windowUrl.searchParams.get("givenMine")) {
                     window.mineUrl = mineUrl;
                     window.selectedMineName = result.instances[i].name;
-                    document.title = window.currentClassView + " in " + window.selectedMineName;
+                    sessionStorage.setItem('currentClassView', 'Gene');
+                    document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
 
                     // Update the imTable
                     clearExtraFilters();
@@ -1289,14 +1298,15 @@ function fillMineSelector() {
 
             }
 
-            // Select the correct option from the dropdown
-            $("#mineSelector option").filter(function() {
-                return $(this).text() == window.selectedMineName;
-            }).prop("selected", true);
+            $('#mineSelector').append('<option value="' + currentMineUrlTemp + '">' + currentMineNameTemp + '</option>').val(mineUrl);
+            $("#mineSelector option[value='" + currentMineUrlTemp + "']").attr("selected","selected");
 
             // Event handling
             $("#mineSelector").change(function(e) {
                 // Sanity check
+                
+                if(!e.eventPhase) return false;
+
                 var sanity = true;
                 var selectedOption = $("#mineSelector option:selected").text();
                 var selectedOptionUrl = $(this).val();
@@ -1335,7 +1345,8 @@ function fillMineSelector() {
                     // Update settings
                     window.mineUrl = selectedOptionUrl;
                     window.selectedMineName = selectedOption;
-                    document.title = window.currentClassView + " in " + window.selectedMineName;
+                    sessionStorage.setItem('currentClassView', 'Gene');
+                    document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
                     window.datasetNamesLoaded = false;
                     window.extraFiltersAdded = false;
 
@@ -1361,7 +1372,7 @@ function fillMineSelector() {
                     };
                     var query = {
                         select: ['*'],
-                        from: window.currentClassView
+                        from: sessionStorage.getItem('currentClassView')
                     };
 
                     imtables.configure({
@@ -1591,3 +1602,13 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
         });
     });
 }
+
+$('#genesButton').click(function() {
+    sessionStorage.setItem('currentClassView', 'Gene');
+    location.reload();
+});
+
+$('#proteinsButton').click(function() {
+    sessionStorage.setItem('currentClassView', 'Protein');
+    location.reload();
+});
