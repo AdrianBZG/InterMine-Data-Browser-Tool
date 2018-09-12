@@ -46,6 +46,7 @@ $(document).ready(function() {
             table.children.table.on("rendered", function(changeDetail) {
                 console.log("Rendered table");
                 console.log(changeDetail);
+                document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
                 updateElements(table.history.currentQuery.constraints, "PieChart");
                 updateGeneLengthChart(table.history.currentQuery.constraints, "GeneLengthChart");
             });

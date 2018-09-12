@@ -1363,7 +1363,6 @@ function fillMineSelector() {
                     window.mineUrl = mineUrl;
                     window.selectedMineName = result.instances[i].name;
                     sessionStorage.setItem('currentClassView', 'Gene');
-                    document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
 
                     // Update the imTable
                     clearExtraFilters();
@@ -1421,7 +1420,6 @@ function fillMineSelector() {
                     window.mineUrl = selectedOptionUrl;
                     window.selectedMineName = selectedOption;
                     sessionStorage.setItem('currentClassView', 'Gene');
-                    document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
                     window.datasetNamesLoaded = false;
                     window.extraFiltersAdded = false;
 
@@ -1473,6 +1471,7 @@ function fillMineSelector() {
                             table.children.table.on("rendered", function(changeDetail) {
                                 console.log("Rendered table");
                                 console.log(changeDetail);
+                                document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
                                 updateElements(table.history.currentQuery.constraints, "PieChart");
                                 updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
                             });
