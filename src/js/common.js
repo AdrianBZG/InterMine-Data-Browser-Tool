@@ -1609,21 +1609,27 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
         var uniqueValues = result['uniqueValues'];
         var minimumValue = result['results'][0]['min'];
         var maximumValue = result['results'][0]['max'];
-        var averageValue = result['results'][0]['min'];
+        var averageValue = parseFloat(result['results'][0]['average']).toFixed(3);
+        var elementsPerBucket = (maximumValue - minimumValue) / (result['results'][0].buckets);
         var stdevValue = parseFloat(result['results'][0]['stdev']).toFixed(3);
         var chartTitle = "Distribution of " + uniqueValues + " Gene Lengths";
         var chartSubTitle = "Min: " + minimumValue + ". Max: " + maximumValue + ". Avg: " + averageValue + ". Stdev: " + stdevValue;
 
         for (var i = 0; i < result['results'].length - 1; i++) {
-            countData.push(result['results'][i]['count']);
-            labelsData.push("");
-            onHoverLabel.push("Bucket " + result['results'][i]['bucket'] + " (" + result['results'][i]['count'] + " values)");
+            // Lower and upper limits for each bucket
+            var lowerLimit = Math.round(minimumValue + (elementsPerBucket * i));
+            var upperLimit = Math.round(minimumValue + (elementsPerBucket * (i+1)));
+            countData.push(Math.log2(result['results'][i]['count']) + 1);
+            labelsData.push(lowerLimit + " to " + upperLimit);
+            onHoverLabel.push(lowerLimit + " to " + upperLimit + ": " + result['results'][i]['count'] + " values");
         }
 
         // Plot
-        var pieOptions = {
+        var barChartOptions = {
             responsive: true,
             maintainAspectRatio: false,
+            //Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+            scaleBeginAtZero : true,
             elements: {
                 center: {
                     text: '90%',
@@ -1647,6 +1653,23 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
                 display: true,
                 text: [chartTitle, chartSubTitle],
                 position: 'bottom'
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: false,
+                        autoSkip: false,
+                        maxRotation: 90,
+                        minRotation: 90
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        display: false
+                    }
+                }]
             },
             tooltips: {
                 callbacks: {
@@ -1672,7 +1695,7 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
                     backgroundColor: colorsData,
                 }],
             },
-            options: pieOptions
+            options: barChartOptions
         });
     });
 }
