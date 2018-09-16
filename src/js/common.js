@@ -128,6 +128,7 @@ function initializeStartupConfiguration() {
     window.clinVarFilter = null;
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
+    window.currentClassViewFilter = null;
     window.pieChartObject = null;
     window.geneLengthChartObject = null;
 
@@ -1595,8 +1596,6 @@ function updateGeneLengthChart(constraints, geneLengthChartID) {
         if (window.geneLengthChartObject) {
             window.geneLengthChartObject.destroy();
         }
-
-        console.log(result);
 
         var ctx = document.getElementById(geneLengthChartID);
 
