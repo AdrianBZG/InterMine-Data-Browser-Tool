@@ -123,6 +123,7 @@ function initializeStartupConfiguration() {
         []
     ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
+    window.interminesHashMap = null;
     window.locationFilter = null;
     window.interactionsFilter = null;
     window.clinVarFilter = null;
@@ -165,21 +166,51 @@ function initializeStartupConfiguration() {
 
     $("#apiKeyManagerSaveButton").click(function() {
         var newApiKeysObject = [];
+
+        var anyError = false; // We will use this variable to check for errors
         
         // Iterate through the elements in the div containing the keys and update the LocalStorage object
         $('#apiKeyManagerModalKeysDiv').children('div').each(function () {
             var mineName = $(this).children("label").text();
-            var mineAPIkey = $(this).children("input").val(); // "this" is the current element in the loop
-            newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
+            var mineAPIkey = $(this).children("input").val();
+
+            // Sanity check: if the API key is valid, we save it, otherwise, warn the user
+            if(mineAPIkey != "") {
+                $.ajax({
+                    url: findElementJSONarray(window.interminesHashMap, "mine", mineName).mineurl + '/user/whoami?token=' + mineAPIkey,
+                    type: 'GET',
+                    async: false,
+                    success: function(data) {
+                        newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
+                    },
+                    error: function(e) {
+                        anyError = true;
+
+                        // Show error
+                        if ($("#invalidAPIkeyAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='invalidAPIkeyAlert'><span class='closebtn' id='closeInvalidAPIkeyAlert'>×</span>Error: API key provided for " + mineName + " is not a valid API key - please check you have entered it correctly.</div><br/>");
+
+                            $("#closeInvalidAPIkeyAlert").click(function() {
+                                $("#invalidAPIkeyAlert").hide();
+                            });
+                        } else {
+                            $("#invalidAPIkeyAlert").show();
+                        }
+                    }.bind(this, anyError) // Bind to this environment, so local variable is accesible from inside
+                });
+            } else {
+                newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
+            }
+        }).promise().done( function(){ 
+            if(!anyError) {
+                // Save to Local Storage and reload
+                localStorage.setItem("api-keys", JSON.stringify(newApiKeysObject));
+                location.reload();
+            }
+
+            // Hide the window
+            $('#apiKeyManagerModal').modal('toggle');
         });
-
-        // Save to Local Storage
-        localStorage.setItem("api-keys", JSON.stringify(newApiKeysObject));
-
-        // Hide the window
-        $('#apiKeyManagerModal').modal('toggle');
-
-        location.reload();
     });
 }
 
@@ -1349,7 +1380,6 @@ function fillMineSelector() {
                     mineUrl += "/service";
                 }
 
-
                 mineUrl = formatMineURL(mineUrl);
 
                 if(result.instances[i].name === window.selectedMineName) {
@@ -1533,7 +1563,7 @@ function updateElements(constraints, pieChartID) {
 function initializeKeyManager() {
     // Check if LocalStorage is available
     if (typeof(Storage) !== "undefined") {
-        var interminesNames = [];
+        window.interminesHashMap = [];
         $.when(getIntermines()).done(function(result) {
             // First get the mines
             for (var i = 0; i < result.instances.length; i++) {
@@ -1546,21 +1576,31 @@ function initializeKeyManager() {
                 if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
 
                 var mineName = result.instances[i].name;
-                interminesNames.push({ "mine" : mineName, "apikey" : "Paste your API key here" });
+
+                var mineUrl = result.instances[i].url;
+
+                // Check for mines not requiring to format the URL
+                if (mineUrl[mineUrl.length - 1] == "/") {
+                    mineUrl += "service";
+                } else {
+                    mineUrl += "/service";
+                }
+
+                window.interminesHashMap.push({ "mine" : mineName, "mineurl" : mineUrl, "apikey" : "Paste your API key here" });
             }
 
             // Now check that the API keys in LocalStorage are up-to-date
             if (localStorage.getItem("api-keys")) {
                 // Maybe there is a new mine since last update, so let's check
                 var currentApiKeysObject = JSON.parse(localStorage.getItem("api-keys"));
-                for (var i = 0; i < interminesNames.length; i++) {
-                    if(!findElementJSONarray(currentApiKeysObject, "mine", interminesNames[i].mine)) {
-                        currentApiKeysObject.push({ "mine" : interminesNames[i].mine, "apikey" : "Paste your API key here" });
+                for (var i = 0; i < window.interminesHashMap.length; i++) {
+                    if(!findElementJSONarray(currentApiKeysObject, "mine", window.interminesHashMap[i].mine)) {
+                        currentApiKeysObject.push({ "mine" : window.interminesHashMap[i].mine, "apikey" : "Paste your API key here" });
                     }
                 }
                 localStorage.setItem("api-keys", JSON.stringify(currentApiKeysObject));
             } else {
-                localStorage.setItem("api-keys", JSON.stringify(interminesNames));
+                localStorage.setItem("api-keys", JSON.stringify(window.interminesHashMap));
             }
 
             // Finally, feed the API manager modal
