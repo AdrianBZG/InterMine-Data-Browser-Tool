@@ -7,13 +7,13 @@ $(document).ready(function() {
  * and handles the default mine view.
  */
 function initializeStartupConfiguration() {
-    window.imTableConstraint = [
-        [],
-        [],
-        [],
-        [],
-        []
-    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
+    window.imTableConstraint = {
+        "goAnnotation" : [],
+        "datasetName" : [],
+        "pathwayName" : [],
+        "proteinDomainName" : [],
+        "diseaseName" : []
+    }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
     window.locationFilter = null;
@@ -120,63 +120,63 @@ function updateTableWithConstraints() {
     }
 
     // GO Annotation
-    if (window.imTableConstraint[0].length > 0) {
+    if (window.imTableConstraint["goAnnotation"].length > 0) {
         if (sessionStorage.getItem('currentClassView') == "Gene") {
             window.imTable.query.addConstraint({
                 "path": "goAnnotation.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint[0]
+                "values": window.imTableConstraint["goAnnotation"]
             });
         } else {
             window.imTable.query.addConstraint({
                 "path": "ontologyAnnotations.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint[0]
+                "values": window.imTableConstraint["goAnnotation"]
             });
         }
     }
 
     // Dataset Name
-    if (window.imTableConstraint[1].length > 0) {
+    if (window.imTableConstraint["datasetName"].length > 0) {
         window.imTable.query.addConstraint({
             "path": "dataSets.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint[1]
+            "values": window.imTableConstraint["datasetName"]
         });
     }
 
     // Pathway Name
-    if (window.imTableConstraint[2].length > 0) {
+    if (window.imTableConstraint["pathwayName"].length > 0) {
         window.imTable.query.addConstraint({
             "path": "pathways.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint[2]
+            "values": window.imTableConstraint["pathwayName"]
         });
     }
 
     // Protein Domain Name
-    if (window.imTableConstraint[3].length > 0) {
+    if (window.imTableConstraint["proteinDomainName"].length > 0) {
         if (sessionStorage.getItem('currentClassView') == "Gene") {
             window.imTable.query.addConstraint({
                 "path": "proteins.proteinDomainRegions.proteinDomain.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint[3]
+                "values": window.imTableConstraint["proteinDomainName"]
             });
         } else {
             window.imTable.query.addConstraint({
                 "path": "proteinDomainRegions.proteinDomain.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint[3]
+                "values": window.imTableConstraint["proteinDomainName"]
             });
         }
     }
 
     // Disease Name
-    if (window.imTableConstraint[4].length > 0) {
+    if (window.imTableConstraint["diseaseName"].length > 0) {
         window.imTable.query.addConstraint({
             "path": "diseases.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint[4]
+            "values": window.imTableConstraint["diseaseName"]
         });
     }
 }
@@ -223,11 +223,11 @@ function showMoreDatasetNames() {
             $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                 if ($(this).is(":checked")) {
                     var checkboxValue = $(this).val();
-                    window.imTableConstraint[1].push(checkboxValue);
+                    window.imTableConstraint["datasetName"].push(checkboxValue);
                     updateTableWithConstraints();
                 } else {
                     var checkboxValue = $(this).val();
-                    remove(window.imTableConstraint[1], checkboxValue);
+                    remove(window.imTableConstraint["datasetName"], checkboxValue);
                     updateTableWithConstraints();
                 }
             });
@@ -335,7 +335,7 @@ function addExtraFilters() {
                             $("#diseasesSearchInput").val(ui.item.value);
 
                             // Filter the table
-                            window.imTableConstraint[4].push(ui.item.value);
+                            window.imTableConstraint["diseaseName"].push(ui.item.value);
                             updateTableWithConstraints();
 
                             var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -344,7 +344,7 @@ function addExtraFilters() {
                                 '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                             $("#" + buttonId).click(function() {
-                                remove(window.imTableConstraint[4], ui.item.value);
+                                remove(window.imTableConstraint["diseaseName"], ui.item.value);
                                 updateTableWithConstraints();
                                 $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                             });
@@ -523,7 +523,7 @@ function addExtraFilters() {
                             $("#proteinDomainNameSearchInput").val(ui.item.value);
 
                             // Filter the table
-                            window.imTableConstraint[3].push(ui.item.value);
+                            window.imTableConstraint["proteinDomainName"].push(ui.item.value);
                             updateTableWithConstraints();
 
                             var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -532,7 +532,7 @@ function addExtraFilters() {
                                 '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                             $("#" + buttonId).click(function() {
-                                remove(window.imTableConstraint[3], ui.item.value);
+                                remove(window.imTableConstraint["proteinDomainName"], ui.item.value);
                                 updateTableWithConstraints();
                                 $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                             });
@@ -719,7 +719,7 @@ function createGoAnnotationFilter() {
                     event.preventDefault();
                     $("#goAnnotationSearchInput").val(ui.item.value);
 
-                    window.imTableConstraint[0].push(ui.item.value);
+                    window.imTableConstraint["goAnnotation"].push(ui.item.value);
                     updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -728,7 +728,7 @@ function createGoAnnotationFilter() {
                         '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                     $("#" + buttonId).click(function() {
-                        remove(window.imTableConstraint[0], ui.item.value);
+                        remove(window.imTableConstraint["goAnnotation"], ui.item.value);
                         updateTableWithConstraints();
                         $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                     });
@@ -796,11 +796,11 @@ function createDatasetFilter() {
                     $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                         if ($(this).is(":checked")) {
                             var checkboxValue = $(this).val();
-                            window.imTableConstraint[1].push(checkboxValue);
+                            window.imTableConstraint["datasetName"].push(checkboxValue);
                             updateTableWithConstraints();
                         } else {
                             var checkboxValue = $(this).val();
-                            remove(window.imTableConstraint[1], checkboxValue);
+                            remove(window.imTableConstraint["datasetName"], checkboxValue);
                             updateTableWithConstraints();
                         }
                     });
@@ -842,7 +842,7 @@ function createPathwaysNameFilter() {
                     $("#pathwayNameSearchInput").val(ui.item.value);
 
                     // Filter the table
-                    window.imTableConstraint[2].push(ui.item.value);
+                    window.imTableConstraint["pathwayName"].push(ui.item.value);
                     updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -851,7 +851,7 @@ function createPathwaysNameFilter() {
                         '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                     $("#" + buttonId).click(function() {
-                        remove(window.imTableConstraint[2], ui.item.value);
+                        remove(window.imTableConstraint["pathwayName"], ui.item.value);
                         updateTableWithConstraints();
                         $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                     });
