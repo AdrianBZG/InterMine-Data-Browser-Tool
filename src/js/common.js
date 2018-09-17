@@ -1113,31 +1113,56 @@ function initializeKeyManager() {
 function initializeViewManager() {
     // First check if LocalStorage is available
     if (typeof(Storage) !== "undefined") {
-        // Is the view manager object in Local Storage? No = add it
+        // Is the view manager object in Local Storage?
+        var currentViewManagerObject;
         if (!localStorage.getItem("view-manager")) {
-            localStorage.setItem("view-manager", []);
+            localStorage.setItem("view-manager", "[]");
         }
+ 
+        currentViewManagerObject = JSON.parse(localStorage.getItem("view-manager"));
+
 
         // Handle the current views display
-        var currentViewManagerObject = JSON.parse(localStorage.getItem("view-manager"));
-        var currentView = sessionStorage.getItem('currentClassView');
         var currentMineViewManagerSettings;
 
         $("#viewManagerModalCurrentViewsDiv").html("");
-
-        if(findElementJSONarray(currentViewManagerObject, "mine", window.mineName)) {
-            currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.mineName);
-            if(currentMineViewManagerSettings[currentView]) {
-                var currentMineAndViewSettings = currentMineViewManagerSettings[currentView];
-                var currentMineAndViewSettingsValues = currentMineAndViewSettings.viewNames.split(",");
+    
+        if(findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)) {
+            currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName);
+            if(currentMineViewManagerSettings.viewNames) {
+                var currentMineAndViewSettingsValues = currentMineViewManagerSettings.viewNames.split(",");
                 for (var i = 0; i < currentMineAndViewSettingsValues.length; i++) {
-                    var htmlToAdd = '<div class="viewManagerElement"><label>' + currentMineAndViewSettingsValues[i] + '</label>';                
-                    htmlToAdd += '<button class="btn btn-danger" type="button" id="viewManager' + currentMineAndViewSettingsValues[i] + 'RemoveButton" data-dismiss="modal">Remove</button>';
+                    // Add the HTML
+                    var htmlToAdd = '<div class="viewManagerElement" id="viewManager' + currentMineAndViewSettingsValues[i] + 'Div"><label id="viewManager' + currentMineAndViewSettingsValues[i] + 'Label">' + currentMineAndViewSettingsValues[i] + '</label>';                
+                    htmlToAdd += '<button class="btn btn-danger" type="button" id="viewManager' + currentMineAndViewSettingsValues[i] + 'RemoveButton" data-dismiss="modal">Remove</button></div>';
                     $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
 
                     // Now handle the remove button
                     $("#viewManager" + currentMineAndViewSettingsValues[i] + "RemoveButton").click(function() {
-                        alert(this.value);
+                        // Get view name from the label
+                        var labelViewName = $(this).closest("div").find("label").text();
+
+                        // Get the current view config
+                        var currentMineSettings = findElementJSONarray(JSON.parse(localStorage.getItem("view-manager")), "mine", window.selectedMineName);
+                        
+                        // Remove the correct one
+                        var newViewConfig = currentMineSettings.viewNames.split(",");
+                        remove(newViewConfig, labelViewName);
+                        newViewConfig = newViewConfig.join(",");
+
+                        // Update in structure
+                        currentMineSettings.viewNames = newViewConfig;
+                        
+                        // Update in Local Storage
+                        localStorage.setItem("view-manager", JSON.stringify([currentMineSettings]));
+
+                        // Remove from list
+                        $("#viewManager" + labelViewName + "Div").remove();
+
+                        // Is list now empty?
+                        if(currentMineSettings.viewNames.split(",")[0] === "") {
+                            $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
+                        }
                     });
                 }
             } else {
@@ -1147,15 +1172,31 @@ function initializeViewManager() {
             $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
         }
 
-        // Handle the buttons
-        // Add
+        // Handle the add buton
         $("#viewManagerAddViewButton").click(function() {
-            alert($("#viewManagerAddViewInput").val());
-        });
+            var inputViewName = $("#viewManagerAddViewInput").val();
 
-        // Save
-        $("#viewManagerSaveButton").click(function() {
-            alert("Save");
+            currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)
+
+            if(!currentMineViewManagerSettings) {
+                currentViewManagerObject.push({ "mine" : window.selectedMineName, "viewNames" : "" });
+                currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)
+            }
+
+            var currentViewConfig = currentMineViewManagerSettings.viewNames.split(",");
+            if(inputViewName != "Gene" && inputViewName != "Protein" && !currentViewConfig.includes(inputViewName)) {
+                currentViewConfig.push(inputViewName);
+ 
+                if(currentViewConfig[0] === "") {
+                    currentMineViewManagerSettings.viewNames = currentViewConfig[1];
+                } else {
+                    currentMineViewManagerSettings.viewNames = currentViewConfig.join(",");
+                }
+
+                // Save in LS and reload
+                localStorage.setItem("view-manager", JSON.stringify([currentMineViewManagerSettings]));
+                location.reload();
+            }
         });
     }
 }
