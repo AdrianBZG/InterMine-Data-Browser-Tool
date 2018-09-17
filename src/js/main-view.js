@@ -6,7 +6,9 @@ $(document).ready(function() {
 
     var currentClassView = sessionStorage.getItem('currentClassView');
 
-    // Handle the current class filter
+    checkForHTTPS();
+    initializeViewButtons();
+    handleResponsiveness();
     handleCurrentClassFilter(currentClassView);
 
     document.title = currentClassView + " in HumanMine";
@@ -123,6 +125,102 @@ function handleCurrentClassFilter(currentClassView) {
 }
 
 /**
+ * This method initializes the default view buttons and adds others depending on the mine and user-specific configuration
+ */
+function initializeViewButtons() {
+    var currentClassView = sessionStorage.getItem('currentClassView');
+    var defaultViews = ['Gene','Protein'];
+
+    for (var i = 0; i < defaultViews.length; i++) {
+        if(currentClassView === defaultViews[i]) {
+            $("#headerButtons").append(
+                '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-primary btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
+        } else {
+            $("#headerButtons").append(
+                '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-default btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
+        }
+
+        $('#' + defaultViews[i] + 'Button').click(function(event) {
+            sessionStorage.setItem('currentClassView', String(this.id).split('Button')[0]);
+            location.reload();
+        });
+    }
+
+    // Add classes with preferredBagType tag for the current mine
+    var mineURL = escapeMineURL(window.mineUrl);
+
+    if(mineURL.slice(-1) != "/") {
+        mineURL += "/";
+    }
+
+    mineURL += "model?format=json";
+
+    $.when(getMineModel(mineURL)).done(function(result) {
+        var mineClasses = JSON.parse(JSON.stringify(result.model.classes));
+        var mineClassesArray = [];
+        for(var x in mineClasses){
+            mineClassesArray.push(mineClasses[x]);
+        }
+
+        for (var i = 0; i < mineClassesArray.length; i++) {
+            if(mineClassesArray[i].tags.includes("im:preferredBagType") && !defaultViews.includes(mineClassesArray[i].name)) {
+                if(currentClassView === mineClassesArray[i].name) {
+                    $("#headerButtons").append(
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-primary btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+                } else {
+                    $("#headerButtons").append(
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-default btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+                }
+
+                $('#' + mineClassesArray[i].name + 'Button').click(function(event) {
+                    sessionStorage.setItem('currentClassView', String(this.id).split('Button')[0]);
+                    location.reload();
+                });
+            }
+        }
+    });
+}
+
+/**
+ * This method checks if there has been any window resize event to change the navbar padding accordingly
+ */
+function handleResponsiveness() {
+    var width = $(window).width();
+
+    // Initial sizing
+    if (width < 992) {
+        var navbarHeight = $("#navbarResponsive").height();
+        if (width < 770) {
+            $("body.fixed-nav").css("padding-top", navbarHeight + 75);
+        } else {
+            $("body.fixed-nav").css("padding-top", navbarHeight + 56);
+        }
+    } else {
+        $("body.fixed-nav").css("padding-top", "56px");
+    }
+
+    // Event handling
+    $(window).on('resize', function() {
+        if ($(this).width() != width) {
+            width = $(this).width();
+            // Regular device
+            if (width < 992) {
+                var navbarHeight = $("#navbarResponsive").height();
+                if (width < 770) {
+                    $("body.fixed-nav").css("padding-top", navbarHeight + 75);
+                } else {
+                    $("body.fixed-nav").css("padding-top", navbarHeight + 56);
+                }
+            }
+            // Small device
+            else {
+                $("body.fixed-nav").css("padding-top", "56px");
+            }
+        }
+    });
+}
+
+/**
  * This method removes any constraint that has been applied to the current class view filter
  */
 function clearCurrentClassViewConstraint() {
@@ -135,4 +233,13 @@ function clearCurrentClassViewConstraint() {
         }
 	}
     window.currentClassViewFilter = null;
+}
+
+/**
+ * This method checks if the user is using HTTPS protocol to access the browser in order to show an informative warning
+ */
+function checkForHTTPS() {
+    if (window.location.protocol.includes("https")) {
+        $("#navbarResponsive").prepend("<div class='alert' id='httpsAlert'>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP, and/or allow unsafe scripts to run.</div><br/>");
+    }
 }
