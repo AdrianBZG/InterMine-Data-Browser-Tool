@@ -46,11 +46,7 @@ $(document).ready(function() {
         }
     ).then(
         function(table) {
-            console.log('Table loaded', table.children.table);
-            //this .on listener will do something when someone interacts with the table. 
             table.children.table.on("rendered", function(changeDetail) {
-                console.log("Rendered table");
-                console.log(changeDetail);
                 document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
                 updateElements(table.history.currentQuery.constraints, "PieChart");
                 updateGeneLengthChart(table.history.currentQuery.constraints, "GeneLengthChart");

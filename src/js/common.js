@@ -29,7 +29,6 @@ function initializeStartupConfiguration() {
 
     readTextFile("./mine_configs/mines_filters.json", function(text) {
         window.minesConfigs = JSON.parse(text);
-        console.log(window.minesConfigs);
     });
 
     // Initial mine service url (HumanMine), name and view
@@ -103,6 +102,15 @@ function initializeStartupConfiguration() {
             // Hide the window
             $('#apiKeyManagerModal').modal('toggle');
         });
+    });
+
+    // Handle the view manager buttons
+    $("#viewManagerButton").click(function() {
+        // Update the key manager structures
+        initializeViewManager();
+        
+        // Show the window
+        $('#viewManagerModal').appendTo("body").modal('show');
     });
 }
 
@@ -1025,11 +1033,8 @@ function fillMineSelector() {
                         }
                     ).then(
                         function(table) {
-                            //console.log('Table loaded', table);
-                            //this .on listener will do something when someone interacts with the table. 
+                            // This .on listener will do something when table is rendered 
                             table.children.table.on("rendered", function(changeDetail) {
-                                console.log("Rendered table");
-                                console.log(changeDetail);
                                 document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
                                 updateElements(table.history.currentQuery.constraints, "PieChart");
                                 updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
@@ -1076,6 +1081,7 @@ function updateElements(constraints, pieChartID) {
     addDefaultFilters();
     handleExtraFilters();
     initializeKeyManager();
+    initializeViewManager();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
         displayItemsInClass(result);
@@ -1146,6 +1152,17 @@ function initializeKeyManager() {
                 $("#apiKeyManagerModalKeysDiv").append(htmlToAdd);
             }
         });
+    }
+}
+
+/**
+ * Method that initializes and manages the view manager using LocalStorage and
+ * fills the view manager modal accordingly
+ */
+function initializeViewManager() {
+    // Check if LocalStorage is available
+    if (typeof(Storage) !== "undefined") {
+        //
     }
 }
 
