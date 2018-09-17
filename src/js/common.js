@@ -1162,7 +1162,19 @@ function initializeKeyManager() {
 function initializeViewManager() {
     // Check if LocalStorage is available
     if (typeof(Storage) !== "undefined") {
-        //
+        $("#viewManagerModalCurrentViewsDiv").html("");
+
+        var htmlToAdd = '<div class="viewManagerElement"><label>Lorem</label>';
+                
+        htmlToAdd += '<button class="btn btn-danger" type="button" data-dismiss="modal">Remove</button>';
+
+        $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
+
+        var htmlToAdd = '<div class="viewManagerElement"><label>Ipsum</label>';
+                
+        htmlToAdd += '<button class="btn btn-danger" type="button" data-dismiss="modal">Remove</button>';
+
+        $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
     }
 }
 

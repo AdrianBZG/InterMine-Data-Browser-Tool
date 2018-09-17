@@ -252,6 +252,12 @@ button {
   }
 }
 
+.viewManagerElement {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
 .smaller {
   font-size: 0.7rem;
 }

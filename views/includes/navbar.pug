@@ -69,10 +69,22 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					| In this modal you are able to manage the custom views for the current mine, as well as adding new ones.
 					br
 					br
-					| Current Views:
-				#viewManagerModalCurrentViewsDiv(class="container")
+					center
+						b Current custom views:
+					br
+					#viewManagerModalCurrentViewsDiv(class="container")
 					br
 					br
-					| Add a new view
+					hr
+					center
+						b Add a new view:
+					br
+					br
+					#viewManagerModalAddViewDiv(class="container")
+						.input-group
+							input(type="text" class="form-control" id="viewManagerAddViewInput" placeholder="Type a valid view name (e.g. Gene)" style="padding-right: 5px;")
+							span.input-group-btn(style="padding-left: 5px;")
+								button.btn.btn-success(type='button' id="viewManagerAddViewButton") Add
+					br
 			.modal-footer
-				button.btn.btn-danger(type='button' data-dismiss='modal' style='position:absolute; left: 15px;') Close
+				button.btn.btn-danger(type='button' data-dismiss='modal') Close
