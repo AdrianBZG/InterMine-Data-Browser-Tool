@@ -1111,21 +1111,52 @@ function initializeKeyManager() {
  * fills the view manager modal accordingly
  */
 function initializeViewManager() {
-    // Check if LocalStorage is available
+    // First check if LocalStorage is available
     if (typeof(Storage) !== "undefined") {
+        // Is the view manager object in Local Storage? No = add it
+        if (!localStorage.getItem("view-manager")) {
+            localStorage.setItem("view-manager", []);
+        }
+
+        // Handle the current views display
+        var currentViewManagerObject = JSON.parse(localStorage.getItem("view-manager"));
+        var currentView = sessionStorage.getItem('currentClassView');
+        var currentMineViewManagerSettings;
+
         $("#viewManagerModalCurrentViewsDiv").html("");
 
-        var htmlToAdd = '<div class="viewManagerElement"><label>Lorem</label>';
-                
-        htmlToAdd += '<button class="btn btn-danger" type="button" data-dismiss="modal">Remove</button>';
+        if(findElementJSONarray(currentViewManagerObject, "mine", window.mineName)) {
+            currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.mineName);
+            if(currentMineViewManagerSettings[currentView]) {
+                var currentMineAndViewSettings = currentMineViewManagerSettings[currentView];
+                var currentMineAndViewSettingsValues = currentMineAndViewSettings.viewNames.split(",");
+                for (var i = 0; i < currentMineAndViewSettingsValues.length; i++) {
+                    var htmlToAdd = '<div class="viewManagerElement"><label>' + currentMineAndViewSettingsValues[i] + '</label>';                
+                    htmlToAdd += '<button class="btn btn-danger" type="button" id="viewManager' + currentMineAndViewSettingsValues[i] + 'RemoveButton" data-dismiss="modal">Remove</button>';
+                    $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
 
-        $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
+                    // Now handle the remove button
+                    $("#viewManager" + currentMineAndViewSettingsValues[i] + "RemoveButton").click(function() {
+                        alert(this.value);
+                    });
+                }
+            } else {
+                $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
+            }
+        } else {
+            $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
+        }
 
-        var htmlToAdd = '<div class="viewManagerElement"><label>Ipsum</label>';
-                
-        htmlToAdd += '<button class="btn btn-danger" type="button" data-dismiss="modal">Remove</button>';
+        // Handle the buttons
+        // Add
+        $("#viewManagerAddViewButton").click(function() {
+            alert($("#viewManagerAddViewInput").val());
+        });
 
-        $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
+        // Save
+        $("#viewManagerSaveButton").click(function() {
+            alert("Save");
+        });
     }
 }
 
