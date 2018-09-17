@@ -5,7 +5,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	select#mineSelector.form-control(style="width: 200px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 	div#headerButtons.col-md-10.text-center
 
-	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 130px;" data-toggle="tooltip" title="Open the view manager")
+	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 130px;" data-toggle="tooltip" title="Open the views manager")
 		i.fa.fa-eye
 	button.btn.btn-primary(id="apiKeyManagerButton" style="position: fixed; top: 10px; right: 75px;" data-toggle="tooltip" title="Open the API Key manager")
 		i.fa.fa-key
@@ -87,4 +87,5 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 								button.btn.btn-success(type='button' id="viewManagerAddViewButton") Add
 					br
 			.modal-footer
-				button.btn.btn-danger(type='button' data-dismiss='modal') Close
+				button.btn.btn-success(type='button' id="viewManagerSaveButton") Save
+				button.btn.btn-danger(type='button' data-dismiss='modal' style='position:absolute; left: 15px;') Close
