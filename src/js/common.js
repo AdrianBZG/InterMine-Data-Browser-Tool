@@ -996,56 +996,7 @@ function fillMineSelector() {
                         localStorage.setItem("selectedMineName", window.selectedMineName);
                     }
 
-                    // Update the imTable
-                    clearExtraFilters();
-                    updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
-                    updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
-
-                    // Instantiate the im-table with all the data available in Gene from HumanMine
-                    var selector = '#dataTable';
-
-                    $(selector).empty();
-
-                    var service = {
-                        root: escapeMineURL(window.mineUrl),
-                        token: getSessionToken()
-                    };
-                    var query = {
-                        select: ['*'],
-                        from: sessionStorage.getItem('currentClassView')
-                    };
-
-                    imtables.configure({
-                        TableCell: {
-                            PreviewTrigger: 'click'
-                        }
-                    });
-
-                    imtables.configure('TableResults.CacheFactor', 20);
-
-                    var imtable = imtables.loadDash(
-                        selector, {
-                            "start": 0,
-                            "size": 25
-                        }, {
-                            service: service,
-                            query: query
-                        }
-                    ).then(
-                        function(table) {
-                            // This .on listener will do something when table is rendered 
-                            table.children.table.on("rendered", function(changeDetail) {
-                                document.title = sessionStorage.getItem('currentClassView') + " in " + window.selectedMineName;
-                                updateElements(table.history.currentQuery.constraints, "PieChart");
-                                updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
-                            });
-
-                            window.imTable = table.children.table;
-                        },
-                        function(error) {
-                            console.error('Could not load table', error);
-                        }
-                    );
+                    location.reload();
                 }
             });
 
