@@ -23,7 +23,7 @@
         "url": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool"
     },
     "dependencies": {
-        "bootstrap": "4.0.0",
+        "bootstrap": "4.1.2",
         "browser-sync": "2.23.6",
         "chart.js": "2.7.1",
         "cookie-parser": "~1.4.3",

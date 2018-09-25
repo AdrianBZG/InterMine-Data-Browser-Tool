@@ -232,12 +232,11 @@ function showMoreDatasetNames() {
                 if ($(this).is(":checked")) {
                     var checkboxValue = $(this).val();
                     window.imTableConstraint["datasetName"].push(checkboxValue);
-                    updateTableWithConstraints();
                 } else {
                     var checkboxValue = $(this).val();
                     remove(window.imTableConstraint["datasetName"], checkboxValue);
-                    updateTableWithConstraints();
                 }
+                updateTableWithConstraints();
             });
         }
     });
@@ -805,12 +804,11 @@ function createDatasetFilter() {
                         if ($(this).is(":checked")) {
                             var checkboxValue = $(this).val();
                             window.imTableConstraint["datasetName"].push(checkboxValue);
-                            updateTableWithConstraints();
                         } else {
                             var checkboxValue = $(this).val();
                             remove(window.imTableConstraint["datasetName"], checkboxValue);
-                            updateTableWithConstraints();
                         }
+                        updateTableWithConstraints();
                     });
                 }
 
