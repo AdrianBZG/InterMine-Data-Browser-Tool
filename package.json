@@ -1,7 +1,7 @@
 {
     "title": "InterMine Data Brpwser",
     "name": "intermine-data-browser",
-    "version": "0.0.4",
+    "version": "1.0.8",
     "description": "A web-based data browser for InterMine",
     "homepage": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool",
     "bugs": {
