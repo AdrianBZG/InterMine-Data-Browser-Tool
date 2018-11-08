@@ -9,7 +9,7 @@
         "email": "adrianrodriguezbazaga@gmail.com"
     },
     "scripts": {
-        "start": "gulp & node ./bin/www",
+        "start": "npm install & gulp & node ./bin/www",
         "dev": "gulp && webpack --config webpack.config.js",
         "test": "mocha --timeout 100000"
     },
