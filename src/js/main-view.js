@@ -127,6 +127,7 @@ function initializeViewButtons() {
     var currentClassView = sessionStorage.getItem('currentClassView');
     var defaultViews = ['Gene','Protein'];
 
+    // Add default views
     for (var i = 0; i < defaultViews.length; i++) {
         if(currentClassView === defaultViews[i]) {
             $("#headerButtons").append(
@@ -175,6 +176,30 @@ function initializeViewButtons() {
             }
         }
     });
+
+    // Add custom views
+    var currentViewManagerObject = JSON.parse(localStorage.getItem("view-manager"));
+    if(findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)) {
+        var currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName);
+        if(currentMineViewManagerSettings.viewNames) {
+            var currentMineAndViewSettingsValues = currentMineViewManagerSettings.viewNames.split(",");
+            for (var i = 0; i < currentMineAndViewSettingsValues.length; i++) {
+                // Add the HTML
+                if(currentClassView === currentMineAndViewSettingsValues[i]) {
+                    $("#headerButtons").append(
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + currentMineAndViewSettingsValues[i] + ' view"><button class="btn btn-primary btn-space" id="' + currentMineAndViewSettingsValues[i] + 'Button" type="button">' + currentMineAndViewSettingsValues[i] + '</button></a>');    
+                } else {
+                    $("#headerButtons").append(
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + currentMineAndViewSettingsValues[i] + ' view"><button class="btn btn-default btn-space" id="' + currentMineAndViewSettingsValues[i] + 'Button" type="button">' + currentMineAndViewSettingsValues[i] + '</button></a>');    
+                }
+
+                $('#' + currentMineAndViewSettingsValues[i] + 'Button').click(function(event) {
+                    sessionStorage.setItem('currentClassView', String(this.id).split('Button')[0]);
+                    location.reload();
+                });
+            }
+        }
+    }
 }
 
 /**

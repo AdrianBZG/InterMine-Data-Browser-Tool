@@ -1157,6 +1157,9 @@ function initializeViewManager() {
                         // Remove from list
                         $("#viewManager" + labelViewName + "Div").remove();
 
+                        // Remove from main view
+                        $("#" + labelViewName + "Button").remove();
+
                         // Is list now empty?
                         if(currentMineSettings.viewNames.split(",")[0] === "") {
                             $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
