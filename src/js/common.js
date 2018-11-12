@@ -681,7 +681,7 @@ function updatePieChart(result, pieChartID) {
 
             }
 
-            window.pieChartObject.update();
+            //window.pieChartObject.update();
         }
     };
 
