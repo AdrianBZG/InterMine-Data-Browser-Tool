@@ -27,7 +27,7 @@ function initializeStartupConfiguration() {
 
     window.minesConfigs = null;
 
-    readTextFile("./mine_configs/mines_filters.json", function(text) {
+    readTextFile("./mine_configs/mines_config.json", function(text) {
         window.minesConfigs = JSON.parse(text);
     });
 
@@ -164,28 +164,32 @@ function updateTableWithConstraints() {
 
     // Protein Domain Name
     if (window.imTableConstraint["proteinDomainName"].length > 0) {
+        var filter = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0].customFilters.filter(function(v){
+            return v.filterName==='Protein-Domain';
+        });
+
+        var proteinDomainFilterQuery = filter[0].filterQuery[0];
+        proteinDomainFilterQuery.values = window.imTableConstraint["proteinDomainName"];
+
         if (sessionStorage.getItem('currentClassView') == "Gene") {
-            window.imTable.query.addConstraint({
-                "path": "proteins.proteinDomainRegions.proteinDomain.name",
-                "op": "ONE OF",
-                "values": window.imTableConstraint["proteinDomainName"]
-            });
-        } else {
-            window.imTable.query.addConstraint({
-                "path": "proteinDomainRegions.proteinDomain.name",
-                "op": "ONE OF",
-                "values": window.imTableConstraint["proteinDomainName"]
-            });
+            window.imTable.query.addConstraint(proteinDomainFilterQuery);
         }
     }
 
     // Disease Name
     if (window.imTableConstraint["diseaseName"].length > 0) {
-        window.imTable.query.addConstraint({
-            "path": "diseases.name",
-            "op": "ONE OF",
-            "values": window.imTableConstraint["diseaseName"]
+        var filter = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0].customFilters.filter(function(v){
+            return v.filterName==='Diseases';
         });
+
+        var diseasesFilterQuery = filter[0].filterQuery[0];
+        diseasesFilterQuery.values = window.imTableConstraint["diseaseName"];
+
+        window.imTable.query.addConstraint(diseasesFilterQuery);
     }
 }
 
@@ -243,9 +247,9 @@ function showMoreDatasetNames() {
 }
 
 /**
- * Method to remove the current extra filters in the sidebar
+ * Method to remove the current Custom filters in the sidebar
  */
-function clearExtraFilters() {
+function clearCustomFilters() {
     $("#locationFilterLi").remove();
     $("#diseasesFilterLi").remove();
     $("#clinvarFilterLi").remove();
@@ -254,30 +258,180 @@ function clearExtraFilters() {
     $("#interactionsFilterLi").remove();
     $("#expressionFilterLi").remove();
     $("#datasetFilterLi").remove();
-    window.extraFiltersAdded = false;
+    window.CustomFiltersAdded = false;
 }
 
-function addExtraFilters() {
-    if (!window.extraFiltersAdded) {
+function addCustomFilters() {
+    if (!window.CustomFiltersAdded) {
         // Read the JSON config file
         if (sessionStorage.getItem('currentClassView') == "Gene") {
-            var extraFiltersAvailable = window.minesConfigs[window.selectedMineName].extra_filters;
+            var availableCustomFilters = window.minesConfigs.filter(function(v){
+                return v.mineName===window.selectedMineName;
+            })[0].customFilters;
+
+            var filter = null;
 
             // Location filter
-            if (extraFiltersAvailable.includes('location')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Location';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Location" id="locationFilterLi"><a class="nav-link" data-toggle="collapse" href="#locationSearchCardBlock" aria-controls="locationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-location-arrow"></i><span class="nav-link-text"></span>Location</a>    <div class="card" style="width: 100%;">        <div class="collapse card-block" id="locationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <div class="ul list-group list-group-flush" id="locationFilterList"></div>            <form-group class="ui-front">                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;" /></div>                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;" /><input class="form-control" type="text" id="locationEndSearchInput" placeholder="End" style="width: 45%;"                    /></div><button class="btn btn-success" type="button" style="width:100%;" id="locationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="locationResetButton">Reset</button></form-group>        </div>    </div></li>');
+            
+                $('#locationSearchButton').click(function() {
+                    if (window.locationFilter) clearLocationConstraint();
+            
+                    var chromosomeInput = $('#locationChromosomeSearchInput').val();
+                    var startLocationInput = $('#locationStartSearchInput').val();
+                    var endLocationInput = $('#locationEndSearchInput').val();
+                    
+                    if (!chromosomeInput) {
+                        if ($("#locationFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, specify a chromosome in the filter input field.</div><br/>");
+            
+                            $("#closeLocationFilterAlert").click(function() {
+                                $("#locationFilterAlert").hide();
+                            });
+                        } else {
+                            $("#locationFilterAlert").show();
+                        }
+                    }
+            
+                    if (!$.isNumeric(startLocationInput) || !$.isNumeric(endLocationInput)) {
+                        if ($("#locationFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, write a integer number in both the 'Start' and 'End' input fields.</div><br/>");
+            
+                            $("#closeLocationFilterAlert").click(function() {
+                                $("#locationFilterAlert").hide();
+                            });
+                        } else {
+                            $("#locationFilterAlert").show();
+                        }
+            
+                        return;
+            
+                    }
+            
+                    if (parseInt(startLocationInput) > parseInt(endLocationInput)) {
+                        if ($("#locationFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>The location start position must be less or equal to the end position.</div><br/>");
+            
+                            $("#closeLocationFilterAlert").click(function() {
+                                $("#locationFilterAlert").hide();
+                            });
+                        } else {
+                            $("#locationFilterAlert").show();
+                        }
+            
+                        return;
+                    }
+            
+                    window.locationFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Location';
+                    });
+
+                    // Format the query
+                    var filterQueryLocationsStart = filter[0].filterQuery[0];
+                    filterQueryLocationsStart.value = parseInt(startLocationInput);
+                    var filterQueryLocationsEnd = filter[0].filterQuery[1];
+                    filterQueryLocationsEnd.value = parseInt(endLocationInput);
+                    var filterQueryLocatedOn = filter[0].filterQuery[2];
+                    filterQueryLocatedOn.value = parseInt(chromosomeInput);
+
+                    // Add the constraints
+                    window.imTable.query.addConstraint(filterQueryLocationsStart);            
+                    window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    window.imTable.query.addConstraint(filterQueryLocationsEnd);            
+                    window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    window.imTable.query.addConstraint(filterQueryLocatedOn);            
+                    window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                });
+            
+                $('#locationResetButton').click(function() {
+                    if (window.locationFilter) clearLocationConstraint();
+                    $("#locationStartSearchInput").val('');
+                    $("#locationEndSearchInput").val('');
+                    $("#locationChromosomeSearchInput").val('');
+                });
             }
 
             // Expression filter
-            if (extraFiltersAvailable.includes('expression')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Expression';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
 
+                $('#expressionSearchButton').click(function() {
+                    if (window.expressionFilter) clearExpressionFilterConstraint();
+                
+                    var expressionPvalue = $('#expressionPvalueSearchInput').val();
+                    var expressionTstatistic = $('#expressionTstatisticSearchInput').val();
+                    var expressionExpressionSelector = $('#expressionExpressionSelector').val();
+                    var expressionDatasetSelector = $('#expressionDatasetSelector').val();
+                        
+                    window.expressionFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Expression';
+                    });
+
+                    // Format the query
+                    var filterQueryPvalue = filter[0].filterQuery[0];
+                    filterQueryPvalue.value = expressionPvalue;
+                    var filterQueryTstatistic = filter[0].filterQuery[1];
+                    filterQueryTstatistic.value = expressionTstatistic;
+                    var filterQueryExpression = filter[0].filterQuery[2];
+                    filterQueryExpression.value = expressionExpressionSelector;
+                    var filterQueryDatasetName = filter[0].filterQuery[3];
+                    filterQueryDatasetName.value = expressionDatasetSelector;
+
+                    // Add the constraints
+                    if (expressionPvalue) {
+                        window.imTable.query.addConstraint(filterQueryPvalue);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (expressionTstatistic) {
+                        window.imTable.query.addConstraint(filterQueryTstatistic);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    window.imTable.query.addConstraint(filterQueryExpression);            
+                    window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    if (expressionDatasetSelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryDatasetName);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+                });
+                
+                $('#expressionResetButton').click(function() {
+                    if (window.expressionFilter) clearExpressionFilterConstraint();
+                    $("#expressionTstatisticSearchInput").val('');
+                    $("#expressionPvalueSearchInput").val('');
+                });                
             }
 
             // Interactions filter
-            if (extraFiltersAvailable.includes('interactions')) {
+
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Interactions';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
 
@@ -311,10 +465,60 @@ function addExtraFilters() {
                     });
 
                 });
+
+                $('#interactionsSearchButton').click(function() {
+                    if (window.interactionsFilter) clearInteractionsConstraint();
+            
+                    var participant2Input = $('#interactionsParticipant2SearchInput').val();
+                    var interactionsTypeSel = $('#interactionsTypeSelector').val();
+                    var interactionsDatasetSel = $('#interactionsDatasetSelector').val();
+            
+                    window.interactionsFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Interactions';
+                    });
+
+                    // Format the query
+                    var filterQueryParticipant2 = filter[0].filterQuery[0];
+                    filterQueryParticipant2.value = participant2Input;
+                    var filterQueryTypeSel = filter[0].filterQuery[1];
+                    filterQueryTypeSel.value = interactionsTypeSel;
+                    var filterQueryDatasetSel = filter[0].filterQuery[2];
+                    filterQueryDatasetSel.value = interactionsDatasetSel;
+
+                    // Add the constraints
+                    if (participant2Input) {
+                        window.imTable.query.addConstraint(filterQueryParticipant2);            
+                        window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (interactionsTypeSel != "All") {
+                        window.imTable.query.addConstraint(filterQueryTypeSel);            
+                        window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (interactionsDatasetSel != "All") {
+                        window.imTable.query.addConstraint(filterQueryDatasetSel);            
+                        window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+                    
+                });
+            
+                $('#interactionsResetButton').click(function() {
+                    if (window.interactionsFilter) clearInteractionsConstraint();
+                    $("#interactionsParticipant2SearchInput").val('');
+                });
             }
 
             // Diseases filter
-            if (extraFiltersAvailable.includes('diseases')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Diseases';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Diseases (OMIM)" id="diseasesFilterLi"><a class="nav-link" data-toggle="collapse" href="#diseasesSearchCardBlock" aria-controls="diseasesSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-certificate"></i><span class="nav-link-text"></span>Diseases (OMIM)</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="diseasesSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="diseasesFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="diseasesSearchInput" placeholder="e.g. alzheimer disease"/></form-group></div></div></li>');
 
@@ -366,7 +570,11 @@ function addExtraFilters() {
             }
 
             // ClinVar filter
-            if (extraFiltersAvailable.includes('clinvar')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='CLINVAR';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="ClinVar" id="clinvarFilterLi"><a class="nav-link" data-toggle="collapse" href="#clinvarSearchCardBlock" aria-controls="clinvarSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-eyedropper"></i><span class="nav-link-text"></span>ClinVar</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="clinvarSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><form-group class="ui-front"><div style="align: center;"><input class="form-control" type="text" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;"/><input class="form-control" type="text" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="clinvarSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="clinvarResetButton">Reset</button></form-group></div></div></li>');
 
@@ -431,10 +639,64 @@ function addExtraFilters() {
                     });
 
                 });
+
+                // Add the search button
+                $('#clinvarSearchButton').click(function() {
+                    if (window.clinVarFilter) clearClinVarConstraint();
+            
+                    var clinVarSignificanceSel = $('#clinvarClinicalSignificanceSearchInput').val();
+                    var clinVarTypeSel = $('#clinvarTypeSearchInput').val();
+                    
+                    if (!clinVarSignificanceSel || !clinVarTypeSel) {
+                        if ($("#clinvarFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='clinvarFilterAlert'><span class='closebtn' id='closeClinVarFilterAlert'>×</span>Please, specify a clinical significante and type in the filter input field.</div><br/>");
+            
+                            $("#closeClinVarFilterAlert").click(function() {
+                                $("#clinvarFilterAlert").hide();
+                            });
+                        } else {
+                            $("#clinvarFilterAlert").show();
+                        }
+                        return;
+                    }
+            
+                    window.clinVarFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='CLINVAR';
+                    });
+                    
+                    // Format the query
+                    var filterQueryTypeSel = filter[0].filterQuery[0];
+                    filterQueryTypeSel.value = clinVarTypeSel;
+                    var filterQuerySignificanceSel = filter[0].filterQuery[1];
+                    filterQuerySignificanceSel = clinVarSignificanceSel;
+
+                    // Add the type constraint
+                    window.imTable.query.addConstraint(filterQueryTypeSel);            
+                    window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    // Add the significance constraint
+                    window.imTable.query.addConstraint(filterQuerySignificanceSel);            
+                    window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                });
+
+                // Add the reset button
+                $('#clinvarResetButton').click(function() {
+                    if (window.clinVarFilter) clearClinVarConstraint();
+                    $("#clinvarClinicalSignificanceSearchInput").val('');
+                    $("#clinvarTypeSearchInput").val('');
+                });
             }
 
-            // Protein localisation filter
-            if (extraFiltersAvailable.includes('protein-localisation')) {
+            // Protein Localisation
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Protein-Localisation';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Localisation" id="proteinLocalisationFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinLocalisationSearchCardBlock" aria-controls="proteinLocalisationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-trello"></i><span class="nav-link-text"></span>Protein Localisation</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinLocalisationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="proteinLocalisationFilterList"></div><form-group class="ui-front"><div class="row"><input class="form-control" type="text" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="proteinLocalisationExpressionTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="APE - two or more antibodies">Two or more antibodies</option><option value="Staining - one antibody only">One antibody only</option></select><select class="form-control" id="proteinLocalisationLevelSelector" style="width: 45%;"><option value="All">All (Level)</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Not detected">Not detected</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;"/><select class="form-control" id="proteinLocalisationRealibilitySelector" style="width: 45%;"><option value="All">All (Realibility)</option><option value="Low">Low</option><option value="Uncertain">Uncertain</option><option value="Supportive">Supportive</option><option value="High">High</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="proteinLocalisationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="proteinLocalisationResetButton">Reset</button></form-group></div></div></li>');
 
@@ -499,10 +761,76 @@ function addExtraFilters() {
                     });
 
                 });
+
+                $('#proteinLocalisationSearchButton').click(function() {
+                    if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+            
+                    var proteinLocalisationCellTypeSearchInput = $('#proteinLocalisationCellTypeSearchInput').val();
+                    var proteinLocalisationExpressionTypeSelector = $('#proteinLocalisationExpressionTypeSelector').val();
+                    var proteinLocalisationLevelSelector = $('#proteinLocalisationLevelSelector').val();
+                    var proteinLocalisationTissueSearchInput = $('#proteinLocalisationTissueSearchInput').val();
+                    var proteinLocalisationReliabilitySelector = $('#proteinLocalisationRealibilitySelector').val();
+            
+                    window.proteinLocalisationFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Protein-Localisation';
+                    });
+
+                    // Format the query
+                    var filterQueryCellType = filter[0].filterQuery[0];
+                    filterQueryCellType.value = proteinLocalisationCellTypeSearchInput;
+                    var filterQueryTissue = filter[0].filterQuery[1];
+                    filterQueryTissue.value = proteinLocalisationTissueSearchInput;
+                    var filterQueryExpressionType = filter[0].filterQuery[2];
+                    filterQueryExpressionType.value = proteinLocalisationExpressionTypeSelector;
+                    var filterQueryLevel = filter[0].filterQuery[3];
+                    filterQueryLevel.value = proteinLocalisationLevelSelector;
+                    var filterQueryReliability = filter[0].filterQuery[4];
+                    filterQueryReliability.value = proteinLocalisationReliabilitySelector;
+
+                    // Add the constraints
+                    if (proteinLocalisationCellTypeSearchInput) {
+                        window.imTable.query.addConstraint(filterQueryCellType);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationTissueSearchInput) {
+                        window.imTable.query.addConstraint(filterQueryTissue);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationExpressionTypeSelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryExpressionType);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationLevelSelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryLevel);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationReliabilitySelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryReliability);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+                });
+            
+                $('#proteinLocalisationResetButton').click(function() {
+                    if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+                    $("#proteinLocalisationCellTypeSearchInput").val('');
+                    $("#proteinLocalisationTissueSearchInput").val('');
+                });
             }
 
             // Protein domain filter
-            if (extraFiltersAvailable.includes('protein-domain')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Protein-Domain';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Domain Name" id="proteinDomainFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinDomainNameSearchCardBlock" aria-controls="proteinDomainNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Protein Domain Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinDomainNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="proteinDomainNameFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype"/></form-group></div></div></li>');
 
@@ -555,7 +883,7 @@ function addExtraFilters() {
 
             createDatasetFilter(); // Dataset filter should be the last one
 
-            window.extraFiltersAdded = true;
+            window.CustomFiltersAdded = true;
         } else {
             createDatasetFilter(); // Dataset filter should be the last one
         }
@@ -930,7 +1258,7 @@ function fillMineSelector() {
                     sessionStorage.setItem('currentClassView', 'Gene');
 
                     // Update the imTable
-                    clearExtraFilters();
+                    clearCustomFilters();
                     updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
                     updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
                 }
@@ -986,7 +1314,7 @@ function fillMineSelector() {
                     window.selectedMineName = selectedOption;
                     sessionStorage.setItem('currentClassView', 'Gene');
                     window.datasetNamesLoaded = false;
-                    window.extraFiltersAdded = false;
+                    window.CustomFiltersAdded = false;
 
                     // Update LocalStorage if its available
                     if (typeof(Storage) !== "undefined") {
@@ -1006,13 +1334,17 @@ function fillMineSelector() {
 }
 
 /**
- * Method to handle the extra filters available in the current selected mine
+ * Method to handle the Custom filters available in the current selected mine
  */
-function handleExtraFilters() {
-    if (!window.extraFiltersAdded) {
-        if (window.minesConfigs[window.selectedMineName]) {
-            addExtraFilters();
-            window.extraFiltersAdded = true;
+function handleCustomFilters() {
+    if (!window.CustomFiltersAdded) {
+        var mineData = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        });
+
+        if (mineData.length > 0) {
+            addCustomFilters();
+            window.CustomFiltersAdded = true;
         } else {
             // Dataset filter should be the last one
             createDatasetFilter();
@@ -1028,7 +1360,7 @@ function handleExtraFilters() {
 function updateElements(constraints, pieChartID) {
     fillMineSelector();
     addDefaultFilters();
-    handleExtraFilters();
+    handleCustomFilters();
     initializeKeyManager();
     initializeViewManager();
 
