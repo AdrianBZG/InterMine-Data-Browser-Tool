@@ -178,6 +178,10 @@ function initializeViewButtons() {
     });
 
     // Add custom views
+    if (!localStorage.getItem("view-manager")) {
+        localStorage.setItem("view-manager", "[]");
+    }
+    
     var currentViewManagerObject = JSON.parse(localStorage.getItem("view-manager"));
     if(findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)) {
         var currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName);
