@@ -5,10 +5,14 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	select#mineSelector.form-control(style="width: 200px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 	div#headerButtons.col-md-10.text-center
 
-	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 130px;" data-toggle="tooltip" title="Open the views manager")
+	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 220px;" data-toggle="tooltip" title="Open the views manager")
 		i.fa.fa-eye
+		span.nav-link-text
+		| Add view
 	button.btn.btn-primary(id="apiKeyManagerButton" style="position: fixed; top: 10px; right: 75px;" data-toggle="tooltip" title="Open the API Key manager")
 		i.fa.fa-key
+		span.nav-link-text
+		| Add API key
 
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
