@@ -10,7 +10,7 @@ Please note that development is very early on and the project is not ready to us
 
 ## DEPLOYMENT
 
-Try it out with the Heroku deployment (may be outdated!): [http://im-browser-prototype.herokuapp.com/](http://im-browser-prototype.herokuapp.com/)
+Try it out with the Heroku deployment (automatic deployment, may have some delay): [http://im-browser-prototype.herokuapp.com/](http://im-browser-prototype.herokuapp.com/)
 
 ## DEPENDENCIES
 

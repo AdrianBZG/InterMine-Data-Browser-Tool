@@ -1,90 +1,42 @@
 $(document).ready(function() {
-    checkForHTTPS();
     initializeStartupConfiguration();
-    handleResponsiveness();
 });
-
-/**
- * This method checks if there has been any window resize event to change the navbar padding accordingly
- */
-function handleResponsiveness() {
-    var width = $(window).width();
-
-    // Initial sizing
-    if (width < 992) {
-        var navbarHeight = $("#navbarResponsive").height();
-        if (width < 770) {
-            $("body.fixed-nav").css("padding-top", navbarHeight + 75);
-        } else {
-            $("body.fixed-nav").css("padding-top", navbarHeight + 56);
-        }
-    } else {
-        $("body.fixed-nav").css("padding-top", "56px");
-    }
-
-    // Event handling
-    $(window).on('resize', function() {
-        if ($(this).width() != width) {
-            width = $(this).width();
-            // Regular device
-            if (width < 992) {
-                var navbarHeight = $("#navbarResponsive").height();
-                if (width < 770) {
-                    $("body.fixed-nav").css("padding-top", navbarHeight + 75);
-                } else {
-                    $("body.fixed-nav").css("padding-top", navbarHeight + 56);
-                }
-            }
-            // Small device
-            else {
-                $("body.fixed-nav").css("padding-top", "56px");
-            }
-        }
-    });
-}
-
-/**
- * This method checks if the user is using HTTPS protocol to access the browser in order to show an informative warning
- */
-function checkForHTTPS() {
-    if (window.location.protocol.includes("https")) {
-        $("#navbarResponsive").prepend("<div class='alert' id='httpsAlert'>You are currently viewing the HTTPS website. Due to security limitations, we are unable to show results from HTTP-only InterMines. You may be able to see more results if you <a href='http://im-browser-prototype.herokuapp.com/'>reload this site</a> via HTTP, and/or allow unsafe scripts to run.</div><br/>");
-    }
-}
 
 /**
  * This method initialies the global variables used for the filters, reads the JSON filters config
  * and handles the default mine view.
  */
 function initializeStartupConfiguration() {
-    window.imTableConstraint = [
-        [],
-        [],
-        [],
-        [],
-        []
-    ]; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
+    window.imTableConstraint = {
+        "goAnnotation" : [],
+        "datasetName" : [],
+        "pathwayName" : [],
+        "proteinDomainName" : [],
+        "diseaseName" : []
+    }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
+    window.interminesHashMap = null;
     window.locationFilter = null;
     window.interactionsFilter = null;
     window.clinVarFilter = null;
     window.expressionFilter = null;
     window.proteinLocalisationFilter = null;
+    window.currentClassViewFilter = null;
     window.pieChartObject = null;
+    window.geneLengthChartObject = null;
 
     window.minesConfigs = null;
 
-    readTextFile("./mine_configs/mines_filters.json", function(text) {
+    readTextFile("./mine_configs/mines_config.json", function(text) {
         window.minesConfigs = JSON.parse(text);
-        console.log(window.minesConfigs);
     });
-
-
 
     // Initial mine service url (HumanMine), name and view
     window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
-    window.currentClassView = "Gene";
+    if(!sessionStorage.getItem('currentClassView')) {
+        sessionStorage.setItem('currentClassView', 'Gene');
+    }
 
     // Check if there is a saved mine in LocalStorage
     if (typeof(Storage) !== "undefined") {
@@ -93,274 +45,73 @@ function initializeStartupConfiguration() {
             window.selectedMineName = localStorage.getItem("selectedMineName");
         }
     }
-}
 
-/**
- * This method is used to get an array of hexadecimal colors, following the rainbow pattern, with the given size (useful for plots)
- * @param {number} input the size of the array of colors
- * @returns {array} an array of hexadecimal colors with the specific size, following a rainbow pattern
- */
-function getColorsArray(size) {
-    var rainbow = [
-        "#fbb735", "#e98931", "#eb403b", "#b32E37", "#6c2a6a",
-        "#5c4399", "#274389", "#1f5ea8", "#227FB0", "#2ab0c5",
-        "#39c0b3", '#b3cae5', '#dbdde4', '#e4e3e4', '#f7ddbb', '#efcab2',
-        '#bccacc', '#c7d8d6', '#d9ebe0', '#ebf9e3', '#f4f8d0',
-        '#5e7fb1', '#dce8f7', '#eff1f4', '#fce1a8', '#f7ec86',
-        '#8fb8ee', '#cbe2f4', '#dbe5eb', '#f9d3b8', '#e0b2a3',
-        '#a2e0f9', '#cef5fc', '#eafaeb', '#fefcd3', '#fdf4ba',
-        '#6bafd2', '#a4c8dc', '#d6cbca', '#eabc96', '#db8876',
-        '#b4ced8', '#d7e5d4', '#e2e8c9', '#f1e5b9', '#edd7ac',
-        '#29153e', '#657489', '#bfb6aa', '#ead79d', '#f2ebda',
-        '#20202f', '#273550', '#416081', '#adacb2', '#eac3a2',
-        '#555351', '#555351', '#8d7b6c', '#cc9d7a', '#fff9aa',
-        '#171c33', '#525f83', '#848896', '#bb9d78', '#f6e183',
-        '#ffe3c8', '#efad9e', '#c79797', '#a78a92', '#857d8d',
-        '#6f749e', '#9a8daf', '#d0a8b9', '#f8bbb1', '#fde6b1',
-        '#536a97', '#8087ad', '#bca391', '#bd968a', '#a38b8a',
-        '#325176', '#7b9ea7', '#9baf93', '#dbaf81', '#fbdf73',
-        '#727288', '#8e889b', '#d3c2bd', '#f9d89a', '#f8c785',
-        '#506e90', '#7695aa', '#a7bdb8', '#e2e2b8', '#fdf998',
-        '#634b5f', '#868080', '#b7b29b', '#dfd6a4', '#e9f3a2',
-        '#7e74b2', '#b3a2c2', '#e2cdbe', '#f6cf97', '#f4a77a',
-        '#34a4ca', '#59d7dd', '#a8f2f0', '#d0f8ef', '#d6f6e1',
-        '#7696cd', '#8fb2e4', '#b0cff0', '#d7e5ec', '#dee0e7',
-        '#8dd6c3', '#c5e5e2', '#eafaeb', '#f9f7ca', '#fceea1',
-        '#4e72c7', '#6d9ed7', '#a4c8d5', '#b4d9e1', '#c4d9d6',
-        '#47565f', '#5b625a', '#947461', '#f98056', '#f7ec86',
-        '#95b3bf', '#c6cdd3', '#e5d8d9', '#f1e1d9', '#f3e1cd',
-        '#4c86ab', '#95a5bc', '#bfcdc9', '#dcd6c9', '#edd9c7',
-        '#0f124a', '#1b2360', '#515b80', '#758391', '#e5e3b0',
-        '#889db6', '#a5b8ce', '#c1cfdd', '#dee1e4', '#d5d1cf',
-        '#74bddb', '#a8d1eb', '#cddbf5', '#e4e6fb', '#f6f4f8',
-        '#a7d3cb', '#bcc1c4', '#e5cab3', '#fee6c5', '#fdecd0',
-        '#325571', '#8e9fa4', '#decab2', '#f2d580', '#ffa642',
-        '#c5d4d7', '#d6b98d', '#c99262', '#8c5962', '#43577e'
-    ];
+    // Handle the API Keys manager buttons
+    $("#apiKeyManagerButton").click(function() {
+        // Update the key manager structures
+        initializeKeyManager();
 
-    return rainbow;
-};
-
-/**
- * Method to get the different intermines names and URLs from the registry
- * @returns {array} an array with the server response containing the different intermines with their URLs
- */
-function getIntermines() {
-    return $.ajax({
-        url: 'http://registry.intermine.org/service/instances?mines=%27prod%27',
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different ontology terms inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different ontology terms
- */
-function getOntologyTermsInClass() {
-    return $.ajax({
-        url: '/fetch/ontologyterms/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different alleles clinical significance inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different alleles clinical significances
- */
-function getAllelesClinicalSignifanceInClass() {
-    return $.ajax({
-        url: '/fetch/clinicalsignificance/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different protein atlas expression cell types inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different protein atlas expression cell types
- */
-function getProteinAtlasExpressionCellTypesInClass() {
-    return $.ajax({
-        url: '/fetch/proteinatlascelltypes/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different protein atlas expression tissue names inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different protein atlas expression tissue names
- */
-function getProteinAtlasExpressionTissueNamesInClass() {
-    return $.ajax({
-        url: '/fetch/proteinatlastissuenames/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different alleles types inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different alleles types
- */
-function getAllelesTypesInClass() {
-    return $.ajax({
-        url: '/fetch/allelestype/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different dataset names inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different dataset names
- */
-function getDatasetNamesInClass() {
-    return $.ajax({
-        url: '/fetch/datasets/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different pathway names inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different pathway names
- */
-function getPathwayNamesInClass() {
-    return $.ajax({
-        url: '/fetch/pathways/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log('Error');
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different diseases names inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different diseases names
- */
-function getDiseasesNamesInClass() {
-    return $.ajax({
-        url: '/fetch/diseases/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different protein domain names inside a class in order to feed the typeahead
- * @returns {array} an array with the server response containing the different protein domain names
- */
-function getProteinDomainNamesInClass() {
-    return $.ajax({
-        url: '/fetch/proteindomainname/' + window.mineUrl,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
- * Method to get the different Participant 2 gene symbols in order to feed the typeahead
- * @returns {array} an array with the server response containing the different participant 2 gene symbols in Interactions
- */
-function getParticipant2SymbolsInClass() {
-    return $.ajax({
-        url: '/fetch/participant2genesymbols/' + window.mineUrl,
-        type: 'GET',
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
-* Method that returns a valid session API key for the current mine
-*/
-function getSessionToken() {
-    var tokenUrl = escapeMineURL(window.mineUrl);
-    var tokenKey = "";
-
-    if(tokenUrl.slice(-1) == "/") {
-        tokenUrl += "session";
-    } else {
-        tokenUrl += "/session";
-    }
-
-    // Get token
-    $.ajax({
-        'url': tokenUrl,
-        data: {},
-        async: false,
-        error: function(xhr, status) {},
-        success: function(data) {
-            tokenKey = data.token;
-        }
+        // Show the window
+        $('#apiKeyManagerModal').appendTo("body").modal('show');
     });
 
-    return tokenKey;
-}
+    $("#apiKeyManagerSaveButton").click(function() {
+        var newApiKeysObject = [];
 
-/**
- * Method to get the different items inside a class (count per organism) in order to feed the sidebar
- * @param {array} constraints: the constraints for the endpoint call
- * @returns {array} an array with the server response containing the different items in a class
- */
-function getItemsInClass(constraints) {
-    return $.ajax({
-        url: '/statistics/count/items/' + window.mineUrl + '/' + window.currentClassView,
-        type: 'POST',
-        data: JSON.stringify(constraints),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
+        var anyError = false; // We will use this variable to check for errors
+        
+        // Iterate through the elements in the div containing the keys and update the LocalStorage object
+        $('#apiKeyManagerModalKeysDiv').children('div').each(function () {
+            var mineName = $(this).children("label").text();
+            var mineAPIkey = $(this).children("input").val();
 
-/**
- * Auxiliary function to flatten an array
- * @param {array} arr: the array to be flattened
- * @returns {array} the flattened array
- */
-function flatten(arr) {
-    return arr.reduce(function(flat, toFlatten) {
-        return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-    }, []);
+            // Sanity check: if the API key is valid, we save it, otherwise, warn the user
+            if(mineAPIkey != "") {
+                $.ajax({
+                    url: findElementJSONarray(window.interminesHashMap, "mine", mineName).mineurl + '/user/whoami?token=' + mineAPIkey,
+                    type: 'GET',
+                    async: false,
+                    success: function(data) {
+                        newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
+                    },
+                    error: function(e) {
+                        anyError = true;
+
+                        // Show error
+                        if ($("#invalidAPIkeyAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='invalidAPIkeyAlert'><span class='closebtn' id='closeInvalidAPIkeyAlert'>×</span>Error: API key provided for " + mineName + " is not a valid API key - please check you have entered it correctly.</div><br/>");
+
+                            $("#closeInvalidAPIkeyAlert").click(function() {
+                                $("#invalidAPIkeyAlert").hide();
+                            });
+                        } else {
+                            $("#invalidAPIkeyAlert").show();
+                        }
+                    }.bind(this, anyError) // Bind to this environment, so local variable is accesible from inside
+                });
+            } else {
+                newApiKeysObject.push({ "mine" : mineName, "apikey" : mineAPIkey });
+            }
+        }).promise().done( function(){ 
+            if(!anyError) {
+                // Save to Local Storage and reload
+                localStorage.setItem("api-keys", JSON.stringify(newApiKeysObject));
+                location.reload();
+            }
+
+            // Hide the window
+            $('#apiKeyManagerModal').modal('toggle');
+        });
+    });
+
+    // Handle the view manager buttons
+    $("#viewManagerButton").click(function() {
+        // Update the key manager structures
+        initializeViewManager();
+        
+        // Show the window
+        $('#viewManagerModal').appendTo("body").modal('show');
+    });
 }
 
 /**
@@ -377,76 +128,68 @@ function updateTableWithConstraints() {
     }
 
     // GO Annotation
-    if (window.imTableConstraint[0].length > 0) {
-        if (window.currentClassView == "Gene") {
+    if (window.imTableConstraint["goAnnotation"].length > 0) {
+        if (sessionStorage.getItem('currentClassView') == "Gene") {
             window.imTable.query.addConstraint({
                 "path": "goAnnotation.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint[0]
+                "values": window.imTableConstraint["goAnnotation"]
             });
         } else {
             window.imTable.query.addConstraint({
                 "path": "ontologyAnnotations.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint[0]
+                "values": window.imTableConstraint["goAnnotation"]
             });
         }
     }
 
     // Dataset Name
-    if (window.imTableConstraint[1].length > 0) {
+    if (window.imTableConstraint["datasetName"].length > 0) {
         window.imTable.query.addConstraint({
             "path": "dataSets.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint[1]
+            "values": window.imTableConstraint["datasetName"]
         });
     }
 
     // Pathway Name
-    if (window.imTableConstraint[2].length > 0) {
+    if (window.imTableConstraint["pathwayName"].length > 0) {
         window.imTable.query.addConstraint({
             "path": "pathways.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint[2]
+            "values": window.imTableConstraint["pathwayName"]
         });
     }
 
     // Protein Domain Name
-    if (window.imTableConstraint[3].length > 0) {
-        if (window.currentClassView == "Gene") {
-            window.imTable.query.addConstraint({
-                "path": "proteins.proteinDomainRegions.proteinDomain.name",
-                "op": "ONE OF",
-                "values": window.imTableConstraint[3]
-            });
-        } else {
-            window.imTable.query.addConstraint({
-                "path": "proteinDomainRegions.proteinDomain.name",
-                "op": "ONE OF",
-                "values": window.imTableConstraint[3]
-            });
+    if (window.imTableConstraint["proteinDomainName"].length > 0) {
+        var filter = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0].customFilters.filter(function(v){
+            return v.filterName==='Protein-Domain';
+        });
+
+        var proteinDomainFilterQuery = filter[0].filterQuery[0];
+        proteinDomainFilterQuery.values = window.imTableConstraint["proteinDomainName"];
+
+        if (sessionStorage.getItem('currentClassView') == "Gene") {
+            window.imTable.query.addConstraint(proteinDomainFilterQuery);
         }
     }
 
     // Disease Name
-    if (window.imTableConstraint[4].length > 0) {
-        window.imTable.query.addConstraint({
-            "path": "diseases.name",
-            "op": "ONE OF",
-            "values": window.imTableConstraint[4]
+    if (window.imTableConstraint["diseaseName"].length > 0) {
+        var filter = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0].customFilters.filter(function(v){
+            return v.filterName==='Diseases';
         });
-    }
-}
 
-/**
- * Auxiliary function to remove an element from an array
- */
-function remove(arr, what) {
-    var found = arr.indexOf(what);
+        var diseasesFilterQuery = filter[0].filterQuery[0];
+        diseasesFilterQuery.values = window.imTableConstraint["diseaseName"];
 
-    while (found !== -1) {
-        arr.splice(found, 1);
-        found = arr.indexOf(what);
+        window.imTable.query.addConstraint(diseasesFilterQuery);
     }
 }
 
@@ -492,37 +235,21 @@ function showMoreDatasetNames() {
             $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                 if ($(this).is(":checked")) {
                     var checkboxValue = $(this).val();
-                    window.imTableConstraint[1].push(checkboxValue);
-                    updateTableWithConstraints();
+                    window.imTableConstraint["datasetName"].push(checkboxValue);
                 } else {
                     var checkboxValue = $(this).val();
-                    remove(window.imTableConstraint[1], checkboxValue);
-                    updateTableWithConstraints();
+                    remove(window.imTableConstraint["datasetName"], checkboxValue);
                 }
+                updateTableWithConstraints();
             });
         }
     });
 }
 
 /**
- * Method to read a json file from a given location
+ * Method to remove the current Custom filters in the sidebar
  */
-function readTextFile(file, callback) {
-    var rawFile = new XMLHttpRequest();
-    rawFile.overrideMimeType("application/json");
-    rawFile.open("GET", file, true);
-    rawFile.onreadystatechange = function() {
-        if (rawFile.readyState === 4 && rawFile.status == "200") {
-            callback(rawFile.responseText);
-        }
-    }
-    rawFile.send(null);
-}
-
-/**
- * Method to remove the current extra filters in the sidebar
- */
-function clearExtraFilters() {
+function clearCustomFilters() {
     $("#locationFilterLi").remove();
     $("#diseasesFilterLi").remove();
     $("#clinvarFilterLi").remove();
@@ -531,30 +258,180 @@ function clearExtraFilters() {
     $("#interactionsFilterLi").remove();
     $("#expressionFilterLi").remove();
     $("#datasetFilterLi").remove();
-    window.extraFiltersAdded = false;
+    window.CustomFiltersAdded = false;
 }
 
-function addExtraFilters() {
-    if (!window.extraFiltersAdded) {
+function addCustomFilters() {
+    if (!window.CustomFiltersAdded) {
         // Read the JSON config file
-        if (window.currentClassView == "Gene") {
-            var extraFiltersAvailable = window.minesConfigs[window.selectedMineName].extra_filters;
+        if (sessionStorage.getItem('currentClassView') == "Gene") {
+            var availableCustomFilters = window.minesConfigs.filter(function(v){
+                return v.mineName===window.selectedMineName;
+            })[0].customFilters;
+
+            var filter = null;
 
             // Location filter
-            if (extraFiltersAvailable.includes('location')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Location';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Location" id="locationFilterLi"><a class="nav-link" data-toggle="collapse" href="#locationSearchCardBlock" aria-controls="locationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-location-arrow"></i><span class="nav-link-text"></span>Location</a>    <div class="card" style="width: 100%;">        <div class="collapse card-block" id="locationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <div class="ul list-group list-group-flush" id="locationFilterList"></div>            <form-group class="ui-front">                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationChromosomeSearchInput" placeholder="Chromosome (e.g. 12)" style="width: 100%; float:left; margin-left: 15px;" /></div>                <div class="row" style="align: center;"><input class="form-control" type="text" id="locationStartSearchInput" placeholder="Start" style="width: 45%; float:left; margin-left: 15px;" /><input class="form-control" type="text" id="locationEndSearchInput" placeholder="End" style="width: 45%;"                    /></div><button class="btn btn-success" type="button" style="width:100%;" id="locationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="locationResetButton">Reset</button></form-group>        </div>    </div></li>');
+            
+                $('#locationSearchButton').click(function() {
+                    if (window.locationFilter) clearLocationConstraint();
+            
+                    var chromosomeInput = $('#locationChromosomeSearchInput').val();
+                    var startLocationInput = $('#locationStartSearchInput').val();
+                    var endLocationInput = $('#locationEndSearchInput').val();
+                    
+                    if (!chromosomeInput) {
+                        if ($("#locationFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, specify a chromosome in the filter input field.</div><br/>");
+            
+                            $("#closeLocationFilterAlert").click(function() {
+                                $("#locationFilterAlert").hide();
+                            });
+                        } else {
+                            $("#locationFilterAlert").show();
+                        }
+                    }
+            
+                    if (!$.isNumeric(startLocationInput) || !$.isNumeric(endLocationInput)) {
+                        if ($("#locationFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>Please, write a integer number in both the 'Start' and 'End' input fields.</div><br/>");
+            
+                            $("#closeLocationFilterAlert").click(function() {
+                                $("#locationFilterAlert").hide();
+                            });
+                        } else {
+                            $("#locationFilterAlert").show();
+                        }
+            
+                        return;
+            
+                    }
+            
+                    if (parseInt(startLocationInput) > parseInt(endLocationInput)) {
+                        if ($("#locationFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='locationFilterAlert'><span class='closebtn' id='closeLocationFilterAlert'>×</span>The location start position must be less or equal to the end position.</div><br/>");
+            
+                            $("#closeLocationFilterAlert").click(function() {
+                                $("#locationFilterAlert").hide();
+                            });
+                        } else {
+                            $("#locationFilterAlert").show();
+                        }
+            
+                        return;
+                    }
+            
+                    window.locationFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Location';
+                    });
+
+                    // Format the query
+                    var filterQueryLocationsStart = filter[0].filterQuery[0];
+                    filterQueryLocationsStart.value = parseInt(startLocationInput);
+                    var filterQueryLocationsEnd = filter[0].filterQuery[1];
+                    filterQueryLocationsEnd.value = parseInt(endLocationInput);
+                    var filterQueryLocatedOn = filter[0].filterQuery[2];
+                    filterQueryLocatedOn.value = parseInt(chromosomeInput);
+
+                    // Add the constraints
+                    window.imTable.query.addConstraint(filterQueryLocationsStart);            
+                    window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    window.imTable.query.addConstraint(filterQueryLocationsEnd);            
+                    window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    window.imTable.query.addConstraint(filterQueryLocatedOn);            
+                    window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                });
+            
+                $('#locationResetButton').click(function() {
+                    if (window.locationFilter) clearLocationConstraint();
+                    $("#locationStartSearchInput").val('');
+                    $("#locationEndSearchInput").val('');
+                    $("#locationChromosomeSearchInput").val('');
+                });
             }
 
             // Expression filter
-            if (extraFiltersAvailable.includes('expression')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Expression';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
 
+                $('#expressionSearchButton').click(function() {
+                    if (window.expressionFilter) clearExpressionFilterConstraint();
+                
+                    var expressionPvalue = $('#expressionPvalueSearchInput').val();
+                    var expressionTstatistic = $('#expressionTstatisticSearchInput').val();
+                    var expressionExpressionSelector = $('#expressionExpressionSelector').val();
+                    var expressionDatasetSelector = $('#expressionDatasetSelector').val();
+                        
+                    window.expressionFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Expression';
+                    });
+
+                    // Format the query
+                    var filterQueryPvalue = filter[0].filterQuery[0];
+                    filterQueryPvalue.value = expressionPvalue;
+                    var filterQueryTstatistic = filter[0].filterQuery[1];
+                    filterQueryTstatistic.value = expressionTstatistic;
+                    var filterQueryExpression = filter[0].filterQuery[2];
+                    filterQueryExpression.value = expressionExpressionSelector;
+                    var filterQueryDatasetName = filter[0].filterQuery[3];
+                    filterQueryDatasetName.value = expressionDatasetSelector;
+
+                    // Add the constraints
+                    if (expressionPvalue) {
+                        window.imTable.query.addConstraint(filterQueryPvalue);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (expressionTstatistic) {
+                        window.imTable.query.addConstraint(filterQueryTstatistic);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    window.imTable.query.addConstraint(filterQueryExpression);            
+                    window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    if (expressionDatasetSelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryDatasetName);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+                });
+                
+                $('#expressionResetButton').click(function() {
+                    if (window.expressionFilter) clearExpressionFilterConstraint();
+                    $("#expressionTstatisticSearchInput").val('');
+                    $("#expressionPvalueSearchInput").val('');
+                });                
             }
 
             // Interactions filter
-            if (extraFiltersAvailable.includes('interactions')) {
+
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Interactions';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
 
@@ -588,10 +465,60 @@ function addExtraFilters() {
                     });
 
                 });
+
+                $('#interactionsSearchButton').click(function() {
+                    if (window.interactionsFilter) clearInteractionsConstraint();
+            
+                    var participant2Input = $('#interactionsParticipant2SearchInput').val();
+                    var interactionsTypeSel = $('#interactionsTypeSelector').val();
+                    var interactionsDatasetSel = $('#interactionsDatasetSelector').val();
+            
+                    window.interactionsFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Interactions';
+                    });
+
+                    // Format the query
+                    var filterQueryParticipant2 = filter[0].filterQuery[0];
+                    filterQueryParticipant2.value = participant2Input;
+                    var filterQueryTypeSel = filter[0].filterQuery[1];
+                    filterQueryTypeSel.value = interactionsTypeSel;
+                    var filterQueryDatasetSel = filter[0].filterQuery[2];
+                    filterQueryDatasetSel.value = interactionsDatasetSel;
+
+                    // Add the constraints
+                    if (participant2Input) {
+                        window.imTable.query.addConstraint(filterQueryParticipant2);            
+                        window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (interactionsTypeSel != "All") {
+                        window.imTable.query.addConstraint(filterQueryTypeSel);            
+                        window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (interactionsDatasetSel != "All") {
+                        window.imTable.query.addConstraint(filterQueryDatasetSel);            
+                        window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+                    
+                });
+            
+                $('#interactionsResetButton').click(function() {
+                    if (window.interactionsFilter) clearInteractionsConstraint();
+                    $("#interactionsParticipant2SearchInput").val('');
+                });
             }
 
             // Diseases filter
-            if (extraFiltersAvailable.includes('diseases')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Diseases';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Diseases (OMIM)" id="diseasesFilterLi"><a class="nav-link" data-toggle="collapse" href="#diseasesSearchCardBlock" aria-controls="diseasesSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-certificate"></i><span class="nav-link-text"></span>Diseases (OMIM)</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="diseasesSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="diseasesFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="diseasesSearchInput" placeholder="e.g. alzheimer disease"/></form-group></div></div></li>');
 
@@ -619,7 +546,7 @@ function addExtraFilters() {
                             $("#diseasesSearchInput").val(ui.item.value);
 
                             // Filter the table
-                            window.imTableConstraint[4].push(ui.item.value);
+                            window.imTableConstraint["diseaseName"].push(ui.item.value);
                             updateTableWithConstraints();
 
                             var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -628,7 +555,7 @@ function addExtraFilters() {
                                 '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                             $("#" + buttonId).click(function() {
-                                remove(window.imTableConstraint[4], ui.item.value);
+                                remove(window.imTableConstraint["diseaseName"], ui.item.value);
                                 updateTableWithConstraints();
                                 $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                             });
@@ -643,7 +570,11 @@ function addExtraFilters() {
             }
 
             // ClinVar filter
-            if (extraFiltersAvailable.includes('clinvar')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='CLINVAR';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="ClinVar" id="clinvarFilterLi"><a class="nav-link" data-toggle="collapse" href="#clinvarSearchCardBlock" aria-controls="clinvarSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-eyedropper"></i><span class="nav-link-text"></span>ClinVar</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="clinvarSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><form-group class="ui-front"><div style="align: center;"><input class="form-control" type="text" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;"/><input class="form-control" type="text" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="clinvarSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="clinvarResetButton">Reset</button></form-group></div></div></li>');
 
@@ -708,10 +639,64 @@ function addExtraFilters() {
                     });
 
                 });
+
+                // Add the search button
+                $('#clinvarSearchButton').click(function() {
+                    if (window.clinVarFilter) clearClinVarConstraint();
+            
+                    var clinVarSignificanceSel = $('#clinvarClinicalSignificanceSearchInput').val();
+                    var clinVarTypeSel = $('#clinvarTypeSearchInput').val();
+                    
+                    if (!clinVarSignificanceSel || !clinVarTypeSel) {
+                        if ($("#clinvarFilterAlert").length == 0) {
+                            $("#navbarResponsive").prepend("<div class='alert' id='clinvarFilterAlert'><span class='closebtn' id='closeClinVarFilterAlert'>×</span>Please, specify a clinical significante and type in the filter input field.</div><br/>");
+            
+                            $("#closeClinVarFilterAlert").click(function() {
+                                $("#clinvarFilterAlert").hide();
+                            });
+                        } else {
+                            $("#clinvarFilterAlert").show();
+                        }
+                        return;
+                    }
+            
+                    window.clinVarFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='CLINVAR';
+                    });
+                    
+                    // Format the query
+                    var filterQueryTypeSel = filter[0].filterQuery[0];
+                    filterQueryTypeSel.value = clinVarTypeSel;
+                    var filterQuerySignificanceSel = filter[0].filterQuery[1];
+                    filterQuerySignificanceSel = clinVarSignificanceSel;
+
+                    // Add the type constraint
+                    window.imTable.query.addConstraint(filterQueryTypeSel);            
+                    window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                
+                    // Add the significance constraint
+                    window.imTable.query.addConstraint(filterQuerySignificanceSel);            
+                    window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                });
+
+                // Add the reset button
+                $('#clinvarResetButton').click(function() {
+                    if (window.clinVarFilter) clearClinVarConstraint();
+                    $("#clinvarClinicalSignificanceSearchInput").val('');
+                    $("#clinvarTypeSearchInput").val('');
+                });
             }
 
-            // Protein localisation filter
-            if (extraFiltersAvailable.includes('protein-localisation')) {
+            // Protein Localisation
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Protein-Localisation';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Localisation" id="proteinLocalisationFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinLocalisationSearchCardBlock" aria-controls="proteinLocalisationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-trello"></i><span class="nav-link-text"></span>Protein Localisation</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinLocalisationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="proteinLocalisationFilterList"></div><form-group class="ui-front"><div class="row"><input class="form-control" type="text" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="proteinLocalisationExpressionTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="APE - two or more antibodies">Two or more antibodies</option><option value="Staining - one antibody only">One antibody only</option></select><select class="form-control" id="proteinLocalisationLevelSelector" style="width: 45%;"><option value="All">All (Level)</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Not detected">Not detected</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;"/><select class="form-control" id="proteinLocalisationRealibilitySelector" style="width: 45%;"><option value="All">All (Realibility)</option><option value="Low">Low</option><option value="Uncertain">Uncertain</option><option value="Supportive">Supportive</option><option value="High">High</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="proteinLocalisationSearchButton">Go!</button><button class="btn btn-danger" type="button" style="width:100%;" id="proteinLocalisationResetButton">Reset</button></form-group></div></div></li>');
 
@@ -776,10 +761,76 @@ function addExtraFilters() {
                     });
 
                 });
+
+                $('#proteinLocalisationSearchButton').click(function() {
+                    if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+            
+                    var proteinLocalisationCellTypeSearchInput = $('#proteinLocalisationCellTypeSearchInput').val();
+                    var proteinLocalisationExpressionTypeSelector = $('#proteinLocalisationExpressionTypeSelector').val();
+                    var proteinLocalisationLevelSelector = $('#proteinLocalisationLevelSelector').val();
+                    var proteinLocalisationTissueSearchInput = $('#proteinLocalisationTissueSearchInput').val();
+                    var proteinLocalisationReliabilitySelector = $('#proteinLocalisationRealibilitySelector').val();
+            
+                    window.proteinLocalisationFilter = [];
+
+                    var filter = window.minesConfigs.filter(function(v){
+                        return v.mineName===window.selectedMineName;
+                    })[0].customFilters.filter(function(v){
+                        return v.filterName==='Protein-Localisation';
+                    });
+
+                    // Format the query
+                    var filterQueryCellType = filter[0].filterQuery[0];
+                    filterQueryCellType.value = proteinLocalisationCellTypeSearchInput;
+                    var filterQueryTissue = filter[0].filterQuery[1];
+                    filterQueryTissue.value = proteinLocalisationTissueSearchInput;
+                    var filterQueryExpressionType = filter[0].filterQuery[2];
+                    filterQueryExpressionType.value = proteinLocalisationExpressionTypeSelector;
+                    var filterQueryLevel = filter[0].filterQuery[3];
+                    filterQueryLevel.value = proteinLocalisationLevelSelector;
+                    var filterQueryReliability = filter[0].filterQuery[4];
+                    filterQueryReliability.value = proteinLocalisationReliabilitySelector;
+
+                    // Add the constraints
+                    if (proteinLocalisationCellTypeSearchInput) {
+                        window.imTable.query.addConstraint(filterQueryCellType);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationTissueSearchInput) {
+                        window.imTable.query.addConstraint(filterQueryTissue);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationExpressionTypeSelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryExpressionType);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationLevelSelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryLevel);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+
+                    if (proteinLocalisationReliabilitySelector != "All") {
+                        window.imTable.query.addConstraint(filterQueryReliability);            
+                        window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    }
+                });
+            
+                $('#proteinLocalisationResetButton').click(function() {
+                    if (window.proteinLocalisationFilter) clearProteinLocalisationFilterConstraint();
+                    $("#proteinLocalisationCellTypeSearchInput").val('');
+                    $("#proteinLocalisationTissueSearchInput").val('');
+                });
             }
 
             // Protein domain filter
-            if (extraFiltersAvailable.includes('protein-domain')) {
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Protein-Domain';
+            });
+
+            if (filter.length > 0) {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Domain Name" id="proteinDomainFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinDomainNameSearchCardBlock" aria-controls="proteinDomainNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Protein Domain Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinDomainNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="proteinDomainNameFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype"/></form-group></div></div></li>');
 
@@ -807,7 +858,7 @@ function addExtraFilters() {
                             $("#proteinDomainNameSearchInput").val(ui.item.value);
 
                             // Filter the table
-                            window.imTableConstraint[3].push(ui.item.value);
+                            window.imTableConstraint["proteinDomainName"].push(ui.item.value);
                             updateTableWithConstraints();
 
                             var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -816,7 +867,7 @@ function addExtraFilters() {
                                 '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                             $("#" + buttonId).click(function() {
-                                remove(window.imTableConstraint[3], ui.item.value);
+                                remove(window.imTableConstraint["proteinDomainName"], ui.item.value);
                                 updateTableWithConstraints();
                                 $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                             });
@@ -832,7 +883,7 @@ function addExtraFilters() {
 
             createDatasetFilter(); // Dataset filter should be the last one
 
-            window.extraFiltersAdded = true;
+            window.CustomFiltersAdded = true;
         } else {
             createDatasetFilter(); // Dataset filter should be the last one
         }
@@ -840,7 +891,7 @@ function addExtraFilters() {
 }
 
 /**
- * Method updates the organisms filter based upon the organisms present in the
+ * Method that updates the organisms filter based upon the organisms present in the
  * current query
  * @param {string} results: the organism query results from the InterMine server
  */
@@ -875,24 +926,6 @@ function displayItemsInClass(result) {
 }
 
 /**
- * Method that escapes a mine URL (to not valid URL format)
- * @param {string} mineURL: the mine URL
- * @returns {string} the escapped mine URL
- */
-function formatMineURL(mineURL) {
-    return mineURL.replace(/:/g, "COLON").replace(/\//g, "SLASH");
-}
-
-/**
- * Method that escapes a mine URL (to valid URL format)
- * @param {string} mineURL: the mine URL
- * @returns {string} the formatted mine URL
- */
-function escapeMineURL(mineURL) {
-    return mineURL.replace(/COLON/g, ":").replace(/SLASH/g, "/");
-}
-
-/**
  * Method updates the pie chart based on the organisms present
  * in the current query
  * @param {string} results: the organism query results from the InterMine server
@@ -914,6 +947,8 @@ function updatePieChart(result, pieChartID) {
         countData.push(result[0].response['results'][i]['count']);
         labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
     }
+
+    var plotTitle = "Number of results for " + sessionStorage.getItem('currentClassView') + " by organism";
 
     // Plot
     var pieOptions = {
@@ -937,6 +972,11 @@ function updatePieChart(result, pieChartID) {
         hover: {
             mode: 'nearest',
             intersect: true,
+        },
+        title: {
+            display: true,
+            text: plotTitle,
+            position: 'bottom'
         },
         tooltips: {
             callbacks: {
@@ -969,7 +1009,7 @@ function updatePieChart(result, pieChartID) {
 
             }
 
-            window.pieChartObject.update();
+            //window.pieChartObject.update();
         }
     };
 
@@ -1014,7 +1054,7 @@ function createGoAnnotationFilter() {
                     event.preventDefault();
                     $("#goAnnotationSearchInput").val(ui.item.value);
 
-                    window.imTableConstraint[0].push(ui.item.value);
+                    window.imTableConstraint["goAnnotation"].push(ui.item.value);
                     updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -1023,7 +1063,7 @@ function createGoAnnotationFilter() {
                         '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                     $("#" + buttonId).click(function() {
-                        remove(window.imTableConstraint[0], ui.item.value);
+                        remove(window.imTableConstraint["goAnnotation"], ui.item.value);
                         updateTableWithConstraints();
                         $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                     });
@@ -1091,13 +1131,12 @@ function createDatasetFilter() {
                     $('#' + datasetName.replace(/[^a-zA-Z0-9]/g, '')).change(function() {
                         if ($(this).is(":checked")) {
                             var checkboxValue = $(this).val();
-                            window.imTableConstraint[1].push(checkboxValue);
-                            updateTableWithConstraints();
+                            window.imTableConstraint["datasetName"].push(checkboxValue);
                         } else {
                             var checkboxValue = $(this).val();
-                            remove(window.imTableConstraint[1], checkboxValue);
-                            updateTableWithConstraints();
+                            remove(window.imTableConstraint["datasetName"], checkboxValue);
                         }
+                        updateTableWithConstraints();
                     });
                 }
 
@@ -1137,7 +1176,7 @@ function createPathwaysNameFilter() {
                     $("#pathwayNameSearchInput").val(ui.item.value);
 
                     // Filter the table
-                    window.imTableConstraint[2].push(ui.item.value);
+                    window.imTableConstraint["pathwayName"].push(ui.item.value);
                     updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -1146,7 +1185,7 @@ function createPathwaysNameFilter() {
                         '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                     $("#" + buttonId).click(function() {
-                        remove(window.imTableConstraint[2], ui.item.value);
+                        remove(window.imTableConstraint["pathwayName"], ui.item.value);
                         updateTableWithConstraints();
                         $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                     });
@@ -1180,10 +1219,13 @@ function fillMineSelector() {
         var windowUrl = new URL(window.location.href);
 
         $.when(getIntermines()).done(function(result) {
-            $('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
+            //$('#mineSelector').find('option').remove().end().append('<option value="httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice">HumanMine</option>').val('httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice');
 
+            // Need to store current mine to append it at the end, or there are some problems with selector events
+            var currentMineNameTemp;
+            var currentMineUrlTemp;
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].name == "HumanMine" || result.instances[i].url.startsWith("https")) continue;
+                if (result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
                 if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
@@ -1200,32 +1242,38 @@ function fillMineSelector() {
                     mineUrl += "/service";
                 }
 
-
                 mineUrl = formatMineURL(mineUrl);
 
-                $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+                if(result.instances[i].name === window.selectedMineName) {
+                    currentMineNameTemp = result.instances[i].name;
+                    currentMineUrlTemp = mineUrl;
+                } else {
+                    $('#mineSelector').append('<option value="' + mineUrl + '">' + result.instances[i].name + '</option>').val(mineUrl);
+                }
 
                 // In case that the user gave a mine to be rendered, set it here
                 if (windowUrl.searchParams.get("givenMine") && result.instances[i].name == windowUrl.searchParams.get("givenMine")) {
                     window.mineUrl = mineUrl;
                     window.selectedMineName = result.instances[i].name;
-                    document.title = window.currentClassView + " in " + window.selectedMineName;
+                    sessionStorage.setItem('currentClassView', 'Gene');
 
                     // Update the imTable
-                    clearExtraFilters();
+                    clearCustomFilters();
                     updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
+                    updateGeneLengthChart(window.imTable.history.currentQuery.constraints, "GeneLengthChart");
                 }
 
             }
 
-            // Select the correct option from the dropdown
-            $("#mineSelector option").filter(function() {
-                return $(this).text() == window.selectedMineName;
-            }).prop("selected", true);
+            $('#mineSelector').append('<option value="' + currentMineUrlTemp + '">' + currentMineNameTemp + '</option>').val(mineUrl);
+            $("#mineSelector option[value='" + currentMineUrlTemp + "']").attr("selected","selected");
 
             // Event handling
             $("#mineSelector").change(function(e) {
                 // Sanity check
+                
+                if(!e.eventPhase) return false;
+
                 var sanity = true;
                 var selectedOption = $("#mineSelector option:selected").text();
                 var selectedOptionUrl = $(this).val();
@@ -1264,9 +1312,9 @@ function fillMineSelector() {
                     // Update settings
                     window.mineUrl = selectedOptionUrl;
                     window.selectedMineName = selectedOption;
-                    document.title = window.currentClassView + " in " + window.selectedMineName;
+                    sessionStorage.setItem('currentClassView', 'Gene');
                     window.datasetNamesLoaded = false;
-                    window.extraFiltersAdded = false;
+                    window.CustomFiltersAdded = false;
 
                     // Update LocalStorage if its available
                     if (typeof(Storage) !== "undefined") {
@@ -1274,56 +1322,7 @@ function fillMineSelector() {
                         localStorage.setItem("selectedMineName", window.selectedMineName);
                     }
 
-                    // Update the imTable
-                    clearExtraFilters();
-                    updateElements(window.imTable.history.currentQuery.constraints, "PieChart");
-
-                    // Instantiate the im-table with all the data available in Gene from HumanMine
-                    var selector = '#dataTable';
-
-                    $(selector).empty();
-
-                    var service = {
-                        root: escapeMineURL(window.mineUrl),
-                        token: getSessionToken()
-                    };
-                    var query = {
-                        select: ['*'],
-                        from: window.currentClassView
-                    };
-
-                    imtables.configure({
-                        TableCell: {
-                            PreviewTrigger: 'click'
-                        }
-                    });
-
-                    imtables.configure('TableResults.CacheFactor', 20);
-
-                    var imtable = imtables.loadDash(
-                        selector, {
-                            "start": 0,
-                            "size": 25
-                        }, {
-                            service: service,
-                            query: query
-                        }
-                    ).then(
-                        function(table) {
-                            //console.log('Table loaded', table);
-                            //this .on listener will do something when someone interacts with the table. 
-                            table.children.table.on("rendered", function(changeDetail) {
-                                console.log("Rendered table");
-                                console.log(changeDetail);
-                                updateElements(table.history.currentQuery.constraints, "PieChart");
-                            });
-
-                            window.imTable = table.children.table;
-                        },
-                        function(error) {
-                            console.error('Could not load table', error);
-                        }
-                    );
+                    location.reload();
                 }
             });
 
@@ -1335,13 +1334,17 @@ function fillMineSelector() {
 }
 
 /**
- * Method to handle the extra filters available in the current selected mine
+ * Method to handle the Custom filters available in the current selected mine
  */
-function handleExtraFilters() {
-    if (!window.extraFiltersAdded) {
-        if (window.minesConfigs[window.selectedMineName]) {
-            addExtraFilters();
-            window.extraFiltersAdded = true;
+function handleCustomFilters() {
+    if (!window.CustomFiltersAdded) {
+        var mineData = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        });
+
+        if (mineData.length > 0) {
+            addCustomFilters();
+            window.CustomFiltersAdded = true;
         } else {
             // Dataset filter should be the last one
             createDatasetFilter();
@@ -1357,11 +1360,288 @@ function handleExtraFilters() {
 function updateElements(constraints, pieChartID) {
     fillMineSelector();
     addDefaultFilters();
-    handleExtraFilters();
+    handleCustomFilters();
+    initializeKeyManager();
+    initializeViewManager();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
         displayItemsInClass(result);
         createSidebarEvents();
         updatePieChart(result, pieChartID);
+    });
+}
+
+/**
+ * Method that initializes and manages the key manager keys using LocalStorage and
+ * fills the Key Manager modal accordingly
+ */
+function initializeKeyManager() {
+    // Check if LocalStorage is available
+    if (typeof(Storage) !== "undefined") {
+        window.interminesHashMap = [];
+        $.when(getIntermines()).done(function(result) {
+            // First get the mines
+            for (var i = 0; i < result.instances.length; i++) {
+                if (result.instances[i].url.startsWith("https")) continue;
+
+                // Temporarily skiping mines with missing concepts for the default filters
+                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+
+                // Mines giving error when querying the API or not responding
+                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+
+                var mineName = result.instances[i].name;
+
+                var mineUrl = result.instances[i].url;
+
+                // Check for mines not requiring to format the URL
+                if (mineUrl[mineUrl.length - 1] == "/") {
+                    mineUrl += "service";
+                } else {
+                    mineUrl += "/service";
+                }
+
+                window.interminesHashMap.push({ "mine" : mineName, "mineurl" : mineUrl, "apikey" : "Paste your API key here" });
+            }
+
+            // Now check that the API keys in LocalStorage are up-to-date
+            if (localStorage.getItem("api-keys")) {
+                // Maybe there is a new mine since last update, so let's check
+                var currentApiKeysObject = JSON.parse(localStorage.getItem("api-keys"));
+                for (var i = 0; i < window.interminesHashMap.length; i++) {
+                    if(!findElementJSONarray(currentApiKeysObject, "mine", window.interminesHashMap[i].mine)) {
+                        currentApiKeysObject.push({ "mine" : window.interminesHashMap[i].mine, "apikey" : "Paste your API key here" });
+                    }
+                }
+                localStorage.setItem("api-keys", JSON.stringify(currentApiKeysObject));
+            } else {
+                localStorage.setItem("api-keys", JSON.stringify(window.interminesHashMap));
+            }
+
+            // Finally, feed the API manager modal
+            $("#apiKeyManagerModalKeysDiv").html("");
+            var uptodateAPIkeysArray = JSON.parse(localStorage.getItem("api-keys"));
+            for (var i = 0; i < uptodateAPIkeysArray.length; i++) {
+                var htmlToAdd = '<div class="apiKeyElement"><label>' + uptodateAPIkeysArray[i].mine + '</label>';
+                
+                if(uptodateAPIkeysArray[i].apikey != "Paste your API key here" && uptodateAPIkeysArray[i].apikey != "") {
+                    htmlToAdd += '<input type="text" value="' + uptodateAPIkeysArray[i].apikey + '"></div>';
+                } else {
+                    htmlToAdd += '<input type="text" placeholder="Paste your API key here"></div>';
+                }
+
+                $("#apiKeyManagerModalKeysDiv").append(htmlToAdd);
+            }
+        });
+    }
+}
+
+/**
+ * Method that initializes and manages the view manager using LocalStorage and
+ * fills the view manager modal accordingly
+ */
+function initializeViewManager() {
+    // First check if LocalStorage is available
+    if (typeof(Storage) !== "undefined") {
+        // Is the view manager object in Local Storage?
+        var currentViewManagerObject;
+        if (!localStorage.getItem("view-manager")) {
+            localStorage.setItem("view-manager", "[]");
+        }
+ 
+        currentViewManagerObject = JSON.parse(localStorage.getItem("view-manager"));
+
+
+        // Handle the current views display
+        var currentMineViewManagerSettings;
+
+        $("#viewManagerModalCurrentViewsDiv").html("");
+    
+        if(findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)) {
+            currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName);
+            if(currentMineViewManagerSettings.viewNames) {
+                var currentMineAndViewSettingsValues = currentMineViewManagerSettings.viewNames.split(",");
+                for (var i = 0; i < currentMineAndViewSettingsValues.length; i++) {
+                    // Add the HTML
+                    var htmlToAdd = '<div class="viewManagerElement" id="viewManager' + currentMineAndViewSettingsValues[i] + 'Div"><label id="viewManager' + currentMineAndViewSettingsValues[i] + 'Label">' + currentMineAndViewSettingsValues[i] + '</label>';                
+                    htmlToAdd += '<button class="btn btn-danger" type="button" id="viewManager' + currentMineAndViewSettingsValues[i] + 'RemoveButton" data-dismiss="modal">Remove</button></div>';
+                    $("#viewManagerModalCurrentViewsDiv").append(htmlToAdd);
+
+                    // Now handle the remove button
+                    $("#viewManager" + currentMineAndViewSettingsValues[i] + "RemoveButton").click(function() {
+                        // Get view name from the label
+                        var labelViewName = $(this).closest("div").find("label").text();
+
+                        // Get the current view config
+                        var currentMineSettings = findElementJSONarray(JSON.parse(localStorage.getItem("view-manager")), "mine", window.selectedMineName);
+                        
+                        // Remove the correct one
+                        var newViewConfig = currentMineSettings.viewNames.split(",");
+                        remove(newViewConfig, labelViewName);
+                        newViewConfig = newViewConfig.join(",");
+
+                        // Update in structure
+                        currentMineSettings.viewNames = newViewConfig;
+                        
+                        // Update in Local Storage
+                        localStorage.setItem("view-manager", JSON.stringify([currentMineSettings]));
+
+                        // Remove from list
+                        $("#viewManager" + labelViewName + "Div").remove();
+
+                        // Remove from main view
+                        $("#" + labelViewName + "Button").remove();
+
+                        // Is list now empty?
+                        if(currentMineSettings.viewNames.split(",")[0] === "") {
+                            $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
+                        }
+                    });
+                }
+            } else {
+                $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
+            }
+        } else {
+            $("#viewManagerModalCurrentViewsDiv").html("You have not added any custom view for this mine.");
+        }
+
+        // Handle the add buton
+        $("#viewManagerAddViewButton").click(function() {
+            var inputViewName = $("#viewManagerAddViewInput").val();
+
+            currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)
+
+            if(!currentMineViewManagerSettings) {
+                currentViewManagerObject.push({ "mine" : window.selectedMineName, "viewNames" : "" });
+                currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)
+            }
+
+            var currentViewConfig = currentMineViewManagerSettings.viewNames.split(",");
+            if(inputViewName != "Gene" && inputViewName != "Protein" && !currentViewConfig.includes(inputViewName)) {
+                currentViewConfig.push(inputViewName);
+ 
+                if(currentViewConfig[0] === "") {
+                    currentMineViewManagerSettings.viewNames = currentViewConfig[1];
+                } else {
+                    currentMineViewManagerSettings.viewNames = currentViewConfig.join(",");
+                }
+
+                // Save in LS and reload
+                localStorage.setItem("view-manager", JSON.stringify([currentMineViewManagerSettings]));
+                location.reload();
+            }
+        });
+    }
+}
+
+/**
+ * Method that updates the gene length chart
+ * @param {string} geneLengthChartID: the div id of the gene length chart, in order to update it
+ */
+function updateGeneLengthChart(constraints, geneLengthChartID) {
+    $.when(getGeneLengthsInClass(constraints)).done(function(result) {
+        if (window.geneLengthChartObject) {
+            window.geneLengthChartObject.destroy();
+        }
+
+        var ctx = document.getElementById(geneLengthChartID);
+
+        var countData = [];
+        var labelsData = [];
+        var onHoverLabel = [];
+        var colorsData = Array(result['results'].length).fill("#337ab7");
+
+        // Statistical values
+        var uniqueValues = result['uniqueValues'];
+        var minimumValue = result['results'][0]['min'];
+        var maximumValue = result['results'][0]['max'];
+        var averageValue = parseFloat(result['results'][0]['average']).toFixed(3);
+        var elementsPerBucket = (maximumValue - minimumValue) / (result['results'][0].buckets);
+        var stdevValue = parseFloat(result['results'][0]['stdev']).toFixed(3);
+        var chartTitle = "Distribution of " + uniqueValues + " Gene Lengths";
+        var chartSubTitle = "Min: " + minimumValue + ". Max: " + maximumValue + ". Avg: " + averageValue + ". Stdev: " + stdevValue;
+
+        for (var i = 0; i < result['results'].length - 1; i++) {
+            // Lower and upper limits for each bucket
+            var lowerLimit = Math.round(minimumValue + (elementsPerBucket * i));
+            var upperLimit = Math.round(minimumValue + (elementsPerBucket * (i+1)));
+            countData.push(Math.log2(result['results'][i]['count']) + 1);
+            labelsData.push(lowerLimit + " to " + upperLimit);
+            onHoverLabel.push(lowerLimit + " to " + upperLimit + ": " + result['results'][i]['count'] + " values");
+        }
+
+        // Plot
+        var barChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            //Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+            scaleBeginAtZero : true,
+            elements: {
+                center: {
+                    text: '90%',
+                    color: '#FF6384', // Default is #000000
+                    fontStyle: 'Arial', // Default is Arial
+                    sidePadding: 20 // Default is 20 (as a percentage)
+                }
+            },
+            legend: {
+                display: false,
+                position: 'top',
+                onClick: function(e) {
+                    e.stopPropagation();
+                }
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            title: {
+                display: true,
+                text: [chartTitle, chartSubTitle],
+                position: 'bottom'
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: false,
+                        autoSkip: false,
+                        maxRotation: 90,
+                        minRotation: 90
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        display: false
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return onHoverLabel[tooltipItem.index];
+                    }
+                },
+                custom: function(tooltip) {
+                    if (!tooltip.opacity) {
+                        document.getElementById(geneLengthChartID).style.cursor = 'default';
+                        return;
+                    }
+                }
+            }
+        };
+
+        window.geneLengthChartObject = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsData,
+                datasets: [{
+                    data: countData,
+                    backgroundColor: colorsData,
+                }],
+            },
+            options: barChartOptions
+        });
     });
 }

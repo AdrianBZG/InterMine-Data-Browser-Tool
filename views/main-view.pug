@@ -17,29 +17,29 @@ html(lang='en')
 			.container-fluid
 				.row
 				
-				.col-xs-12
-					.card(style="width: 100%; height: 100%;")
-						.card-header
+				.col-xs-12(style="padding-left: 25px; padding-bottom: 15px; padding-right: 25px;")
+					#graphsBoxBody.card
+						.card-header(style="width: 100%; height: 100%;")
 							i.fa.fa-pie-chart
-							|  Number of results for Gene by organism
+							|  Graphs
 						.card-body
-							.row
-								canvas#PieChart(width='100%', height='150%')
+							#PieChartHolder(style='float:left; width: 50%;')
+								canvas#PieChart(width='200px', height='250px')
+							#PieChart2Holder(style='float:right; width: 50%;')
+								canvas#GeneLengthChart(width='200px', height='250px')
 					
 				
 				.row.row-centered
 				
-				div#dataTable
+				div#dataTable(style="padding-left: 25px; padding-top: 15px; padding-right: 25px;")
 
 			include includes/footer.pug
-
-			include includes/scroll-to-top.pug
 
 			include includes/js/core.pug
 
 			include includes/js/custom.pug
 
 			// Custom scripts for this page
-			script(src='javascripts/genes-view.min.js')
+			script(src='javascripts/main-view.min.js')
 			script(src='javascripts/sidebar-events.min.js')
 			script(src='javascripts/piechart-events.min.js')

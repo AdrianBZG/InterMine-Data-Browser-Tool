@@ -252,6 +252,12 @@ button {
   }
 }
 
+.viewManagerElement {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
@@ -466,25 +472,6 @@ body.sidenav-toggled #mainNav.fixed-top #sidenavToggler i {
   -ms-filter: 'FlipH';
 }
 
-#mainNav.static-top .sidenav-toggler {
-  display: none;
-}
-
-@media (min-width: 992px) {
-  #mainNav.static-top .sidenav-toggler {
-    display: flex;
-  }
-}
-
-body.sidenav-toggled #mainNav.static-top #sidenavToggler i {
-  -webkit-transform: scaleX(-1);
-  -moz-transform: scaleX(-1);
-  -o-transform: scaleX(-1);
-  transform: scaleX(-1);
-  filter: FlipH;
-  -ms-filter: 'FlipH';
-}
-
 .content-wrapper {
   overflow-x: hidden;
   background: white;
@@ -668,43 +655,6 @@ body.sidenav-toggled .navbar-sidenav-tooltip.show {
   }
 }
 
-.card-body-icon {
-  position: absolute;
-  z-index: 0;
-  top: -25px;
-  right: -25px;
-  font-size: 5rem;
-  -webkit-transform: rotate(15deg);
-  -ms-transform: rotate(15deg);
-  transform: rotate(15deg);
-}
-
-@media (min-width: 576px) {
-  .card-columns {
-    column-count: 1;
-  }
-}
-
-@media (min-width: 768px) {
-  .card-columns {
-    column-count: 2;
-  }
-}
-
-@media (min-width: 1200px) {
-  .card-columns {
-    column-count: 2;
-  }
-}
-
-.card-login {
-  max-width: 25rem;
-}
-
-.card-register {
-  max-width: 40rem;
-}
-
 footer.sticky-footer {
   position: absolute;
   right: 0;
@@ -724,72 +674,5 @@ footer.sticky-footer {
 @media (min-width: 992px) {
   body.sidenav-toggled footer.sticky-footer {
     width: calc(100% - 55px);
-  }
-}
-
-/* Center the loader */
-#loader {
-  position: absolute;
-  left: 50%;
-  top: 40%;
-  z-index: 1;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
-
-@-webkit-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Add animation to "page content" */
-.animate-bottom {
-  position: relative;
-  -webkit-animation-name: animatebottom;
-  -webkit-animation-duration: 1s;
-  animation-name: animatebottom;
-  animation-duration: 1s;
-}
-
-@-webkit-keyframes animatebottom {
-  from {
-    bottom: -100px;
-    opacity: 0;
-  }
-  to {
-    bottom: 0px;
-    opacity: 1;
-  }
-}
-
-@keyframes animatebottom {
-  from {
-    bottom: -100px;
-    opacity: 0;
-  }
-  to {
-    bottom: 0;
-    opacity: 1;
   }
 }

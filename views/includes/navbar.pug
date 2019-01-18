@@ -4,11 +4,12 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
 	select#mineSelector.form-control(style="width: 200px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 	div#headerButtons.col-md-10.text-center
-		a(href="/genes" data-toggle="tooltip" title="Change to Genes view")
-			button.btn.btn-primary.btn-space(id="genesButton" type="button") Genes
-		a(href="/proteins" data-toggle="tooltip" title="Change to Proteins view")
-			button.btn.btn-default.btn-space(id="proteinsButton" type="button") Proteins
-	
+
+	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 130px;" data-toggle="tooltip" title="Open the views manager")
+		i.fa.fa-eye
+	button.btn.btn-primary(id="apiKeyManagerButton" style="position: fixed; top: 10px; right: 75px;" data-toggle="tooltip" title="Open the API Key manager")
+		i.fa.fa-key
+
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Organism short name' id='organismFilterLi')
@@ -39,3 +40,51 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 							#goAnnotationFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
+
+//API keys manager modal
+#apiKeyManagerModal.modal.fade(role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				h4.modal-title API Keys Manager
+			.modal-body
+				#apiKeyManagerModalBodyText
+					| Adding an API key allows you to save lists and load previously saved lists into the data browser. You&apos;ll need to paste one key for each InterMine you use. 
+					a(href='https://intermine.readthedocs.io/en/latest/web-services/authentication/#authentication-for-existing-user-accounts-permanent-tokens' target='_blank') How do I find my API key?
+					br
+					br
+				#apiKeyManagerModalKeysDiv(class="container")
+			.modal-footer
+				button.btn.btn-success(type='button' id="apiKeyManagerSaveButton") Save
+				button.btn.btn-danger(type='button' data-dismiss='modal' style='position:absolute; left: 15px;') Close
+
+//Add new view modal
+#viewManagerModal.modal.fade(role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				h4.modal-title Views manager
+			.modal-body
+				#viewManagerModalBodyText
+					| In this modal you are able to manage the custom views for the current mine, as well as adding new ones.
+					br
+					br
+					center
+						b Current custom views:
+					br
+					#viewManagerModalCurrentViewsDiv(class="container")
+					br
+					br
+					hr
+					center
+						b Add a new view:
+					br
+					br
+					#viewManagerModalAddViewDiv(class="container")
+						.input-group
+							input(type="text" class="form-control" id="viewManagerAddViewInput" placeholder="Type a valid view name (e.g. Gene)" style="padding-right: 5px;")
+							span.input-group-btn(style="padding-left: 5px;")
+								button.btn.btn-success(type='button' id="viewManagerAddViewButton") Add
+					br
+			.modal-footer
+				button.btn.btn-danger(type='button' data-dismiss='modal') Close

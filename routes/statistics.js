@@ -112,6 +112,78 @@ router.post('/count/items/:mineUrl/:classname', function(req, res, next) {
 });
 
 /**
+ * POST Gene Lengths summaries from a mine inside a class (parameter) using custom constraints
+ */
+router.post('/genelength/:mineUrl/:classname', function(req, res, next) {
+    var constraints = req.body;	
+    var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: mineUrl
+    });
+
+    var query = {
+        "from": className,
+        "select": ["length", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+		"where": constraints,
+        "orderBy": [{
+            "path": "length",
+            "direction": "ASC"
+        }]
+    };
+
+    var genelengths = new imjs.Query(query, service),
+    genelengthsPath = [query.from, query.select[0]].join('.');
+        genelengths.summarize(genelengthsPath).then(function(genelengthsSummary) {
+        //This returns the gene length and the number of gene rows associated with the gene length
+        res.json(genelengthsSummary);
+    });
+});
+
+/**
+ * GET Gene Lengths summaries from a mine inside a class (parameter)
+ */
+router.get('/genelength/:mineUrl/:classname', function(req, res, next) {
+    var className = req.params.classname;
+    var mineUrl = req.params.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
+
+    if (className != "Protein" && className != "Gene") {
+        res.status(500).send('You need to specify a valid class: Protein, Gene');
+    }
+
+    var service = new imjs.Service({
+        root: mineUrl
+    });
+
+    var query = {
+        "from": className,
+        "select": ["length", "primaryIdentifier"],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "length",
+            "direction": "ASC"
+        }]
+    };
+
+    var genelengths = new imjs.Query(query, service),
+    genelengthsPath = [query.from, query.select[0]].join('.');
+        genelengths.summarize(genelengthsPath).then(function(genelengthsSummary) {
+        //This returns the gene length and the number of gene rows associated with the gene length
+        res.json(genelengthsSummary);
+    });
+});
+
+/**
  * GET count of items inside a class (parameter) in HumanMine
  */
 router.get('/count/items/:mineUrl/:classname', function(req, res, next) {	

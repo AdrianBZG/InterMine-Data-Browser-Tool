@@ -1,0 +1,130 @@
+[
+  {
+    "mineName": "HumanMine",
+    "customFilters": [
+      {
+        "filterQuery": [{
+                "path": "alleles.type",
+                "op": "==",
+                "value": "AAA"
+              },
+              {
+                "path": "alleles.clinicalSignificance",
+                "op": "==",
+                "value": "BBB"
+              }
+            ],
+          "filterName": "CLINVAR"
+      },
+      {
+        "filterQuery": [{
+                "path": "locations.start",
+                "op": ">=",
+                "value": "AAA"
+              },
+              {
+                "path": "locations.end",
+                "op": "<=",
+                "value": "BBB"
+              },
+              {
+                "path": "locations.locatedOn.primaryIdentifier",
+                "op": "==",
+                "value": "CCC"
+              }
+            ],
+          "filterName": "Location"
+      },
+      {
+        "filterQuery": [{
+                "path": "diseases.name",
+                "op": "ONE OF",
+                "values": "AAA"
+              }
+            ],
+          "filterName": "Diseases"
+      },
+      {
+        "filterQuery": [{
+                "path": "proteinAtlasExpression.cellType",
+                "op": "==",
+                "value": "AAA"
+              },
+              {
+                "path": "proteinAtlasExpression.tissue.name",
+                "op": "==",
+                "value": "BBB"
+              },
+              {
+                "path": "proteinAtlasExpression.expressionType",
+                "op": "==",
+                "value": "CCC"
+              },
+              {
+                "path": "proteinAtlasExpression.level",
+                "op": "==",
+                "value": "DDD"
+              },
+              {
+                "path": "proteinAtlasExpression.reliability",
+                "op": "==",
+                "value": "EEE"
+              }
+            ],
+          "filterName": "Protein-Localisation"
+      },
+      {
+        "filterQuery": [{
+                "path": "proteins.proteinDomainRegions.proteinDomain.name",
+                "op": "ONE OF",
+                "values": "AAA"
+              }
+            ],
+          "filterName": "Protein-Domain"
+      },
+      {
+        "filterQuery": [{
+                "path": "interactions.participant2.symbol",
+                "op": "==",
+                "value": "AAA"
+              },
+              {
+                "path": "interactions.details.type",
+                "op": "==",
+                "value": "BBB"
+              },
+              {
+                "path": "interactions.details.dataSets.name",
+                "op": "==",
+                "value": "CCC"
+              }
+            ],
+          "filterName": "Interactions"
+      },
+      {
+        "filterQuery": [{
+                "path": "atlasExpression.pValue",
+                "op": ">=",
+                "value": "AAA"
+              },
+              {
+                "path": "atlasExpression.tStatistic",
+                "op": ">=",
+                "value": "BBB"
+              },
+              {
+                "path": "atlasExpression.expression",
+                "op": "==",
+                "value": "CCC"
+              },
+              {
+                "path": "atlasExpression.dataSets.name",
+                "op": "==",
+                "value": "DDD"
+              }
+            ],
+          "filterName": "Expression"
+      }
+    ]
+  }
+]

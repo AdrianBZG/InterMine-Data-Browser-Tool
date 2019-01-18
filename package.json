@@ -1,7 +1,7 @@
 {
     "title": "InterMine Data Brpwser",
     "name": "intermine-data-browser",
-    "version": "0.0.4",
+    "version": "1.0.8",
     "description": "A web-based data browser for InterMine",
     "homepage": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool",
     "bugs": {
@@ -23,7 +23,7 @@
         "url": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool"
     },
     "dependencies": {
-        "bootstrap": "4.0.0",
+        "bootstrap": "4.1.2",
         "browser-sync": "2.23.6",
         "chart.js": "2.7.1",
         "cookie-parser": "~1.4.3",
@@ -43,12 +43,7 @@
         "jquery.easing": "^1.4.1",
         "jsdom": "^11.11.0",
         "morgan": "~1.9.0",
-        "pug": "2.0.0-beta11"
-    },
-    "devDependencies": {
-        "browser-sync": "2.23.6",
-        "chai": "^4.1.2",
-        "chai-http": "^4.0.0",
+        "pug": "2.0.0-beta11",
         "gulp": "^3.9.1",
         "gulp-clean-css": "3.9.2",
         "gulp-header": "2.0.1",
@@ -57,7 +52,12 @@
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
         "gulp-uglify": "3.0.0",
-        "imjs": "^3.15.1",
+        "imjs": "^3.15.1"
+    },
+    "devDependencies": {
+        "browser-sync": "2.23.6",
+        "chai": "^4.1.2",
+        "chai-http": "^4.0.0",
         "mocha": "^5.2.0"
     }
 }
