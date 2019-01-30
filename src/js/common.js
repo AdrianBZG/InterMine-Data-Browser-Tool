@@ -1203,12 +1203,68 @@ function createPathwaysNameFilter() {
     }
 }
 
+function createPhenotypesNameFilter() {
+    try {
+        $.when(getPhenotypeNames()).done(function(result) {
+
+            var availablePhenotypeNames = [];
+
+            for (var i = 0; i < result.results.length; i++) {
+                if (result.results[i]["item"] != null) {
+                    availablePhenotypeNames.push({
+                        label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                        value: result.results[i]["item"]
+                    });
+                }
+            }
+
+            $("#phenotypeNameSearchInput").autocomplete({
+                minLength: 3,
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availablePhenotypeNames, request.term);
+                    response(results.slice(0, 15));
+                },
+                select: function(event, ui) {
+                    event.preventDefault();
+                    $("#phenotypeNameSearchInput").val(ui.item.value);
+
+                    // Filter the table
+                    //window.imTableConstraint["pathwayName"].push(ui.item.value);
+                    //updateTableWithConstraints();
+
+                    var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+
+                    $("#phenotypeFilterList").append(
+                        '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+
+                    // $("#" + buttonId).click(function() {
+                    //     remove(window.imTableConstraint["pathwayName"], ui.item.value);
+                    //     updateTableWithConstraints();
+                    //     $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                    // });
+                },
+                focus: function(event, ui) {
+                    event.preventDefault();
+                    $("#phenotypeNameSearchInput").val(ui.item.value);
+                }
+            });
+
+        });
+    } catch (err) {
+        $("#pathwayNameFilterLi").remove();
+        console.log(err);
+    }
+    console.log('execur');
+}
+
+
 /**
  * Method to add the default filters for all mines
  */
 function addDefaultFilters() {
     createPathwaysNameFilter();
     createGoAnnotationFilter();
+    createPhenotypesNameFilter();
 }
 
 /**

@@ -388,12 +388,7 @@ router.get('/participant2genesymbols/:mineUrl', function(req, res, next) {
  * GET Phenotype Names from HumanMine inside a class (parameter)
  */
 router.get('/phenotypes/:mineUrl', function(req, res, next) {
-    var className = req.params.classname;
     var mineUrl = formatMineURL(req.params.mineUrl);
-
-    if (className != "Protein" && className != "Gene") {
-        res.status(500).send('You need to specify a valid class: Protein, Gene');
-    }
 
     var service = new imjs.Service({
         root: mineUrl
