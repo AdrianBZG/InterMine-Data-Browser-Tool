@@ -12,7 +12,8 @@ function initializeStartupConfiguration() {
         "datasetName" : [],
         "pathwayName" : [],
         "proteinDomainName" : [],
-        "diseaseName" : []
+        "diseaseName" : [],
+        "phenotypeName": []
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -1229,19 +1230,19 @@ function createPhenotypesNameFilter() {
                     $("#phenotypeNameSearchInput").val(ui.item.value);
 
                     // Filter the table
-                    //window.imTableConstraint["pathwayName"].push(ui.item.value);
-                    //updateTableWithConstraints();
+                    window.imTableConstraint["phenotypeName"].push(ui.item.value);
+                    updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
 
                     $("#phenotypeFilterList").append(
                         '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
-                    // $("#" + buttonId).click(function() {
-                    //     remove(window.imTableConstraint["pathwayName"], ui.item.value);
-                    //     updateTableWithConstraints();
-                    //     $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
-                    // });
+                    $("#" + buttonId).click(function() {
+                        remove(window.imTableConstraint["HPOTerm"], ui.item.value);
+                        updateTableWithConstraints();
+                        $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                    });
                 },
                 focus: function(event, ui) {
                     event.preventDefault();
@@ -1254,7 +1255,6 @@ function createPhenotypesNameFilter() {
         $("#pathwayNameFilterLi").remove();
         console.log(err);
     }
-    console.log('execur');
 }
 
 
