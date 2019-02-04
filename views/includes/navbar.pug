@@ -85,11 +85,11 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					br
 					br
 					#viewManagerModalAddViewDiv(class="container")
-						.input-group
-							select(name="addViewDropDown", id="addViewDropDown")
-							//- input(type="text" class="form-control" id="viewManagerAddViewInput" placeholder="Type a valid view name (e.g. Gene)" style="padding-right: 5px;")
-							span.input-group-btn(style="padding-left: 5px;")
-								button.btn.btn-success(type='button' id="viewManagerAddViewButton") Add
+						.viewManagerElement
+							.input-group
+								select(name="addViewDropDown", id="addViewDropDown")
+								span.input-group-btn
+									button.btn.btn-success(type='button' id="viewManagerAddViewButton") Add
 					br
 			.modal-footer
 				button.btn.btn-danger(type='button' data-dismiss='modal') Close
