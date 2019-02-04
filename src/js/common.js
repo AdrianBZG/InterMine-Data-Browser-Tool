@@ -109,6 +109,7 @@ function initializeStartupConfiguration() {
         // Update the key manager structures
         initializeViewManager();
         
+        addViewSelectOptions();
         // Show the window
         $('#viewManagerModal').appendTo("body").modal('show');
     });
@@ -193,6 +194,60 @@ function updateTableWithConstraints() {
     }
 }
 
+
+function addViewSelectOptions() {
+    // Add classes with preferredBagType tag for the current mine
+ var mineURL = escapeMineURL(window.mineUrl);
+
+ if(mineURL.slice(-1) != "/") {
+     mineURL += "/";
+ }
+ console.log("after")
+ var proxyurl = "https://cors-anywhere.herokuapp.com/";
+
+
+ mineURL += "model?format=json";
+ var url = proxyurl + mineURL;
+ $.when(getMineModel(url)).done(function(result) {
+     console.log("inside mine url")
+     var mineClasses = JSON.parse(JSON.stringify(result.model.classes));
+     var mineClassesArray = [];
+     for(var x in mineClasses){
+         mineClassesArray.push(mineClasses[x]);
+     }
+
+     var s = document.getElementById('addViewDropDown');
+     var op = "";
+     var defaultViews = ['Gene','Protein'];
+
+     for (var i = 0; i < mineClassesArray.length; i++) {
+         if(!defaultViews.includes(mineClassesArray[i].name)) {
+        //     //  if(currentClassView === mineClassesArray[i].name) {
+        //     //      $("#headerButtons").append(
+        //     //          '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-primary btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+        //     //  } else {
+        //     //      $("#headerButtons").append(
+        //     //          '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-default btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+        //     //  }
+
+        //     //  $('#' + mineClassesArray[i].name + 'Button').click(function(event) {
+        //     //      sessionStorage.setItem('currentClassView', String(this.id).split('Button')[0]);
+        //     //      location.reload();
+        //     //  });
+
+            op += "<option>" + mineClassesArray[i].name + "</option>";
+         }
+     }
+     s.innerHTML = op;
+ }).fail(function(error){
+     console.log("error", error);
+ })
+ console.log(" fails")
+
+}
+
+// addViewSelectOptions();
+ 
 /**
  * Method to expand the dataset names filter, showing the remaining ones and adding the appropriate event handling to them
  */
@@ -1507,7 +1562,8 @@ function initializeViewManager() {
 
         // Handle the add buton
         $("#viewManagerAddViewButton").click(function() {
-            var inputViewName = $("#viewManagerAddViewInput").val();
+            var e = document.getElementById("addViewDropDown");
+            var inputViewName = e.options[e.selectedIndex].value;
 
             currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)
 
