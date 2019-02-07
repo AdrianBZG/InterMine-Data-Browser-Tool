@@ -395,13 +395,20 @@ router.get('/phenotypes/:mineUrl', function(req, res, next) {
     });
 
     var query = {
-        "from": "HPOTerm" ,
-        "select": ["identifier", "name", "ontology.name", "description"],
+        "from": "Gene" ,
+        "select": [
+            "symbol",
+            "name",
+            "primaryIdentifier",
+            "secondaryIdentifier",
+            "organism.name",
+            "diseases.hpoAnnotations.hpoTerm.name"
+        ],
         "model": {
             "name": "genomic"
         },
         "orderBy": [{
-            "path": "identifier",
+            "path": "symbol",
             "direction": "ASC"
         }]
     };

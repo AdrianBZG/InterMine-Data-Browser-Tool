@@ -267,6 +267,6 @@ function getPhenotypeNames() {
         error: function(e) {
             console.log(e);
         },
-        success: function(data) {}
+        success: function(data) {console.log(data);}
     })
 }
