@@ -124,6 +124,14 @@
               }
             ],
           "filterName": "Expression"
+      },
+      {
+        "filterQuery": [{
+          "path": "diseases.hpoAnnotations.hpoTerm.name",
+          "op": "ONE OF",
+          "values": "AAA"
+        }],
+        "filterName": "Phenotype"
       }
     ]
   }
