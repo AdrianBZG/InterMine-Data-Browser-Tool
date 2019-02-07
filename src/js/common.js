@@ -119,12 +119,6 @@ function initializeStartupConfiguration() {
  * Method to update the im-table with the filters selected in the sidebar
  */
 function updateTableWithConstraints() {
-    console.log({
-            "path": "diseases.hpoAnnotations.hpoTerm.name",
-            "op": "ONE OF",
-            "values": window.imTableConstraint["phenotypeName"]
-        });
-
     while (window.imTable.query.constraints.length > 0) {
         try {
             window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
@@ -1247,7 +1241,6 @@ function createPhenotypesNameFilter() {
 
                     // Filter the table
                     window.imTableConstraint["phenotypeName"].push(ui.item.value);
-                    // console.log(window.imTableConstraint);
                     updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";

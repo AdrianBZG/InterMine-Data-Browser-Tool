@@ -46,14 +46,14 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 								input(type="text" class="form-control" id="goAnnotationSearchInput" placeholder="e.g. protein binding")
 			li.nav-item(data-toggle='tooltip', data-placement='right', title='Phenotype Name' id='phenotypeNameFilterLi')
 					a.nav-link(data-toggle="collapse", href="#phenotypeNameSearchCardBlock", aria-controls="phenotypeNameSearchCardBlock", style='color:black')
-						i.fa.fa-fw.fa-code-fork
+						i.fa.fa-fw.fa-product-hunt
 						span.nav-link-text
 						| Phenotype Name
 					.card(style="width: 100%;")
 						#phenotypeNameSearchCardBlock.collapse.card-block(style="overflow: auto;")
 							#phenotypeFilterList.ul.list-group.list-group-flush
 							form-group.ui-front
-								input(type="text" class="form-control" id="phenotypeNameSearchInput" placeholder="e.g. HP:0000000005")
+								input(type="text" class="form-control" id="phenotypeNameSearchInput" placeholder="e.g. Edema")
 //API keys manager modal
 #apiKeyManagerModal.modal.fade(role='dialog')
 	.modal-dialog.modal-lg
