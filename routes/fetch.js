@@ -397,12 +397,8 @@ router.get('/phenotypes/:mineUrl', function(req, res, next) {
     var query = {
         "from": "Gene" ,
         "select": [
-            "symbol",
-            "name",
-            "primaryIdentifier",
-            "secondaryIdentifier",
-            "organism.name",
-            "diseases.hpoAnnotations.hpoTerm.name"
+            "diseases.hpoAnnotations.hpoTerm.name",
+            "primaryIdentifier"
         ],
         "model": {
             "name": "genomic"

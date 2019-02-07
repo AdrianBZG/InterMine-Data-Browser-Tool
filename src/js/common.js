@@ -119,6 +119,11 @@ function initializeStartupConfiguration() {
  * Method to update the im-table with the filters selected in the sidebar
  */
 function updateTableWithConstraints() {
+    console.log({
+            "path": "diseases.hpoAnnotations.hpoTerm.name",
+            "op": "ONE OF",
+            "values": window.imTableConstraint["phenotypeName"]
+        });
 
     while (window.imTable.query.constraints.length > 0) {
         try {
@@ -126,6 +131,14 @@ function updateTableWithConstraints() {
         } catch (err) {
             continue;
         }
+    }
+
+    if (window.imTableConstraint["phenotypeName"].length > 0) {
+        window.imTable.query.addConstraint({
+            "path": "diseases.hpoAnnotations.hpoTerm.name",
+            "op": "ONE OF",
+            "values": window.imTableConstraint["phenotypeName"]
+        });
     }
 
     // GO Annotation
@@ -192,6 +205,9 @@ function updateTableWithConstraints() {
 
         window.imTable.query.addConstraint(diseasesFilterQuery);
     }
+
+    // Phenotype Name
+    
 }
 
 /**
@@ -1231,6 +1247,7 @@ function createPhenotypesNameFilter() {
 
                     // Filter the table
                     window.imTableConstraint["phenotypeName"].push(ui.item.value);
+                    // console.log(window.imTableConstraint);
                     updateTableWithConstraints();
 
                     var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
@@ -1239,7 +1256,7 @@ function createPhenotypesNameFilter() {
                         '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
 
                     $("#" + buttonId).click(function() {
-                        remove(window.imTableConstraint["HPOTerm"], ui.item.value);
+                        remove(window.imTableConstraint["phenotypeName"], ui.item.value);
                         updateTableWithConstraints();
                         $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
                     });
@@ -1252,7 +1269,7 @@ function createPhenotypesNameFilter() {
 
         });
     } catch (err) {
-        $("#pathwayNameFilterLi").remove();
+        $("#phenotypeNameFilterLi").remove();
         console.log(err);
     }
 }
