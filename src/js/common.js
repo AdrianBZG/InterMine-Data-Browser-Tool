@@ -126,14 +126,6 @@ function updateTableWithConstraints() {
         }
     }
 
-    // if (window.imTableConstraint["phenotypeName"].length > 0) {
-    //     window.imTable.query.addConstraint({
-    //         "path": "diseases.hpoAnnotations.hpoTerm.name",
-    //         "op": "ONE OF",
-    //         "values": window.imTableConstraint["phenotypeName"]
-    //     });
-    // }
-
     // GO Annotation
     if (window.imTableConstraint["goAnnotation"].length > 0) {
         if (sessionStorage.getItem('currentClassView') == "Gene") {
@@ -947,7 +939,7 @@ function addCustomFilters() {
             if (filter.length > 0) {
                 window.imTableConstraint.phenotypeName = [];
                 $("#sidebarUl").append(
-                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Phenotype Name" id="phenotypeNameFilterLi"><a class="nav-link" data-toggle="collapse" href="#phenotypeNameSearchCardBlock" aria-controls="phenotypeNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Phenotype Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="phenotypeNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="phenotypeFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="phenotypeNameSearchInput" placeholder="e.g. Edema"/></form-group></div></div></li>');
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Phenotype" id="phenotypeNameFilterLi"><a class="nav-link" data-toggle="collapse" href="#phenotypeNameSearchCardBlock" aria-controls="phenotypeNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Phenotype</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="phenotypeNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="phenotypeFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="phenotypeNameSearchInput" placeholder="e.g. Edema"/></form-group></div></div></li>');
                    try {
                        $.when(getPhenotypeNames()).done(function(result) {
                 
