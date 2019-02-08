@@ -52,6 +52,11 @@
   background-clip: padding-box;
 }
 
+.centeredSelect {
+  display: block;
+  margin: 0 auto;
+}
+
 .ui-autocomplete > li > div {
   display: block;
   padding: 3px 20px;
@@ -244,3 +249,7 @@ button{
   align-items: center;
   padding: 5px;
 }
+
+select, button {
+  vertical-align:top;
+ }

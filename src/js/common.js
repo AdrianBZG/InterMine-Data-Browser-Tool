@@ -215,6 +215,40 @@ function updateTableWithConstraints() {
     
 }
 
+
+function addViewManagerSelectOptions() {
+    // Add classes with preferredBagType tag for the current mine
+    var mineURL = escapeMineURL(window.mineUrl);
+
+    if(mineURL.slice(-1) != "/") {
+        mineURL += "/";
+    }
+
+    mineURL += "model?format=json";
+    var url = mineURL;
+    
+    $.when(getMineModel(url)).done(function(result) {
+        var mineClasses = JSON.parse(JSON.stringify(result.model.classes));
+        var mineClassesArray = [];
+        for(var x in mineClasses) {
+            mineClassesArray.push(mineClasses[x]);
+        }
+
+        var selectObject = document.getElementById('addViewDropDown');
+        var op = "";
+        var defaultViews = ['Gene','Protein'];
+
+        for (var i = 0; i < mineClassesArray.length; i++) {
+            if(!defaultViews.includes(mineClassesArray[i].name)) {
+                op += "<option>" + mineClassesArray[i].name + "</option>";
+            }
+        }
+        selectObject.innerHTML = op;
+    }).fail(function(error){
+        console.log("error", error);
+    })
+}
+ 
 /**
  * Method to expand the dataset names filter, showing the remaining ones and adding the appropriate event handling to them
  */
@@ -1448,6 +1482,7 @@ function updateElements(constraints, pieChartID) {
     handleCustomFilters();
     initializeKeyManager();
     initializeViewManager();
+    addViewManagerSelectOptions();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
         displayItemsInClass(result);
@@ -1592,7 +1627,8 @@ function initializeViewManager() {
 
         // Handle the add buton
         $("#viewManagerAddViewButton").click(function() {
-            var inputViewName = $("#viewManagerAddViewInput").val();
+            var e = document.getElementById("addViewDropDown");
+            var inputViewName = e.options[e.selectedIndex].value;
 
             currentMineViewManagerSettings = findElementJSONarray(currentViewManagerObject, "mine", window.selectedMineName)
 
