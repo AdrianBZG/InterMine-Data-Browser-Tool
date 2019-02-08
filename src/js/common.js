@@ -12,7 +12,7 @@ function initializeStartupConfiguration() {
         "datasetName" : [],
         "pathwayName" : [],
         "proteinDomainName" : [],
-        "diseaseName" : []
+        "diseaseName" : [],
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -118,7 +118,6 @@ function initializeStartupConfiguration() {
  * Method to update the im-table with the filters selected in the sidebar
  */
 function updateTableWithConstraints() {
-
     while (window.imTable.query.constraints.length > 0) {
         try {
             window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
@@ -126,6 +125,14 @@ function updateTableWithConstraints() {
             continue;
         }
     }
+
+    // if (window.imTableConstraint["phenotypeName"].length > 0) {
+    //     window.imTable.query.addConstraint({
+    //         "path": "diseases.hpoAnnotations.hpoTerm.name",
+    //         "op": "ONE OF",
+    //         "values": window.imTableConstraint["phenotypeName"]
+    //     });
+    // }
 
     // GO Annotation
     if (window.imTableConstraint["goAnnotation"].length > 0) {
@@ -191,6 +198,21 @@ function updateTableWithConstraints() {
 
         window.imTable.query.addConstraint(diseasesFilterQuery);
     }
+
+    // Phenotype Name
+    if (window.imTableConstraint["phenotypeName"].length > 0) {
+        var filter = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0].customFilters.filter(function(v){
+            return v.filterName==='Phenotype';
+        });
+
+        var phenotypeDomainFilterQuery = filter[0].filterQuery[0];
+        phenotypeDomainFilterQuery.values = window.imTableConstraint["phenotypeName"];
+
+        window.imTable.query.addConstraint(phenotypeDomainFilterQuery);
+    }
+    
 }
 
 
@@ -292,6 +314,7 @@ function clearCustomFilters() {
     $("#interactionsFilterLi").remove();
     $("#expressionFilterLi").remove();
     $("#datasetFilterLi").remove();
+    $("#phenotypeFilterLi").remove();
     window.CustomFiltersAdded = false;
 }
 
@@ -913,6 +936,68 @@ function addCustomFilters() {
                     });
 
                 });
+            }
+
+            //Phenotype Filter
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Phenotype';
+            });
+
+
+            if (filter.length > 0) {
+                window.imTableConstraint.phenotypeName = [];
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Phenotype Name" id="phenotypeNameFilterLi"><a class="nav-link" data-toggle="collapse" href="#phenotypeNameSearchCardBlock" aria-controls="phenotypeNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Phenotype Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="phenotypeNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="phenotypeFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="phenotypeNameSearchInput" placeholder="e.g. Edema"/></form-group></div></div></li>');
+                   try {
+                       $.when(getPhenotypeNames()).done(function(result) {
+                
+                           var availablePhenotypeNames = [];
+                
+                           for (var i = 0; i < result.results.length; i++) {
+                               if (result.results[i]["item"] != null) {
+                                   availablePhenotypeNames.push({
+                                       label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                       value: result.results[i]["item"]
+                                   });
+                               }
+                           }
+                
+                           $("#phenotypeNameSearchInput").autocomplete({
+                               minLength: 3,
+                               source: function(request, response) {
+                                   var results = $.ui.autocomplete.filter(availablePhenotypeNames, request.term);
+                                   response(results.slice(0, 15));
+                               },
+                               select: function(event, ui) {
+                                   event.preventDefault();
+                                   $("#phenotypeNameSearchInput").val(ui.item.value);
+                
+                                   // Filter the table
+                                   window.imTableConstraint["phenotypeName"].push(ui.item.value);
+                                   updateTableWithConstraints();
+                
+                                   var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+                
+                                   $("#phenotypeFilterList").append(
+                                       '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+                
+                                   $("#" + buttonId).click(function() {
+                                       remove(window.imTableConstraint["phenotypeName"], ui.item.value);
+                                       updateTableWithConstraints();
+                                       $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                                   });
+                               },
+                               focus: function(event, ui) {
+                                   event.preventDefault();
+                                   $("#phenotypeNameSearchInput").val(ui.item.value);
+                               }
+                           });
+                
+                       });
+                   } catch (err) {
+                       $("#phenotypeNameFilterLi").remove();
+                       console.log(err);
+                   }
             }
 
             createDatasetFilter(); // Dataset filter should be the last one

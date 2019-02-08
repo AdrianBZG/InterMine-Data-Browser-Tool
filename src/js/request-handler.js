@@ -259,3 +259,14 @@ function getGeneLengthsInClass(constraints) {
         success: function(data) {}
     })
 }
+
+function getPhenotypeNames() {
+    return $.ajax({
+        url: '/fetch/phenotypes/' + window.mineUrl,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
