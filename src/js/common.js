@@ -105,6 +105,7 @@ function initializeStartupConfiguration() {
     });
     
     $("#listManagerButton").click(function() {
+        getSavedLists();
         $("#listManagerModal").modal("show");
     })
 
