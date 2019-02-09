@@ -103,6 +103,10 @@ function initializeStartupConfiguration() {
             $('#apiKeyManagerModal').modal('toggle');
         });
     });
+    
+    $("#listManagerButton").click(function() {
+        $("#listManagerModal").modal("show");
+    })
 
     // Handle the view manager buttons
     $("#viewManagerButton").click(function() {
