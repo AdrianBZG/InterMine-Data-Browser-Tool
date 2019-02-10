@@ -269,6 +269,7 @@ select, button {
 
 .saved-list-item {
   overflow-x: auto;
+  cursor: pointer;
 }
 
 .smaller {

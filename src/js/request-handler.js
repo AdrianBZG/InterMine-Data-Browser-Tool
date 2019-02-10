@@ -301,6 +301,6 @@ function getSavedLists() {
         error: function(e){
             console.log(e);
         },
-        success: function(data) {console.log(data)}
+        success: function(data) {}
     });
 }

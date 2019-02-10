@@ -107,7 +107,7 @@ function initializeStartupConfiguration() {
 
     
     $("#listManagerButton").click(function() {
-        initializeSavedList();
+        initializeSavedLists();
         $("#listManagerModal").modal("show");
     })
 
@@ -125,7 +125,8 @@ function initializeStartupConfiguration() {
  * Method to initialize the saved lists based on the API Keys
  */
 
-function initializeSavedList(){
+function initializeSavedLists(){
+    if(window.savedListsInitialized) return;
     $.when(getSavedLists()).then(function(result) {
         var formElement = '<input class="form-control" id="saved-lists-filter" placeholder="Filter">';
         var listElements = result.map(function(list) {
@@ -138,10 +139,28 @@ function initializeSavedList(){
                 if(el.textContent.toLowerCase().indexOf(data) == -1) el.style.display = 'none';
                 else el.style.display = 'block';
             });
-        })
+        });
+        $(".saved-list-item").each(function(i, el) { 
+            el.addEventListener('click', function() {
+                if(el.dataset.listConstraintActive === "true") {
+                    el.dataset.listConstraintActive = "false";
+                    el.classList.remove('active');
+                    var listName = el.textContent;
+                    var x;
+                    while((x = window.imTableConstraint.savedLists.indexOf(listName)) != -1) {
+                        window.imTableConstraint.savedLists.splice(x, 1);
+                    }
+                }
+                else {
+                    el.dataset.listConstraintActive = "true";
+                    el.classList.add('active');
+                    var listName = el.textContent;
+                    window.imTableConstraint.savedLists.push(listName);
+                }
+            });
+        });
+        window.savedListsInitialized = true;
     })
-
-    
 }
 
 /**
