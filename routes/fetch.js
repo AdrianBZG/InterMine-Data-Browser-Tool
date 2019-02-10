@@ -418,7 +418,6 @@ router.get('/phenotypes/:mineUrl', function(req, res, next) {
 });
 
 router.post('/lists/:mineUrl', function(req, res, next) {
-    console.log('here');
     const mineUrl = formatMineURL(req.params.mineUrl);
     const { apiKey } = req.body;
     const token = apiKey || null;

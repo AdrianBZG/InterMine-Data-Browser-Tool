@@ -13,6 +13,7 @@ function initializeStartupConfiguration() {
         "pathwayName" : [],
         "proteinDomainName" : [],
         "diseaseName" : [],
+        "savedLists": []
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -103,9 +104,10 @@ function initializeStartupConfiguration() {
             $('#apiKeyManagerModal').modal('toggle');
         });
     });
+
     
     $("#listManagerButton").click(function() {
-        getSavedLists();
+        initializeSavedList();
         $("#listManagerModal").modal("show");
     })
 
@@ -117,6 +119,29 @@ function initializeStartupConfiguration() {
         // Show the window
         $('#viewManagerModal').appendTo("body").modal('show');
     });
+}
+
+/**
+ * Method to initialize the saved lists based on the API Keys
+ */
+
+function initializeSavedList(){
+    $.when(getSavedLists()).then(function(result) {
+        var formElement = '<input class="form-control" id="saved-lists-filter" placeholder="Filter">';
+        var listElements = result.map(function(list) {
+            return "<li class='list-group-item saved-list-item'>" + list.title + "</li>"
+        }).join('');
+        $('#savedLists').html(formElement + listElements);
+        $('#saved-lists-filter').on('input', function(e){
+            var data = $('#saved-lists-filter')[0].value.toLowerCase().trim();
+            $(".saved-list-item").each(function(i, el) {
+                if(el.textContent.toLowerCase().indexOf(data) == -1) el.style.display = 'none';
+                else el.style.display = 'block';
+            });
+        })
+    })
+
+    
 }
 
 /**
@@ -1412,7 +1437,7 @@ function fillMineSelector() {
                                 });
                             } else {
                                 $("#unavailableMineAlert").show();
-                            }
+}
 
                             // Handle error
                             sanity = false;
