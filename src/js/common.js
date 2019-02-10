@@ -253,6 +253,16 @@ function updateTableWithConstraints() {
 
         window.imTable.query.addConstraint(phenotypeDomainFilterQuery);
     }
+
+    // List Constraints
+    if(window.imTableConstraint['savedLists']) {
+        window.imTable.query.addConstraint({
+            "path": "Gene",
+            "op": "IN",
+            "value": window.imTableConstraint.savedLists,
+            "code": "A"
+        });
+    }
     
 }
 
