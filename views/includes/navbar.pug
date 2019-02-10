@@ -103,6 +103,7 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 		.modal-content
 			.modal-header
 				h4.modal-title List Manager
+				button.btn.btn-success(type='button' id="listManagerSaveButton", disabled="true") Apply
 			.modal-body
 				#listManagerModalBodyText
 					//- | Adding an API key allows you to save lists and load previously saved lists into the data browser. You&apos;ll need to paste one key for each InterMine you use. 
@@ -112,5 +113,3 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 				ul#savedLists.list-group
 					| Loading data...
 			.modal-footer
-				button.btn.btn-success(type='button' id="apiKeyManagerSaveButton") Apply
-				button.btn.btn-danger(type='button' data-dismiss='modal' style='position:absolute; left: 15px;') Close
