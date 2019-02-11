@@ -263,8 +263,8 @@ function updateTableWithConstraints() {
     if(window.imTableConstraint['savedLists'].length > 0) {
         window.imTable.query.addConstraint({
             "path": sessionStorage.getItem('currentClassView'),
-            "op": "ONE OF",
-            "value": window.imTableConstraint["savedLists"].join(','),
+            "op": "IN",
+            "value": window.imTableConstraint["savedLists"],
             "code": "A"
         });
     }
