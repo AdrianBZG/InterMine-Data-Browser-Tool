@@ -13,7 +13,7 @@ function initializeStartupConfiguration() {
         "pathwayName" : [],
         "proteinDomainName" : [],
         "diseaseName" : [],
-        "savedList": []
+        "savedLists": []
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -142,7 +142,6 @@ function initializeSavedLists(){
             });
         });
         $("#listManagerSaveButton").click(function() {
-            console.log('here');
             updateTableWithConstraints();
             $("#listManagerModal").modal("hide");
         });
@@ -151,22 +150,17 @@ function initializeSavedLists(){
                 if(el.dataset.listConstraintActive === "true") {
                     el.dataset.listConstraintActive = "false";
                     el.classList.remove('active');
-                    window.imTableConstraint.savedList = null;
-                    /*var x;
+                    var listName = el.textContent;
+                    var x;
                     while((x = window.imTableConstraint.savedLists.indexOf(listName)) != -1) {
                         window.imTableConstraint.savedLists.splice(x, 1);
-                    }*/
+                    }
                 }
                 else {
-                    $(".saved-list-item").each(function(i, el) { 
-                        el.dataset.listConstraintActive = "false";
-                        el.classList.remove('active') 
-                    });
                     el.dataset.listConstraintActive = "true";
                     el.classList.add('active');
                     var listName = el.textContent;
-                    window.imTableConstraint.savedList = listName;
-                    // window.imTableConstraint.savedLists.push(listName);
+                    window.imTableConstraint.savedLists.push(listName);
                 }
             });
         });
@@ -226,7 +220,7 @@ function updateTableWithConstraints() {
         var filter = window.minesConfigs.filter(function(v){
             return v.mineName===window.selectedMineName;
         })[0].customFilters.filter(function(v){
-            return v.filterName==='Protein-Domain';
+            return v.filterName==='Protein-Domasmilein';
         });
 
         var proteinDomainFilterQuery = filter[0].filterQuery[0];
@@ -266,11 +260,11 @@ function updateTableWithConstraints() {
     }
 
     // List Constraints
-    if(window.imTableConstraint['savedList']) {
+    if(window.imTableConstraint['savedLists'].length > 0) {
         window.imTable.query.addConstraint({
-            "path": "Gene",
-            "op": "IN",
-            "value": window.imTableConstraint.savedList,
+            "path": sessionStorage.getItem('currentClassView'),
+            "op": "ONE OF",
+            "value": window.imTableConstraint["savedLists"].join(','),
             "code": "A"
         });
     }

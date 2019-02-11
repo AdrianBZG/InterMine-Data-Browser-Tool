@@ -103,13 +103,10 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 		.modal-content
 			.modal-header
 				h4.modal-title List Manager
-				button.btn.btn-success(type='button' id="listManagerSaveButton", disabled="true") Apply
+				#listManagerModalButtons
+					button.btn.btn-success(type='button' id="listManagerSaveButton", disabled="true") Apply
+					button.btn.btn-danger(type='button' data-dismiss='modal') Close
 			.modal-body
-				#listManagerModalBodyText
-					//- | Adding an API key allows you to save lists and load previously saved lists into the data browser. You&apos;ll need to paste one key for each InterMine you use. 
-					//- a(href='https://intermine.readthedocs.io/en/latest/web-services/authentication/#authentication-for-existing-user-accounts-permanent-tokens' target='_blank') How do I find my API key?
-					//- br
-					//- br
 				ul#savedLists.list-group
 					| Loading data...
 			.modal-footer

@@ -272,6 +272,10 @@ select, button {
   cursor: pointer;
 }
 
+#listManagerSaveButton {
+  margin-right: 5px;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
