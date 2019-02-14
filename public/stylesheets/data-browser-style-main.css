@@ -276,6 +276,10 @@ select, button {
   margin-right: 5px;
 }
 
+#listManagerResetButton {
+  margin-right: 5px;
+}
+
 .smaller {
   font-size: 0.7rem;
 }

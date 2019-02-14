@@ -134,6 +134,7 @@ function initializeSavedLists(){
         }).join('');
         $('#savedLists').html(formElement + listElements);
         document.getElementById('listManagerSaveButton').disabled = false;
+        document.getElementById('listManagerResetButton').disabled = false;
         $('#saved-lists-filter').on('input', function(e){
             var data = $('#saved-lists-filter')[0].value.toLowerCase().trim();
             $(".saved-list-item").each(function(i, el) {
@@ -144,6 +145,17 @@ function initializeSavedLists(){
         $("#listManagerSaveButton").click(function() {
             updateTableWithConstraints();
             $("#listManagerModal").modal("hide");
+        });
+        $("#listManagerResetButton").click(function() {
+            if(window.imTableConstraint['savedList']) {
+                window.imTableConstraint['savedList'] = null;
+                $('.saved-list-item').each(function(i, el_) {
+                    el_.dataset.listConstraintActive = "false";
+                    el_.classList.remove('active');
+                });
+                $("#listManagerModal").modal("hide");
+                updateTableWithConstraints();
+            }
         });
         $(".saved-list-item").each(function(i, el) { 
             el.addEventListener('click', function() {
