@@ -13,6 +13,7 @@ function initializeStartupConfiguration() {
         "pathwayName" : [],
         "proteinDomainName" : [],
         "diseaseName" : [],
+        "savedList": null
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -104,6 +105,12 @@ function initializeStartupConfiguration() {
         });
     });
 
+    
+    $("#listManagerButton").click(function() {
+        initializeSavedLists();
+        $("#listManagerModal").modal("show");
+    })
+
     // Handle the view manager buttons
     $("#viewManagerButton").click(function() {
         // Update the key manager structures
@@ -112,6 +119,65 @@ function initializeStartupConfiguration() {
         // Show the window
         $('#viewManagerModal').appendTo("body").modal('show');
     });
+}
+
+/**
+ * Method to initialize the saved lists based on the API Keys
+ */
+
+function initializeSavedLists(){
+    if(window.savedListsInitialized) return;
+    $.when(getSavedLists()).then(function(result) {
+        var formElement = '<input class="form-control" id="saved-lists-filter" placeholder="Filter">';
+        var listElements = result.map(function(list) {
+            return "<li class='list-group-item saved-list-item'>" + list.title + "</li>"
+        }).join('');
+        $('#savedLists').html(formElement + listElements);
+        document.getElementById('listManagerSaveButton').disabled = false;
+        document.getElementById('listManagerResetButton').disabled = false;
+        $('#saved-lists-filter').on('input', function(e){
+            var data = $('#saved-lists-filter')[0].value.toLowerCase().trim();
+            $(".saved-list-item").each(function(i, el) {
+                if(el.textContent.toLowerCase().indexOf(data) == -1) el.style.display = 'none';
+                else el.style.display = 'block';
+            });
+        });
+        $("#listManagerSaveButton").click(function() {
+            updateTableWithConstraints();
+            $("#listManagerModal").modal("hide");
+        });
+        $("#listManagerResetButton").click(function() {
+            if(window.imTableConstraint['savedList']) {
+                window.imTableConstraint['savedList'] = null;
+                $('.saved-list-item').each(function(i, el_) {
+                    el_.dataset.listConstraintActive = "false";
+                    el_.classList.remove('active');
+                });
+                $("#listManagerModal").modal("hide");
+                updateTableWithConstraints();
+            }
+        });
+        $(".saved-list-item").each(function(i, el) { 
+            el.addEventListener('click', function() {
+                if(el.dataset.listConstraintActive === "true") {
+                    el.dataset.listConstraintActive = "false";
+                    el.classList.remove('active');
+                    window.imTableConstraint["savedList"] = null;
+                }
+                else {
+                    $('.saved-list-item').each(function(i, el_) {
+                        el_.dataset.listConstraintActive = "false";
+                        el_.classList.remove('active');
+                    });
+                    el.dataset.listConstraintActive = "true";
+                    el.classList.add('active');
+                    var listName = el.textContent;
+                    window.imTableConstraint['savedList'] = listName;
+                }
+            });
+        });
+        window.savedListsInitialized = true;
+    })
 }
 
 /**
@@ -166,7 +232,7 @@ function updateTableWithConstraints() {
         var filter = window.minesConfigs.filter(function(v){
             return v.mineName===window.selectedMineName;
         })[0].customFilters.filter(function(v){
-            return v.filterName==='Protein-Domain';
+            return v.filterName==='Protein-Domasmilein';
         });
 
         var proteinDomainFilterQuery = filter[0].filterQuery[0];
@@ -192,7 +258,7 @@ function updateTableWithConstraints() {
     }
 
     // Phenotype Name
-    if (window.imTableConstraint["phenotypeName"].length > 0) {
+    if (window.imTableConstraint["phenotypeName"] && window.imTableConstraint["phenotypeName"].length > 0) {
         var filter = window.minesConfigs.filter(function(v){
             return v.mineName===window.selectedMineName;
         })[0].customFilters.filter(function(v){
@@ -204,7 +270,16 @@ function updateTableWithConstraints() {
 
         window.imTable.query.addConstraint(phenotypeDomainFilterQuery);
     }
-    
+
+    // List Constraints
+    if(window.imTableConstraint['savedList']) {
+        window.imTable.query.addConstraint({
+            "path": sessionStorage.getItem('currentClassView'),
+            "op": "IN",
+            "value": window.imTableConstraint["savedList"],
+            "code": "A"
+        });
+    }
 }
 
 
@@ -1407,7 +1482,7 @@ function fillMineSelector() {
                                 });
                             } else {
                                 $("#unavailableMineAlert").show();
-                            }
+}
 
                             // Handle error
                             sanity = false;

@@ -5,14 +5,18 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	select#mineSelector.form-control(style="width: 200px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 	div#headerButtons.col-md-10.text-center
 
-	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 220px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the views manager")
+	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 236px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the views manager")
 		i.fa.fa-eye(style="margin-right: 5px;")
 		span.nav-link-text
 		| Add view
-	button.btn.btn-primary(id="apiKeyManagerButton" style="position: fixed; top: 10px; right: 75px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the API Key manager")
+	button.btn.btn-primary(id="apiKeyManagerButton" style="position: fixed; top: 10px; right: 96px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the API Key manager")
 		i.fa.fa-key(style="margin-right: 5px;")
 		span.nav-link-text
 		| Add API key
+	button.btn.btn-primary(id="listManagerButton" style="position: fixed; top: 10px; right: 11px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Lists")
+		i.fa.fa-list(style="margin-right: 5px;")
+		span.nav-link-text
+		| Lists
 
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
@@ -92,3 +96,18 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					br
 			.modal-footer
 				button.btn.btn-danger(type='button' data-dismiss='modal') Close
+
+//List manager modal
+#listManagerModal.modal.fade(role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				h4.modal-title List Manager
+				#listManagerModalButtons
+					button.btn.btn-success(type='button' id="listManagerSaveButton", disabled="true") Apply
+					button.btn(type='button' id="listManagerResetButton", disabled="true") Reset
+					button.btn.btn-danger(type='button' data-dismiss='modal') Close
+			.modal-body
+				ul#savedLists.list-group
+					| Loading data...
+			.modal-footer

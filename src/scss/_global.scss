@@ -253,3 +253,18 @@ button{
 select, button {
   vertical-align:top;
  }
+
+.saved-list-item {
+  overflow-x: auto;
+  cursor: pointer;
+}
+
+#listManagerSaveButton {
+  margin-right: 5px;
+}
+
+#listManagerResetButton {
+  margin-right: 5px;
+  background-color: #6c757d;
+  color: white;
+}

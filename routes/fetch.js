@@ -416,4 +416,15 @@ router.get('/phenotypes/:mineUrl', function(req, res, next) {
         res.json(pathwaySummary);
     });
 });
+
+router.post('/lists/:mineUrl', function(req, res, next) {
+    const mineUrl = formatMineURL(req.params.mineUrl);
+    const { apiKey } = req.body;
+    const token = apiKey || null;
+    var service = new imjs.Service({
+        root: mineUrl,
+        token
+    });
+    service.fetchLists().then(lists => res.json(lists));
+});
 module.exports = router;
