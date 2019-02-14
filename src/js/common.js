@@ -13,7 +13,7 @@ function initializeStartupConfiguration() {
         "pathwayName" : [],
         "proteinDomainName" : [],
         "diseaseName" : [],
-        "savedLists": []
+        "savedList": null
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -150,17 +150,17 @@ function initializeSavedLists(){
                 if(el.dataset.listConstraintActive === "true") {
                     el.dataset.listConstraintActive = "false";
                     el.classList.remove('active');
-                    var listName = el.textContent;
-                    var x;
-                    while((x = window.imTableConstraint.savedLists.indexOf(listName)) != -1) {
-                        window.imTableConstraint.savedLists.splice(x, 1);
-                    }
+                    window.imTableConstraint["savedList"] = null;
                 }
                 else {
+                    $('.saved-list-item').each(function(i, el_) {
+                        el_.dataset.listConstraintActive = "false";
+                        el_.classList.remove('active');
+                    });
                     el.dataset.listConstraintActive = "true";
                     el.classList.add('active');
                     var listName = el.textContent;
-                    window.imTableConstraint.savedLists.push(listName);
+                    window.imTableConstraint['savedList'] = listName;
                 }
             });
         });
@@ -246,7 +246,7 @@ function updateTableWithConstraints() {
     }
 
     // Phenotype Name
-    if (window.imTableConstraint["phenotypeName"].length > 0) {
+    if (window.imTableConstraint["phenotypeName"] && window.imTableConstraint["phenotypeName"].length > 0) {
         var filter = window.minesConfigs.filter(function(v){
             return v.mineName===window.selectedMineName;
         })[0].customFilters.filter(function(v){
@@ -260,15 +260,14 @@ function updateTableWithConstraints() {
     }
 
     // List Constraints
-    if(window.imTableConstraint['savedLists'].length > 0) {
+    if(window.imTableConstraint['savedList']) {
         window.imTable.query.addConstraint({
             "path": sessionStorage.getItem('currentClassView'),
             "op": "IN",
-            "value": window.imTableConstraint["savedLists"],
+            "value": window.imTableConstraint["savedList"],
             "code": "A"
         });
     }
-    
 }
 
 
