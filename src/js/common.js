@@ -27,9 +27,14 @@ function initializeStartupConfiguration() {
     window.geneLengthChartObject = null;
 
     window.minesConfigs = null;
+    window.minesPreferredOrganisms = null;
 
     readTextFile("./mine_configs/mines_config.json", function(text) {
         window.minesConfigs = JSON.parse(text);
+    });
+
+    readTextFile("./mine_configs/mines_preferred_organisms.json", function(text) {
+        window.minesPreferredOrganisms = JSON.parse(text);
     });
 
     // Initial mine service url (HumanMine), name and view
@@ -1090,23 +1095,44 @@ function displayItemsInClass(result) {
     var labelsData = [];
     var colorsData = getColorsArray(result[0].response['results'].length);
 
-    for (var i = 0; i < result[0].response['results'].length; i++) {
-        countData.push(result[0].response['results'][i]['count']);
-        labelsData.push(result[0].response['results'][i]['item']);
-    }
-
     var resultantElements = result[0].response['results'].length;
 
-    // At most, 5 elements, which are ordered (top 5)
-    if (resultantElements > 5) {
-        resultantElements = 5;
+    var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
+        return v.mineName===window.selectedMineName;
+    })[0];
+
+    countPreferredOrganismsAdded = 0;
+    if(minePreferredOrganisms != null) {
+        minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
+
+        // Fill the organism short name dropdown with the preferred organisms, if any
+        if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
+            colorsData = getColorsArray(minePreferredOrganisms.length);
+            for (var i = 0; i < resultantElements; i++) {
+                var organismName = result[0].response['results'][i]['item'];
+                var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+                if(minePreferredOrganisms.includes(organismName)) {
+                    $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                    countPreferredOrganismsAdded++;
+                }
+            }
+        }
     }
 
-    // Fill the organism short name dropdown with top 5 organisms according to count
+    // At most 15 elements
+    resultantElements = Math.max(0, Math.min(resultantElements, 15) - countPreferredOrganismsAdded);
+
+    // Fill the organism short name dropdown with top 7 organisms according to count
     for (var i = 0; i < resultantElements; i++) {
         var organismName = result[0].response['results'][i]['item'];
         var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-        $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+        if(minePreferredOrganisms != null) {
+            if(!minePreferredOrganisms.includes(organismName)) {
+                $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+            }
+        } else {
+            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+        }
     }
 
 }
@@ -1129,9 +1155,42 @@ function updatePieChart(result, pieChartID) {
     var labelsData = [];
     var colorsData = getColorsArray(result[0].response['results'].length);
 
-    for (var i = 0; i < result[0].response['results'].length; i++) {
-        countData.push(result[0].response['results'][i]['count']);
-        labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+    var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
+        return v.mineName===window.selectedMineName;
+    })[0];
+
+    countPreferredOrganismsAdded = 0;
+    if(minePreferredOrganisms != null) {
+        minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
+
+        // Fill the organism short name dropdown with the preferred organisms, if any
+        if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
+            colorsData = getColorsArray(result[0].response['results'].length + minePreferredOrganisms.length);
+            for (var i = 0; i < result[0].response['results'].length; i++) {
+                var organismName = result[0].response['results'][i]['item'];
+                if(minePreferredOrganisms.includes(organismName)) {
+                    countData.push(result[0].response['results'][i]['count']);
+                    labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+                    countPreferredOrganismsAdded++;
+                }
+            }
+        }
+    }
+
+    // At most 15 elements
+    resultantElements = Math.max(0, Math.min(result[0].response['results'].length, 15) - countPreferredOrganismsAdded);
+
+    for (var i = 0; i < resultantElements; i++) {
+        var organismName = result[0].response['results'][i]['item'];
+        if(minePreferredOrganisms != null) {
+            if(!minePreferredOrganisms.includes(organismName)) {
+                countData.push(result[0].response['results'][i]['count']);
+                labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+            }
+        } else {
+            countData.push(result[0].response['results'][i]['count']);
+            labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+        }
     }
 
     var plotTitle = "Number of results for " + sessionStorage.getItem('currentClassView') + " by organism";

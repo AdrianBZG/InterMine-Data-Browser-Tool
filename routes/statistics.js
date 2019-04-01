@@ -70,7 +70,7 @@ router.post('/count/items/:mineUrl/:classname', function(req, res, next) {
 
         var q = new imjs.Query(query, service);
 
-        q.summarize("Gene.organism.shortName", 10)
+        q.summarize("Gene.organism.shortName", 50)
             .then(function(response) {
                 result.push({
                     "itemName": "Organism short name",
