@@ -3,8 +3,13 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 	a.navbar-brand(href='/')
 		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
 	select#mineSelector.form-control(style="width: 180px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
+
 	div#headerButtons.col-md-10.text-center
 
+	button.btn.btn-primary(id="resetAllButton" style="position: fixed; top: 10px; right: 354px; background-color: #868e96; border-color: #868e96;" data-toggle="tooltip" title="Reset all the filters")
+		i.fa.fa-recycle(style="margin-right: 5px;")
+		span.nav-link-text
+		| Reset
 	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 236px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the views manager")
 		i.fa.fa-eye(style="margin-right: 5px;")
 		span.nav-link-text

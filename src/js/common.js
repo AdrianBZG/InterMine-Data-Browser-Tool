@@ -124,6 +124,10 @@ function initializeStartupConfiguration() {
         // Show the window
         $('#viewManagerModal').appendTo("body").modal('show');
     });
+
+    $("#resetAllButton").click(function() {
+        location.reload();
+    });
 }
 
 /**
