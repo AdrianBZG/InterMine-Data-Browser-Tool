@@ -16,6 +16,11 @@ $(document).ready(function() {
     $("#genesButton").removeClass("btn-default").addClass("btn-primary");
     var mineUrl = window.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
+    // Remove Graphs box if class is not currently Gene or Protein (issue #39)
+    if(!["Gene", "Protein"].includes(currentClassView)) {
+        $("#graphsBoxBody").hide();
+    }
+
     // Instantiate the im-table with all the data available in Gene from HumanMine
     var selector = '#dataTable';
     var service = {
