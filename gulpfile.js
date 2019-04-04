@@ -113,7 +113,7 @@ gulp.task('js:minify', function() {
       './src/js/*.js',
       '!./src/js/*.min.js'
     ])
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(rename({
       suffix: '.min'
     }))

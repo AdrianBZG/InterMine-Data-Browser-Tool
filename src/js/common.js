@@ -253,7 +253,7 @@ function updateTableWithConstraints() {
         var filter = window.minesConfigs.filter(function(v){
             return v.mineName===window.selectedMineName;
         })[0].customFilters.filter(function(v){
-            return v.filterName==='Protein-Domasmilein';
+            return v.filterName==='Protein-Domain';
         });
 
         var proteinDomainFilterQuery = filter[0].filterQuery[0];
@@ -1199,6 +1199,7 @@ function updatePieChart(result, pieChartID) {
 
     countPreferredOrganismsAdded = 0;
     var colorsData = [];
+    var currentQueryOrganisms = [];
 
     if(minePreferredOrganisms != null) {
         minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
@@ -1213,6 +1214,9 @@ function updatePieChart(result, pieChartID) {
                     countData.push(result[0].response['results'][i]['count']);
                     labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
                     colorsData.push(window.organismColorsMap[organismName]);
+
+                    currentQueryOrganisms.push(organismName);
+
                     countPreferredOrganismsAdded++;
                     if(countPreferredOrganismsAdded == 10) break;
                 }
@@ -1230,12 +1234,37 @@ function updatePieChart(result, pieChartID) {
                 countData.push(result[0].response['results'][i]['count']);
                 labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
                 colorsData.push(window.organismColorsMap[organismName]);
+                currentQueryOrganisms.push(organismName);
             }
         } else {
             countData.push(result[0].response['results'][i]['count']);
             labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
             colorsData.push(window.organismColorsMap[organismName]);
+            currentQueryOrganisms.push(organismName);
         }
+    }
+
+    // Count number of unique elements
+    var seen = {};
+    currentQueryOrganisms = currentQueryOrganisms.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+
+    if(currentQueryOrganisms.length != Object.keys(window.organismColorsMap).length) {
+        // Remove the checked class from the elements in the sidebar filter
+        $('.checked').each(function(i, obj) {
+            $(obj).removeClass("checked");
+            $(obj).addClass("unchecked");
+        });
+
+        // Add the checked class in the sidebar to the correct ones selected in the pie chart
+        $('.unchecked').each(function(i, obj) {
+            organismShortname = $(obj).find("a p").filter(".float-md-left").toArray()[0].innerHTML;
+            if(currentQueryOrganisms.includes(organismShortname)) {
+                $(obj).removeClass("unchecked");
+                $(obj).addClass("checked");
+            }
+        });
     }
 
     var plotTitle = "Number of results for " + sessionStorage.getItem('currentClassView') + " by organism";
