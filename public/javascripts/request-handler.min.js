@@ -175,6 +175,9 @@ function getSessionToken() {
             if(findElementJSONarray(apiKeysObject, "mine", window.selectedMineName)) {
                 var apiKeyForThisMine = findElementJSONarray(apiKeysObject, "mine", window.selectedMineName)["apikey"];
                 if(apiKeyForThisMine && apiKeyForThisMine != "" && apiKeyForThisMine != "Paste your API key here") {
+                    // Change the added/not added API key icon
+                    $("#APIKeyIconNotAdded").hide();
+                    $("#APIKeyIconAdded").show();
                     return apiKeyForThisMine;
                 }
             }

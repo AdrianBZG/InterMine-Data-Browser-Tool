@@ -6,6 +6,10 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 
 	div#headerButtons.col-md-10.text-center
 
+	button.btn.btn-primary(id="APIKeyIconBlock" style="position: fixed; top: 10px; right: 450px; background-color: transparent; border-color: transparent;")
+		i.fa.fa-user-times(id="APIKeyIconNotAdded", style="color: #000000;" data-toggle="tooltip" title="You haven't added an API key for this mine and some functionality may be unavailable.")
+		i.fa.fa-user(id="APIKeyIconAdded", style="color: #000000; display:none;" data-toggle="tooltip" title="You have added an API key for this mine.")
+
 	button.btn.btn-primary(id="resetAllButton" style="position: fixed; top: 10px; right: 354px; background-color: #868e96; border-color: #868e96;" data-toggle="tooltip" title="Reset all the filters")
 		i.fa.fa-recycle(style="margin-right: 5px;")
 		span.nav-link-text
