@@ -13,6 +13,7 @@ function initializeStartupConfiguration() {
         "pathwayName" : [],
         "proteinDomainName" : [],
         "diseaseName" : [],
+        "organism" : [],
         "savedList": null
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
@@ -21,6 +22,9 @@ function initializeStartupConfiguration() {
     window.interactionsFilter = null;
     window.clinVarFilter = null;
     window.expressionFilter = null;
+    window.organismFilterLetters = ["A","B","C","D","E","F","G","H","I","J"];
+    window.organismFilter = null;
+    window.organismColorsMap = {}
     window.proteinLocalisationFilter = null;
     window.currentClassViewFilter = null;
     window.pieChartObject = null;
@@ -128,6 +132,10 @@ function initializeStartupConfiguration() {
     $("#resetAllButton").click(function() {
         location.reload();
     });
+
+    // Update organism short name filter
+    updateOrganismsSidebarFilter();
+    createSidebarEvents();
 }
 
 /**
@@ -207,13 +215,15 @@ function updateTableWithConstraints() {
             window.imTable.query.addConstraint({
                 "path": "goAnnotation.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint["goAnnotation"]
+                "values": window.imTableConstraint["goAnnotation"],
+                "code": "K"
             });
         } else {
             window.imTable.query.addConstraint({
                 "path": "ontologyAnnotations.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint["goAnnotation"]
+                "values": window.imTableConstraint["goAnnotation"],
+                "code": "K"
             });
         }
     }
@@ -223,7 +233,8 @@ function updateTableWithConstraints() {
         window.imTable.query.addConstraint({
             "path": "dataSets.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint["datasetName"]
+            "values": window.imTableConstraint["datasetName"],
+            "code": "L"
         });
     }
 
@@ -232,7 +243,8 @@ function updateTableWithConstraints() {
         window.imTable.query.addConstraint({
             "path": "pathways.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint["pathwayName"]
+            "values": window.imTableConstraint["pathwayName"],
+            "code": "M"
         });
     }
 
@@ -252,6 +264,21 @@ function updateTableWithConstraints() {
         }
     }
 
+    // Organism
+    if (window.imTableConstraint["organism"].length > 0) {
+        var organismValues = window.imTableConstraint["organism"];
+
+        for(var i = 0; i < organismValues.length; i++) {
+            window.imTable.query.addConstraint({
+                "path": "organism.shortName",
+                "op": "=",
+                "value": organismValues[i],
+                "code": window.organismFilterLetters[i]
+            });
+            window.imTable.query.constraintLogic = window.tableConstraintLogic;
+        }
+    }
+
     // Disease Name
     if (window.imTableConstraint["diseaseName"].length > 0) {
         var filter = window.minesConfigs.filter(function(v){
@@ -264,6 +291,7 @@ function updateTableWithConstraints() {
         diseasesFilterQuery.values = window.imTableConstraint["diseaseName"];
 
         window.imTable.query.addConstraint(diseasesFilterQuery);
+        window.imTable.query.constraintLogic = window.tableConstraintLogic;
     }
 
     // Phenotype Name
@@ -286,7 +314,7 @@ function updateTableWithConstraints() {
             "path": sessionStorage.getItem('currentClassView'),
             "op": "IN",
             "value": window.imTableConstraint["savedList"],
-            "code": "A"
+            "code": "N"
         });
     }
 }
@@ -1086,59 +1114,66 @@ function addCustomFilters() {
 }
 
 /**
- * Method that updates the organisms filter based upon the organisms present in the
- * current query
+ * Method that updates the entries in the organisms filter
  * @param {string} results: the organism query results from the InterMine server
  */
-function displayItemsInClass(result) {
+function updateOrganismsSidebarFilter() {
 
-    // First remove the li elements
-    $('#organismshortnamelist').parent().find('li').remove();
+    $.when(getItemsInClass([])).done(function(result) {
+        // First remove the li elements
+        $('#organismshortnamelist').parent().find('li').remove();
 
-    var countData = [];
-    var labelsData = [];
-    var colorsData = getColorsArray(result[0].response['results'].length);
+        var colorsData = getColorsArray(result[0].response['results'].length);
 
-    var resultantElements = result[0].response['results'].length;
+        var resultantElements = result[0].response['results'].length;
 
-    var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
-        return v.mineName===window.selectedMineName;
-    })[0];
+        var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0];
 
-    countPreferredOrganismsAdded = 0;
-    if(minePreferredOrganisms != null) {
-        minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
+        countPreferredOrganismsAdded = 0;
+        if(minePreferredOrganisms != null) {
+            minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
 
-        // Fill the organism short name dropdown with the preferred organisms, if any
-        if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
-            colorsData = getColorsArray(minePreferredOrganisms.length);
-            for (var i = 0; i < resultantElements; i++) {
-                var organismName = result[0].response['results'][i]['item'];
-                var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-                if(minePreferredOrganisms.includes(organismName)) {
-                    $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
-                    countPreferredOrganismsAdded++;
+            // Fill the organism short name dropdown with the preferred organisms, if any
+            if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
+                colorsData = getColorsArray(minePreferredOrganisms.length);
+                for (var i = 0; i < resultantElements; i++) {
+                    var organismName = result[0].response['results'][i]['item'];
+                    var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+                    if(minePreferredOrganisms.includes(organismName)) {
+                        $("#organismshortnamelist").append('<li class="list-group-item unchecked" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                        
+                        // Add to the organisms colors dict
+                        window.organismColorsMap[organismName] = colorsData[countPreferredOrganismsAdded];
+
+                        countPreferredOrganismsAdded++;
+                        if(countPreferredOrganismsAdded == 10) break;
+                    }
                 }
             }
         }
-    }
 
-    // At most 15 elements
-    resultantElements = Math.max(0, Math.min(resultantElements, 15) - countPreferredOrganismsAdded);
+        // At most 10 elements
+        resultantElements = Math.max(0, Math.min(resultantElements, 10) - countPreferredOrganismsAdded);
 
-    // Fill the organism short name dropdown with top 7 organisms according to count
-    for (var i = 0; i < resultantElements; i++) {
-        var organismName = result[0].response['results'][i]['item'];
-        var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-        if(minePreferredOrganisms != null) {
-            if(!minePreferredOrganisms.includes(organismName)) {
-                $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+        // Fill the organism short name dropdown with top 10 organisms according to count
+        for (var i = 0; i < resultantElements; i++) {
+            var organismName = result[0].response['results'][i]['item'];
+            var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+            if(minePreferredOrganisms != null) {
+                if(!minePreferredOrganisms.includes(organismName)) {
+                    $("#organismshortnamelist").append('<li class="list-group-item unchecked" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                    // Add to the organisms colors dict
+                    window.organismColorsMap[organismName] = colorsData[countPreferredOrganismsAdded+i];
+                }
+            } else {
+                $("#organismshortnamelist").append('<li class="list-group-item unchecked" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                // Add to the organisms colors dict
+                window.organismColorsMap[organismName] = colorsData[countPreferredOrganismsAdded+i];
             }
-        } else {
-            $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
         }
-    }
-
+    });
 }
 
 /**
@@ -1157,32 +1192,36 @@ function updatePieChart(result, pieChartID) {
 
     var countData = [];
     var labelsData = [];
-    var colorsData = getColorsArray(result[0].response['results'].length);
 
     var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
         return v.mineName===window.selectedMineName;
     })[0];
 
     countPreferredOrganismsAdded = 0;
+    var colorsData = [];
+
     if(minePreferredOrganisms != null) {
         minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
 
         // Fill the organism short name dropdown with the preferred organisms, if any
         if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
-            colorsData = getColorsArray(result[0].response['results'].length + minePreferredOrganisms.length);
+            colorsData = [];
+
             for (var i = 0; i < result[0].response['results'].length; i++) {
                 var organismName = result[0].response['results'][i]['item'];
                 if(minePreferredOrganisms.includes(organismName)) {
                     countData.push(result[0].response['results'][i]['count']);
                     labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+                    colorsData.push(window.organismColorsMap[organismName]);
                     countPreferredOrganismsAdded++;
+                    if(countPreferredOrganismsAdded == 10) break;
                 }
             }
         }
     }
 
-    // At most 15 elements
-    resultantElements = Math.max(0, Math.min(result[0].response['results'].length, 15) - countPreferredOrganismsAdded);
+    // At most 10 elements
+    resultantElements = Math.max(0, Math.min(result[0].response['results'].length, 10) - countPreferredOrganismsAdded);
 
     for (var i = 0; i < resultantElements; i++) {
         var organismName = result[0].response['results'][i]['item'];
@@ -1190,10 +1229,12 @@ function updatePieChart(result, pieChartID) {
             if(!minePreferredOrganisms.includes(organismName)) {
                 countData.push(result[0].response['results'][i]['count']);
                 labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+                colorsData.push(window.organismColorsMap[organismName]);
             }
         } else {
             countData.push(result[0].response['results'][i]['count']);
             labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+            colorsData.push(window.organismColorsMap[organismName]);
         }
     }
 
@@ -1241,21 +1282,34 @@ function updatePieChart(result, pieChartID) {
             }
         },
         onClick: function(evt, elements) {
-            var datasetIndex;
-            var dataset;
-
             if (elements.length) {
                 var index = elements[0]._index;
 
                 selectedSegment = window.pieChartObject.data.labels[index].split("(")[0].trim();
 
-                // Filter the table
-                window.imTable.query.addConstraint({
-                    "path": "organism.shortName",
-                    "op": "==",
-                    "value": selectedSegment
+                // Clean organism filters
+                if(window.organismFilter) clearOrganismConstraint();
+                window.imTableConstraint["organism"] = [];
+
+                // Set the organism filter according to selected pie chart segment
+                window.imTableConstraint["organism"].push(selectedSegment);
+
+                // Remove the checked class from the elements in the sidebar filter
+                $('.checked').each(function(i, obj) {
+                    $(obj).removeClass("checked");
+                    $(obj).addClass("unchecked");
                 });
 
+                // Add the checked class in the sidebar to the correct ones selected in the pie chart
+                $('.unchecked').each(function(i, obj) {
+                    organismShortname = $(obj).find("a p").filter(".float-md-left").toArray()[0].innerHTML;
+                    if(window.imTableConstraint["organism"].includes(organismShortname)) {
+                        $(obj).removeClass("unchecked");
+                        $(obj).addClass("checked");
+                    }
+                });
+
+                updateTableWithConstraints();
             }
 
             //window.pieChartObject.update();
@@ -1615,7 +1669,6 @@ function updateElements(constraints, pieChartID) {
     addViewManagerSelectOptions();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
-        displayItemsInClass(result);
         createSidebarEvents();
         updatePieChart(result, pieChartID);
     });

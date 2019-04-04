@@ -6,78 +6,34 @@
         "filterQuery": [{
                 "path": "alleles.type",
                 "op": "==",
-                "value": "AAA"
+                "value": "AAA",
+                "code": "O"
               },
               {
                 "path": "alleles.clinicalSignificance",
                 "op": "==",
-                "value": "BBB"
+                "value": "BBB",
+                "code": "S"
               }
             ],
           "filterName": "CLINVAR"
       },
       {
         "filterQuery": [{
-                "path": "locations.start",
-                "op": ">=",
-                "value": "AAA"
-              },
-              {
-                "path": "locations.end",
-                "op": "<=",
-                "value": "BBB"
-              },
-              {
-                "path": "locations.locatedOn.primaryIdentifier",
-                "op": "==",
-                "value": "CCC"
-              }
-            ],
-          "filterName": "Location"
-      },
-      {
-        "filterQuery": [{
                 "path": "diseases.name",
                 "op": "ONE OF",
-                "values": "AAA"
+                "values": "AAA",
+                "code": "P"
               }
             ],
           "filterName": "Diseases"
       },
       {
         "filterQuery": [{
-                "path": "proteinAtlasExpression.cellType",
-                "op": "==",
-                "value": "AAA"
-              },
-              {
-                "path": "proteinAtlasExpression.tissue.name",
-                "op": "==",
-                "value": "BBB"
-              },
-              {
-                "path": "proteinAtlasExpression.expressionType",
-                "op": "==",
-                "value": "CCC"
-              },
-              {
-                "path": "proteinAtlasExpression.level",
-                "op": "==",
-                "value": "DDD"
-              },
-              {
-                "path": "proteinAtlasExpression.reliability",
-                "op": "==",
-                "value": "EEE"
-              }
-            ],
-          "filterName": "Protein-Localisation"
-      },
-      {
-        "filterQuery": [{
                 "path": "proteins.proteinDomainRegions.proteinDomain.name",
                 "op": "ONE OF",
-                "values": "AAA"
+                "values": "AAA",
+                "code": "Q"
               }
             ],
           "filterName": "Protein-Domain"
@@ -86,17 +42,20 @@
         "filterQuery": [{
                 "path": "interactions.participant2.symbol",
                 "op": "==",
-                "value": "AAA"
+                "value": "AAA",
+                "code": "T"
               },
               {
                 "path": "interactions.details.type",
                 "op": "==",
-                "value": "BBB"
+                "value": "BBB",
+                "code": "U"
               },
               {
                 "path": "interactions.details.dataSets.name",
                 "op": "==",
-                "value": "CCC"
+                "value": "CCC",
+                "code": "V"
               }
             ],
           "filterName": "Interactions"
@@ -105,22 +64,26 @@
         "filterQuery": [{
                 "path": "atlasExpression.pValue",
                 "op": ">=",
-                "value": "AAA"
+                "value": "AAA",
+                "code": "W"
               },
               {
                 "path": "atlasExpression.tStatistic",
                 "op": ">=",
-                "value": "BBB"
+                "value": "BBB",
+                "code": "X"
               },
               {
                 "path": "atlasExpression.expression",
                 "op": "==",
-                "value": "CCC"
+                "value": "CCC",
+                "code": "Y"
               },
               {
                 "path": "atlasExpression.dataSets.name",
                 "op": "==",
-                "value": "DDD"
+                "value": "DDD",
+                "code": "Z"
               }
             ],
           "filterName": "Expression"
@@ -129,7 +92,8 @@
         "filterQuery": [{
           "path": "diseases.hpoAnnotations.hpoTerm.name",
           "op": "ONE OF",
-          "values": "AAA"
+          "values": "AAA",
+          "code": "R"
         }],
         "filterName": "Phenotype"
       }

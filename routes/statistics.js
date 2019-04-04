@@ -60,6 +60,7 @@ router.post('/count/items/:mineUrl/:classname', function(req, res, next) {
 
     if (className == "Gene") {
         var query = {
+            "constraintLogic": "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (W AND X AND Y AND Z)",
             "from": 'Gene',
             "select": ['primaryIdentifier'],
             "model": {
@@ -86,6 +87,7 @@ router.post('/count/items/:mineUrl/:classname', function(req, res, next) {
 
     if (className == "Protein") {
         var query = {
+            "constraintLogic": "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (W AND X AND Y AND Z)",
             "from": 'Protein',
             "select": ['primaryIdentifier'],
             "model": {
@@ -128,6 +130,7 @@ router.post('/genelength/:mineUrl/:classname', function(req, res, next) {
     });
 
     var query = {
+        "constraintLogic": "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (W AND X AND Y AND Z)",
         "from": className,
         "select": ["length", "primaryIdentifier"],
         "model": {

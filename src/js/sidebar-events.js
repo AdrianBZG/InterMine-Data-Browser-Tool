@@ -38,18 +38,28 @@ function createSidebarEvents() {
     $('#organismshortnamelist li').click(function() {
         if ($(this).hasClass("checked")) {
             $(this).removeClass("checked");
+            $(this).addClass("unchecked");
         } else {
             $(this).addClass("checked");
+            $(this).removeClass("unchecked");
         }
 
-        // Filter by the selected organisms
-        window.imTable.query.addConstraint({
-            "path": "organism.shortName",
-            "op": "==",
-            "value": $('.checked a p').toArray()[0].innerHTML
-        });
-        //updateElements(formattedConstraint[0], "PieChart");
+        var selectedOrganismsArray = $('.checked a p').filter(".float-md-left").toArray();  
 
+        if(selectedOrganismsArray.length > 0) {
+            if(window.organismFilter) clearOrganismConstraint();
+
+            window.imTableConstraint["organism"] = [];
+
+            for(var i = 0; i < selectedOrganismsArray.length; i++) {
+                window.imTableConstraint["organism"].push(selectedOrganismsArray[i].innerHTML);
+            }
+        } else {
+            window.imTableConstraint["organism"] = []
+            if(window.organismFilter) clearOrganismConstraint();
+        }
+
+        updateTableWithConstraints();
     });
 
     $('#btnDatasetViewMore').click(function() {
@@ -122,6 +132,21 @@ function clearInteractionsConstraint() {
 }
 
 /**
+ * This method removes any constraint that has been applied to the Organism filter
+ */
+function clearOrganismConstraint() {
+	for(var i = 0; i < window.organismFilter.length; i++) {
+        try {
+            window.imTable.query.removeConstraint(window.organismFilter[i]);
+        }
+        catch(err) {
+            continue;
+        }
+	}
+    window.organismFilter = null;
+}
+
+/**
  * This method removes any constraint that has been applied to the ClinVar filter
  */
 function clearClinVarConstraint() {
@@ -148,5 +173,4 @@ function addDatasetConstraint(datasetName) {
         "value": datasetName,
         "code": datasetName.replace(/ /g, '')
     });
-    //console.log(window.imTable);
 }
