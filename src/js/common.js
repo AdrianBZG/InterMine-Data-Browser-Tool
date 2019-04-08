@@ -12,7 +12,9 @@ function initializeStartupConfiguration() {
         "datasetName" : [],
         "pathwayName" : [],
         "proteinDomainName" : [],
-        "diseaseName" : []
+        "diseaseName" : [],
+        "organism" : [],
+        "savedList": null
     }; // 0 = GO annotation, 1 = Dataset Name, 2 = Pathway Name, 3 = Protein Domain Name, 4 = Disease Name
 
     window.interminesHashMap = null;
@@ -20,15 +22,23 @@ function initializeStartupConfiguration() {
     window.interactionsFilter = null;
     window.clinVarFilter = null;
     window.expressionFilter = null;
+    window.organismFilterLetters = ["A","B","C","D","E","F","G","H","I","J"];
+    window.organismFilter = null;
+    window.organismColorsMap = {}
     window.proteinLocalisationFilter = null;
     window.currentClassViewFilter = null;
     window.pieChartObject = null;
     window.geneLengthChartObject = null;
 
     window.minesConfigs = null;
+    window.minesPreferredOrganisms = null;
 
     readTextFile("./mine_configs/mines_config.json", function(text) {
         window.minesConfigs = JSON.parse(text);
+    });
+
+    readTextFile("./mine_configs/mines_preferred_organisms.json", function(text) {
+        window.minesPreferredOrganisms = JSON.parse(text);
     });
 
     // Initial mine service url (HumanMine), name and view
@@ -104,6 +114,12 @@ function initializeStartupConfiguration() {
         });
     });
 
+    
+    $("#listManagerButton").click(function() {
+        initializeSavedLists();
+        $("#listManagerModal").modal("show");
+    })
+
     // Handle the view manager buttons
     $("#viewManagerButton").click(function() {
         // Update the key manager structures
@@ -112,13 +128,79 @@ function initializeStartupConfiguration() {
         // Show the window
         $('#viewManagerModal').appendTo("body").modal('show');
     });
+
+    $("#resetAllButton").click(function() {
+        location.reload();
+    });
+
+    // Update organism short name filter
+    updateOrganismsSidebarFilter();
+    createSidebarEvents();
+}
+
+/**
+ * Method to initialize the saved lists based on the API Keys
+ */
+
+function initializeSavedLists(){
+    if(window.savedListsInitialized) return;
+    $.when(getSavedLists()).then(function(result) {
+        var formElement = '<input class="form-control" id="saved-lists-filter" placeholder="Filter">';
+        var listElements = result.map(function(list) {
+            return "<li class='list-group-item saved-list-item'>" + list.title + "</li>"
+        }).join('');
+        $('#savedLists').html(formElement + listElements);
+        document.getElementById('listManagerSaveButton').disabled = false;
+        document.getElementById('listManagerResetButton').disabled = false;
+        $('#saved-lists-filter').on('input', function(e){
+            var data = $('#saved-lists-filter')[0].value.toLowerCase().trim();
+            $(".saved-list-item").each(function(i, el) {
+                if(el.textContent.toLowerCase().indexOf(data) == -1) el.style.display = 'none';
+                else el.style.display = 'block';
+            });
+        });
+        $("#listManagerSaveButton").click(function() {
+            updateTableWithConstraints();
+            $("#listManagerModal").modal("hide");
+        });
+        $("#listManagerResetButton").click(function() {
+            if(window.imTableConstraint['savedList']) {
+                window.imTableConstraint['savedList'] = null;
+                $('.saved-list-item').each(function(i, el_) {
+                    el_.dataset.listConstraintActive = "false";
+                    el_.classList.remove('active');
+                });
+                $("#listManagerModal").modal("hide");
+                updateTableWithConstraints();
+            }
+        });
+        $(".saved-list-item").each(function(i, el) { 
+            el.addEventListener('click', function() {
+                if(el.dataset.listConstraintActive === "true") {
+                    el.dataset.listConstraintActive = "false";
+                    el.classList.remove('active');
+                    window.imTableConstraint["savedList"] = null;
+                }
+                else {
+                    $('.saved-list-item').each(function(i, el_) {
+                        el_.dataset.listConstraintActive = "false";
+                        el_.classList.remove('active');
+                    });
+                    el.dataset.listConstraintActive = "true";
+                    el.classList.add('active');
+                    var listName = el.textContent;
+                    window.imTableConstraint['savedList'] = listName;
+                }
+            });
+        });
+        window.savedListsInitialized = true;
+    })
 }
 
 /**
  * Method to update the im-table with the filters selected in the sidebar
  */
 function updateTableWithConstraints() {
-
     while (window.imTable.query.constraints.length > 0) {
         try {
             window.imTable.query.removeConstraint(window.imTable.query.constraints[0]);
@@ -133,13 +215,15 @@ function updateTableWithConstraints() {
             window.imTable.query.addConstraint({
                 "path": "goAnnotation.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint["goAnnotation"]
+                "values": window.imTableConstraint["goAnnotation"],
+                "code": "K"
             });
         } else {
             window.imTable.query.addConstraint({
                 "path": "ontologyAnnotations.ontologyTerm.name",
                 "op": "ONE OF",
-                "values": window.imTableConstraint["goAnnotation"]
+                "values": window.imTableConstraint["goAnnotation"],
+                "code": "K"
             });
         }
     }
@@ -149,7 +233,8 @@ function updateTableWithConstraints() {
         window.imTable.query.addConstraint({
             "path": "dataSets.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint["datasetName"]
+            "values": window.imTableConstraint["datasetName"],
+            "code": "L"
         });
     }
 
@@ -158,7 +243,8 @@ function updateTableWithConstraints() {
         window.imTable.query.addConstraint({
             "path": "pathways.name",
             "op": "ONE OF",
-            "values": window.imTableConstraint["pathwayName"]
+            "values": window.imTableConstraint["pathwayName"],
+            "code": "M"
         });
     }
 
@@ -178,6 +264,21 @@ function updateTableWithConstraints() {
         }
     }
 
+    // Organism
+    if (window.imTableConstraint["organism"].length > 0) {
+        var organismValues = window.imTableConstraint["organism"];
+
+        for(var i = 0; i < organismValues.length; i++) {
+            window.imTable.query.addConstraint({
+                "path": "organism.shortName",
+                "op": "=",
+                "value": organismValues[i],
+                "code": window.organismFilterLetters[i]
+            });
+            window.imTable.query.constraintLogic = window.tableConstraintLogic;
+        }
+    }
+
     // Disease Name
     if (window.imTableConstraint["diseaseName"].length > 0) {
         var filter = window.minesConfigs.filter(function(v){
@@ -190,7 +291,34 @@ function updateTableWithConstraints() {
         diseasesFilterQuery.values = window.imTableConstraint["diseaseName"];
 
         window.imTable.query.addConstraint(diseasesFilterQuery);
+        window.imTable.query.constraintLogic = window.tableConstraintLogic;
     }
+
+    // Phenotype Name
+    if (window.imTableConstraint["phenotypeName"] && window.imTableConstraint["phenotypeName"].length > 0) {
+        var filter = window.minesConfigs.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0].customFilters.filter(function(v){
+            return v.filterName==='Phenotype';
+        });
+
+        var phenotypeDomainFilterQuery = filter[0].filterQuery[0];
+        phenotypeDomainFilterQuery.values = window.imTableConstraint["phenotypeName"];
+
+        window.imTable.query.addConstraint(phenotypeDomainFilterQuery);
+    }
+
+    // List Constraints
+    if(window.imTableConstraint['savedList']) {
+        window.imTable.query.addConstraint({
+            "path": sessionStorage.getItem('currentClassView'),
+            "op": "IN",
+            "value": window.imTableConstraint["savedList"],
+            "code": "N"
+        });
+    }
+
+    window.imTable.query.constraintLogic = window.tableConstraintLogic;
 }
 
 
@@ -292,6 +420,7 @@ function clearCustomFilters() {
     $("#interactionsFilterLi").remove();
     $("#expressionFilterLi").remove();
     $("#datasetFilterLi").remove();
+    $("#phenotypeFilterLi").remove();
     window.CustomFiltersAdded = false;
 }
 
@@ -387,6 +516,8 @@ function addCustomFilters() {
                 
                     window.imTable.query.addConstraint(filterQueryLocatedOn);            
                     window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                 });
             
                 $('#locationResetButton').click(function() {
@@ -404,7 +535,7 @@ function addCustomFilters() {
 
             if (filter.length > 0) {
                 $("#sidebarUl").append(
-                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionDatasetSelector" style="width: 100%; float:left; margin-left: 15px;"><option value="E-MTAB-62">Dataset: E-MTAB-62</option><option value="E-MTAB-513">Dataset: Illumina bodymap (E-MTAB-513)</option></select></div><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 100%; float:left; margin-left: 15px;"><option value="UP">Expression: UP</option><option value="DOWN">Expression: DOWN</option><option value="NONDE">Expression: NONDE</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 100%; float:left; margin-left: 15px;"/><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 100%; float:left; margin-left: 30px;"/></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionTissueSearchInput" placeholder="Tissue (e.g. brain)" style="width: 100%; float:left; margin-left: 60px; display:none;"/></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionFPKMSearchInput" placeholder="FPKM value (e.g. 0.8)" style="width: 100%; float:left; margin-left: 30px; display:none;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
 
                 $('#expressionSearchButton').click(function() {
                     if (window.expressionFilter) clearExpressionFilterConstraint();
@@ -413,6 +544,7 @@ function addCustomFilters() {
                     var expressionTstatistic = $('#expressionTstatisticSearchInput').val();
                     var expressionExpressionSelector = $('#expressionExpressionSelector').val();
                     var expressionDatasetSelector = $('#expressionDatasetSelector').val();
+                    var expressionTissue = $('#expressionTissueSearchInput').val();
                         
                     window.expressionFilter = [];
 
@@ -431,25 +563,42 @@ function addCustomFilters() {
                     filterQueryExpression.value = expressionExpressionSelector;
                     var filterQueryDatasetName = filter[0].filterQuery[3];
                     filterQueryDatasetName.value = expressionDatasetSelector;
+                    var filterQueryTissueName = filter[0].filterQuery[4];
+                    filterQueryTissueName.value = expressionDatasetSelector;
 
-                    // Add the constraints
-                    if (expressionPvalue) {
-                        window.imTable.query.addConstraint(filterQueryPvalue);            
+                    if(expressionDatasetSelector == "E-MTAB-62") {
+                        if (expressionPvalue) {
+                            window.imTable.query.addConstraint(filterQueryPvalue);            
+                            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        }
+    
+                        if (expressionTstatistic) {
+                            window.imTable.query.addConstraint(filterQueryTstatistic);            
+                            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        }
+    
+                        window.imTable.query.addConstraint(filterQueryExpression);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    
+                        if (expressionDatasetSelector != "All") {
+                            window.imTable.query.addConstraint(filterQueryDatasetName);            
+                            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        }
+                    } else if(expressionDatasetSelector == "E-MTAB-513") {
+                        expressionTissue
+                        filterQueryExpression.value = $('#expressionFPKMSearchInput').val();
+
+                        // Tissue filter
+                        window.imTable.query.addConstraint(filterQueryTissueName);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        
+                        // FPKM filter    
+                        window.imTable.query.addConstraint(filterQueryExpression);            
                         window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
                     }
 
-                    if (expressionTstatistic) {
-                        window.imTable.query.addConstraint(filterQueryTstatistic);            
-                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
-                    }
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
 
-                    window.imTable.query.addConstraint(filterQueryExpression);            
-                    window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
-                
-                    if (expressionDatasetSelector != "All") {
-                        window.imTable.query.addConstraint(filterQueryDatasetName);            
-                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
-                    }
                 });
                 
                 $('#expressionResetButton').click(function() {
@@ -538,6 +687,8 @@ function addCustomFilters() {
                         window.imTable.query.addConstraint(filterQueryDatasetSel);            
                         window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
                     }
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                     
                 });
             
@@ -715,6 +866,8 @@ function addCustomFilters() {
                     // Add the significance constraint
                     window.imTable.query.addConstraint(filterQuerySignificanceSel);            
                     window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                 });
 
                 // Add the reset button
@@ -850,6 +1003,8 @@ function addCustomFilters() {
                         window.imTable.query.addConstraint(filterQueryReliability);            
                         window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
                     }
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                 });
             
                 $('#proteinLocalisationResetButton').click(function() {
@@ -915,6 +1070,68 @@ function addCustomFilters() {
                 });
             }
 
+            //Phenotype Filter
+            filter = availableCustomFilters.filter(function(v){
+                return v.filterName==='Phenotype';
+            });
+
+
+            if (filter.length > 0) {
+                window.imTableConstraint.phenotypeName = [];
+                $("#sidebarUl").append(
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Phenotype" id="phenotypeNameFilterLi"><a class="nav-link" data-toggle="collapse" href="#phenotypeNameSearchCardBlock" aria-controls="phenotypeNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Phenotype</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="phenotypeNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="phenotypeFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="phenotypeNameSearchInput" placeholder="e.g. Edema"/></form-group></div></div></li>');
+                   try {
+                       $.when(getPhenotypeNames()).done(function(result) {
+                
+                           var availablePhenotypeNames = [];
+                
+                           for (var i = 0; i < result.results.length; i++) {
+                               if (result.results[i]["item"] != null) {
+                                   availablePhenotypeNames.push({
+                                       label: result.results[i]["item"] + " (" + result.results[i]["count"] + ")",
+                                       value: result.results[i]["item"]
+                                   });
+                               }
+                           }
+                
+                           $("#phenotypeNameSearchInput").autocomplete({
+                               minLength: 3,
+                               source: function(request, response) {
+                                   var results = $.ui.autocomplete.filter(availablePhenotypeNames, request.term);
+                                   response(results.slice(0, 15));
+                               },
+                               select: function(event, ui) {
+                                   event.preventDefault();
+                                   $("#phenotypeNameSearchInput").val(ui.item.value);
+                
+                                   // Filter the table
+                                   window.imTableConstraint["phenotypeName"].push(ui.item.value);
+                                   updateTableWithConstraints();
+                
+                                   var buttonId = ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + "button";
+                
+                                   $("#phenotypeFilterList").append(
+                                       '<div class="input-group" id="' + ui.item.value.replace(/[^a-zA-Z0-9]/g, '') + '"><label class="form-control">' + ui.item.value.slice(0, 22) + '</label><span class="input-group-btn"><button class="btn btn-sm" type="button" id="' + buttonId + '" style="height: 100%;">x</button></span></div>');
+                
+                                   $("#" + buttonId).click(function() {
+                                       remove(window.imTableConstraint["phenotypeName"], ui.item.value);
+                                       updateTableWithConstraints();
+                                       $("#" + ui.item.value.replace(/[^a-zA-Z0-9]/g, '')).remove();
+                                   });
+                               },
+                               focus: function(event, ui) {
+                                   event.preventDefault();
+                                   $("#phenotypeNameSearchInput").val(ui.item.value);
+                               }
+                           });
+                
+                       });
+                   } catch (err) {
+                       $("#phenotypeNameFilterLi").remove();
+                       console.log(err);
+                   }
+            }
+
             createDatasetFilter(); // Dataset filter should be the last one
 
             window.CustomFiltersAdded = true;
@@ -925,38 +1142,66 @@ function addCustomFilters() {
 }
 
 /**
- * Method that updates the organisms filter based upon the organisms present in the
- * current query
+ * Method that updates the entries in the organisms filter
  * @param {string} results: the organism query results from the InterMine server
  */
-function displayItemsInClass(result) {
+function updateOrganismsSidebarFilter() {
 
-    // First remove the li elements
-    $('#organismshortnamelist').parent().find('li').remove();
+    $.when(getItemsInClass([])).done(function(result) {
+        // First remove the li elements
+        $('#organismshortnamelist').parent().find('li').remove();
 
-    var countData = [];
-    var labelsData = [];
-    var colorsData = getColorsArray(result[0].response['results'].length);
+        var colorsData = getColorsArray(result[0].response['results'].length);
 
-    for (var i = 0; i < result[0].response['results'].length; i++) {
-        countData.push(result[0].response['results'][i]['count']);
-        labelsData.push(result[0].response['results'][i]['item']);
-    }
+        var resultantElements = result[0].response['results'].length;
 
-    var resultantElements = result[0].response['results'].length;
+        var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
+            return v.mineName===window.selectedMineName;
+        })[0];
 
-    // At most, 5 elements, which are ordered (top 5)
-    if (resultantElements > 5) {
-        resultantElements = 5;
-    }
+        countPreferredOrganismsAdded = 0;
+        if(minePreferredOrganisms != null) {
+            minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
 
-    // Fill the organism short name dropdown with top 5 organisms according to count
-    for (var i = 0; i < resultantElements; i++) {
-        var organismName = result[0].response['results'][i]['item'];
-        var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
-        $("#organismshortnamelist").append('<li class="list-group-item" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
-    }
+            // Fill the organism short name dropdown with the preferred organisms, if any
+            if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
+                colorsData = getColorsArray(minePreferredOrganisms.length);
+                for (var i = 0; i < resultantElements; i++) {
+                    var organismName = result[0].response['results'][i]['item'];
+                    var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+                    if(minePreferredOrganisms.includes(organismName)) {
+                        $("#organismshortnamelist").append('<li class="list-group-item unchecked" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                        
+                        // Add to the organisms colors dict
+                        window.organismColorsMap[organismName] = colorsData[countPreferredOrganismsAdded];
 
+                        countPreferredOrganismsAdded++;
+                        if(countPreferredOrganismsAdded == 10) break;
+                    }
+                }
+            }
+        }
+
+        // At most 10 elements
+        resultantElements = Math.max(0, Math.min(resultantElements, 10) - countPreferredOrganismsAdded);
+
+        // Fill the organism short name dropdown with top 10 organisms according to count
+        for (var i = 0; i < resultantElements; i++) {
+            var organismName = result[0].response['results'][i]['item'];
+            var organismCount = "(" + result[0].response['results'][i]['count'] + ")";
+            if(minePreferredOrganisms != null) {
+                if(!minePreferredOrganisms.includes(organismName)) {
+                    $("#organismshortnamelist").append('<li class="list-group-item unchecked" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                    // Add to the organisms colors dict
+                    window.organismColorsMap[organismName] = colorsData[countPreferredOrganismsAdded+i];
+                }
+            } else {
+                $("#organismshortnamelist").append('<li class="list-group-item unchecked" style="border-width: 2px; border-style: solid; border-color: ' + colorsData[countPreferredOrganismsAdded+i] + ';"><a class="nav-link" href="#" style="color:black; text-align:center;"><p class="float-md-left">' + organismName + '</p><p class="float-md-right">' + organismCount + '</p></a></li>');
+                // Add to the organisms colors dict
+                window.organismColorsMap[organismName] = colorsData[countPreferredOrganismsAdded+i];
+            }
+        }
+    });
 }
 
 /**
@@ -975,11 +1220,79 @@ function updatePieChart(result, pieChartID) {
 
     var countData = [];
     var labelsData = [];
-    var colorsData = getColorsArray(result[0].response['results'].length);
 
-    for (var i = 0; i < result[0].response['results'].length; i++) {
-        countData.push(result[0].response['results'][i]['count']);
-        labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+    var minePreferredOrganisms = window.minesPreferredOrganisms.filter(function(v){
+        return v.mineName===window.selectedMineName;
+    })[0];
+
+    countPreferredOrganismsAdded = 0;
+    var colorsData = [];
+    var currentQueryOrganisms = [];
+
+    if(minePreferredOrganisms != null) {
+        minePreferredOrganisms = minePreferredOrganisms.preferredOrganisms;
+
+        // Fill the organism short name dropdown with the preferred organisms, if any
+        if(minePreferredOrganisms && minePreferredOrganisms.length > 0) {
+            colorsData = [];
+
+            for (var i = 0; i < result[0].response['results'].length; i++) {
+                var organismName = result[0].response['results'][i]['item'];
+                if(minePreferredOrganisms.includes(organismName)) {
+                    countData.push(result[0].response['results'][i]['count']);
+                    labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+                    colorsData.push(window.organismColorsMap[organismName]);
+
+                    currentQueryOrganisms.push(organismName);
+
+                    countPreferredOrganismsAdded++;
+                    if(countPreferredOrganismsAdded == 10) break;
+                }
+            }
+        }
+    }
+
+    // At most 10 elements
+    resultantElements = Math.max(0, Math.min(result[0].response['results'].length, 10) - countPreferredOrganismsAdded);
+
+    for (var i = 0; i < resultantElements; i++) {
+        var organismName = result[0].response['results'][i]['item'];
+        if(minePreferredOrganisms != null) {
+            if(!minePreferredOrganisms.includes(organismName)) {
+                countData.push(result[0].response['results'][i]['count']);
+                labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+                colorsData.push(window.organismColorsMap[organismName]);
+                currentQueryOrganisms.push(organismName);
+            }
+        } else {
+            countData.push(result[0].response['results'][i]['count']);
+            labelsData.push(result[0].response['results'][i]['item'] + " (" + result[0].response['results'][i]['count'] + ")");
+            colorsData.push(window.organismColorsMap[organismName]);
+            currentQueryOrganisms.push(organismName);
+        }
+    }
+
+    // Count number of unique elements
+    var seen = {};
+    currentQueryOrganisms = currentQueryOrganisms.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+
+    if(currentQueryOrganisms.length != Object.keys(window.organismColorsMap).length) {
+        // Remove the checked class from the elements in the sidebar filter
+        $('.checked').each(function(i, obj) {
+            $(obj).removeClass("checked");
+            $(obj).addClass("unchecked");
+        });
+
+        // Add the checked class in the sidebar to the correct ones selected in the pie chart
+        $('.unchecked').each(function(i, obj) {
+            organismShortname = $(obj).find("a p").filter(".float-md-left").toArray()[0].innerHTML;
+            if(currentQueryOrganisms.includes(organismShortname)) {
+                $(obj).removeClass("unchecked");
+                $(obj).addClass("checked");
+            }
+        });
     }
 
     var plotTitle = "Number of results for " + sessionStorage.getItem('currentClassView') + " by organism";
@@ -1026,21 +1339,34 @@ function updatePieChart(result, pieChartID) {
             }
         },
         onClick: function(evt, elements) {
-            var datasetIndex;
-            var dataset;
-
             if (elements.length) {
                 var index = elements[0]._index;
 
                 selectedSegment = window.pieChartObject.data.labels[index].split("(")[0].trim();
 
-                // Filter the table
-                window.imTable.query.addConstraint({
-                    "path": "organism.shortName",
-                    "op": "==",
-                    "value": selectedSegment
+                // Clean organism filters
+                if(window.organismFilter) clearOrganismConstraint();
+                window.imTableConstraint["organism"] = [];
+
+                // Set the organism filter according to selected pie chart segment
+                window.imTableConstraint["organism"].push(selectedSegment);
+
+                // Remove the checked class from the elements in the sidebar filter
+                $('.checked').each(function(i, obj) {
+                    $(obj).removeClass("checked");
+                    $(obj).addClass("unchecked");
                 });
 
+                // Add the checked class in the sidebar to the correct ones selected in the pie chart
+                $('.unchecked').each(function(i, obj) {
+                    organismShortname = $(obj).find("a p").filter(".float-md-left").toArray()[0].innerHTML;
+                    if(window.imTableConstraint["organism"].includes(organismShortname)) {
+                        $(obj).removeClass("unchecked");
+                        $(obj).addClass("checked");
+                    }
+                });
+
+                updateTableWithConstraints();
             }
 
             //window.pieChartObject.update();
@@ -1330,7 +1656,7 @@ function fillMineSelector() {
                                 });
                             } else {
                                 $("#unavailableMineAlert").show();
-                            }
+}
 
                             // Handle error
                             sanity = false;
@@ -1378,12 +1704,33 @@ function handleCustomFilters() {
 
         if (mineData.length > 0) {
             addCustomFilters();
+            setDynamicExpressionDatasetSelectorEvents();
             window.CustomFiltersAdded = true;
         } else {
             // Dataset filter should be the last one
             createDatasetFilter();
         }
     }
+}
+
+function setDynamicExpressionDatasetSelectorEvents() {
+    $('body').on('change','#expressionDatasetSelector',function(){
+        var selectedDataset = $('#expressionDatasetSelector').val();
+
+        if(selectedDataset == "E-MTAB-513") {
+            $("#expressionExpressionSelector").hide();
+            $("#expressionPvalueSearchInput").hide();
+            $("#expressionTstatisticSearchInput").hide();
+            $("#expressionTissueSearchInput").show();
+            $("#expressionFPKMSearchInput").show();
+        } else {
+            $("#expressionExpressionSelector").show();
+            $("#expressionPvalueSearchInput").show();
+            $("#expressionTstatisticSearchInput").show();
+            $("#expressionTissueSearchInput").hide();
+            $("#expressionFPKMSearchInput").hide();
+        }
+    });
 }
 
 /**
@@ -1400,7 +1747,6 @@ function updateElements(constraints, pieChartID) {
     addViewManagerSelectOptions();
 
     $.when(getItemsInClass(constraints)).done(function(result) {
-        displayItemsInClass(result);
         createSidebarEvents();
         updatePieChart(result, pieChartID);
     });

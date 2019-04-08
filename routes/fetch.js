@@ -384,4 +384,47 @@ router.get('/participant2genesymbols/:mineUrl', function(req, res, next) {
 
 });
 
+/**
+ * GET Phenotype Names from HumanMine inside a class (parameter)
+ */
+router.get('/phenotypes/:mineUrl', function(req, res, next) {
+    var mineUrl = formatMineURL(req.params.mineUrl);
+
+    var service = new imjs.Service({
+        root: mineUrl
+    });
+
+    var query = {
+        "from": "Gene" ,
+        "select": [
+            "diseases.hpoAnnotations.hpoTerm.name",
+            "primaryIdentifier"
+        ],
+        "model": {
+            "name": "genomic"
+        },
+        "orderBy": [{
+            "path": "symbol",
+            "direction": "ASC"
+        }]
+    };
+
+    var pathways = new imjs.Query(query, service),
+        pathwaysPath = [query.from, query.select[0]].join('.');
+    pathways.summarize(pathwaysPath).then(function(pathwaySummary) {
+        //This returns the pathway name and the number of gene rows associated with the pathway
+        res.json(pathwaySummary);
+    });
+});
+
+router.post('/lists/:mineUrl', function(req, res, next) {
+    const mineUrl = formatMineURL(req.params.mineUrl);
+    const { apiKey } = req.body;
+    const token = apiKey || null;
+    var service = new imjs.Service({
+        root: mineUrl,
+        token
+    });
+    service.fetchLists().then(lists => res.json(lists));
+});
 module.exports = router;

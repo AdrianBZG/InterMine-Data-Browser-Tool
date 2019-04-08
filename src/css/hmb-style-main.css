@@ -826,3 +826,7 @@ footer.sticky-footer {
 .checkbox label {
     #margin-left: 0px;
 }
+
+.saved-list-item {
+  overflow-x: scroll;
+}

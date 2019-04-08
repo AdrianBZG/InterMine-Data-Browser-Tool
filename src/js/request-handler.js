@@ -175,6 +175,9 @@ function getSessionToken() {
             if(findElementJSONarray(apiKeysObject, "mine", window.selectedMineName)) {
                 var apiKeyForThisMine = findElementJSONarray(apiKeysObject, "mine", window.selectedMineName)["apikey"];
                 if(apiKeyForThisMine && apiKeyForThisMine != "" && apiKeyForThisMine != "Paste your API key here") {
+                    // Change the added/not added API key icon
+                    $("#APIKeyIconNotAdded").hide();
+                    $("#APIKeyIconAdded").show();
                     return apiKeyForThisMine;
                 }
             }
@@ -258,4 +261,49 @@ function getGeneLengthsInClass(constraints) {
         },
         success: function(data) {}
     })
+}
+
+function getPhenotypeNames() {
+    return $.ajax({
+        url: '/fetch/phenotypes/' + window.mineUrl,
+        type: 'GET',
+        error: function(e) {
+            console.log(e);
+        },
+        success: function(data) {}
+    })
+}
+
+/**
+ * Method to get the summary of gene length inside a class (in buckets) in order to feed the bar graph
+ * @param {array} constraints: the constraints for the endpoint call
+ * @returns {array} an array with the server response containing the summaries
+ */
+function getSavedLists() {
+    var hm = window.interminesHashMap;
+    var apiKey;
+    for(var i = 0; i < hm.length; ++i) {
+        var mineData = hm[i];
+        if(window.formatMineURL(mineData.mineurl) === window.mineUrl) {
+            var apiKeyArray = JSON.parse(localStorage.getItem('api-keys'));
+            for(var j = 0; j < apiKeyArray.length; ++j) {
+                if(mineData.mine === apiKeyArray[j].mine) {
+                    apiKey = apiKeyArray[j].apikey;
+                    break;
+                }
+            }
+        }
+    }
+    
+    return $.ajax({
+        url: '/fetch/lists/' + window.mineUrl,
+        type: 'POST', 
+        body: JSON.stringify({
+            token: apiKey
+        }),
+        error: function(e){
+            console.log(e);
+        },
+        success: function(data) {}
+    });
 }
