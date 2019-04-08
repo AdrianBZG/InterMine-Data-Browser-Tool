@@ -84,6 +84,12 @@
                 "op": "==",
                 "value": "DDD",
                 "code": "Z"
+              },
+              {
+                "path": "atlasExpression.condition",
+                "op": ">=",
+                "value": "BBB",
+                "code": "X"
               }
             ],
           "filterName": "Expression"

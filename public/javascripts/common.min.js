@@ -317,6 +317,8 @@ function updateTableWithConstraints() {
             "code": "N"
         });
     }
+
+    window.imTable.query.constraintLogic = window.tableConstraintLogic;
 }
 
 
@@ -422,6 +424,10 @@ function clearCustomFilters() {
     window.CustomFiltersAdded = false;
 }
 
+function foo(element) {
+    console.log($(element).val());
+}
+
 function addCustomFilters() {
     if (!window.CustomFiltersAdded) {
         // Read the JSON config file
@@ -514,6 +520,8 @@ function addCustomFilters() {
                 
                     window.imTable.query.addConstraint(filterQueryLocatedOn);            
                     window.locationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                 });
             
                 $('#locationResetButton').click(function() {
@@ -531,7 +539,7 @@ function addCustomFilters() {
 
             if (filter.length > 0) {
                 $("#sidebarUl").append(
-                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="UP">UP</option><option value="DOWN">DOWN</option><option value="NONDE">NONDE</option></select><select class="form-control" id="expressionDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="ArrayExpress accession: E-MTAB-62">E-MTAB-62</option><option value="E-MTAB-513 illumina body map">Illumina bodymap</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 45%; float:left; margin-left: 15px;"/><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 45%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
+                    '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Expression" id="expressionFilterLi"><a class="nav-link" data-toggle="collapse" href="#expressionSearchCardBlock" aria-controls="expressionSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-tasks"></i><span class="nav-link-text"></span>Expression</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="expressionSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="expressionFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><select class="form-control" id="expressionDatasetSelector" style="width: 100%; float:left; margin-left: 15px;"><option value="E-MTAB-62">Dataset: E-MTAB-62</option><option value="E-MTAB-513">Dataset: Illumina bodymap (E-MTAB-513)</option></select></div><div class="row" style="align: center;"><select class="form-control" id="expressionExpressionSelector" style="width: 100%; float:left; margin-left: 15px;"><option value="UP">Expression: UP</option><option value="DOWN">Expression: DOWN</option><option value="NONDE">Expression: NONDE</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionPvalueSearchInput" placeholder="P-value (Opt)" style="width: 100%; float:left; margin-left: 15px;"/><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionTstatisticSearchInput" placeholder="T-statistic (Opt)" style="width: 100%; float:left; margin-left: 30px;"/></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionTissueSearchInput" placeholder="Tissue (e.g. brain)" style="width: 100%; float:left; margin-left: 60px; display:none;"/></div><div class="row" style="align: center;"><input class="form-control" type="text" id="expressionFPKMSearchInput" placeholder="FPKM value (e.g. 0.8)" style="width: 100%; float:left; margin-left: 30px; display:none;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="expressionSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="expressionResetButton">Reset</button></form-group></div></div></li>');
 
                 $('#expressionSearchButton').click(function() {
                     if (window.expressionFilter) clearExpressionFilterConstraint();
@@ -540,6 +548,7 @@ function addCustomFilters() {
                     var expressionTstatistic = $('#expressionTstatisticSearchInput').val();
                     var expressionExpressionSelector = $('#expressionExpressionSelector').val();
                     var expressionDatasetSelector = $('#expressionDatasetSelector').val();
+                    var expressionTissue = $('#expressionTissueSearchInput').val();
                         
                     window.expressionFilter = [];
 
@@ -558,25 +567,42 @@ function addCustomFilters() {
                     filterQueryExpression.value = expressionExpressionSelector;
                     var filterQueryDatasetName = filter[0].filterQuery[3];
                     filterQueryDatasetName.value = expressionDatasetSelector;
+                    var filterQueryTissueName = filter[0].filterQuery[4];
+                    filterQueryTissueName.value = expressionDatasetSelector;
 
-                    // Add the constraints
-                    if (expressionPvalue) {
-                        window.imTable.query.addConstraint(filterQueryPvalue);            
+                    if(expressionDatasetSelector == "E-MTAB-62") {
+                        if (expressionPvalue) {
+                            window.imTable.query.addConstraint(filterQueryPvalue);            
+                            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        }
+    
+                        if (expressionTstatistic) {
+                            window.imTable.query.addConstraint(filterQueryTstatistic);            
+                            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        }
+    
+                        window.imTable.query.addConstraint(filterQueryExpression);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                    
+                        if (expressionDatasetSelector != "All") {
+                            window.imTable.query.addConstraint(filterQueryDatasetName);            
+                            window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        }
+                    } else if(expressionDatasetSelector == "E-MTAB-513") {
+                        expressionTissue
+                        filterQueryExpression.value = $('#expressionFPKMSearchInput').val();
+
+                        // Tissue filter
+                        window.imTable.query.addConstraint(filterQueryTissueName);            
+                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+                        
+                        // FPKM filter    
+                        window.imTable.query.addConstraint(filterQueryExpression);            
                         window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
                     }
 
-                    if (expressionTstatistic) {
-                        window.imTable.query.addConstraint(filterQueryTstatistic);            
-                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
-                    }
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
 
-                    window.imTable.query.addConstraint(filterQueryExpression);            
-                    window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
-                
-                    if (expressionDatasetSelector != "All") {
-                        window.imTable.query.addConstraint(filterQueryDatasetName);            
-                        window.expressionFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
-                    }
                 });
                 
                 $('#expressionResetButton').click(function() {
@@ -665,6 +691,8 @@ function addCustomFilters() {
                         window.imTable.query.addConstraint(filterQueryDatasetSel);            
                         window.interactionsFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
                     }
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                     
                 });
             
@@ -842,6 +870,8 @@ function addCustomFilters() {
                     // Add the significance constraint
                     window.imTable.query.addConstraint(filterQuerySignificanceSel);            
                     window.clinVarFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                 });
 
                 // Add the reset button
@@ -977,6 +1007,8 @@ function addCustomFilters() {
                         window.imTable.query.addConstraint(filterQueryReliability);            
                         window.proteinLocalisationFilter.push(window.imTable.query.constraints[window.imTable.query.constraints.length - 1]);
                     }
+
+                    window.imTable.query.constraintLogic = window.tableConstraintLogic;
                 });
             
                 $('#proteinLocalisationResetButton').click(function() {
@@ -1676,12 +1708,33 @@ function handleCustomFilters() {
 
         if (mineData.length > 0) {
             addCustomFilters();
+            setDynamicExpressionDatasetSelectorEvents();
             window.CustomFiltersAdded = true;
         } else {
             // Dataset filter should be the last one
             createDatasetFilter();
         }
     }
+}
+
+function setDynamicExpressionDatasetSelectorEvents() {
+    $('body').on('change','#expressionDatasetSelector',function(){
+        var selectedDataset = $('#expressionDatasetSelector').val();
+
+        if(selectedDataset == "E-MTAB-513") {
+            $("#expressionExpressionSelector").hide();
+            $("#expressionPvalueSearchInput").hide();
+            $("#expressionTstatisticSearchInput").hide();
+            $("#expressionTissueSearchInput").show();
+            $("#expressionFPKMSearchInput").show();
+        } else {
+            $("#expressionExpressionSelector").show();
+            $("#expressionPvalueSearchInput").show();
+            $("#expressionTstatisticSearchInput").show();
+            $("#expressionTissueSearchInput").hide();
+            $("#expressionFPKMSearchInput").hide();
+        }
+    });
 }
 
 /**
