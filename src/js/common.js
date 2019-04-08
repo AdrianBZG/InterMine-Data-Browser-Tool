@@ -424,10 +424,6 @@ function clearCustomFilters() {
     window.CustomFiltersAdded = false;
 }
 
-function foo(element) {
-    console.log($(element).val());
-}
-
 function addCustomFilters() {
     if (!window.CustomFiltersAdded) {
         // Read the JSON config file
