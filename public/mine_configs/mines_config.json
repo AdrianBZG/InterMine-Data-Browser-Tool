@@ -87,7 +87,7 @@
               },
               {
                 "path": "atlasExpression.condition",
-                "op": ">=",
+                "op": "==",
                 "value": "BBB",
                 "code": "X"
               }
