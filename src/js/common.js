@@ -1293,6 +1293,11 @@ function updatePieChart(result, pieChartID) {
                 $(obj).addClass("checked");
             }
         });
+    } else {
+        $('.checked').each(function(i, obj) {
+            $(obj).removeClass("checked");
+            $(obj).addClass("unchecked");
+        });
     }
 
     var plotTitle = "Number of results for " + sessionStorage.getItem('currentClassView') + " by organism";

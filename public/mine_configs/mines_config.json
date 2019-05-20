@@ -75,7 +75,7 @@
               },
               {
                 "path": "atlasExpression.expression",
-                "op": "==",
+                "op": ">=",
                 "value": "CCC",
                 "code": "Y"
               },
