@@ -4,16 +4,20 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
 	select#mineSelector.form-control(style="width: 180px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
 
-	div#headerButtons.col-md-10.text-center
+	div#headerButtons.col-md-6.text-center
 
-	button.btn.btn-primary(id="APIKeyIconBlock" style="position: fixed; top: 10px; right: 450px; background-color: transparent; border-color: transparent;")
+	button.btn.btn-primary(id="APIKeyIconBlock" style="position: fixed; top: 10px; right: 578px; background-color: transparent; border-color: transparent;")
 		i.fa.fa-user-times(id="APIKeyIconNotAdded", style="color: #000000;" data-toggle="tooltip" title="You haven't added an API key for this mine and some functionality may be unavailable.")
 		i.fa.fa-user(id="APIKeyIconAdded", style="color: #000000; display:none;" data-toggle="tooltip" title="You have added an API key for this mine.")
 
-	button.btn.btn-primary(id="resetAllButton" style="position: fixed; top: 10px; right: 354px; background-color: #868e96; border-color: #868e96;" data-toggle="tooltip" title="Reset all the filters")
+	button.btn.btn-primary(id="resetAllButton" style="position: fixed; top: 10px; right: 484px; background-color: #868e96; border-color: #868e96;" data-toggle="tooltip" title="Reset all the filters")
 		i.fa.fa-recycle(style="margin-right: 5px;")
 		span.nav-link-text
 		| Reset
+	button.btn.btn-primary(id="viewConstraintsButton" style="position: fixed; top: 10px; right: 352px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="See the current constraints")
+		i.fa.fa-adjust(style="margin-right: 5px;")
+		span.nav-link-text
+		| Constraints
 	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 236px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the views manager")
 		i.fa.fa-eye(style="margin-right: 5px;")
 		span.nav-link-text
@@ -117,6 +121,25 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 					button.btn(type='button' id="listManagerResetButton", disabled="true") Reset
 					button.btn.btn-danger(type='button' data-dismiss='modal') Close
 			.modal-body
+				| In this modal you can filter to see only the genes in a InterMine list. Please note that when filtering by a list, the current data constraints will be reset.
+				br
+				br
 				ul#savedLists.list-group
 					| Loading data...
+			.modal-footer
+
+//Constraints modal
+#constraintsModal.modal.fade(role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				h4.modal-title Constraints Viewer
+				#constraintsModalButtons
+					button.btn.btn-danger(type='button' data-dismiss='modal') Close
+			.modal-body
+				| In this modal you can, in a single view, see what constraints you have applied.
+				br
+				br
+				ul#constraintsModalList.list-group
+					| Loading...
 			.modal-footer

@@ -282,6 +282,10 @@ select, button {
   color: white;
 }
 
+input, select {
+  width: 100%;
+}
+
 .smaller {
   font-size: 0.7rem;
 }
