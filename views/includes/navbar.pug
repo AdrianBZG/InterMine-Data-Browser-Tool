@@ -124,3 +124,19 @@ nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
 				ul#savedLists.list-group
 					| Loading data...
 			.modal-footer
+
+//Constraints modal
+#constraintsModal.modal.fade(role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				h4.modal-title Constraints Viewer
+				#constraintsModalButtons
+					button.btn.btn-danger(type='button' data-dismiss='modal') Close
+			.modal-body
+				| In this modal you can, in a single view, see what constraints you have applied.
+				br
+				br
+				ul#constraintsModalList.list-group
+					| Loading...
+			.modal-footer

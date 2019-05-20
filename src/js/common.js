@@ -120,6 +120,11 @@ function initializeStartupConfiguration() {
         $("#listManagerModal").modal("show");
     })
 
+    $("#viewConstraintsButton").click(function() {
+        initializeConstraintsList();
+        $("#constraintsModal").modal("show");
+    })
+
     // Handle the view manager buttons
     $("#viewManagerButton").click(function() {
         // Update the key manager structures
@@ -136,6 +141,27 @@ function initializeStartupConfiguration() {
     // Update organism short name filter
     updateOrganismsSidebarFilter();
     createSidebarEvents();
+}
+
+/**
+ * Method to initialize the constraint list from the IM table
+ */
+
+function initializeConstraintsList() {
+    var tableConstraints = window.imTable.query.constraints;
+    if(tableConstraints.length > 0) {
+        var listHtml = "";
+        for(var i = 0; i < tableConstraints.length; i++) {
+            if(tableConstraints[i].value) {
+                listHtml += "<li class='list-group-item'>" + tableConstraints[i].path + " " + tableConstraints[i].op + " " + tableConstraints[i].value + "</li>";
+            } else {
+                listHtml += "<li class='list-group-item'>" + tableConstraints[i].path + " " + tableConstraints[i].op + " " + tableConstraints[i].values + "</li>";
+            }
+        }
+        $('#constraintsModalList').html(listHtml);
+    } else {
+        $('#constraintsModalList').html("<center>You haven't added any constraint.</center>");
+    }
 }
 
 /**
