@@ -141,6 +141,7 @@ gulp.task('default', gulp.parallel('css', 'js', 'vendor', 'images', 'mine_config
 
 /**
  * Signal async task completion
+ * reference: https://gulpjs.com/docs/en/getting-started/async-completion
  */
 
  function taskCompletion(){
