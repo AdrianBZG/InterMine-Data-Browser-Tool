@@ -87,7 +87,7 @@ gulp.task('css:compile', function() {
 /**
  * Gulp task to minify CSS
  */
-gulp.task('css:minify', gulp.series('css:compile', function() {
+gulp.task('css:minify', ['css:compile'], function() {
   return gulp.src([
       './src/css/*.css',
       '!./src/css/*.min.css'
@@ -98,12 +98,12 @@ gulp.task('css:minify', gulp.series('css:compile', function() {
     }))
     .pipe(gulp.dest('./public/stylesheets'))
     .pipe(browserSync.stream());
-}));
+});
 
 /**
  * Gulp task for CSS
  */
-gulp.task('css', gulp.series('css:compile', 'css:minify'));
+gulp.task('css', ['css:compile', 'css:minify']);
 
 /**
  * Gulp task to minify JavaScript
@@ -124,7 +124,7 @@ gulp.task('js:minify', function() {
 /**
  * Gulp task for JS
  */
-gulp.task('js', gulp.series('js:minify'));
+gulp.task('js', ['js:minify']);
 
 /**
  * Gulp task for launching the documentation on src/ files and save it as HTML in the docs folder
@@ -137,15 +137,4 @@ gulp.task('documentation', function (cb) {
 /**
  * Gulp default task: CSS + JS + Vendor + images
  */
-gulp.task('default', gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs'));
-
-/**
- * Signal async task completion
- * reference: https://gulpjs.com/docs/en/getting-started/async-completion
- */
-
- function taskCompletion(){
-   return Promise.resolve('All tasks are completed');
- }
-
- exports.default=taskCompletion;
+gulp.task('default', ['css', 'js', 'vendor', 'images', 'mine_configs']);
