@@ -108,13 +108,8 @@ body.sticky-footer .content-wrapper {
 }
 
 body.fixed-nav {
-  padding-top: 56px;
-}
-
-@media screen and (max-width: 991px) {
-  body.fixed-nav {
-    padding-top: calc(56px * 8.5);
-  }
+  padding-top: 0 !important;
+  background: #e9ecef;
 }
 
 .content-wrapper {
@@ -248,12 +243,21 @@ button {
   align-items: center;
 }
 
+.options {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
 @media (max-width: 991px) {
   #graphsBoxBody {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-items: center;
+  }
+
+  .options {
+    flex-wrap: wrap;
   }
 }
 
@@ -379,13 +383,23 @@ input, select {
   text-overflow: ellipsis;
 }
 
+#headerButtons {
+  display: flex;
+  flex-wrap: nowrap;
+  margin: 5px;
+}
+
 @media (min-width: 992px) {
-  #mainNav .navbar-brand {
-    width: 225px;
+  #mainNav {
+    display: flex;
+    justify-content: space-between;
   }
   #mainNav .navbar-collapse {
     overflow: visible;
     max-height: none;
+    position: fixed;
+    top: 0;
+    left: 0;
   }
   #mainNav .navbar-collapse .navbar-sidenav {
     position: absolute;
@@ -394,7 +408,7 @@ input, select {
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
     flex-direction: column;
-    margin-top: 56px;
+    margin-top: 63px;
   }
   #mainNav .navbar-collapse .navbar-sidenav > .nav-item {
     width: 225px;
@@ -459,6 +473,7 @@ input, select {
   #mainNav.fixed-top .sidenav-toggler > .nav-item > .nav-link {
     padding: 1em;
   }
+  
 }
 
 #mainNav.fixed-top.navbar-dark .sidenav-toggler {
@@ -625,6 +640,7 @@ body.sidenav-toggled .navbar-sidenav-tooltip.show {
 @media (min-width: 992px) {
   #mainNav.navbar-light .navbar-collapse .navbar-sidenav {
     background: #e9ecef;
+    min-height: calc(100vh - 61px);
   }
   #mainNav.navbar-light .navbar-collapse .navbar-sidenav li.active a {
     color: #e9ecef !important;

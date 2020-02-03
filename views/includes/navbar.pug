@@ -1,35 +1,36 @@
 // Navigation
-nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
-	a.navbar-brand(href='/')
-		img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
-	select#mineSelector.form-control(style="width: 180px; position: fixed; top: 10px; left: 75px;" data-toggle="tooltip" title="Select an InterMine")
+nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light
+	div(style="display: flex; align-items: center; margin: 0 5px;")
+		a.navbar-brand(href='/')
+			img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
+		select#mineSelector.form-control(style="min-width: 180px; width: 10vw;" data-toggle="tooltip" title="Select an InterMine")
 
-	div#headerButtons.col-md-6.text-center
+	div#headerButtons.text-center
 
-	button.btn.btn-primary(id="APIKeyIconBlock" style="position: fixed; top: 10px; right: 578px; background-color: transparent; border-color: transparent;")
-		i.fa.fa-user-times(id="APIKeyIconNotAdded", style="color: #000000;" data-toggle="tooltip" title="You haven't added an API key for this mine and some functionality may be unavailable.")
-		i.fa.fa-user(id="APIKeyIconAdded", style="color: #000000; display:none;" data-toggle="tooltip" title="You have added an API key for this mine.")
-
-	button.btn.btn-primary(id="resetAllButton" style="position: fixed; top: 10px; right: 484px; background-color: #868e96; border-color: #868e96;" data-toggle="tooltip" title="Reset all the filters")
-		i.fa.fa-recycle(style="margin-right: 5px;")
-		span.nav-link-text
-		| Reset
-	button.btn.btn-primary(id="viewConstraintsButton" style="position: fixed; top: 10px; right: 352px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="See the current constraints")
-		i.fa.fa-adjust(style="margin-right: 5px;")
-		span.nav-link-text
-		| Constraints
-	button.btn.btn-primary(id="viewManagerButton" style="position: fixed; top: 10px; right: 236px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the views manager")
-		i.fa.fa-eye(style="margin-right: 5px;")
-		span.nav-link-text
-		| Add view
-	button.btn.btn-primary(id="apiKeyManagerButton" style="position: fixed; top: 10px; right: 96px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Open the API Key manager")
-		i.fa.fa-key(style="margin-right: 5px;")
-		span.nav-link-text
-		| Add API key
-	button.btn.btn-primary(id="listManagerButton" style="position: fixed; top: 10px; right: 11px; background-color: #2439d8; border-color: #2439d8;" data-toggle="tooltip" title="Lists")
-		i.fa.fa-list(style="margin-right: 5px;")
-		span.nav-link-text
-		| Lists
+	div.options
+		button.btn.btn-primary(id="APIKeyIconBlock" style="background-color: transparent; border-color: transparent; margin: 5px;")
+			i.fa.fa-user-times(id="APIKeyIconNotAdded", style="color: #000000;" data-toggle="tooltip" title="You haven't added an API key for this mine and some functionality may be unavailable.")
+			i.fa.fa-user(id="APIKeyIconAdded", style="color: #000000; display:none;" data-toggle="tooltip" title="You have added an API key for this mine.")
+		button.btn.btn-primary(id="resetAllButton" style="background-color: #868e96; border-color: #868e96; margin: 5px;" data-toggle="tooltip" title="Reset all the filters")
+			i.fa.fa-recycle(style="margin-right: 5px;")
+			span.nav-link-text
+			| Reset
+		button.btn.btn-primary(id="viewConstraintsButton" style="background-color: #2439d8; border-color: #2439d8; margin: 5px;" data-toggle="tooltip" title="See the current constraints")
+			i.fa.fa-adjust(style="margin-right: 5px;")
+			span.nav-link-text
+			| Constraints
+		button.btn.btn-primary(id="viewManagerButton" style="background-color: #2439d8; border-color: #2439d8; margin: 5px;" data-toggle="tooltip" title="Open the views manager")
+			i.fa.fa-eye(style="margin-right: 5px;")
+			span.nav-link-text
+			| Add view
+		button.btn.btn-primary(id="apiKeyManagerButton" style="background-color: #2439d8; border-color: #2439d8; margin: 5px;" data-toggle="tooltip" title="Open the API Key manager")
+			i.fa.fa-key(style="margin-right: 5px;")
+			span.nav-link-text
+			| Add API key
+		button.btn.btn-primary(id="listManagerButton" style="background-color: #2439d8; border-color: #2439d8; margin: 5px;" data-toggle="tooltip" title="Lists")
+			i.fa.fa-list(style="margin-right: 5px;")
+			span.nav-link-text
+			| Lists
 
 	#navbarResponsive.navbar-collapse
 		ul#sidebarUl.navbar-nav.navbar-sidenav.list-group.panel(style="overflow: auto;")
