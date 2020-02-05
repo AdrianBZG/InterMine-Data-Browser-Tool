@@ -109,10 +109,8 @@ body.sticky-footer {
 }
 
 body.fixed-nav {
-  padding-top: $navbar-base-height;
-  @media screen and (max-width: 991px) {
-    padding-top: calc(#{$navbar-base-height} * 8.5);
-  }
+  padding-top: 0 !important;
+  background: #e9ecef;
 }
 
 .content-wrapper {
@@ -235,12 +233,21 @@ button{
   align-items: center;
 }
 
+.options {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
 @media (max-width: 991px) {
   #graphsBoxBody {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-items: center;
+  }
+  
+  .options {
+    flex-wrap: wrap;
   }
 }
 

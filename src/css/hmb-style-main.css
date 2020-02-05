@@ -143,13 +143,23 @@ body.fixed-nav {
   text-overflow: ellipsis;
 }
 
+#headerButtons {
+  display: flex;
+  flex-wrap: nowrap;
+  margin: 5px;
+}
+
 @media (min-width: 992px) {
-  #mainNav .navbar-brand {
-    width: 250px;
+  #mainNav {
+    display: flex;
+    justify-content: space-between;
   }
   #mainNav .navbar-collapse {
     overflow: visible;
     max-height: none;
+    position: fixed;
+    top: 0;
+    left: 0;
   }
   #mainNav .navbar-collapse .navbar-sidenav {
     position: absolute;
@@ -158,7 +168,7 @@ body.fixed-nav {
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
     flex-direction: column;
-    margin-top: 56px;
+    margin-top: 63px;
   }
   #mainNav .navbar-collapse .navbar-sidenav > .nav-item {
     width: 250px;
@@ -404,6 +414,7 @@ body.sidenav-toggled .navbar-sidenav-tooltip.show {
 @media (min-width: 992px) {
   #mainNav.navbar-light .navbar-collapse .navbar-sidenav {
     background: #e9ecef;
+    min-height: calc(100vh - 61px);
   }
   #mainNav.navbar-light .navbar-collapse .navbar-sidenav li.active a {
     color: #e9ecef !important;
