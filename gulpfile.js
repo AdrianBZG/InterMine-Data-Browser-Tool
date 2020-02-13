@@ -6,7 +6,7 @@ var pkg = require('./package.json');
 var browserSync = require('browser-sync').create();
 var exec = require('child_process').exec;
 var open = require('open');
-
+var port = process.env.PORT || 3000;
 /**
  * Gulp task to copy third party libraries from /node_modules into /vendor
  */
@@ -138,7 +138,7 @@ gulp.task('documentation', function(cb) {
  */
 gulp.task('browser', function(cb) {
     console.log("Launching Browser");
-    open(`http://localhost:3000`);
+    open(`http://localhost:${port}`);
     console.log("Browser Launched");
     return cb();
 })
