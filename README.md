@@ -1,28 +1,28 @@
 # InterMine Data Browser
-<p align="center">Build Status (Travis CI): <a href="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool"><img src="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool.svg?branch=master"></a><br>
-<p align="center"><img src="https://badges.frapsoft.com/os/v1/open-source.png?v=103"> <a href="LICENSE"><img src="https://img.shields.io/badge/License-LGPL%202.1-blue.svg"></a> <img src="https://img.shields.io/david/strongloop/express.svg"></p>
+<p align="left">Build Status (Travis CI): <a href="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool"><img src="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool.svg?branch=master"></a><br>
+<p align="left"><img src="https://badges.frapsoft.com/os/v1/open-source.png?v=103"> <a href="LICENSE"><img src="https://img.shields.io/badge/License-LGPL%202.1-blue.svg"></a> <img src="https://img.shields.io/david/strongloop/express.svg"></p>
 
-The goal of this project, is to implement a faceted search tool to display the data from InterMine database, allowing the users to search easily within the different mines available around InterMine. without the requirement of having an extensive knowledge of the data model.
+The goal of this project is to implement a faceted search tool to display the data from InterMine database, allowing the users to search easily within the different mines available around InterMine without the requirement of having an extensive knowledge of the data model.
 
-For the project organization, please refer to [https://github.com/intermine](https://github.com/intermine)
+For the project organization, please refer to [InterMine](https://github.com/intermine)
 
-Please note that development is very early on and the project is not ready to use yet.
+_Please note that the development is very early on and the project is not ready to use yet._
 
 ## DEPLOYMENT
 
-Try it out with the Heroku deployment (automatic deployment, may have some delay): [http://im-browser-prototype.herokuapp.com/](http://im-browser-prototype.herokuapp.com/)
+Try it out with the Heroku deployment [here](http://im-browser-prototype.herokuapp.com/) (automatic deployment, may have some delay)
+
+## GETTING STARTED
+
+Please visit [Getting Started](getting-started.md)
 
 ## DEPENDENCIES
 
-Check [package.json](package.json)
-
-## BUILDING
-
-See [BUILD.md](BUILD.md)
+Check [package.json file](package.json)
 
 ## DOCUMENTATION
 
-Apart from the in-line comments in the code, documentation generated with documentation.js is available in [https://adrianbzg.github.io/InterMine-Data-Browser-Tool/](https://adrianbzg.github.io/InterMine-Data-Browser-Tool/). To update the documentation, the 'gulp documentation' is available.
+Apart from the in-line comments in the code, documentation generated with _documentation.js_ can be accessed [here](https://adrianbzg.github.io/InterMine-Data-Browser-Tool/). To update the documentation, the 'gulp documentation' is available.
 
 ## REQUIRED ONTOLOGY CONCEPTS (PER MINE) FOR EACH FILTER
 
@@ -40,18 +40,35 @@ Apart from the in-line comments in the code, documentation generated with docume
 |     Interactions     |                                         interactions.participant2.symbol + interactions.details.type + interactions.details.dataSets.name                                        |
 |      Expression      |                                 atlasExpression.pValue + atlasExpression.tStatistic + atlasExpression.expression + atlasExpression.dataSets.name                                 |
 
-## CONTRIBUTING
+## CONTRIBUTING GUIDELINES
 
 1. Find a thing to fix/implement in [Issues](https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues?direction=desc&sort=created&state=open) or come up with your own idea, [create a discussion issue](https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues/new) for it and get a feedback.
-2. [Fork the repo](https://help.github.com/articles/fork-a-repo)
-3. Create your feature branch (`git checkout -b my-new-feature`)
-4. Commit your changes (`git commit -am 'Add some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. [Create new Pull Request](https://help.github.com/articles/using-pull-requests)
+
+2. [Fork](https://help.github.com/articles/fork-a-repo) the repository.
+
+3. Create your new feature branch.
+
+   ``` bash
+   git checkout -b my-new-feature
+   ```
+   
+4. Commit your changes.
+
+   ``` bash
+   git commit -am 'Add some feature
+   ```
+   
+5. Push to the newly created feature branch.
+
+   ``` bash
+   git push origin my-new-feature
+   ```
+   
+6. Create a new [Pull Request](https://help.github.com/articles/using-pull-requests)
 
 ## CONTACT
 
-You can contact the developers by opening an issue in this repo.
+You can contact the developers by opening a new issue in this repository [here](https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues/new).
 
 ## SCREENSHOTS
 
