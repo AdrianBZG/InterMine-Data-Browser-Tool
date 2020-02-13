@@ -5,6 +5,7 @@ var rename = require("gulp-rename");
 var pkg = require('./package.json');
 var browserSync = require('browser-sync').create();
 var exec = require('child_process').exec;
+var open = require('open');
 
 /**
  * Gulp task to copy third party libraries from /node_modules into /vendor
@@ -133,6 +134,16 @@ gulp.task('documentation', function(cb) {
 })
 
 /**
+ * Gulp task for launching browser with server url
+ */
+gulp.task('browser', function(cb) {
+    console.log("Launching Browser");
+    open(`http://localhost:3000`);
+    console.log("Browser Launched");
+    return cb();
+})
+
+/**
  * Gulp default task: CSS + JS + Vendor + images
  */
-gulp.task('default', gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs'));
+gulp.task('default', gulp.series(gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs'), 'browser'));
