@@ -1,16 +1,16 @@
 // Navigation
-nav#mainNav.navbar.navbar-expand-lg.navbar-light.bg-light
+nav#mainNav.navbar.navbar-light
 	div(style="display: flex; align-items: center; margin: 0 5px;")
 		a.navbar-brand(href='/')
 			img(src="/img/intermine-logo.png" style="width: 24px; height: 25px;")
 		select#mineSelector.form-control(style="min-width: 180px; width: 10vw;" data-toggle="tooltip" title="Select an InterMine")
 
-	div#headerButtons.text-center
+	div#headerButtons
 
 	div.options
-		button.btn.btn-primary(id="APIKeyIconBlock" style="background-color: transparent; border-color: transparent; margin: 5px;")
-			i.fa.fa-user-times(id="APIKeyIconNotAdded", style="color: #000000;" data-toggle="tooltip" title="You haven't added an API key for this mine and some functionality may be unavailable.")
-			i.fa.fa-user(id="APIKeyIconAdded", style="color: #000000; display:none;" data-toggle="tooltip" title="You have added an API key for this mine.")
+		button.btn.btn-primary(id="APIKeyIconBlock" style="background-color: #c0d848; border-color: transparent; margin: 5px;")
+			i.fa.fa-user-times(id="APIKeyIconNotAdded", style="color: #fff;" data-toggle="tooltip" title="You haven't added an API key for this mine and some functionality may be unavailable.")
+			i.fa.fa-user(id="APIKeyIconAdded", style="color: #fff; display:none;" data-toggle="tooltip" title="You have added an API key for this mine.")
 		button.btn.btn-primary(id="resetAllButton" style="background-color: #868e96; border-color: #868e96; margin: 5px;" data-toggle="tooltip" title="Reset all the filters")
 			i.fa.fa-recycle(style="margin-right: 5px;")
 			span.nav-link-text
