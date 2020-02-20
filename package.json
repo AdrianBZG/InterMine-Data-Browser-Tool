@@ -1,11 +1,11 @@
 {
     "title": "InterMine Data Brpwser",
     "name": "intermine-data-browser",
-    "version": "1.0.8",
+    "version": "1.1.0",
     "description": "A web-based data browser for InterMine",
-    "homepage": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool",
+    "homepage": "https://github.com/InterMine/InterMine-Data-Browser-Tool",
     "bugs": {
-        "url": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues",
+        "url": "https://github.com/InterMine/InterMine-Data-Browser-Tool/issues",
         "email": "adrianrodriguezbazaga@gmail.com"
     },
     "scripts": {
@@ -16,11 +16,19 @@
     "author": "Adrian Rodriguez-Bazaga",
     "contributors": [
         "Yo Yehudi",
-        "Rachel Lyne"
+        "Rachel Lyne",
+        "LarkhSingla",
+        "Divyanshu Mahajan",
+        "Ankit Kumar",
+        "Nikhil Vats",
+        "Himanshu Singh",
+        "Varun Bhandia",
+        "holloh",
+        "himanshuc3"
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/AdrianBZG/InterMine-Data-Browser-Tool"
+        "url": "https://github.com/InterMine/InterMine-Data-Browser-Tool"
     },
     "dependencies": {
         "JSONStream": "^1.3.5",
