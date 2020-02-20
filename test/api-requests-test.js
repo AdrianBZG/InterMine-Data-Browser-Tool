@@ -5,152 +5,39 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../app');
 let should = chai.should();
+let intermine = require('imjs');
 
 chai.use(chaiHttp);
 
-describe('Fetch', () => {
-  describe('/GET listing of ontology terms of HumanMine primary classes', () => {	  
-	  it('it should GET the listing of ontology terms inside class Protein in HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/ontologyterms/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Protein')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of ontology terms inside class Gene in HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/ontologyterms/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of dataset names inside class Protein in HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/datasets/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Protein')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of dataset names inside class Gene in HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/datasets/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of pathway names inside class Protein in HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/pathways/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Protein')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of pathway names inside class Gene in HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/pathways/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of protein domain names inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/proteindomainname/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of Participant 2 Gene symbols inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/participant2genesymbols/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of Diseases Names inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/diseases/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of Alleles types inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/allelestype/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
-	  
-	  it('it should GET the listing of Alleles Clinical Significance inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/clinicalsignificance/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-				res.body.results.length.should.be.at.least(1);
-				done();
-            });
-      });
+describe('API requests using imjs', () => {
+  describe('/Obtain pathway names in a given class should not be empty', () => {	  
+	  it('it should get the pathway names inside class Gene in HumanMine', (done) => {
+        
+        var service = new intermine.Service({
+            root: "https://www.humanmine.org/humanmine/service"
+        });
 
-      it('it should GET the listing of Protein Atlas Expression Cell Types inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/proteinatlascelltypes/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-                res.body.results.length.should.be.at.least(1);
-                done();
-            });
-      });
+        var query = {
+            "from": "Gene",
+            "select": ["pathways.name", "primaryIdentifier"],
+            "model": {
+                "name": "genomic"
+            },
+            "orderBy": [{
+                "path": "pathways.name",
+                "direction": "ASC"
+            }]
+        };
 
-      it('it should GET the listing of Protein Atlas Expression Tissue Names inside HumanMine', (done) => {
-        chai.request(server)
-            .get('/fetch/proteinatlastissuenames/httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice/Gene')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.results.should.be.a('array');
-                res.body.results.length.should.be.at.least(1);
-                done();
-            });
+        var pathways = new intermine.Query(query, service),
+            pathwaysPath = [query.from, query.select[0]].join('.');
+        pathways.summarize(pathwaysPath).then(function(pathwaySummary) {
+            //This returns the pathway name and the number of gene rows associated with the pathway
+            pathwaySummary.should.be.a('array');
+			pathwaySummary.length.should.be.at.least(1);
+            done();
+        });
+
       });
   });
 });
