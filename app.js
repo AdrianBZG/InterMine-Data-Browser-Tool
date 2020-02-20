@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var statisticsRouter = require('./routes/statistics');
 var fetchRouter = require('./routes/fetch');
 
 var http = require('http');
@@ -25,7 +24,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter); // Home page router, to render the views
-app.use('/statistics', statisticsRouter); // Statistics router, intended to be used as REST API
 app.use('/fetch', fetchRouter); // Statistics router, intended to be used as REST API
 
 // Catch 404 and forward to error handler

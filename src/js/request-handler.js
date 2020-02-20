@@ -4,7 +4,7 @@
  */
 function getIntermines() {
     return $.ajax({
-        url: 'http://registry.intermine.org/service/instances?mines=%27prod%27',
+        url: 'https://registry.intermine.org/service/instances?mines=%27prod%27',
         type: 'GET',
         error: function(e) {
             console.log(e);
@@ -112,7 +112,7 @@ function getPathwayNamesInClass() {
         url: '/fetch/pathways/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
         type: 'GET',
         error: function(e) {
-            console.log('Error');
+            console.log(e);
         },
         success: function(data) {}
     })
@@ -226,40 +226,104 @@ function getMineModel(serviceUrl) {
 }
 
 /**
- * Method to get the different items inside a class (count per organism) in order to feed the sidebar
- * @param {array} constraints: the constraints for the endpoint call
- * @returns {array} an array with the server response containing the different items in a class
- */
-function getItemsInClass(constraints) {
-    return $.ajax({
-        url: '/statistics/count/items/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
-        type: 'POST',
-        data: JSON.stringify(constraints),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
-    })
-}
-
-/**
  * Method to get the summary of gene length inside a class (in buckets) in order to feed the bar graph
  * @param {array} constraints: the constraints for the endpoint call
  * @returns {array} an array with the server response containing the summaries
  */
-function getGeneLengthsInClass(constraints) {
-    return $.ajax({
-        url: '/statistics/genelength/' + window.mineUrl + '/' + sessionStorage.getItem('currentClassView'),
-        type: 'POST',
-        data: JSON.stringify(constraints),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        error: function(e) {
-            console.log(e);
-        },
-        success: function(data) {}
+function getGeneLengthsInClass(className, constraints) {
+    return new Promise((resolve, reject) => {
+        var service = new imjs.Service({
+            root: escapeMineURL(window.mineUrl)
+        });
+
+        var query = {
+            "constraintLogic": "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (W AND X AND Y AND Z)",
+            "from": className,
+            "select": ["length", "primaryIdentifier"],
+            "model": {
+                "name": "genomic"
+            },
+            "where": constraints,
+            "orderBy": [{
+                "path": "length",
+                "direction": "ASC"
+            }]
+        };
+
+        var genelengths = new imjs.Query(query, service),
+        genelengthsPath = [query.from, query.select[0]].join('.');
+            genelengths.summarize(genelengthsPath).then(function(genelengthsSummary) {
+            //This returns the gene length and the number of gene rows associated with the gene length
+            resolve(genelengthsSummary);
+        }).catch(function(error) {
+            reject(error.message);
+        });
+    });
+}
+
+/**
+ * Method to get the different items inside a class (count per organism) in order to feed the sidebar
+ * @param {array} constraints: the constraints for the endpoint call
+ * @returns {array} an array with the server response containing the different items in a class
+ */
+function getItemsInClass(className, constraints) {
+    return new Promise((resolve, reject) => {
+        var result = [];
+        
+        var service = new imjs.Service({
+            root: escapeMineURL(window.mineUrl)
+        });
+
+        if (className == "Gene") {
+            var query = {
+                "constraintLogic": "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (W AND X AND Y AND Z)",
+                "from": 'Gene',
+                "select": ['primaryIdentifier'],
+                "model": {
+                    'name': 'genomic'
+                },
+                "where": constraints
+            };
+
+            var q = new imjs.Query(query, service);
+
+            q.summarize("Gene.organism.shortName", 50)
+                .then(function(response) {
+                    result.push({
+                        "itemName": "Organism short name",
+                        "response": response
+                    });
+                    resolve(result);
+                }).catch(function(error) {
+                    reject(error.message);
+                });
+
+        }
+
+        if (className == "Protein") {
+            var query = {
+                "constraintLogic": "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (W AND X AND Y AND Z)",
+                "from": 'Protein',
+                "select": ['primaryIdentifier'],
+                "model": {
+                    'name': 'genomic'
+                },
+                "where": constraints
+            };
+
+            var q = new imjs.Query(query, service);
+
+            q.summarize("Protein.organism.shortName", 10)
+                .then(function(response) {
+                    result.push({
+                        "itemName": "Organism short name",
+                        "response": response
+                    });
+                    resolve(result);
+                }).catch(function(error) {
+                    reject(error.message);
+                });
+        }
     })
 }
 

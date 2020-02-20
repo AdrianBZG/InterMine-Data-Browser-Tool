@@ -42,7 +42,7 @@ function initializeStartupConfiguration() {
     });
 
     // Initial mine service url (HumanMine), name and view
-    window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
+    window.mineUrl = "httpsCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
     if(!sessionStorage.getItem('currentClassView')) {
         sessionStorage.setItem('currentClassView', 'Gene');
@@ -139,7 +139,11 @@ function initializeStartupConfiguration() {
     });
 
     // Update organism short name filter
-    updateOrganismsSidebarFilter();
+    try {
+        updateOrganismsSidebarFilter();
+    } catch (err) {
+        console.log("There was an error updating the organism sidebar filter: ", err);
+    }
     createSidebarEvents();
 }
 
@@ -1172,8 +1176,9 @@ function addCustomFilters() {
  * @param {string} results: the organism query results from the InterMine server
  */
 function updateOrganismsSidebarFilter() {
+    var className = sessionStorage.getItem('currentClassView');
 
-    $.when(getItemsInClass([])).done(function(result) {
+    getItemsInClass(className, []).then(function(result) {
         // First remove the li elements
         $('#organismshortnamelist').parent().find('li').remove();
 
@@ -1236,7 +1241,6 @@ function updateOrganismsSidebarFilter() {
  * @param {string} results: the organism query results from the InterMine server
  */
 function updatePieChart(result, pieChartID) {
-
     // Update pie
     if (window.pieChartObject) {
         window.pieChartObject.destroy();
@@ -1616,13 +1620,13 @@ function fillMineSelector() {
             var currentMineNameTemp;
             var currentMineUrlTemp;
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].url.startsWith("https")) continue;
+                //if (result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
-                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+                //if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
 
                 // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+                //if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
 
                 var mineUrl = result.instances[i].url;
 
@@ -1777,10 +1781,16 @@ function updateElements(constraints, pieChartID) {
     initializeViewManager();
     addViewManagerSelectOptions();
 
-    $.when(getItemsInClass(constraints)).done(function(result) {
-        createSidebarEvents();
-        updatePieChart(result, pieChartID);
-    });
+    try {
+        //$.when(getItemsInClass(constraints)).done(function(result) {
+        getItemsInClass(sessionStorage.getItem('currentClassView'), constraints).then(function(result) {
+            createSidebarEvents();
+            updatePieChart(result, pieChartID);
+        });
+        //});
+    } catch (err) {
+        console.log("There was an error updating the elements", err);
+    }
 }
 
 /**
@@ -1794,13 +1804,13 @@ function initializeKeyManager() {
         $.when(getIntermines()).done(function(result) {
             // First get the mines
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].url.startsWith("https")) continue;
+                //if (result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
-                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+                //if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
 
                 // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+                //if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
 
                 var mineName = result.instances[i].name;
 
@@ -1952,7 +1962,7 @@ function initializeViewManager() {
  * @param {string} geneLengthChartID: the div id of the gene length chart, in order to update it
  */
 function updateGeneLengthChart(constraints, geneLengthChartID) {
-    $.when(getGeneLengthsInClass(constraints)).done(function(result) {
+    getGeneLengthsInClass(sessionStorage.getItem('currentClassView'), constraints).then(function(result) {
         if (window.geneLengthChartObject) {
             window.geneLengthChartObject.destroy();
         }
