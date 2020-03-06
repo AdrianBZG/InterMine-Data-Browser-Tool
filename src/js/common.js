@@ -42,7 +42,7 @@ function initializeStartupConfiguration() {
     });
 
     // Initial mine service url (HumanMine), name and view
-    window.mineUrl = "httpCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
+    window.mineUrl = "httpsCOLONSLASHSLASHwww.humanmine.orgSLASHhumanmineSLASHservice";
     window.selectedMineName = "HumanMine";
     if(!sessionStorage.getItem('currentClassView')) {
         sessionStorage.setItem('currentClassView', 'Gene');
@@ -139,7 +139,11 @@ function initializeStartupConfiguration() {
     });
 
     // Update organism short name filter
-    updateOrganismsSidebarFilter();
+    try {
+        updateOrganismsSidebarFilter();
+    } catch (err) {
+        console.log("There was an error updating the organism sidebar filter: ", err);
+    }
     createSidebarEvents();
 }
 
@@ -170,7 +174,7 @@ function initializeConstraintsList() {
 
 function initializeSavedLists(){
     if(window.savedListsInitialized) return;
-    $.when(getSavedLists()).then(function(result) {
+    getSavedLists().then(function(result) {
         var formElement = '<input class="form-control" id="saved-lists-filter" placeholder="Filter">';
         var listElements = result.map(function(list) {
             return "<li class='list-group-item saved-list-item'>" + list.title + "</li>"
@@ -385,7 +389,7 @@ function addViewManagerSelectOptions() {
  * Method to expand the dataset names filter, showing the remaining ones and adding the appropriate event handling to them
  */
 function showMoreDatasetNames() {
-    $.when(getDatasetNamesInClass()).done(function(result) {
+    getDatasetNamesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
         var availableDatasetNames = [];
 
         for (var i = 0; i < result.results.length; i++) {
@@ -644,7 +648,7 @@ function addCustomFilters() {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Interactions" id="interactionsFilterLi"><a class="nav-link" data-toggle="collapse" href="#interactionsSearchCardBlock" aria-controls="interactionsSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-podcast"></i><span class="nav-link-text"></span>Interactions</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="interactionsSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="interactionsFilterList"></div><form-group class="ui-front"><div class="row" style="align: center;"><input class="form-control" type="text" id="interactionsParticipant2SearchInput" placeholder="Optional: Participant 2 (symbol)" style="width: 100%; float:left; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="interactionsTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="physical">Physical</option><option value="genetic">Genetic</option></select><select class="form-control" id="interactionsDatasetSelector" style="width: 45%;"><option value="All">All (Set)</option><option value="BioGRID interaction data set">BioGRID</option><option value="IntAct interactions data set">IntAct</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="interactionsSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="interactionsResetButton">Reset</button></form-group></div></div></li>');
 
-                $.when(getParticipant2SymbolsInClass()).done(function(result) {
+                getParticipant2SymbolsInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableParticipant2Symbol = [];
 
@@ -733,7 +737,7 @@ function addCustomFilters() {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Diseases (OMIM)" id="diseasesFilterLi"><a class="nav-link" data-toggle="collapse" href="#diseasesSearchCardBlock" aria-controls="diseasesSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-certificate"></i><span class="nav-link-text"></span>Diseases (OMIM)</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="diseasesSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="diseasesFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="diseasesSearchInput" placeholder="e.g. alzheimer disease"/></form-group></div></div></li>');
 
-                $.when(getDiseasesNamesInClass()).done(function(result) {
+                getDiseasesNamesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableDiseasesNames = [];
 
@@ -789,7 +793,7 @@ function addCustomFilters() {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="ClinVar" id="clinvarFilterLi"><a class="nav-link" data-toggle="collapse" href="#clinvarSearchCardBlock" aria-controls="clinvarSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-eyedropper"></i><span class="nav-link-text"></span>ClinVar</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="clinvarSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><form-group class="ui-front"><div style="align: center;"><input class="form-control" type="text" id="clinvarClinicalSignificanceSearchInput" placeholder="Significance (e.g. Pathogenic)" style="width: 100%;"/><input class="form-control" type="text" id="clinvarTypeSearchInput" placeholder="Type (e.g. insertion)" style="width: 100%;"/></div><button class="btn btn-success" type="button" style="width:100%;" id="clinvarSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="clinvarResetButton">Reset</button></form-group></div></div></li>');
 
-                $.when(getAllelesClinicalSignifanceInClass()).done(function(result) {
+                getAllelesClinicalSignifanceInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableData = [];
 
@@ -820,7 +824,7 @@ function addCustomFilters() {
 
                 });
 
-                $.when(getAllelesTypesInClass()).done(function(result) {
+                getAllelesTypesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableData = [];
 
@@ -913,7 +917,7 @@ function addCustomFilters() {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Localisation" id="proteinLocalisationFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinLocalisationSearchCardBlock" aria-controls="proteinLocalisationSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-trello"></i><span class="nav-link-text"></span>Protein Localisation</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinLocalisationSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;"><div class="ul list-group list-group-flush" id="proteinLocalisationFilterList"></div><form-group class="ui-front"><div class="row"><input class="form-control" type="text" id="proteinLocalisationCellTypeSearchInput" placeholder="Cell type (e.g. adipocytes)" style="width: 100%; margin-left: 15px;"/></div><div class="row" style="align: center;"><select class="form-control" id="proteinLocalisationExpressionTypeSelector" style="width: 45%; float:left; margin-left: 15px;"><option value="All">All (Type)</option><option value="APE - two or more antibodies">Two or more antibodies</option><option value="Staining - one antibody only">One antibody only</option></select><select class="form-control" id="proteinLocalisationLevelSelector" style="width: 45%;"><option value="All">All (Level)</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Not detected">Not detected</option></select></div><div class="row" style="align: center;"><input class="form-control" type="text" id="proteinLocalisationTissueSearchInput" placeholder="Tissue" style="width: 45%; float:left; margin-left: 15px;"/><select class="form-control" id="proteinLocalisationRealibilitySelector" style="width: 45%;"><option value="All">All (Realibility)</option><option value="Low">Low</option><option value="Uncertain">Uncertain</option><option value="Supportive">Supportive</option><option value="High">High</option></select></div><button class="btn btn-success" type="button" style="width:100%;" id="proteinLocalisationSearchButton">Go!</button><button class="btn btn-secondary" type="button" style="width:100%;" id="proteinLocalisationResetButton">Reset</button></form-group></div></div></li>');
 
-                $.when(getProteinAtlasExpressionCellTypesInClass()).done(function(result) {
+                getProteinAtlasExpressionCellTypesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableData = [];
 
@@ -944,7 +948,7 @@ function addCustomFilters() {
 
                 });
 
-                $.when(getProteinAtlasExpressionTissueNamesInClass()).done(function(result) {
+                getProteinAtlasExpressionTissueNamesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableData = [];
 
@@ -1049,7 +1053,7 @@ function addCustomFilters() {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Protein Domain Name" id="proteinDomainFilterLi"><a class="nav-link" data-toggle="collapse" href="#proteinDomainNameSearchCardBlock" aria-controls="proteinDomainNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Protein Domain Name</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="proteinDomainNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="proteinDomainNameFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="proteinDomainNameSearchInput" placeholder="e.g. immunoglobulin subtype"/></form-group></div></div></li>');
 
-                $.when(getProteinDomainNamesInClass()).done(function(result) {
+                getProteinDomainNamesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
                     var availableProteinDomainNames = [];
 
@@ -1107,7 +1111,7 @@ function addCustomFilters() {
                 $("#sidebarUl").append(
                     '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Phenotype" id="phenotypeNameFilterLi"><a class="nav-link" data-toggle="collapse" href="#phenotypeNameSearchCardBlock" aria-controls="phenotypeNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-product-hunt"></i><span class="nav-link-text"></span>Phenotype</a><div class="card" style="width: 100%;"><div class="collapse card-block" id="phenotypeNameSearchCardBlock" style="overflow: auto;"><div class="ul list-group list-group-flush" id="phenotypeFilterList"></div><form-group class="ui-front"><input class="form-control" type="text" id="phenotypeNameSearchInput" placeholder="e.g. Edema"/></form-group></div></div></li>');
                    try {
-                       $.when(getPhenotypeNames()).done(function(result) {
+                        getPhenotypeNames(sessionStorage.getItem('currentClassView'), []).then(function(result) {
                 
                            var availablePhenotypeNames = [];
                 
@@ -1172,8 +1176,9 @@ function addCustomFilters() {
  * @param {string} results: the organism query results from the InterMine server
  */
 function updateOrganismsSidebarFilter() {
+    var className = sessionStorage.getItem('currentClassView');
 
-    $.when(getItemsInClass([])).done(function(result) {
+    getItemsInClass(className, []).then(function(result) {
         // First remove the li elements
         $('#organismshortnamelist').parent().find('li').remove();
 
@@ -1236,7 +1241,6 @@ function updateOrganismsSidebarFilter() {
  * @param {string} results: the organism query results from the InterMine server
  */
 function updatePieChart(result, pieChartID) {
-
     // Update pie
     if (window.pieChartObject) {
         window.pieChartObject.destroy();
@@ -1419,7 +1423,7 @@ function updatePieChart(result, pieChartID) {
 
 function createGoAnnotationFilter() {
     try {
-        $.when(getOntologyTermsInClass()).done(function(result) {
+        getOntologyTermsInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
             var availableGoTerms = [];
 
@@ -1479,7 +1483,7 @@ function createDatasetFilter() {
                 '<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dataset Name" id="datasetFilterLi"><a class="nav-link" data-toggle="collapse" href="#datasetNameSearchCardBlock" aria-controls="datasetNameSearchCardBlock" style="color:black;"><i class="fa fa-fw fa-database"></i><span class="nav-link-text"></span>Dataset Name</a><div class="card" style="width: 100%;">        <div class="collapse card-block" id="datasetNameSearchCardBlock" style="overflow-y: auto; overflow-x:hidden;">            <form-group class="ui-front">                <div id="datasetsSelector"></div>            </form-group><button class="btn btn-block btn-warning" id="btnDatasetViewMore" type="button">View more</button></div>    </div></li>');
         }
 
-        $.when(getDatasetNamesInClass()).done(function(result) {
+        getDatasetNamesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
             if (!window.datasetNamesLoaded) {
                 var availableDatasetNames = [];
 
@@ -1543,7 +1547,7 @@ function createDatasetFilter() {
 
 function createPathwaysNameFilter() {
     try {
-        $.when(getPathwayNamesInClass()).done(function(result) {
+        getPathwayNamesInClass(sessionStorage.getItem('currentClassView'), []).then(function(result) {
 
             var availablePathwayNames = [];
 
@@ -1616,13 +1620,13 @@ function fillMineSelector() {
             var currentMineNameTemp;
             var currentMineUrlTemp;
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].url.startsWith("https")) continue;
+                //if (result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
-                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+                //if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
 
                 // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+                //if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
 
                 var mineUrl = result.instances[i].url;
 
@@ -1777,10 +1781,14 @@ function updateElements(constraints, pieChartID) {
     initializeViewManager();
     addViewManagerSelectOptions();
 
-    $.when(getItemsInClass(constraints)).done(function(result) {
-        createSidebarEvents();
-        updatePieChart(result, pieChartID);
-    });
+    try {
+        getItemsInClass(sessionStorage.getItem('currentClassView'), constraints).then(function(result) {
+            createSidebarEvents();
+            updatePieChart(result, pieChartID);
+        });
+    } catch (err) {
+        console.log("There was an error updating the elements", err);
+    }
 }
 
 /**
@@ -1794,13 +1802,13 @@ function initializeKeyManager() {
         $.when(getIntermines()).done(function(result) {
             // First get the mines
             for (var i = 0; i < result.instances.length; i++) {
-                if (result.instances[i].url.startsWith("https")) continue;
+                //if (result.instances[i].url.startsWith("https")) continue;
 
                 // Temporarily skiping mines with missing concepts for the default filters
-                if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
+                //if (result.instances[i].name == "GrapeMine" || result.instances[i].name == "RepetDB" || result.instances[i].name == "Wheat3BMine" || result.instances[i].name == "WormMine" || result.instances[i].name == "XenMine" || result.instances[i].name == "PlanMine") continue;
 
                 // Mines giving error when querying the API or not responding
-                if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
+                //if (result.instances[i].name == "ModMine" || result.instances[i].name == "MitoMiner") continue;
 
                 var mineName = result.instances[i].name;
 
@@ -1952,7 +1960,7 @@ function initializeViewManager() {
  * @param {string} geneLengthChartID: the div id of the gene length chart, in order to update it
  */
 function updateGeneLengthChart(constraints, geneLengthChartID) {
-    $.when(getGeneLengthsInClass(constraints)).done(function(result) {
+    getGeneLengthsInClass(sessionStorage.getItem('currentClassView'), constraints).then(function(result) {
         if (window.geneLengthChartObject) {
             window.geneLengthChartObject.destroy();
         }

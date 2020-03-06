@@ -8,7 +8,9 @@ footer.sticky-footer {
 
   background-color: $gray-200;
 
-  line-height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   @media (min-width: 992px) {
     width: calc(100% - #{$sidenav-base-width});
   }
