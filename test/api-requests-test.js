@@ -3,20 +3,18 @@ process.env.NODE_ENV = 'test';
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
-let server = require('../app');
-let should = chai.should();
+var expect = chai.expect;
 let intermine = require('imjs');
 
 chai.use(chaiHttp);
 
 describe('API requests using imjs', () => {
   describe('/Obtain pathway names in a given class should not be empty', () => {	  
-	  it('it should get the pathway names inside class Gene in HumanMine', (done) => {
+	  it('it should get the pathway names inside class Gene in zebrafishmine', (done) => {
         
         var service = new intermine.Service({
-            root: "https://www.humanmine.org/humanmine/service"
-        });
-
+            root: 'http://zebrafishmine.org/service'
+        }); 
         var query = {
             "from": "Gene",
             "select": ["pathways.name", "primaryIdentifier"],
@@ -31,10 +29,11 @@ describe('API requests using imjs', () => {
 
         var pathways = new intermine.Query(query, service),
             pathwaysPath = [query.from, query.select[0]].join('.');
-        pathways.summarize(pathwaysPath).then(function(pathwaySummary) {
+            pathways.summarize(pathwaysPath).then(function(pathwaySummary) {
+
             //This returns the pathway name and the number of gene rows associated with the pathway
-            pathwaySummary.should.be.a('array');
-			pathwaySummary.length.should.be.at.least(1);
+            expect(pathwaySummary).to.be.a('object');
+            expect(pathwaySummary).to.include({rootClass: 'Gene'});;
             done();
         });
 

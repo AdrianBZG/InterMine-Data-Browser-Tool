@@ -44,7 +44,7 @@ function getPathwayNamesInClass(className, constraints) {
 
         var pathways = new imjs.Query(query, service),
             pathwaysPath = [query.from, query.select[0]].join('.');
-        pathways.summarize(pathwaysPath).then(function(pathwaySummary) {
+            pathways.summarize(pathwaysPath).then(function(pathwaySummary) {
             //This returns the pathway name and the number of gene rows associated with the pathway
             resolve(pathwaySummary);
         });
