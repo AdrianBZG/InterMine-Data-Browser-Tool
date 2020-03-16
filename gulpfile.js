@@ -1,12 +1,11 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var cleanCSS = require('gulp-clean-css');
-var rename = require("gulp-rename");
-var pkg = require('./package.json');
-var browserSync = require('browser-sync').create();
-var exec = require('child_process').exec;
-var open = require('open');
-var port = process.env.PORT || 3000;
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const cleanCSS = require('gulp-clean-css');
+const rename = require("gulp-rename");
+const browserSync = require('browser-sync').create();
+const exec = require('child_process').exec;
+const open = require('open');
+const port = process.env.PORT || 3000;
 /**
  * Gulp task to copy third party libraries from /node_modules into /vendor
  */
