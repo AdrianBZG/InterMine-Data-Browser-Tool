@@ -7,6 +7,8 @@ const exec = require('child_process').exec;
 const open = require('open');
 const port = process.env.PORT || 3000;
 const clean = require('gulp-clean')
+const pug = require('gulp-pug');
+
 /**
  * Gulp task to copy third party libraries from /node_modules into /vendor
  */
@@ -155,6 +157,16 @@ gulp.task('documentation', function(cb) {
 })
 
 /**
+ * Gulp task for building pug to static html
+ */
+gulp.task('views', function(){
+   return gulp.src('views/main-view.pug')
+      .pipe(rename({basename: 'index'}))
+      .pipe(pug())
+      .pipe(gulp.dest('./public'))
+})
+
+/**
  * Gulp task for launching browser with server url
  */
 gulp.task('browser', function(cb) {
@@ -183,6 +195,7 @@ gulp.task('browserSync', async function() {
    gulp.watch('./node_modules/*', gulp.series('clean:vendor', 'vendor'))
    gulp.watch('./src/img/*', gulp.series('clean:images', 'images'))
    gulp.watch('./src/mine_configs/*', gulp.series('clean:mine_configs', 'mine_configs'))
+   gulp.watch('./views/**/*', gulp.series('views'))
 });
 
 /**
