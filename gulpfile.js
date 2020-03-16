@@ -6,6 +6,7 @@ const browserSync = require('browser-sync').create();
 const exec = require('child_process').exec;
 const open = require('open');
 const port = process.env.PORT || 3000;
+const clean = require('gulp-clean')
 /**
  * Gulp task to copy third party libraries from /node_modules into /vendor
  */
@@ -51,6 +52,13 @@ gulp.task('vendor', function(done) {
     // Signals completion of the task
     done();
 });
+
+/**
+ * Gulp tasks for deleting vendor directory to ensure unused files are removed
+ */
+gulp.task('clean:vendor', function(){
+   return gulp.src('public/vendor', {read:false, allowEmpty: true}).pipe(clean())
+})
 
 /**
  * Gulp task to move the images in the src folder to the public folder
@@ -158,6 +166,7 @@ gulp.task('browserSync', async function() {
 
    gulp.watch('./src/(css|scss)/*', gulp.series('css'))
    gulp.watch('./src/js/*', gulp.series('js'))
+   gulp.watch('./node_modules/*', gulp.series('clean:vendor', 'vendor'))
 });
 
 /**
