@@ -143,6 +143,21 @@ gulp.task('browser', function(cb) {
 })
 
 /**
+ * Gulp task for keeping the browser in sync when the files change. Will load the locally 
+ * rendered pug files, and not from the server.
+ */
+gulp.task('browserSync', async function() {
+   browserSync.init({
+       injectChanges: true,
+       server: {
+          baseDir: './public'
+       },
+       port,
+       files: ['./public/**/*', './views/**/*']
+   });
+});
+
+/**
  * Gulp default task: CSS + JS + Vendor + images
  */
 gulp.task('default', gulp.series(gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs'), 'browser'));
