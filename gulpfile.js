@@ -61,6 +61,13 @@ gulp.task('clean:images', function(){
 })
 
 /**
+ * Gulp tasks for deleting mine configs directory to ensure unused files are removed
+ */
+gulp.task('clean:mine_configs', function(){
+   return gulp.src('public/mine_configs', {read:false, allowEmpty: true}).pipe(clean())
+})
+
+/**
  * Gulp tasks for deleting vendor directory to ensure unused files are removed
  */
 gulp.task('clean:vendor', function(){
@@ -175,6 +182,7 @@ gulp.task('browserSync', async function() {
    gulp.watch('./src/js/*', gulp.series('js'))
    gulp.watch('./node_modules/*', gulp.series('clean:vendor', 'vendor'))
    gulp.watch('./src/img/*', gulp.series('clean:images', 'images'))
+   gulp.watch('./src/mine_configs/*', gulp.series('clean:mine_configs', 'mine_configs'))
 });
 
 /**
