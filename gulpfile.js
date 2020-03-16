@@ -158,6 +158,14 @@ gulp.task('browserSync', async function() {
 });
 
 /**
+ * Gulp dev task. Will do an initial build and then sync changes with the browser using BrowserSync
+ */
+gulp.task('dev', gulp.series(
+    gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs', 'views'), 
+    gulp.series('browserSync')
+    ))
+
+/**
  * Gulp default task: CSS + JS + Vendor + images
  */
 gulp.task('default', gulp.series(gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs'), 'browser'));
