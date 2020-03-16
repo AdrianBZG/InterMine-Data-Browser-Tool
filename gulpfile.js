@@ -155,6 +155,9 @@ gulp.task('browserSync', async function() {
        port,
        files: ['./public/**/*', './views/**/*']
    });
+
+   gulp.watch('./src/(css|scss)/*', gulp.series('css'))
+   gulp.watch('./src/js/*', gulp.series('js'))
 });
 
 /**
