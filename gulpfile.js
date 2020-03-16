@@ -54,6 +54,13 @@ gulp.task('vendor', function(done) {
 });
 
 /**
+ * Gulp tasks for deleting images directory to ensure unused files are removed
+ */
+gulp.task('clean:images', function(){
+   return gulp.src('public/img', {read:false, allowEmpty: true}).pipe(clean())
+})
+
+/**
  * Gulp tasks for deleting vendor directory to ensure unused files are removed
  */
 gulp.task('clean:vendor', function(){
@@ -167,6 +174,7 @@ gulp.task('browserSync', async function() {
    gulp.watch('./src/(css|scss)/*', gulp.series('css'))
    gulp.watch('./src/js/*', gulp.series('js'))
    gulp.watch('./node_modules/*', gulp.series('clean:vendor', 'vendor'))
+   gulp.watch('./src/img/*', gulp.series('clean:images', 'images'))
 });
 
 /**
