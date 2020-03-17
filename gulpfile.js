@@ -1,12 +1,14 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var cleanCSS = require('gulp-clean-css');
-var rename = require("gulp-rename");
-var pkg = require('./package.json');
-var browserSync = require('browser-sync').create();
-var exec = require('child_process').exec;
-var open = require('open');
-var port = process.env.PORT || 3000;
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const cleanCSS = require('gulp-clean-css');
+const rename = require("gulp-rename");
+const browserSync = require('browser-sync').create();
+const exec = require('child_process').exec;
+const open = require('open');
+const port = process.env.PORT || 3000;
+const clean = require('gulp-clean')
+const pug = require('gulp-pug');
+
 /**
  * Gulp task to copy third party libraries from /node_modules into /vendor
  */
@@ -52,6 +54,27 @@ gulp.task('vendor', function(done) {
     // Signals completion of the task
     done();
 });
+
+/**
+ * Gulp tasks for deleting images directory to ensure unused files are removed
+ */
+gulp.task('clean:images', function(){
+   return gulp.src('public/img', {read:false, allowEmpty: true}).pipe(clean())
+})
+
+/**
+ * Gulp tasks for deleting mine configs directory to ensure unused files are removed
+ */
+gulp.task('clean:mine_configs', function(){
+   return gulp.src('public/mine_configs', {read:false, allowEmpty: true}).pipe(clean())
+})
+
+/**
+ * Gulp tasks for deleting vendor directory to ensure unused files are removed
+ */
+gulp.task('clean:vendor', function(){
+   return gulp.src('public/vendor', {read:false, allowEmpty: true}).pipe(clean())
+})
 
 /**
  * Gulp task to move the images in the src folder to the public folder
@@ -134,6 +157,16 @@ gulp.task('documentation', function(cb) {
 })
 
 /**
+ * Gulp task for building pug to static html
+ */
+gulp.task('views', function(){
+   return gulp.src('views/main-view.pug')
+      .pipe(rename({basename: 'index'}))
+      .pipe(pug())
+      .pipe(gulp.dest('./public'))
+})
+
+/**
  * Gulp task for launching browser with server url
  */
 gulp.task('browser', function(cb) {
@@ -142,6 +175,36 @@ gulp.task('browser', function(cb) {
     console.log("Browser Launched");
     return cb();
 })
+
+/**
+ * Gulp task for keeping the browser in sync when the files change. Will load the locally 
+ * rendered pug files, and not from the server.
+ */
+gulp.task('browserSync', async function() {
+   browserSync.init({
+       injectChanges: true,
+       server: {
+          baseDir: './public'
+       },
+       port,
+       files: ['./public/**/*', './views/**/*']
+   });
+
+   gulp.watch('./src/(css|scss)/*', gulp.series('css'))
+   gulp.watch('./src/js/*', gulp.series('js'))
+   gulp.watch('./node_modules/*', gulp.series('clean:vendor', 'vendor'))
+   gulp.watch('./src/img/*', gulp.series('clean:images', 'images'))
+   gulp.watch('./src/mine_configs/*', gulp.series('clean:mine_configs', 'mine_configs'))
+   gulp.watch('./views/**/*', gulp.series('views'))
+});
+
+/**
+ * Gulp dev task. Will do an initial build and then sync changes with the browser using BrowserSync
+ */
+gulp.task('dev', gulp.series(
+    gulp.parallel('css', 'js', 'vendor', 'images', 'mine_configs', 'views'), 
+    gulp.series('browserSync')
+    ))
 
 /**
  * Gulp default task: CSS + JS + Vendor + images

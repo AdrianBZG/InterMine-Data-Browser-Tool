@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "gulp & node ./bin/www",
-    "dev": "gulp && webpack --config webpack.config.js",
+    "dev": "gulp dev",
     "test": "mocha --timeout 100000"
   },
   "author": "Adrian Rodriguez-Bazaga",
@@ -57,6 +57,8 @@
     "browser-sync": "^2.26.7",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-pug": "^4.0.1",
     "mocha": "^5.2.0"
   }
 }
