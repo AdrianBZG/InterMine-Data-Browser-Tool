@@ -14,8 +14,8 @@ $(document).ready(function() {
     window.tableConstraintLogic = "(A OR B OR C OR D OR E OR F OR G OR H OR I OR J) AND (K) AND (L) AND (M) AND (N) AND (O) AND (P) AND (Q) AND (R) AND (O AND S) AND (T AND U AND V) AND (Y AND Z AND W AND X)";
 
     document.title = currentClassView + " in HumanMine";
-    $("#proteinsButton").removeClass("btn-primary").addClass("btn-default");
-    $("#genesButton").removeClass("btn-default").addClass("btn-primary");
+    $("#proteinsButton").removeClass("btn-primary").addClass("btn-outline-primary");
+    $("#genesButton").removeClass("btn-outline-primary").addClass("btn-primary");
     var mineUrl = window.mineUrl.replace(/COLON/g, ":").replace(/SLASH/g, "/");
 
     // Remove Graphs box if class is not currently Gene or Protein (issue #39)
@@ -142,7 +142,7 @@ function initializeViewButtons() {
                 '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-primary btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
         } else {
             $("#headerButtons").append(
-                '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-default btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
+                '<a href="#" data-toggle="tooltip" title="Change to ' + defaultViews[i] + ' view"><button class="btn btn-outline-primary btn-space" id="' + defaultViews[i] + 'Button" type="button">' + defaultViews[i] + '</button></a>');
         }
 
         $('#' + defaultViews[i] + 'Button').click(function(event) {
@@ -174,7 +174,7 @@ function initializeViewButtons() {
                         '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-primary btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
                 } else {
                     $("#headerButtons").append(
-                        '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-default btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
+                        '<a href="#" data-toggle="tooltip" title="Change to ' + mineClassesArray[i].name + ' view"><button class="btn btn-primary btn-space" id="' + mineClassesArray[i].name + 'Button" type="button">' + mineClassesArray[i].name + '</button></a>');    
                 }
 
                 $('#' + mineClassesArray[i].name + 'Button').click(function(event) {
