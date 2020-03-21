@@ -121,8 +121,8 @@ body.fixed-nav {
 // Scroll to top button
 .scroll-to-top {
   position: fixed;
-  right: 15px;
-  bottom: 3px;
+  right: 5px;
+  bottom: 8px;
 
   display: none;
 
@@ -144,6 +144,23 @@ body.fixed-nav {
   }
   i {
     font-weight: 800;
+  }
+}
+
+// Scroll to Top Button
+#scrollToTopBtn {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  padding: 4px 8px;
+  background-color: #0044cc;
+  color: #fff;
+  opacity: 0.5;
+  display: none;
+  z-index: 9;
+
+  &:hover {
+    opacity: 1;
   }
 }
 
