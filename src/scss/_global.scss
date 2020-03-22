@@ -118,40 +118,13 @@ body.fixed-nav {
   padding-top: 1rem;
 }
 
-// Scroll to top button
-.scroll-to-top {
-  position: fixed;
-  right: 5px;
-  bottom: 8px;
 
-  display: none;
-
-  width: 50px;
-  height: 50px;
-
-  text-align: center;
-
-  color: white;
-  background: fade-out($gray-800, .5);
-
-  line-height: 45px;
-  &:focus,
-  &:hover {
-    color: white;
-  }
-  &:hover {
-    background: $gray-800;
-  }
-  i {
-    font-weight: 800;
-  }
-}
 
 // Scroll to Top Button
 #scrollToTopBtn {
   position: fixed;
   right: 30px;
-  bottom: 30px;
+  bottom: 50px;
   padding: 4px 8px;
   background-color: #0044cc;
   color: #fff;
@@ -162,6 +135,10 @@ body.fixed-nav {
   &:hover {
     opacity: 1;
   }
+}
+
+@media (max-width: 600px){
+  #scrollToTopBtn{bottom: 75px;}
 }
 
 .ui-state-active a,
