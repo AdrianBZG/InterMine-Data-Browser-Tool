@@ -1,5 +1,21 @@
 $(document).ready(function() {
     initializeStartupConfiguration();
+
+    // Scroll to Top button script
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 200) {
+            $('#scrollToTopBtn').fadeIn();
+        } else {
+            $('#scrollToTopBtn').fadeOut();
+        }
+    });
+
+    $('#scrollToTopBtn').click(function() {
+        $('body, html').animate({
+            scrollTop: 0
+        }, 800);
+        return false;
+    })
 });
 
 /**

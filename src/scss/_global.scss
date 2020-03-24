@@ -118,33 +118,27 @@ body.fixed-nav {
   padding-top: 1rem;
 }
 
-// Scroll to top button
-.scroll-to-top {
+
+
+// Scroll to Top Button
+#scrollToTopBtn {
   position: fixed;
-  right: 15px;
-  bottom: 3px;
-
+  right: 30px;
+  bottom: 50px;
+  padding: 4px 8px;
+  background-color: #0044cc;
+  color: #fff;
+  opacity: 0.5;
   display: none;
+  z-index: 9;
 
-  width: 50px;
-  height: 50px;
-
-  text-align: center;
-
-  color: white;
-  background: fade-out($gray-800, .5);
-
-  line-height: 45px;
-  &:focus,
   &:hover {
-    color: white;
+    opacity: 1;
   }
-  &:hover {
-    background: $gray-800;
-  }
-  i {
-    font-weight: 800;
-  }
+}
+
+@media (max-width: 785px){
+  #scrollToTopBtn{bottom: 75px;}
 }
 
 .ui-state-active a,
