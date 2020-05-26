@@ -13,9 +13,9 @@ print_background: false
 #  1. Introduction
   
   
-This software  design document is for the migration of the intermine data browser to a react/es6 app. It describes the architecture and system design used in that process.
+This software design document is for the migration of the intermine data browser to a react/es6 app. It describes the architecture and system design used in that process.
 
-It was formulated alongside Adrián Rodríguez-Bazaga, and Nikhil Vats, mentors for the May 2020 Outreachy internship round.
+It was formulated by John Mendez alongside Adrián Rodríguez-Bazaga, and Nikhil Vats, mentors for the May 2020 Outreachy internship round.
   
 ##  1.1. Purpose
   
