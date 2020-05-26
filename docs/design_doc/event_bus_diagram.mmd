@@ -1,0 +1,16 @@
+sequenceDiagram
+   participant Comp1
+   participant Comp2
+   participant Comp3
+   rect rgba(33, 137, 255, .5)
+   Comp3 ->> event bus: COMP_3_MESSAGE
+   event bus ->> +Atom3: COMP_3_MESSAGE
+   Atom3 ->>- Comp3: RENDER COMPONENT
+   end
+   rect rgba(110, 66, 193, .3)
+   event bus ->> +Atom2: COMP_3_MESSAGE
+   Atom2 ->>-Comp2: RENDER COMPONENT
+   end
+   rect rgba(179, 29, 39, .4)
+   event bus -x Atom1: COMP_3_MESSAGE
+   end
