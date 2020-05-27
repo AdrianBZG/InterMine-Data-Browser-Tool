@@ -15,7 +15,7 @@ print_background: false
   
 This software design document is for the migration of the intermine data browser to a react/es6 app. It describes the architecture and system design used in that process.
 
-It was formulated by John Mendez alongside Adrián Rodríguez-Bazaga, and Nikhil Vats, mentors for the May 2020 Outreachy internship round.
+It was formulated by John Mendez in collaboration with Adrián Rodríguez-Bazaga, Nikhil Vats, and Aman Dwivedi.
   
 ##  1.1. Purpose
   
@@ -120,7 +120,7 @@ The user interface should feel inviting to users, both new and loyal. At each st
   
 To achieve this goal, the application is designed according to these principles:
   
-1. **The every user matters principle**:  this application is data heavy, dense, and requires reading charts. So at the least we strive to achieve the W3C accessibility standards.
+1. **The every user matters principle**:  this application is data heavy, dense, and requires reading charts. We strive to achieve the W3C accessibility standards, especially for non-mouse users.
 
 
 2. **The simplicity principle**: It should *always* be clear what actions the user can take at each step of the flow. We will prevent the user from bringing the application to an invalid state. If they do, we display clear error messages and guidance.
@@ -132,7 +132,7 @@ To achieve this goal, the application is designed according to these principles:
 ##  UI Mockups
   
   
-The following images describe ideal workflow states for the user.
+The following images describe ideal workflow states for the user. To achieve our goal for accessivbility, we leverage the UI library `reakit`.
   
 ###  Full Application
   
