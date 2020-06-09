@@ -1,85 +1,68 @@
-# InterMine Data Browser
-<p align="left">Build Status (Travis CI): <a href="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool"><img src="https://travis-ci.org/AdrianBZG/InterMine-Data-Browser-Tool.svg?branch=master"></a><br>
-<p align="left"><img src="https://badges.frapsoft.com/os/v1/open-source.png?v=103"> <a href="LICENSE"><img src="https://img.shields.io/badge/License-LGPL%202.1-blue.svg"></a> <img src="https://img.shields.io/david/strongloop/express.svg"></p>
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-The goal of this project is to implement a faceted search tool to display the data from InterMine database, allowing the users to search easily within the different mines available around InterMine without the requirement of having an extensive knowledge of the data model.
+## Available Scripts
 
-For the project organization, please refer to [InterMine](https://github.com/intermine)
+In the project directory, you can run:
 
-_Please note that the development is very early on and the project is not ready to use yet._
+### `yarn start`
 
-## DEPLOYMENT
+Runs the app in the development mode.<br />
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-Try it out with the Heroku deployment [here](http://im-browser-prototype.herokuapp.com/) (automatic deployment, may have some delay)
+The page will reload if you make edits.<br />
+You will also see any lint errors in the console.
 
-## GETTING STARTED
+### `yarn test`
 
-Please visit [Getting Started](getting-started.md)
+Launches the test runner in the interactive watch mode.<br />
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-## DEPENDENCIES
+### `yarn build`
 
-Check [package.json file](package.json)
+Builds the app for production to the `build` folder.<br />
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## DOCUMENTATION
+The build is minified and the filenames include the hashes.<br />
+Your app is ready to be deployed!
 
-Apart from the in-line comments in the code, documentation generated with _documentation.js_ can be accessed [here](https://adrianbzg.github.io/InterMine-Data-Browser-Tool/). To update the documentation, the 'gulp documentation' is available.
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## REQUIRED ONTOLOGY CONCEPTS (PER MINE) FOR EACH FILTER
+### `yarn eject`
 
-|        Filter        |                                                                                 Ontology concepts                                                                                |
-|:--------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|     GO Annotation    |                                                                          goAnnotation.ontologyTerm.name                                                                          |
-|     Dataset Name     |                                                                                   dataSets.name                                                                                  |
-|     Pathway Name     |                                                                                   pathways.name                                                                                  |
-|  Organism short name |                                                                              Gene.organism.shortName                                                                             |
-|       Location       |                                                      locations.start + locations.end + locations.locatedOn.primaryIdentifier                                                     |
-|    Diseases (OMIM)   |                                                                                   diseases.name                                                                                  |
-|        ClinVar       |                                                                    alleles.clinicalSignificance + alleles.type                                                                   |
-| Protein Localisation | proteinAtlasExpression.cellType + proteinAtlasExpression.tissue.name + proteinAtlasExpression.expressionType + proteinAtlasExpression.level + proteinAtlasExpression.reliability |
-|  Protein Domain Name |                                                                 proteins.proteinDomainRegions.proteinDomain.name                                                                 |
-|     Interactions     |                                         interactions.participant2.symbol + interactions.details.type + interactions.details.dataSets.name                                        |
-|      Expression      |                                 atlasExpression.pValue + atlasExpression.tStatistic + atlasExpression.expression + atlasExpression.dataSets.name                                 |
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-## CONTRIBUTING GUIDELINES
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-1. Find a thing to fix/implement in [Issues](https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues?direction=desc&sort=created&state=open) or come up with your own idea, [create a discussion issue](https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues/new) for it and get a feedback.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-2. [Fork](https://help.github.com/articles/fork-a-repo) the repository.
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-3. Create your new feature branch.
+## Learn More
 
-   ``` bash
-   git checkout -b my-new-feature
-   ```
-   
-4. Commit your changes.
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-   ``` bash
-   git commit -am 'Add some feature
-   ```
-   
-5. Push to the newly created feature branch.
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-   ``` bash
-   git push origin my-new-feature
-   ```
-   
-6. Create a new [Pull Request](https://help.github.com/articles/using-pull-requests)
+### Code Splitting
 
-## CONTACT
+This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
 
-You can contact the developers by opening a new issue in this repository [here](https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/issues/new).
+### Analyzing the Bundle Size
 
-## SCREENSHOTS
+This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-Searching in HumanMine (Release 1.1.0)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/qdU3oiu.png" /></div>
+### Making a Progressive Web App
 
-Searching in HumanMine for Alzheimer disease (Release 1.1.0)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/gP97sDM.png" /></div>
+This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
 
-Searching in FlyMine (Release 1.1.0)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/4dgqXLl.png" /></div>
+### Advanced Configuration
 
-Searching in HymenopteraMine (Release 1.1.0)<br>
-<div style="text-align:center"><img src ="https://i.imgur.com/Duhsj3P.png" /></div>
+This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+
+### Deployment
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+
+### `yarn build` fails to minify
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify

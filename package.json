@@ -1,7 +1,7 @@
 {
-  "title": "InterMine Data Brpwser",
+  "title": "InterMine Data Browser",
   "name": "intermine-data-browser",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "A web-based data browser for InterMine",
   "homepage": "https://github.com/InterMine/InterMine-Data-Browser-Tool",
   "bugs": {
@@ -9,10 +9,11 @@
     "email": "adrianrodriguezbazaga@gmail.com"
   },
   "scripts": {
-    "start": "",
-    "dev": "",
-    "serve": "serve orig_app",
-    "test": ""
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "serve": "serve orig_app"
   },
   "author": "Adrian Rodriguez-Bazaga",
   "contributors": [
@@ -32,6 +33,29 @@
     "url": "https://github.com/InterMine/InterMine-Data-Browser-Tool"
   },
   "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "react-scripts": "3.4.1",
     "serve": "^11.3.2"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
