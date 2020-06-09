@@ -27,8 +27,20 @@
 		"@testing-library/jest-dom": "^4.2.4",
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
+		"@typescript-eslint/eslint-plugin": "2.x",
+		"@typescript-eslint/parser": "2.x",
+		"babel-eslint": "10.x",
+		"eslint": "6.x",
 		"eslint-config-prettier": "^6.11.0",
+		"eslint-config-react-app": "^5.2.1",
+		"eslint-plugin-flowtype": "4.x",
+		"eslint-plugin-import": "2.x",
+		"eslint-plugin-jsx-a11y": "6.x",
+		"eslint-plugin-react": "7.x",
+		"eslint-plugin-react-hooks": "2.x",
 		"eslint-plugin-simple-import-sort": "^5.0.3",
+		"husky": ">=4",
+		"lint-staged": ">=10",
 		"prettier": "^2.0.5",
 		"prettier-plugin-package": "^1.0.0",
 		"react-scripts": "3.4.1",
@@ -60,6 +72,18 @@
 	],
 	"eslintConfig": {
 		"extends": "react-app"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{json,css,md}": "prettier --write",
+		"*.{js,jsx}": [
+			"prettier --write",
+			"eslint --cache --fix"
+		]
 	},
 	"title": "InterMine Data Browser"
 }
