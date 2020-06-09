@@ -11,6 +11,7 @@
   "scripts": {
     "start": "gulp & node ./bin/www",
     "dev": "gulp dev",
+    "serve": "serve orig_app",
     "test": "mocha --timeout 100000"
   },
   "author": "Adrian Rodriguez-Bazaga",
@@ -51,7 +52,8 @@
     "jsdom": "^11.11.0",
     "morgan": "~1.9.0",
     "open": "^7.0.2",
-    "pug": "^2.0.4"
+    "pug": "^2.0.4",
+    "serve": "^11.3.2"
   },
   "devDependencies": {
     "browser-sync": "^2.26.7",
