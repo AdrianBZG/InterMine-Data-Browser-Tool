@@ -5575,6 +5575,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-simple-import-sort@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "eslint-plugin-simple-import-sort@npm:5.0.3"
+  peerDependencies:
+    eslint: ">=5.0.0"
+  checksum: 75bd43970b6f2b92967eef34d6972ac136980cb8eab2ddcb16ec16efe8a3ecf5a0db207581c23bd141c0597258835958b66da1d8db961c721114ecd7204d167a
+  languageName: node
+  linkType: hard
+
 "eslint-scope@npm:^4.0.3":
   version: 4.0.3
   resolution: "eslint-scope@npm:4.0.3"
@@ -7264,6 +7273,7 @@ fsevents@^1.2.7:
     "@testing-library/react": ^9.3.2
     "@testing-library/user-event": ^7.1.2
     eslint-config-prettier: ^6.11.0
+    eslint-plugin-simple-import-sort: ^5.0.3
     prettier: ^2.0.5
     prettier-plugin-package: ^1.0.0
     react: ^16.13.1
