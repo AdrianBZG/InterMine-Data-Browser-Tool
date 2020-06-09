@@ -1487,6 +1487,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@craco/craco@npm:^5.6.4":
+  version: 5.6.4
+  resolution: "@craco/craco@npm:5.6.4"
+  dependencies:
+    cross-spawn: ^7.0.0
+    lodash: ^4.17.15
+    webpack-merge: ^4.2.2
+  peerDependencies:
+    react-scripts: "*"
+  bin:
+    craco: ./bin/craco.js
+  checksum: 30cf931da3b8c4c91f2b5788f057027fa6a6ed250cc548bc237e8e8f1b91f1667785bb8015ca03d9e40d9a9ff0df6acdd7fd9ec61ec67d0e0d707ad41f8b57fa
+  languageName: node
+  linkType: hard
+
 "@csstools/convert-colors@npm:^1.4.0":
   version: 1.4.0
   resolution: "@csstools/convert-colors@npm:1.4.0"
@@ -7561,6 +7576,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "intermine-data-browser@workspace:."
   dependencies:
+    "@craco/craco": ^5.6.4
     "@testing-library/jest-dom": ^4.2.4
     "@testing-library/react": ^9.3.2
     "@testing-library/user-event": ^7.1.2
@@ -14817,6 +14833,15 @@ resolve@^1.17.0:
   peerDependencies:
     webpack: 2 || 3 || 4
   checksum: 00f084e2c2883fa68996758446784e366c76fb32a4cffa5131824dc7c2f8ab8b8c24e8cb8c3bd0776f2ef0471fddc9c37ec7712add925341885ee0cdbc48c4b8
+  languageName: node
+  linkType: hard
+
+"webpack-merge@npm:^4.2.2":
+  version: 4.2.2
+  resolution: "webpack-merge@npm:4.2.2"
+  dependencies:
+    lodash: ^4.17.15
+  checksum: 038c6d8ba45f538ce8e4505a8a3d90fbd2e554ba2065bacffe4d7cff0229cce9f0d983bf56061f8e0fef86c711da7232f88681aab285c06673b3916b1040cd9e
   languageName: node
   linkType: hard
 
