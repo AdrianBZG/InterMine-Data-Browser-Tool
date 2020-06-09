@@ -83,7 +83,7 @@
 		"*.{json,css,md}": "prettier --write",
 		"*.{js,jsx}": [
 			"prettier --write",
-			"eslint --cache --fix"
+			"eslint --fix"
 		]
 	},
 	"title": "InterMine Data Browser"
