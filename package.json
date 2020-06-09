@@ -1,62 +1,63 @@
 {
-  "title": "InterMine Data Browser",
-  "name": "intermine-data-browser",
-  "version": "2.0.0",
-  "description": "A web-based data browser for InterMine",
-  "homepage": "https://github.com/InterMine/InterMine-Data-Browser-Tool",
-  "bugs": {
-    "url": "https://github.com/InterMine/InterMine-Data-Browser-Tool/issues",
-    "email": "adrianrodriguezbazaga@gmail.com"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "serve": "serve orig_app"
-  },
-  "author": "Adrian Rodriguez-Bazaga",
-  "contributors": [
-    "Yo Yehudi",
-    "Rachel Lyne",
-    "LarkhSingla",
-    "Divyanshu Mahajan",
-    "Ankit Kumar",
-    "Nikhil Vats",
-    "Himanshu Singh",
-    "Varun Bhandia",
-    "holloh",
-    "himanshuc3"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/InterMine/InterMine-Data-Browser-Tool"
-  },
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "prettier": "^2.0.5",
-    "react-scripts": "3.4.1",
-    "serve": "^11.3.2"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+	"name": "intermine-data-browser",
+	"version": "2.0.0",
+	"description": "A web-based data browser for InterMine",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool"
+	},
+	"author": "Adrian Rodriguez-Bazaga",
+	"homepage": "https://github.com/InterMine/InterMine-Data-Browser-Tool",
+	"bugs": {
+		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool/issues",
+		"email": "adrianrodriguezbazaga@gmail.com"
+	},
+	"scripts": {
+		"build": "react-scripts build",
+		"eject": "react-scripts eject",
+		"serve": "serve orig_app",
+		"start": "react-scripts start",
+		"test": "react-scripts test"
+	},
+	"dependencies": {
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.3.2",
+		"@testing-library/user-event": "^7.1.2",
+		"prettier": "^2.0.5",
+		"prettier-plugin-package": "^1.0.0",
+		"react-scripts": "3.4.1",
+		"serve": "^11.3.2"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"contributors": [
+		"Yo Yehudi",
+		"Rachel Lyne",
+		"LarkhSingla",
+		"Divyanshu Mahajan",
+		"Ankit Kumar",
+		"Nikhil Vats",
+		"Himanshu Singh",
+		"Varun Bhandia",
+		"holloh",
+		"himanshuc3"
+	],
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"title": "InterMine Data Browser"
 }
