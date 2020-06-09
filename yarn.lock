@@ -8112,7 +8112,11 @@ fsevents@^1.2.7:
     react-scripts: 3.4.1
     serve: ^11.3.2
     stylelint: ^13.6.0
+    stylelint-8-point-grid: ^0.2.6
+    stylelint-a11y: ^1.2.3
+    stylelint-config-prettier: ^8.0.1
     stylelint-config-recommended: ^3.0.0
+    stylelint-declaration-block-no-ignored-properties: ^2.3.0
   languageName: unknown
   linkType: soft
 
@@ -14966,6 +14970,35 @@ resolve@^1.17.0:
   languageName: node
   linkType: hard
 
+"stylelint-8-point-grid@npm:^0.2.6":
+  version: 0.2.6
+  resolution: "stylelint-8-point-grid@npm:0.2.6"
+  dependencies:
+    stylelint: ^13.3.2
+  checksum: ff6a987d15b41098fcde794536decd710fc4754b3d26ece9ea8826870df29e76fb2f18439e9f502f88fe3f34284c3ec443e6e725930af692f3f3f7c212f9442a
+  languageName: node
+  linkType: hard
+
+"stylelint-a11y@npm:^1.2.3":
+  version: 1.2.3
+  resolution: "stylelint-a11y@npm:1.2.3"
+  peerDependencies:
+    stylelint: ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0
+  checksum: 4fd3f0c9a98d044fe428169ebd554ef98b88aefa3a438eefe411511e2ef99f7892b334fd85f571e2ad2889011aec789c53a99fd296cc61852e031cde5c980719
+  languageName: node
+  linkType: hard
+
+"stylelint-config-prettier@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "stylelint-config-prettier@npm:8.0.1"
+  peerDependencies:
+    stylelint: ">=11.0.0"
+  bin:
+    stylelint-config-prettier-check: bin/check.js
+  checksum: 6b9d562852ec8173f4fa38da83a1d3c53fafe6bf860f23143261bdc5fd70304be8c01c640bc02e5cc0cce19bde298aae810108e497f7462cdb7efae237699163
+  languageName: node
+  linkType: hard
+
 "stylelint-config-recommended@npm:^3.0.0":
   version: 3.0.0
   resolution: "stylelint-config-recommended@npm:3.0.0"
@@ -14975,7 +15008,18 @@ resolve@^1.17.0:
   languageName: node
   linkType: hard
 
-"stylelint@npm:^13.6.0":
+"stylelint-declaration-block-no-ignored-properties@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "stylelint-declaration-block-no-ignored-properties@npm:2.3.0"
+  dependencies:
+    postcss: ^7.0.27
+  peerDependencies:
+    stylelint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0
+  checksum: 94f9e925cfe0520dc7c231f3b9b9f04195cf3d13311f48bb0230a7610764dba90f5fdac0e85ebf854db5ed08c1cd27f3cf2724714175c349bd889eeffcfa18b8
+  languageName: node
+  linkType: hard
+
+"stylelint@npm:^13.3.2, stylelint@npm:^13.6.0":
   version: 13.6.0
   resolution: "stylelint@npm:13.6.0"
   dependencies:
