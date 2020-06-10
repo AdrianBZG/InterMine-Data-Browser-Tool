@@ -1,10 +1,10 @@
 import 'modern-normalize'
-import './rootStyles.js'
+import './styles.root.js'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { App } from './App'
+import { App } from './components/App'
 import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
