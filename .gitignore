@@ -25,3 +25,6 @@ yarn-error.log*
 
 # linaria
 src/.linaria_cache
+
+# Yarn
+*install-state.gz
