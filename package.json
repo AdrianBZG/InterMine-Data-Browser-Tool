@@ -87,7 +87,7 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "lint-staged"
+			"pre-commit": "NODE_ENV=development lint-staged"
 		}
 	},
 	"lint-staged": {
