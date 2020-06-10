@@ -12,10 +12,13 @@
 		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool/issues",
 		"email": "adrianrodriguezbazaga@gmail.com"
 	},
+	"engines": {
+		"node": ">=10"
+	},
 	"scripts": {
 		"build": "craco build",
 		"eject": "craco eject",
-		"lint:css": "NODE_ENV=development stylelint src/**/*.js{x}",
+		"lint:css": "cross-env NODE_ENV=development stylelint src/**/*.js{x}",
 		"lint:js": "eslint src/**/*.{js,jsx}",
 		"serve": "serve orig_app",
 		"start": "craco start",
@@ -36,6 +39,7 @@
 		"babel-eslint": "10.x",
 		"babel-preset-react-app": "^9.1.2",
 		"craco-linaria": "^1.1.2",
+		"cross-env": "^7.0.2",
 		"eslint": "6.x",
 		"eslint-config-prettier": "^6.11.0",
 		"eslint-config-react-app": "^5.2.1",
@@ -89,7 +93,7 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "NODE_ENV=development lint-staged"
+			"pre-commit": "cross-env NODE_ENV=development lint-staged"
 		}
 	},
 	"lint-staged": {
