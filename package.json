@@ -15,7 +15,7 @@
 	"scripts": {
 		"build": "craco build",
 		"eject": "craco eject",
-		"lint:css": "stylelint src/**/*.{js,jsx}",
+		"lint:css": "NODE_ENV=development stylelint src/**/*.js{x}",
 		"lint:js": "eslint src/**/*.{js,jsx}",
 		"serve": "serve orig_app",
 		"start": "craco start",
@@ -33,6 +33,7 @@
 		"@typescript-eslint/eslint-plugin": "2.x",
 		"@typescript-eslint/parser": "2.x",
 		"babel-eslint": "10.x",
+		"babel-preset-react-app": "^9.1.2",
 		"craco-linaria": "^1.1.2",
 		"eslint": "6.x",
 		"eslint-config-prettier": "^6.11.0",

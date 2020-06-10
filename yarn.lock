@@ -8092,6 +8092,7 @@ fsevents@^1.2.7:
     "@typescript-eslint/eslint-plugin": 2.x
     "@typescript-eslint/parser": 2.x
     babel-eslint: 10.x
+    babel-preset-react-app: ^9.1.2
     craco-linaria: ^1.1.2
     eslint: 6.x
     eslint-config-prettier: ^6.11.0
