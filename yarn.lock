@@ -8106,6 +8106,7 @@ fsevents@^1.2.7:
     husky: ">=4"
     linaria: ^1.3.3
     lint-staged: ">=10"
+    modern-normalize: ^0.6.0
     prettier: ^2.0.5
     prettier-plugin-package: ^1.0.0
     react: ^16.13.1
@@ -10432,6 +10433,13 @@ fsevents@^1.2.7:
   bin:
     mkdirp: bin/cmd.js
   checksum: 1aa3a6a2d7514f094a91329ec09994f5d32d2955a4985ecbb3d86f2aaeafc4aa11521f98d606144c1d49cd9835004d9a73342709b8c692c92e59eacf37412468
+  languageName: node
+  linkType: hard
+
+"modern-normalize@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "modern-normalize@npm:0.6.0"
+  checksum: 7a64657fe8e6d870c043cf255aaf90b15bfbbe44bf11d30813f8c6c3d814c1c6367d96c670b8859a837a1137eb53930eef8901374d39e044496c36f0468fd006
   languageName: node
   linkType: hard
 
