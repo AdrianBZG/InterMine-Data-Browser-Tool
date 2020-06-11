@@ -20,6 +20,7 @@ export const Text = ({
 	className,
 	fontWeight,
 	screenreaderOnly: visuallyHidden,
+	style,
 }) => {
 	const platform = isMobile ? 'mobile' : 'desktop'
 	let weight = 400 // medium
@@ -39,6 +40,9 @@ export const Text = ({
 			size={textSizes[platform][fontSize]}
 			fontWeight={weight}
 			lineHeight={lh}
+			// this is required so css can be overridden by the consumer, it is not used by us,
+			// only passed forward
+			style={style}
 		>
 			{children}
 		</StyledText>
