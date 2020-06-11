@@ -3,6 +3,7 @@ import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 
+import { fontSizes } from '../theme/fontSizes'
 import { screenreaderOnly } from '../theme/utils'
 
 const StyledText = styled.div`
@@ -37,7 +38,7 @@ export const Text = ({
 		<StyledText
 			className={cx(className, visuallyHidden && screenreaderOnly)}
 			as={as}
-			size={textSizes[platform][fontSize]}
+			size={fontSizes[platform][fontSize]}
 			fontWeight={weight}
 			lineHeight={lh}
 			// this is required so css can be overridden by the consumer, it is not used by us,
@@ -71,32 +72,9 @@ Text.P = P
 Text.Span = Span
 Text.Div = Div
 
-const textSizes = {
-	desktop: {
-		'00': '48px',
-		'0': '40px',
-		'1': '32px',
-		'2': '24px',
-		'3': '20px',
-		'4': '16px',
-		'5': '14px',
-		'6': '12px',
-	},
-	mobile: {
-		'00': '40px',
-		'0': '32px',
-		'1': '26px',
-		'2': '22px',
-		'3': '18px',
-		'4': '16px',
-		'5': '14px',
-		'6': '12px',
-	},
-}
-
 const commonPropTypes = {
 	// in decreasing order of size
-	fontSize: PropTypes.oneOf(['00', '0', '1', '2', '3', '4', '5', '6']),
+	fontSize: PropTypes.oneOf(['xsmall', 'small', 'medium', 'large']),
 	isMobile: PropTypes.bool,
 	lineHeight: PropTypes.oneOf(['default', 'condensed', 'condensed-ultra']),
 	weight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
@@ -104,7 +82,7 @@ const commonPropTypes = {
 }
 
 const commonProps = {
-	fontSize: '4',
+	fontSize: 'medium',
 	isMobile: false,
 	lineHeight: 'default',
 	fontWeight: 'regular',
