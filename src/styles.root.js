@@ -3,9 +3,6 @@ import { css } from 'linaria'
 export const globals = css`
 	:global() {
 		:root {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-				'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-
 			${'' /* 
          When using light text on dark background, text appears thicker.
          Setting font smoothing fixes this.
