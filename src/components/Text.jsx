@@ -50,15 +50,15 @@ export const Text = ({
 }
 
 // semantically correct variants
-const H1 = ({ children }) => React.cloneElement(<Text />, { as: 'h1' }, children)
-const H2 = ({ children }) => React.cloneElement(<Text />, { as: 'h2' }, children)
-const H3 = ({ children }) => React.cloneElement(<Text />, { as: 'h3' }, children)
-const H4 = ({ children }) => React.cloneElement(<Text />, { as: 'h4' }, children)
-const H5 = ({ children }) => React.cloneElement(<Text />, { as: 'h5' }, children)
-const H6 = ({ children }) => React.cloneElement(<Text />, { as: 'h6' }, children)
-const P = ({ children }) => React.cloneElement(<Text />, { as: 'p' }, children)
-const Span = ({ children }) => React.cloneElement(<Text />, { as: 'span' }, children)
-const Div = ({ children }) => React.cloneElement(<Text />, { as: 'div' }, children)
+const H1 = (props) => React.cloneElement(<Text />, { ...props, as: 'h1' })
+const H2 = (props) => React.cloneElement(<Text />, { ...props, as: 'h2' })
+const H3 = (props) => React.cloneElement(<Text />, { ...props, as: 'h3' })
+const H4 = (props) => React.cloneElement(<Text />, { ...props, as: 'h4' })
+const H5 = (props) => React.cloneElement(<Text />, { ...props, as: 'h5' })
+const H6 = (props) => React.cloneElement(<Text />, { ...props, as: 'h6' })
+const P = (props) => React.cloneElement(<Text />, { ...props, as: 'p' })
+const Span = (props) => React.cloneElement(<Text />, { ...props, as: 'span' })
+const Div = (props) => React.cloneElement(<Text />, { ...props, as: 'div' })
 
 // expose semantically correct elements for the user
 Text.H1 = H1
