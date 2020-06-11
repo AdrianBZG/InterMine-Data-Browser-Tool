@@ -8230,6 +8230,7 @@ fsevents@^1.2.7:
     modern-normalize: ^0.6.0
     prettier: ^2.0.5
     prettier-plugin-package: ^1.0.0
+    prop-types: ^15.7.2
     react: ^16.13.1
     react-dom: ^16.13.1
     react-scripts: 3.4.1
