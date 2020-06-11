@@ -1,54 +1,14 @@
-import { cx } from 'linaria'
 import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 
 import { fontSizes } from '../theme/fontSizes'
-import { screenreaderOnly } from '../theme/utils'
 
-const StyledText = styled.div`
-	font-size: ${(props) => props.size};
-	line-height: ${(props) => props.lineHeight};
-	font-weight: ${(props) => props.fontWeight};
+export const Text = styled.div`
+	font-size: ${({ isMobile, fontSize }) => getFontSize(isMobile, fontSize)};
+	line-height: ${({ lineHeight }) => getLineHeight(lineHeight)};
+	font-weight: ${({ fontWeight }) => getFontWeight(fontWeight)};
 `
-
-export const Text = ({
-	as,
-	fontSize,
-	isMobile,
-	lineHeight,
-	children,
-	className,
-	fontWeight,
-	screenreaderOnly: visuallyHidden,
-	style,
-}) => {
-	const platform = isMobile ? 'mobile' : 'desktop'
-	let weight = 400 // medium
-	let lh = 1.5 // regular
-
-	if (lineHeight === 'condensed') lh = 1.25
-	if (lineHeight === 'condensed-ultra') lh = 1
-
-	if (fontWeight === 'medium') weight = 500
-	if (fontWeight === 'semibold') weight = 600
-	if (fontWeight === 'bold') weight = 700
-
-	return (
-		<StyledText
-			className={cx(className, visuallyHidden && screenreaderOnly)}
-			as={as}
-			size={fontSizes[platform][fontSize]}
-			fontWeight={weight}
-			lineHeight={lh}
-			// this is required so css can be overridden by the consumer, it is not used by us,
-			// only passed forward
-			style={style}
-		>
-			{children}
-		</StyledText>
-	)
-}
 
 // semantically correct variants
 const H1 = (props) => React.cloneElement(<Text />, { ...props, as: 'h1' })
@@ -71,6 +31,35 @@ Text.H6 = H6
 Text.P = P
 Text.Span = Span
 Text.Div = Div
+
+const getFontWeight = (weight) => {
+	switch (weight) {
+		case 'medium':
+			return 500
+		case 'semibold':
+			return 600
+		case 'bold':
+			return 700
+		default:
+			return 400
+	}
+}
+
+const getLineHeight = (height) => {
+	switch (height) {
+		case 'condensed':
+			return 1.25
+		case 'condensed-ultra':
+			return 1
+		default:
+			return 1.5
+	}
+}
+
+const getFontSize = (isMobile, fontSize) => {
+	const platform = isMobile ? 'mobile' : 'desktop'
+	return fontSizes[platform][fontSize]
+}
 
 const commonPropTypes = {
 	// in decreasing order of size
