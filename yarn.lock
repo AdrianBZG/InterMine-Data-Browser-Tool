@@ -2243,6 +2243,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/json-schema@npm:^7.0.4":
+  version: 7.0.5
+  resolution: "@types/json-schema@npm:7.0.5"
+  checksum: 6290f9fe93ac957b244262d5ff56cfd3045c63da6ed88dcc2d5b84131e6284c8e6213bf0cb81423a4f940182647bcd69057309c982f8db64dfff8f65f800ef80
+  languageName: node
+  linkType: hard
+
 "@types/json5@npm:^0.0.29":
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
@@ -2875,6 +2882,18 @@ __metadata:
     json-schema-traverse: ^0.4.1
     uri-js: ^4.2.2
   checksum: aed1e0ab1b906913e2b466b1a0372ee5e4fe2927802ff81bcce350f482b0546cdb49df6ab551adad191ac19766007cdaf6c2d8b70e992528b806d9a8275ce2bd
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^6.12.2":
+  version: 6.12.2
+  resolution: "ajv@npm:6.12.2"
+  dependencies:
+    fast-deep-equal: ^3.1.1
+    fast-json-stable-stringify: ^2.0.0
+    json-schema-traverse: ^0.4.1
+    uri-js: ^4.2.2
+  checksum: 09f3d7992c4a6e554e65accab279878c2da2a7e3ca782032de51c7c91d80a43a3e2aeb26efb8e8950b3941a89882f21aaca1170dafada784a7a0f275b5e6e745
   languageName: node
   linkType: hard
 
@@ -8221,6 +8240,7 @@ fsevents@^1.2.7:
     stylelint-config-prettier: ^8.0.1
     stylelint-config-recommended: ^3.0.0
     stylelint-declaration-block-no-ignored-properties: ^2.3.0
+    stylelint-webpack-plugin: ^2.0.0
     webpack-bundle-analyzer: ^3.8.0
   languageName: unknown
   linkType: soft
@@ -14171,6 +14191,17 @@ resolve@^1.17.0:
   languageName: node
   linkType: hard
 
+"schema-utils@npm:^2.6.6":
+  version: 2.7.0
+  resolution: "schema-utils@npm:2.7.0"
+  dependencies:
+    "@types/json-schema": ^7.0.4
+    ajv: ^6.12.2
+    ajv-keywords: ^3.4.1
+  checksum: 5d3e7c9e532712bbe0b7ba2f0bdbebc88ca3066c00ceb89877667c3c7b7ea5ee65e0ff7ffbf5164ebda43b0726166d4d39b382e91e9554b7ad2f6b06e77f947d
+  languageName: node
+  linkType: hard
+
 "select-hose@npm:^2.0.0":
   version: 2.0.0
   resolution: "select-hose@npm:2.0.0"
@@ -15205,6 +15236,20 @@ resolve@^1.17.0:
   peerDependencies:
     stylelint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0
   checksum: 94f9e925cfe0520dc7c231f3b9b9f04195cf3d13311f48bb0230a7610764dba90f5fdac0e85ebf854db5ed08c1cd27f3cf2724714175c349bd889eeffcfa18b8
+  languageName: node
+  linkType: hard
+
+"stylelint-webpack-plugin@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "stylelint-webpack-plugin@npm:2.0.0"
+  dependencies:
+    arrify: ^2.0.1
+    micromatch: ^4.0.2
+    schema-utils: ^2.6.6
+  peerDependencies:
+    stylelint: ^13.0.0
+    webpack: ^4.0.0 || ^5.0.0
+  checksum: 10ed498bbc522b51c1d9218e4edb3d4d84f75a4e21b7beb8749c406ec81223c1f3954a85a6aa0645c6ffcda5fae8e74e216d197830aad37f6c10b791dcbd5c4d
   languageName: node
   linkType: hard
 
