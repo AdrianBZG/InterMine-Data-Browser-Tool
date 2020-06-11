@@ -1,16 +1,10 @@
 import { css, cx } from 'linaria'
-import React, { useLayoutEffect } from 'react'
+import React from 'react'
 
 import logo from '../images/logo.svg'
-import { initPalette, lightTheme } from '../theme'
+import { lightTheme } from '../theme'
 
 export const App = () => {
-	/**
-	 * Use layoutEffect so that the variables are set before the DOM is layed
-	 * out, to prevent FOUC
-	 */
-	useLayoutEffect(() => initPalette(), [])
-
 	return (
 		<div className={cx(app, lightTheme)}>
 			<header className={appHeader}>

@@ -67,17 +67,12 @@ const solidPalette = {
 	solidBlack: '#10161a',
 	solidWhite: '#ffffff',
 }
-/**
- * Helper to set css variables. This allows us to keep the associated
- * values in one object, rather than multiple places.
- */
-export const initPalette = () => {
-	const root = document.documentElement
-	const palettes = [bluePalette, yellowPalette, greenPalette, redPalette, greyPalette, solidPalette]
 
-	palettes.forEach((color) => {
-		Object.keys(color).forEach((c) => {
-			root.style.setProperty(`--${c}`, color[c])
-		})
-	})
+export const colors = {
+	bluePalette,
+	yellowPalette,
+	greenPalette,
+	redPalette,
+	greyPalette,
+	solidPalette,
 }

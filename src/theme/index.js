@@ -1,2 +1,2 @@
 export { lightTheme, darkTheme } from './theme'
-export { initPalette } from './colorPalette'
+export { colors } from './colorPalette'
