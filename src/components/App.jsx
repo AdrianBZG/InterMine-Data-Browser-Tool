@@ -3,15 +3,14 @@ import React from 'react'
 
 import logo from '../images/logo.svg'
 import { lightTheme } from '../theme'
+import { Text } from './Text'
 
 export const App = () => {
 	return (
 		<div className={cx(app, lightTheme)}>
 			<header className={appHeader}>
 				<img src={logo} className={appLogo} alt="logo" />
-				<p>
-					Edit <code>src/App.js</code> and save to reload.
-				</p>
+				<Text>Edit src/App.js and save to reload.</Text>
 				<a className={appLink} href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
 					Learn React
 				</a>
@@ -49,7 +48,6 @@ const appHeader = css`
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	font-size: calc(10px + 2vmin);
 	color: white;
 `
 
