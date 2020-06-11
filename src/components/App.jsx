@@ -10,7 +10,7 @@ export const App = () => {
 		<div className={cx(app, lightTheme)}>
 			<header className={appHeader}>
 				<img src={logo} className={appLogo} alt="logo" />
-				<Text>Edit src/App.js and save to reload.</Text>
+				<Text.Span>Edit src/App.js and save to reload.</Text.Span>
 				<a className={appLink} href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
 					Learn React
 				</a>

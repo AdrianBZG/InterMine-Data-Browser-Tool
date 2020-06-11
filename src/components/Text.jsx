@@ -49,6 +49,28 @@ export const Text = ({
 	)
 }
 
+// semantically correct variants
+const H1 = ({ children }) => React.cloneElement(<Text />, { as: 'h1' }, children)
+const H2 = ({ children }) => React.cloneElement(<Text />, { as: 'h2' }, children)
+const H3 = ({ children }) => React.cloneElement(<Text />, { as: 'h3' }, children)
+const H4 = ({ children }) => React.cloneElement(<Text />, { as: 'h4' }, children)
+const H5 = ({ children }) => React.cloneElement(<Text />, { as: 'h5' }, children)
+const H6 = ({ children }) => React.cloneElement(<Text />, { as: 'h6' }, children)
+const P = ({ children }) => React.cloneElement(<Text />, { as: 'p' }, children)
+const Span = ({ children }) => React.cloneElement(<Text />, { as: 'span' }, children)
+const Div = ({ children }) => React.cloneElement(<Text />, { as: 'div' }, children)
+
+// expose semantically correct elements for the user
+Text.H1 = H1
+Text.H2 = H2
+Text.H3 = H3
+Text.H4 = H4
+Text.H5 = H5
+Text.H6 = H6
+Text.P = P
+Text.Span = Span
+Text.Div = Div
+
 const textSizes = {
 	desktop: {
 		'00': '48px',
@@ -72,8 +94,7 @@ const textSizes = {
 	},
 }
 
-Text.propTypes = {
-	as: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div']),
+const commonPropTypes = {
 	// in decreasing order of size
 	fontSize: PropTypes.oneOf(['00', '0', '1', '2', '3', '4', '5', '6']),
 	isMobile: PropTypes.bool,
@@ -82,11 +103,36 @@ Text.propTypes = {
 	screenreaderOnly: PropTypes.bool,
 }
 
-Text.defaultProps = {
-	as: 'p',
+const commonProps = {
 	fontSize: '4',
 	isMobile: false,
 	lineHeight: 'default',
 	fontWeight: 'regular',
 	screenreaderOnly: false,
 }
+
+Text.propTypes = {
+	as: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div']),
+	...commonPropTypes,
+}
+
+H1.propTypes = { ...commonPropTypes }
+H2.propTypes = { ...commonPropTypes }
+H3.propTypes = { ...commonPropTypes }
+H4.propTypes = { ...commonPropTypes }
+H5.propTypes = { ...commonPropTypes }
+H6.propTypes = { ...commonPropTypes }
+P.propTypes = { ...commonPropTypes }
+Span.propTypes = { ...commonPropTypes }
+Div.propTypes = { ...commonPropTypes }
+
+Text.defaultProps = { as: 'p', ...commonProps }
+H1.defaultProps = { ...commonProps }
+H2.defaultProps = { ...commonProps }
+H3.defaultProps = { ...commonProps }
+H4.defaultProps = { ...commonProps }
+H5.defaultProps = { ...commonProps }
+H6.defaultProps = { ...commonProps }
+P.defaultProps = { ...commonProps }
+Span.defaultProps = { ...commonProps }
+Div.defaultProps = { ...commonProps }
