@@ -1,11 +1,12 @@
-import { css } from 'linaria'
+import { css, cx } from 'linaria'
 import React from 'react'
 
+import { lightTheme } from '../colorPalette'
 import logo from '../images/logo.svg'
 
 export const App = () => {
 	return (
-		<div className={app}>
+		<div className={cx(app, lightTheme)}>
 			<header className={appHeader}>
 				<img src={logo} className={appLogo} alt="logo" />
 				<p>

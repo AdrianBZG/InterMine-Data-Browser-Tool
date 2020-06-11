@@ -1,5 +1,4 @@
 import 'modern-normalize'
-import './styles.root.js'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
