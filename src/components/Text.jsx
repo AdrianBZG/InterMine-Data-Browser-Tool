@@ -4,33 +4,21 @@ import React from 'react'
 
 import { fontSizes } from '../theme/fontSizes'
 
-export const Text = styled.div`
+export const Div = styled.div`
 	font-size: ${({ isMobile, fontSize }) => getFontSize(isMobile, fontSize)};
 	line-height: ${({ lineHeight }) => getLineHeight(lineHeight)};
 	font-weight: ${({ fontWeight }) => getFontWeight(fontWeight)};
 `
 
-// semantically correct variants
-const H1 = (props) => React.cloneElement(<Text />, { ...props, as: 'h1' })
-const H2 = (props) => React.cloneElement(<Text />, { ...props, as: 'h2' })
-const H3 = (props) => React.cloneElement(<Text />, { ...props, as: 'h3' })
-const H4 = (props) => React.cloneElement(<Text />, { ...props, as: 'h4' })
-const H5 = (props) => React.cloneElement(<Text />, { ...props, as: 'h5' })
-const H6 = (props) => React.cloneElement(<Text />, { ...props, as: 'h6' })
-const P = (props) => React.cloneElement(<Text />, { ...props, as: 'p' })
-const Span = (props) => React.cloneElement(<Text />, { ...props, as: 'span' })
-const Div = (props) => React.cloneElement(<Text />, { ...props, as: 'div' })
-
-// expose semantically correct elements for the user
-Text.H1 = H1
-Text.H2 = H2
-Text.H3 = H3
-Text.H4 = H4
-Text.H5 = H5
-Text.H6 = H6
-Text.P = P
-Text.Span = Span
-Text.Div = Div
+// expose semantically correct variants
+export const H1 = (props) => React.cloneElement(<Div />, { ...props, as: 'h1' })
+export const H2 = (props) => React.cloneElement(<Div />, { ...props, as: 'h2' })
+export const H3 = (props) => React.cloneElement(<Div />, { ...props, as: 'h3' })
+export const H4 = (props) => React.cloneElement(<Div />, { ...props, as: 'h4' })
+export const H5 = (props) => React.cloneElement(<Div />, { ...props, as: 'h5' })
+export const H6 = (props) => React.cloneElement(<Div />, { ...props, as: 'h6' })
+export const P = (props) => React.cloneElement(<Div />, { ...props, as: 'p' })
+export const Span = (props) => React.cloneElement(<Div />, { ...props, as: 'span' })
 
 const getFontWeight = (weight) => {
 	switch (weight) {
@@ -67,7 +55,6 @@ const commonPropTypes = {
 	isMobile: PropTypes.bool,
 	lineHeight: PropTypes.oneOf(['default', 'condensed', 'condensed-ultra']),
 	weight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
-	screenreaderOnly: PropTypes.bool,
 }
 
 const commonProps = {
@@ -75,12 +62,6 @@ const commonProps = {
 	isMobile: false,
 	lineHeight: 'default',
 	fontWeight: 'regular',
-	screenreaderOnly: false,
-}
-
-Text.propTypes = {
-	as: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div']),
-	...commonPropTypes,
 }
 
 H1.propTypes = { ...commonPropTypes }
@@ -93,7 +74,6 @@ P.propTypes = { ...commonPropTypes }
 Span.propTypes = { ...commonPropTypes }
 Div.propTypes = { ...commonPropTypes }
 
-Text.defaultProps = { as: 'p', ...commonProps }
 H1.defaultProps = { ...commonProps }
 H2.defaultProps = { ...commonProps }
 H3.defaultProps = { ...commonProps }

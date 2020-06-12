@@ -3,14 +3,14 @@ import React from 'react'
 
 import logo from '../images/logo.svg'
 import { lightTheme } from '../theme'
-import { Text } from './Text'
+import * as Text from './Text'
 
 export const App = () => {
 	return (
 		<div className={cx(app, lightTheme)}>
 			<header className={appHeader}>
 				<img src={logo} className={appLogo} alt="logo" />
-				<Text.Span>Edit src/App.js and save to reload.</Text.Span>
+				<Text.Span fontSize={'large'}>Edit src/App.js and save to reload.</Text.Span>
 				<a className={appLink} href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
 					Learn React
 				</a>
