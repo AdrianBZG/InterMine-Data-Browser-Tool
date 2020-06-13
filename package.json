@@ -24,6 +24,7 @@
 		"lint:js": "cross-env NODE_ENV=development eslint src/**/*.{js,jsx}",
 		"serve": "serve orig_app",
 		"start": "craco start",
+		"storybook": "start-storybook",
 		"test": "craco test"
 	},
 	"dependencies": {
