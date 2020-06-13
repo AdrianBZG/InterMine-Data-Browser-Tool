@@ -1,68 +1,67 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Intermine Data Browser
 
-## Available Scripts
+The goal of this project is to implement a faceted search tool to display the data from InterMine
+database, allowing the users to search easily within the different mines available around InterMine
+without the requirement of having an extensive knowledge of the data model.
 
-In the project directory, you can run:
+For the project organization, please refer to [InterMine](https://github.com/intermine)
 
-### `yarn start`
+## Quick Links
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Check out the [latest deployed version]()
+- Learn more and get started with the [docs]()
+- Set up the project [to contribute]()
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## Required Ontology Concepts (per mine) for each filter
 
-### `yarn test`
+| Filter               | Ontology Concepts                                                                                                                                                                |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GO Annotation        | goAnnotation.ontologyTerm.name                                                                                                                                                   |
+| Dataset Name         | dataSets.name                                                                                                                                                                    |
+| Pathway Name         | pathways.name                                                                                                                                                                    |
+| Organism short name  | Gene.organism.shortName                                                                                                                                                          |
+| Location             | locations.start + locations.end + locations.locatedOn.primaryIdentifier                                                                                                          |
+| Diseases (OMIM)      | diseases.name                                                                                                                                                                    |
+| ClinVar              | alleles.clinicalSignificance + alleles.type                                                                                                                                      |
+| Protein Localisation | proteinAtlasExpression.cellType + proteinAtlasExpression.tissue.name + proteinAtlasExpression.expressionType + proteinAtlasExpression.level + proteinAtlasExpression.reliability |
+| Protein Domain Name  | proteins.proteinDomainRegions.proteinDomain.name                                                                                                                                 |
+| Interactions         | interactions.participant2.symbol + interactions.details.type + interactions.details.dataSets.name                                                                                |
+| Expression           | atlasExpression.pValue + atlasExpression.tStatistic + atlasExpression.expression + atlasExpression.dataSets.name                                                                 |
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Contributing Guidelines
 
-### `yarn build`
+These instructions, as well as more complete documentation can be found at [http://netlify-site]()
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Find a thing to fix/implement in [Issues](https://github.com/JM_Mendez/InterMine-Data-Browser-Tool/issues?direction=desc&sort=created&state=open) or come up with your own idea, [create a discussion issue](https://github.com/JM_Mendez/InterMine-Data-Browser-Tool/issues/new) for it and get a feedback.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+2. [Fork](https://help.github.com/articles/fork-a-repo) the repository.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Create your new feature branch.
 
-### `yarn eject`
+```bash
+   git checkout -b my-new-feature
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+4. Install the packages.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+This project uses `yarn berry` for package management. Make sure to have it globally installed before proceeding.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```bash
+npm install -g yarn
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+If you run `yarn -v`, the version displayed will be `v1*`. Yet, this project will automatically use `v2 berry`.
 
-## Learn More
+5. Commit your changes.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+git commit -am 'Add some feature
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+6. Push to the newly created feature branch.
 
-### Code Splitting
+```bash
+git push origin my-new-feature
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+7. Create a new [Pull Request](https://help.github.com/articles/using-pull-requests)
