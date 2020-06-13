@@ -1,0 +1,79 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+import LinkTo from '@storybook/addon-links/react'
+
+<Meta title="Docs/Getting Started/Quick Start" />
+
+# Quick Start
+
+## Preparation
+
+1. [Fork](https://help.github.com/articles/fork-a-repo) the repository
+2. Clone the repo
+
+```sh
+git clone https://github.com/JM-Mendez/InterMine-Data-Browser-Tool.git
+```
+
+### Install Dependencies
+
+This project uses `yarn berry` for package management. Make sure to have it
+globally installed before proceeding.
+
+```sh
+npm install -g yarn
+```
+
+If you run `yarn -v`, the version will show as `v1`. Yet, this project
+will automatically use `v2 berry`.
+
+Now enter the repo's directory
+
+```sh
+cd InterMine-Data-Browser-Tool
+```
+
+Then install the dependencies.
+
+```sh
+yarn install
+```
+
+## Development
+
+This project uses `storybook` for developing components in isolation, as well for
+documentation.
+
+There is usually no need to have both `storybook` and the app open in the
+terminal at the same time. You can, but doing so will most likely consume more resources
+than is required.
+
+After running the approriate command, the browser will open to the local development url.
+If you wish to view the application in a mobile browser, for instance to work on
+responsiveness, then use the provided network url on your mobile device.
+
+### Developing Components
+
+```sh
+yarn storybook
+```
+
+### Developing the Application
+
+```sh
+yarn start
+```
+
+### Testing
+
+This project uses [react-testing-library](https://testing-library.com/docs/react-testing-library/intro)
+to test the UI components. Familiarity with this library is highly recommended.
+
+By running the following command, you can execute tests in watch mode. On a CI server, tests will exit
+upon completion.
+
+```sh
+yarn test
+```
+
+If you haven't already, now would be a good time to learn how we
+style the application in our <LinkTo kind='docs-getting-started-styling--page'>styleguide</LinkTo>.

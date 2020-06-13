@@ -2368,6 +2368,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/addon-links@npm:^5.3.19":
+  version: 5.3.19
+  resolution: "@storybook/addon-links@npm:5.3.19"
+  dependencies:
+    "@storybook/addons": 5.3.19
+    "@storybook/client-logger": 5.3.19
+    "@storybook/core-events": 5.3.19
+    "@storybook/csf": 0.0.1
+    "@storybook/router": 5.3.19
+    core-js: ^3.0.1
+    global: ^4.3.2
+    prop-types: ^15.7.2
+    qs: ^6.6.0
+    ts-dedent: ^1.1.0
+  peerDependencies:
+    react: "*"
+  checksum: b01dfbf2f705293ed54766df04ee848a45916c1d995abb12c1ccb0f76d8c69c5bbb8bfa7ecaa78f1c5a48dbaf7762d3f475a733f5167731284f45e4bc90eb353
+  languageName: node
+  linkType: hard
+
 "@storybook/addons@npm:5.3.19":
   version: 5.3.19
   resolution: "@storybook/addons@npm:5.3.19"
@@ -10408,6 +10428,7 @@ fsevents@^1.2.7:
   dependencies:
     "@craco/craco": ^5.6.4
     "@storybook/addon-docs": ^5.3.19
+    "@storybook/addon-links": ^5.3.19
     "@storybook/preset-create-react-app": ^3.0.1
     "@storybook/react": ^5.3.19
     "@testing-library/jest-dom": ^4.2.4
