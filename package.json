@@ -74,6 +74,9 @@
 		"stylelint-webpack-plugin": "^2.0.0",
 		"webpack-bundle-analyzer": "^3.8.0"
 	},
+	"resolutions": {
+		"webpack": "4.42.0"
+	},
 	"browserslist": {
 		"production": [
 			">0.2%",
