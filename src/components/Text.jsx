@@ -2,7 +2,7 @@ import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { fontSizes } from '../theme/fontSizes'
+import { fontSizes } from '../theme'
 
 export const Div = styled.div`
 	font-size: ${({ isMobile, fontSize }) => getFontSize(isMobile, fontSize)};
@@ -51,7 +51,7 @@ const getFontSize = (isMobile, fontSize) => {
 
 const commonPropTypes = {
 	// in decreasing order of size
-	fontSize: PropTypes.oneOf(['xsmall', 'small', 'medium', 'large']),
+	fontSize: PropTypes.oneOf(['xsmall', 'small', 'medium', 'regular', 'large', 'xlarge', 'xxlarge']),
 	isMobile: PropTypes.bool,
 	lineHeight: PropTypes.oneOf(['default', 'condensed', 'condensed-ultra']),
 	weight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
