@@ -8,5 +8,9 @@ module.exports = {
 			},
 		},
 	],
-	stories: ['../docs/Intro.story.mdx', '../src/**/*.story.jsx'],
+	stories: [
+		'../docs/intro.story.mdx',
+		'../docs/getting-started/*.story.mdx',
+		'../src/**/*.story.jsx',
+	],
 }
