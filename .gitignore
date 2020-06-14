@@ -28,3 +28,6 @@ src/.linaria_cache
 
 # Yarn
 *install-state.gz
+
+# Storybook
+.storybook-dist

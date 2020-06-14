@@ -7,7 +7,7 @@
 		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool"
 	},
 	"author": "Adrian Rodriguez-Bazaga",
-	"homepage": "https://github.com/InterMine/InterMine-Data-Browser-Tool",
+	"homepage": ".",
 	"bugs": {
 		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool/issues",
 		"email": "adrianrodriguezbazaga@gmail.com"
@@ -25,6 +25,7 @@
 		"serve": "serve orig_app",
 		"start": "craco start",
 		"storybook": "start-storybook",
+		"storybook:build": "build-storybook -c .storybook -o .storybook-dist",
 		"test": "craco test"
 	},
 	"dependencies": {

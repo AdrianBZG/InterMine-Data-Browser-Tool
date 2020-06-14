@@ -8,15 +8,17 @@ module.exports = {
 	webpack: {
 		plugins: [
 			...when(Boolean(process.env.ANALYZE), () => [new BundleAnalyzerPlugin()], []),
-			whenDev(
-				() =>
+			...whenDev(
+				() => [
 					new StyleLintPlugin({
 						configBasedir: __dirname,
 						context: path.resolve(__dirname, 'src'),
 						files: ['**/*.jsx'],
 						// allow errors to still compile during development
 						emitWarning: true,
-					})
+					}),
+				],
+				[]
 			),
 		],
 	},
