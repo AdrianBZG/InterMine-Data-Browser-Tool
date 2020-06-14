@@ -1,0 +1,99 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs/blocks'
+import { colors, getStorybookPalette } from '../../src/theme'
+
+<Meta title="Docs/Styling/Color Palette" />
+
+# Color Palette
+
+## Source
+
+Colors were ported over from Github's [primer color system](https://primer.style/css/support/color-system)
+and adjusted where required.
+
+## Usage
+
+Colors are exposed from `src/theme` as the named export `colors`.
+
+Each palette is then available under the key listed below the name. The numbers below the shades
+correspond to the saturation level for the color, with `0` being the lighest, and `9` the darkest.
+
+To access a color with a numbered shade, you must add `00` after the shade number. See
+the example below.
+
+```js
+colors.bluePalette.blue400 // #2188ff
+```
+
+## Color Swatches
+
+<ColorPalette>
+	<ColorItem
+		title="Solid black and white"
+		subtitle="theme.colors.solidPalette"
+		colors={{ ...colors.solidPalette }}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Grey palette"
+		subtitle="theme.colors.greyPalette"
+		colors={getStorybookPalette(colors.greyPalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Blue palette"
+		subtitle="theme.colors.bluePalette"
+		colors={getStorybookPalette(colors.bluePalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Green palette"
+		subtitle="theme.colors.greenPalette"
+		colors={getStorybookPalette(colors.greenPalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Purple palette"
+		subtitle="theme.colors.purplePalette"
+		colors={getStorybookPalette(colors.purplePalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Yellow palette"
+		subtitle="theme.colors.yellowPalette"
+		colors={getStorybookPalette(colors.yellowPalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Orange palette"
+		subtitle="theme.colors.orangePalette"
+		colors={getStorybookPalette(colors.orangePalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Red palette"
+		subtitle="theme.colors.redPalette"
+		colors={getStorybookPalette(colors.redPalette)}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Pink palette"
+		subtitle="theme.colors.pinkPalette"
+		colors={getStorybookPalette(colors.pinkPalette)}
+	/>
+</ColorPalette>

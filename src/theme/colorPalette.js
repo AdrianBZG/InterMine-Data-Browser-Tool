@@ -107,6 +107,13 @@ const pinkPalette = {
 	pink900: '#6d224f',
 }
 
+export const getStorybookPalette = (palette) =>
+	Object.keys(palette).reduce((allColors, nextColor, idx) => {
+		allColors[`${idx}`] = palette[nextColor]
+
+		return allColors
+	}, {})
+
 export const colors = {
 	bluePalette,
 	yellowPalette,
