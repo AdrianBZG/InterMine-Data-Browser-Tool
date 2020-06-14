@@ -51,14 +51,14 @@ const getFontSize = (isMobile, fontSize) => {
 
 const commonPropTypes = {
 	// in decreasing order of size
-	fontSize: PropTypes.oneOf(['xsmall', 'small', 'medium', 'regular', 'large', 'xlarge', 'xxlarge']),
+	fontSize: PropTypes.oneOf(['s1', 's2', 'm1', 'm2', 'm3', 'l1', 'l2', 'l3']),
 	isMobile: PropTypes.bool,
 	lineHeight: PropTypes.oneOf(['default', 'condensed', 'condensed-ultra']),
 	weight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
 }
 
 const commonProps = {
-	fontSize: 'medium',
+	fontSize: 'm2',
 	isMobile: false,
 	lineHeight: 'default',
 	fontWeight: 'regular',
