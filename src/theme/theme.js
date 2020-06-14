@@ -1,5 +1,14 @@
 import { css } from 'linaria'
 
+export const globals = css`
+	:global() {
+		body {
+			font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+				'Apple Color Emoji', 'Segoe UI Emoji';
+		}
+	}
+`
+
 export const lightTheme = css`
 	-webkit-font-smoothing: auto;
 	-moz-osx-font-smoothing: auto;
