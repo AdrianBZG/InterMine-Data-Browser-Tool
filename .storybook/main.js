@@ -9,11 +9,7 @@ module.exports = {
 			},
 		},
 	],
-	stories: [
-		'../docs/intro.story.mdx',
-		'../docs/getting-started/*.story.mdx',
-		'../src/**/*.story.jsx',
-	],
+	stories: ['../docs/**/*.story.mdx', '../src/**/*.story.jsx'],
 	webpackFinal: async (config, { configType }) => {
 		config.module.rules.push({
 			test: /\.jsx?$/,
