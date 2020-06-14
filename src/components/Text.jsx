@@ -2,12 +2,12 @@ import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import * as React from 'react'
 
-import { fontSizes } from '../theme'
+import { fontLineHeights, fontWeights, getFontSize } from '../theme'
 
 export const Div = styled.div`
 	font-size: ${({ isMobile, fontSize }) => getFontSize(isMobile, fontSize)};
-	line-height: ${({ lineHeight }) => getLineHeight(lineHeight)};
-	font-weight: ${({ fontWeight }) => getFontWeight(fontWeight)};
+	line-height: ${({ lineHeight }) => fontLineHeights[lineHeight]};
+	font-weight: ${({ fontWeight }) => fontWeights[fontWeight]};
 `
 
 // expose semantically correct variants
@@ -19,35 +19,6 @@ export const H5 = (props) => React.cloneElement(<Div />, { ...props, as: 'h5' })
 export const H6 = (props) => React.cloneElement(<Div />, { ...props, as: 'h6' })
 export const P = (props) => React.cloneElement(<Div />, { ...props, as: 'p' })
 export const Span = (props) => React.cloneElement(<Div />, { ...props, as: 'span' })
-
-const getFontWeight = (weight) => {
-	switch (weight) {
-		case 'medium':
-			return 500
-		case 'semibold':
-			return 600
-		case 'bold':
-			return 700
-		default:
-			return 400
-	}
-}
-
-const getLineHeight = (height) => {
-	switch (height) {
-		case 'condensed':
-			return 1.25
-		case 'condensed-ultra':
-			return 1
-		default:
-			return 1.5
-	}
-}
-
-const getFontSize = (isMobile, fontSize) => {
-	const platform = isMobile ? 'mobile' : 'desktop'
-	return fontSizes[platform][fontSize]
-}
 
 const commonPropTypes = {
 	fontSize: PropTypes.oneOf(['s1', 's2', 'm1', 'm2', 'm3', 'l1', 'l2', 'l3']),

@@ -20,3 +20,21 @@ export const fontSizes = {
 		l3: '40px',
 	},
 }
+
+export const fontWeights = {
+	medium: 500,
+	semibold: 600,
+	bold: 700,
+	regular: 400,
+}
+
+export const fontLineHeights = {
+	condensed: 1.25,
+	'condensed-ultra': 1,
+	default: 1,
+}
+
+export const getFontSize = (isMobile, fontSize) => {
+	const platform = isMobile ? 'mobile' : 'desktop'
+	return fontSizes[platform][fontSize]
+}

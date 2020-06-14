@@ -1,5 +1,5 @@
 export { lightTheme, darkTheme } from './theme'
 export { colors, getStorybookPalette } from './colorPalette'
-export { fontSizes } from './typography'
+export { fontSizes, getFontSize, fontWeights, fontLineHeights } from './typography'
 export { spacing } from './spacing'
 export { shadows } from './shadows'
