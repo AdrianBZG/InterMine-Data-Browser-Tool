@@ -37,7 +37,7 @@
 		"@storybook/addon-docs": "^5.3.19",
 		"@storybook/addon-links": "^5.3.19",
 		"@storybook/preset-create-react-app": "^3.0.1",
-		"@storybook/react": "^5.3.19",
+		"@storybook/react": "next",
 		"@testing-library/jest-dom": "^4.2.4",
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
