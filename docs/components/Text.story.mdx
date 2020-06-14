@@ -1,0 +1,38 @@
+import { Meta, Props, Preview, Story } from '@storybook/addon-docs/blocks'
+import * as Text from '../../src/components/Text'
+import LinkTo from '@storybook/addon-links/react'
+
+<Meta title="Components/Text" component={Text.Span} />
+
+# Text.\*
+
+## Renders a semantically correct text element
+
+```js
+import * as Text from './src/components/Text'
+```
+
+### Result
+
+<Preview>
+	<Story name="Text.*">
+		<Text.Span fontSize="m3">Intermine Data Browser</Text.Span>
+	</Story>
+</Preview>
+
+The following semantic components are exposed from `src/components/Text` to provide
+a consistent api.
+
+- `H1`
+- `H2`
+- `H3`
+- `H4`
+- `H5`
+- `H6`
+- `Span`
+- `P`
+- `Div`
+
+## Props
+
+<Props of={Text.Span} />

@@ -1,6 +1,6 @@
 import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
-import React from 'react'
+import * as React from 'react'
 
 import { fontSizes } from '../theme'
 
@@ -50,11 +50,20 @@ const getFontSize = (isMobile, fontSize) => {
 }
 
 const commonPropTypes = {
-	// in decreasing order of size
 	fontSize: PropTypes.oneOf(['s1', 's2', 'm1', 'm2', 'm3', 'l1', 'l2', 'l3']),
+	/**
+	 * Selects the correct font size for the platform
+	 */
 	isMobile: PropTypes.bool,
+	/**
+	 * ***`default`*** is best for multiline text, such as on cards.
+	 *
+	 * ***`condensed`*** is best for large multiline text.
+	 *
+	 * ***`condensed-ultra`*** is useful for single lined text since it doesn't add spacing.
+	 */
 	lineHeight: PropTypes.oneOf(['default', 'condensed', 'condensed-ultra']),
-	weight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
+	fontWeight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
 }
 
 const commonProps = {
