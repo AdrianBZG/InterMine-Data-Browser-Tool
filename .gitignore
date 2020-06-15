@@ -31,3 +31,5 @@ src/.linaria_cache
 
 # Storybook
 .storybook-dist
+# Local Netlify folder
+.netlify
