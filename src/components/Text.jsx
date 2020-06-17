@@ -1,26 +1,43 @@
-import { styled } from 'linaria/react'
+import { Text as BText } from '@blueprintjs/core'
+import { css } from 'linaria'
 import PropTypes from 'prop-types'
 import * as React from 'react'
 
 import { fontLineHeights, fontWeights, getFontSize } from '../theme'
 
-export const Div = styled.div`
-	font-size: ${({ isMobile, fontSize }) => getFontSize(isMobile, fontSize)};
-	line-height: ${({ lineHeight }) => fontLineHeights[lineHeight]};
-	font-weight: ${({ fontWeight }) => fontWeights[fontWeight]};
-`
+export const Text = ({
+	isMobile,
+	tagName,
+	fontSize,
+	lineHeight,
+	fontWeight,
+	children,
+	ellipsize,
+}) => {
+	return (
+		<div
+			style={{
+				'--fontSize': getFontSize(fontSize, isMobile),
+				'--lineHeight': fontLineHeights[lineHeight],
+				'--fontWeight': fontWeights[fontWeight],
+			}}
+		>
+			<BText
+				className={css`
+					font-size: var(--fontSize);
+					line-height: var(--lineHeight);
+					font-weight: var(--fontWeight);
+				`}
+				ellipsize={ellipsize}
+				tagName={tagName}
+			>
+				{children}
+			</BText>
+		</div>
+	)
+}
 
-// expose semantically correct variants
-export const H1 = (props) => React.cloneElement(<Div />, { ...props, as: 'h1' })
-export const H2 = (props) => React.cloneElement(<Div />, { ...props, as: 'h2' })
-export const H3 = (props) => React.cloneElement(<Div />, { ...props, as: 'h3' })
-export const H4 = (props) => React.cloneElement(<Div />, { ...props, as: 'h4' })
-export const H5 = (props) => React.cloneElement(<Div />, { ...props, as: 'h5' })
-export const H6 = (props) => React.cloneElement(<Div />, { ...props, as: 'h6' })
-export const P = (props) => React.cloneElement(<Div />, { ...props, as: 'p' })
-export const Span = (props) => React.cloneElement(<Div />, { ...props, as: 'span' })
-
-const commonPropTypes = {
+Text.propTypes = {
 	fontSize: PropTypes.oneOf(['s1', 's2', 'm1', 'm2', 'm3', 'l1', 'l2', 'l3']),
 	/**
 	 * Selects the correct font size for the platform
@@ -35,31 +52,24 @@ const commonPropTypes = {
 	 */
 	lineHeight: PropTypes.oneOf(['default', 'condensed', 'condensed-ultra']),
 	fontWeight: PropTypes.oneOf(['regular', 'medium', 'semibold', 'bold']),
+	/**
+	 * Indicates that this component should be truncated with an ellipsis if it overflows its container.
+	 * The title attribute will also be added when content overflows to show the full text of the children on hover.
+	 *
+	 * This is passed to the `Blueprintjs` underlying `Text` component
+	 */
+	ellipsize: PropTypes.bool,
+	/**
+	 * HTML tag name to use for rendered element.
+	 */
+	tagName: PropTypes.string,
 }
 
-const commonProps = {
+Text.defaultProps = {
 	fontSize: 'm2',
 	isMobile: false,
 	lineHeight: 'default',
 	fontWeight: 'regular',
+	ellipsize: false,
+	tagName: 'div',
 }
-
-H1.propTypes = { ...commonPropTypes }
-H2.propTypes = { ...commonPropTypes }
-H3.propTypes = { ...commonPropTypes }
-H4.propTypes = { ...commonPropTypes }
-H5.propTypes = { ...commonPropTypes }
-H6.propTypes = { ...commonPropTypes }
-P.propTypes = { ...commonPropTypes }
-Span.propTypes = { ...commonPropTypes }
-Div.propTypes = { ...commonPropTypes }
-
-H1.defaultProps = { ...commonProps }
-H2.defaultProps = { ...commonProps }
-H3.defaultProps = { ...commonProps }
-H4.defaultProps = { ...commonProps }
-H5.defaultProps = { ...commonProps }
-H6.defaultProps = { ...commonProps }
-P.defaultProps = { ...commonProps }
-Span.defaultProps = { ...commonProps }
-Div.defaultProps = { ...commonProps }

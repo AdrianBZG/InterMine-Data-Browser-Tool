@@ -107,13 +107,6 @@ const pinkPalette = {
 	pink900: '#6d224f',
 }
 
-export const getStorybookPalette = (palette) =>
-	Object.keys(palette).reduce((allColors, nextColor, idx) => {
-		allColors[`${idx}`] = palette[nextColor]
-
-		return allColors
-	}, {})
-
 export const colors = {
 	bluePalette,
 	yellowPalette,
@@ -124,4 +117,20 @@ export const colors = {
 	purplePalette,
 	orangePalette,
 	pinkPalette,
+}
+
+/**
+ * Storybook utils
+ */
+export const getStorybookPalette = (palette) =>
+	Object.keys(palette).reduce((allColors, nextColor, idx) => {
+		allColors[`${idx}`] = palette[nextColor]
+
+		return allColors
+	}, {})
+
+export const allColors = Object.values(colors).reduce((c, nc) => ({ ...nc, ...c }), {})
+
+export const getColorFromPalette = (color) => {
+	return colors[color.replace(/\d+/, 'Palette')][color]
 }

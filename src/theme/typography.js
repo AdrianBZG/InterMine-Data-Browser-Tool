@@ -31,10 +31,10 @@ export const fontWeights = {
 export const fontLineHeights = {
 	condensed: 1.25,
 	'condensed-ultra': 1,
-	default: 1,
+	default: 1.5,
 }
 
-export const getFontSize = (isMobile, fontSize) => {
+export const getFontSize = (fontSize, isMobile = false) => {
 	const platform = isMobile ? 'mobile' : 'desktop'
 	return fontSizes[platform][fontSize]
 }

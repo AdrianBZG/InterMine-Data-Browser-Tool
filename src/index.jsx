@@ -1,4 +1,5 @@
-import 'modern-normalize'
+import 'normalize.css'
+import '@blueprintjs/core/lib/css/blueprint.css'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
