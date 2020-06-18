@@ -31,6 +31,7 @@ export const fontWeights = {
 export const fontLineHeights = {
 	condensed: 1.25,
 	'condensed-ultra': 1,
+	condensedUltra: 1,
 	default: 1.5,
 }
 

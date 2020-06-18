@@ -1,9 +1,9 @@
 import { Text as BText } from '@blueprintjs/core'
-import { css } from 'linaria'
+import { css, cx } from 'linaria'
 import PropTypes from 'prop-types'
 import * as React from 'react'
 
-import { fontLineHeights, fontWeights, getFontSize } from '../theme'
+import { useTheme } from '../theme'
 
 export const Text = ({
 	isMobile,
@@ -13,21 +13,27 @@ export const Text = ({
 	fontWeight,
 	children,
 	ellipsize,
+	className,
 }) => {
+	const theme = useTheme()
+
 	return (
 		<div
 			style={{
-				'--fontSize': getFontSize(fontSize, isMobile),
-				'--lineHeight': fontLineHeights[lineHeight],
-				'--fontWeight': fontWeights[fontWeight],
+				'--fontSize': theme.getFontSize(fontSize, isMobile),
+				'--lineHeight': theme.fontLineHeights[lineHeight],
+				'--fontWeight': theme.fontWeights[fontWeight],
 			}}
 		>
 			<BText
-				className={css`
-					font-size: var(--fontSize);
-					line-height: var(--lineHeight);
-					font-weight: var(--fontWeight);
-				`}
+				className={cx(
+					className,
+					css`
+						font-size: var(--fontSize);
+						line-height: var(--lineHeight);
+						font-weight: var(--fontWeight);
+					`
+				)}
 				ellipsize={ellipsize}
 				tagName={tagName}
 			>
