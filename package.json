@@ -22,7 +22,8 @@
 		"lint": "concurrently \"yarn:lint:*\"",
 		"lint:css": "cross-env NODE_ENV=development stylelint src/**/*.js{x}",
 		"lint:js": "cross-env NODE_ENV=development eslint src/**/*.{js,jsx}",
-		"serve": "serve orig_app",
+		"serve": "serve build",
+		"serve:orig": "serve orig_app",
 		"start": "craco start",
 		"storybook": "start-storybook -p 9000",
 		"storybook:build": "build-storybook -c .storybook -o .storybook-dist",
@@ -30,7 +31,7 @@
 	},
 	"dependencies": {
 		"@blueprintjs/core": "^3.28.2",
-		"@callstack/react-theme-provider": "^2.1.0",
+		"@blueprintjs/select": "^3.13.3",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1"
 	},
@@ -66,6 +67,8 @@
 		"jest-axe": "^3.4.0",
 		"linaria": "next",
 		"lint-staged": ">=10",
+		"node-sass": "^4.14.1",
+		"node-sass-glob-importer": "^5.3.2",
 		"prettier": "^2.0.5",
 		"prettier-plugin-package": "^1.0.0",
 		"prop-types": "^15.7.2",

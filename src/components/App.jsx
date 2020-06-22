@@ -1,62 +1,38 @@
-import { css, cx } from 'linaria'
+import { styled } from 'linaria/react'
 import React from 'react'
 
-import logo from '../images/logo.svg'
-import { useTheme } from '../theme'
-import { Constraint } from './Constraints/ConstraintBase'
-import { Text } from './Text'
+import { ChartSection } from './Layout/ChartSection'
+import { ConstraintSection } from './Layout/ConstraintSection'
+import { Header } from './Layout/Header'
+import { TableSection } from './Layout/TableSection'
+
+const StyledTableChartsSection = styled.section`
+	padding: 10px 30px 0;
+	overflow: auto;
+	height: calc(100vh - 3.643em);
+`
+
+const Main = styled.main`
+	display: grid;
+	grid-template-columns: 230px 1fr;
+`
+
+const S = {
+	Main,
+	TableChartsSection: StyledTableChartsSection,
+}
 
 export const App = () => {
-	const theme = useTheme()
-
 	return (
-		<div className={cx(app, theme.lightTheme)}>
-			<header className={appHeader}>
-				<img src={logo} className={appLogo} alt="logo" />
-				<Text fontSize={'m2'} tagName={'span'}>
-					Edit src/App.js and save to reload.
-				</Text>
-				<a className={appLink} href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-					Learn React
-				</a>
-				<Constraint />
-			</header>
+		<div className="light-theme">
+			<Header />
+			<S.Main>
+				<ConstraintSection />
+				<S.TableChartsSection>
+					<ChartSection />
+					<TableSection />
+				</S.TableChartsSection>
+			</S.Main>
 		</div>
 	)
 }
-
-const app = css`
-	text-align: center;
-`
-
-const appLogo = css`
-	height: 40vmin;
-	pointer-events: none;
-
-	@media (prefers-reduced-motion: no-preference) {
-		animation: App-logo-spin infinite 20s linear;
-	}
-
-	@keyframes App-logo-spin {
-		from {
-			transform: rotate(0deg);
-		}
-		to {
-			transform: rotate(360deg);
-		}
-	}
-`
-
-const appHeader = css`
-	background-color: #282c34;
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	color: white;
-`
-
-const appLink = css`
-	color: #61dafb;
-`

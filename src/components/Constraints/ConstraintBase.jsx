@@ -4,52 +4,53 @@ import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { useTheme, withTheme } from '../../theme'
+const CountTag = styled.div`
+	display: flex;
+	align-self: flex-start;
+	margin-left: 5px;
+	font-size: var(--fs-desktopS1);
+	font-weight: var(--fw-medium);
+	line-height: 1;
+	border: 2px solid var(--green5);
+	border-radius: 10px;
+	height: 1.333em;
 
-const CountTagWrapper = withTheme(
-	styled.div`
-		display: flex;
-		align-self: flex-start;
-		margin-left: 5px;
-		font-size: ${({ theme }) => theme.fontSizes.desktop.s1};
-		font-weight: ${({ theme }) => theme.fontWeights.medium};
-		line-height: ${({ theme }) => theme.fontLineHeights.condensedUltra};
-		border: 2px solid ${({ theme }) => theme.colors.greenPalette.green500};
-		border-radius: 10px;
-		height: 1.333em;
+	& > small {
+		margin: 0 0.833em;
+	}
+`
 
-		& > div {
-			margin: 0 0.833em;
-		}
-	`
-)
-
-const StyledIcon = styled(Icon)`
+const TagIcon = styled(Icon)`
 	/* We need to override Blueprint styling to create our pill */
 	margin: -0.167em -0.167em !important;
 	align-self: flex-start;
 `
 
-const ConstraintLabelWrapper = styled.div`
+const ConstraintLabel = styled.div`
 	display: flex;
 	align-items: center;
 `
 
-const ConstraintIcon = withTheme(
-	styled.div`
-		border-radius: 30px;
-		border: ${(props) => `0.167em solid ${props.labelBorderColor}`};
-		font-size: ${({ theme }) => theme.fontSizes.desktop.s1};
-		font-weight: ${({ theme }) => theme.fontWeights.medium};
-		height: 2.5em;
-		line-height: ${({ theme }) => theme.fontLineHeights.condensedUltra};
-		margin-right: 0.625em;
-		width: 2.5em;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	`
-)
+const ConstraintIcon = styled.div`
+	border-radius: 30px;
+	border: ${(props) => `0.167em solid ${props.labelBorderColor}`};
+	font-size: var(--fs-desktopS1);
+	font-weight: var(--fw-medium);
+	height: 2.5em;
+	line-height: 1;
+	margin-right: 0.625em;
+	width: 2.5em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`
+
+const S = {
+	ConstraintLabel,
+	ConstraintIcon,
+	CountTag,
+	TagIcon,
+}
 
 /**
  * A constraint is styled as a button that takes the full width of its container. Each
@@ -66,8 +67,6 @@ export const Constraint = ({
 	ariaLabel,
 	labelText,
 }) => {
-	const theme = useTheme()
-
 	return (
 		<Button
 			minimal={true}
@@ -76,24 +75,24 @@ export const Constraint = ({
 			alignText="left"
 			aria-label={ariaLabel ? ariaLabel : constraintName}
 		>
-			<ConstraintLabelWrapper>
-				<ConstraintIcon labelBorderColor={labelBorderColor}>
+			<S.ConstraintLabel>
+				<S.ConstraintIcon labelBorderColor={labelBorderColor}>
 					<span>{labelText}</span>
-				</ConstraintIcon>
+				</S.ConstraintIcon>
 				{constraintName}
 				{constraintCount > 0 && (
-					<CountTagWrapper>
-						{constraintCount > 1 && <div>{constraintCount}</div>}
-						<StyledIcon icon={IconNames.TICK_CIRCLE} color={theme.colors.greenPalette.green500} />
-					</CountTagWrapper>
+					<S.CountTag>
+						{constraintCount > 1 && <small>{constraintCount}</small>}
+						<S.TagIcon icon={IconNames.TICK_CIRCLE} color="var(--green5)" />
+					</S.CountTag>
 				)}
-			</ConstraintLabelWrapper>
+			</S.ConstraintLabel>
 		</Button>
 	)
 }
 
 export const ConstraintBase = ({ children, ...constraintProps }) => (
-	<Popover fill={true} usePortal={true} lazy={true} position="right">
+	<Popover fill={true} usePortal={false} lazy={true} position="right" boundary="viewport">
 		<Constraint {...constraintProps} />
 		{children}
 	</Popover>

@@ -1,3 +1,6 @@
+const globImporter = require('node-sass-glob-importer')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+
 module.exports = {
 	addons: [
 		'@storybook/addon-knobs',
@@ -19,6 +22,20 @@ module.exports = {
 				sourceMap: false,
 				cacheDirectory: 'src/.linaria_cache/storybook',
 			},
+		})
+
+		config.module.rules.push({
+			test: /\.scss$/,
+			use: [
+				{
+					loader: 'sass-loader',
+					options: {
+						sassOptions: {
+							importer: globImporter(),
+						},
+					},
+				},
+			],
 		})
 
 		return config

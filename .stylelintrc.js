@@ -23,7 +23,7 @@ module.exports = {
 		'a11y/no-text-align-justify': true,
 		'plugin/8-point-grid': {
 			base: 10,
-			whitelist: ['5px'],
+			whitelist: ['5px', '43px' /* top bar height */],
 		},
 		'plugin/declaration-block-no-ignored-properties': true,
 	},

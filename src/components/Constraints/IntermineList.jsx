@@ -8,7 +8,8 @@ export const IntermineList = ({ constraintCount }) => (
 		constraintName="Intermine List"
 		labelText="IL"
 		labelBorderColor={Colors.COBALT4}
-		constraintCount={constraintCount}
+		constraintCount={2}
+		// constraintCount={constraintCount}
 	>
 		<div style={{ height: '100px' }}>{'Look ma, a popover!'}</div>
 	</ConstraintBase>
