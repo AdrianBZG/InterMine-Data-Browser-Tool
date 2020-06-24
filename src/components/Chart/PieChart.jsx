@@ -13,7 +13,13 @@ export const PieChart = () => {
 		const runQuery = async () => {
 			try {
 				const summary = await query.summarize('Gene.organism.shortName', 50)
-				setChartData(summary.results.map((res) => ({ id: res.item, value: res.count })))
+				setChartData(
+					summary.results.map((res) => ({
+						id: res.item,
+						value: res.count,
+						label: `${res.item} (${res.count})`,
+					}))
+				)
 			} catch (e) {
 				console.error(e.message)
 			}
@@ -24,33 +30,30 @@ export const PieChart = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	console.log(JSON.stringify(chartData))
 	return (
 		<ResponsivePie
 			data={chartData}
-			margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
 			innerRadius={0.5}
-			padAngle={1.5}
+			padAngle={0.8}
+			margin={{ left: -200, top: 0, bottom: 0, right: 20 }}
 			cornerRadius={3}
-			width={448}
 			colors={{ scheme: 'accent' }}
 			enableSlicesLabels={false}
+			enableRadialLabels={false}
 			borderWidth={1}
 			sortByValue={true}
 			borderColor={{ from: 'color', modifiers: [['darker', 0.5]] }}
-			radialLabel={(e) => e.id + ' (' + e.value + ')'}
-			radialLabelsSkipAngle={10}
-			radialLabelsTextXOffset={6}
-			radialLabelsTextColor="#333333"
-			radialLabelsLinkOffset={0}
-			radialLabelsLinkDiagonalLength={16}
-			radialLabelsLinkHorizontalLength={24}
-			radialLabelsLinkStrokeWidth={1}
-			radialLabelsLinkColor={{ theme: 'axis.ticks.line.stroke' }}
-			slicesLabelsSkipAngle={10}
-			slicesLabelsTextColor="#333333"
 			animate={true}
 			motionStiffness={90}
 			motionDamping={15}
+			theme={{
+				legends: {
+					text: {
+						fontSize: 'var(--fs-desktopS2)',
+					},
+				},
+			}}
 			defs={[
 				{
 					id: 'dots',
@@ -87,13 +90,12 @@ export const PieChart = () => {
 			]}
 			legends={[
 				{
-					anchor: 'bottom',
-					direction: 'row',
-					translateY: 56,
-					itemWidth: 100,
-					itemHeight: 18,
-					itemTextColor: '#999',
-					symbolSize: 18,
+					anchor: 'top-right',
+					direction: 'column',
+					itemWidth: 200,
+					itemHeight: 36,
+					itemTextColor: 'var(--blue9)',
+					symbolSize: 24,
 					symbolShape: 'circle',
 					effects: [
 						{

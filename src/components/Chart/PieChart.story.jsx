@@ -1,5 +1,6 @@
 import { Card } from '@blueprintjs/core'
 import { css } from 'linaria'
+import { styled } from 'linaria/react'
 import React from 'react'
 
 import { PieChart } from './PieChart'
@@ -9,14 +10,19 @@ export default {
 	title: 'Components/Data Visualization',
 }
 
+const StyledCard = styled(Card)`
+	height: 376px;
+`
+
 export const Chart = () => (
-	<Card
-		className={css`
-			height: 376px;
-			padding-top: 0px;
-			padding-bottom: 0px;
-		`}
-	>
-		<PieChart />
-	</Card>
+	<StyledCard>
+		<div
+			className={css`
+				height: 80%;
+				width: 500px;
+			`}
+		>
+			<PieChart />
+		</div>
+	</StyledCard>
 )
