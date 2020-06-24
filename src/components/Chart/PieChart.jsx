@@ -6,11 +6,11 @@ import { Doughnut } from 'react-chartjs-2'
 import { geneQueryStub, mineUrl } from '../../stubs/utils'
 
 const scheme = [
-	'#898cff ',
-	'#f589b6',
-	'#fcdc89',
+	pattern.draw('dot', '#898cff '),
 	'#90d4f7',
+	pattern.draw('diamond-box', '#f589b6'),
 	'#71e096',
+	pattern.draw('dot-dash', '#fcdc89'),
 	'#f5a26e',
 	'#668de5',
 	'#ed6d79',
@@ -21,7 +21,7 @@ const scheme = [
 	'#67eebd',
 ]
 
-export const PieChart = ({ isColorBlind = true }) => {
+export const PieChart = ({ isColorBlind = false }) => {
 	const [chartData, setChartData] = useState({ data: [], labels: [] })
 	const colorPalette = isColorBlind ? pattern.generate(scheme) : scheme
 
