@@ -21,7 +21,7 @@ const S = {
 	Chart: Chart,
 }
 
-const ChartSection = () => {
+export const ChartSection = () => {
 	return (
 		<section id="Chart">
 			<S.Chart>
