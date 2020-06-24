@@ -12,7 +12,9 @@ export default {
 export const Chart = () => (
 	<Card
 		className={css`
-			width: 500px;
+			height: 376px;
+			padding-top: 0px;
+			padding-bottom: 0px;
 		`}
 	>
 		<PieChart />
