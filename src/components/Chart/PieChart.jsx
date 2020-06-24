@@ -1,4 +1,3 @@
-import { schemePaired } from 'd3-scale-chromatic'
 import imjs from 'imjs'
 import pattern from 'patternomaly'
 import React, { useEffect, useState } from 'react'
@@ -6,9 +5,25 @@ import { Doughnut } from 'react-chartjs-2'
 
 import { geneQueryStub, mineUrl } from '../../stubs/utils'
 
-export const PieChart = ({ isColorBlind = false }) => {
+const scheme = [
+	'#898cff ',
+	'#f589b6',
+	'#fcdc89',
+	'#90d4f7',
+	'#71e096',
+	'#f5a26e',
+	'#668de5',
+	'#ed6d79',
+	'#5ad0e5',
+	'#cff381',
+	'#f696e3',
+	'#bb96ff',
+	'#67eebd',
+]
+
+export const PieChart = ({ isColorBlind = true }) => {
 	const [chartData, setChartData] = useState({ data: [], labels: [] })
-	const colorPalette = isColorBlind ? pattern.generate(schemePaired) : schemePaired
+	const colorPalette = isColorBlind ? pattern.generate(scheme) : scheme
 
 	const service = new imjs.Service({ root: mineUrl })
 	const query = new imjs.Query(geneQueryStub, service)
