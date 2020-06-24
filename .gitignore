@@ -33,3 +33,6 @@ src/.linaria_cache
 .storybook-dist
 # Local Netlify folder
 .netlify
+
+# Dev environment variables
+.env

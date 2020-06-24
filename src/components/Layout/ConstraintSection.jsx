@@ -18,6 +18,7 @@ const ConstraintList = styled.ul`
 const ConstraintSectionWrapper = styled.section`
 	min-width: 230px;
 	border-right: 2px solid var(--blue5);
+	background-color: var(--solidWhite);
 `
 
 const S = {

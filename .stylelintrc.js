@@ -4,7 +4,6 @@ module.exports = {
 		'stylelint-config-recommended',
 		'stylelint-config-prettier',
 		'stylelint-a11y/recommended',
-		'stylelint-8-point-grid',
 		'linaria/stylelint-config',
 	],
 	rules: {
@@ -21,10 +20,6 @@ module.exports = {
 		'a11y/no-obsolete-attribute': true,
 		'a11y/no-obsolete-element': true,
 		'a11y/no-text-align-justify': true,
-		'plugin/8-point-grid': {
-			base: 10,
-			whitelist: ['5px', '43px' /* top bar height */],
-		},
 		'plugin/declaration-block-no-ignored-properties': true,
 	},
 }
