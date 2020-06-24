@@ -1,8 +1,8 @@
-import { css } from 'linaria'
+import { Card } from '@blueprintjs/core'
 import { styled } from 'linaria/react'
 import React from 'react'
 
-import { ChartSection } from './ChartSection'
+import { PieChart } from '../Chart/PieChart'
 import { TableSection } from './TableSection'
 
 const StyledTableChartsSection = styled.section`
@@ -10,8 +10,25 @@ const StyledTableChartsSection = styled.section`
 	overflow: auto;
 	height: calc(100vh - 3.643em);
 `
+
+const Chart = styled(Card)`
+	height: 380px;
+	margin-bottom: 20px;
+`
+
 const S = {
 	TableChartsSection: StyledTableChartsSection,
+	Chart: Chart,
+}
+
+const ChartSection = () => {
+	return (
+		<section id="Chart">
+			<S.Chart>
+				<PieChart />
+			</S.Chart>
+		</section>
+	)
 }
 
 export const TableChartsSection = () => {
