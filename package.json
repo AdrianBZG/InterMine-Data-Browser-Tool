@@ -35,7 +35,8 @@
 		"imjs": "^4.0.0",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
-		"underscore.string": "^3.3.5"
+		"underscore.string": "^3.3.5",
+		"victory": "^34.3.12"
 	},
 	"devDependencies": {
 		"@blueprintjs/eslint-plugin": "^0.2.0",
