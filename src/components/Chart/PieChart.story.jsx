@@ -18,8 +18,8 @@ export const Chart = () => (
 	<StyledCard>
 		<div
 			className={css`
-				height: 80%;
-				width: 500px;
+				width: 600px;
+				height: 376px;
 			`}
 		>
 			<PieChart />

@@ -1,23 +1,10 @@
 import { schemePaired } from 'd3-scale-chromatic'
 import imjs from 'imjs'
-import { styled } from 'linaria/react'
 import pattern from 'patternomaly'
 import React, { useEffect, useState } from 'react'
 import { Doughnut } from 'react-chartjs-2'
 
 import { geneQueryStub, mineUrl } from '../../stubs/utils'
-
-const Label = styled.span`
-	font-weight: var(--fw-bold);
-	text-align: center;
-	margin: 30px 0 0;
-	width: 80%;
-	display: inline-block;
-`
-
-const S = {
-	Label,
-}
 
 export const PieChart = ({ isColorBlind = false }) => {
 	const [chartData, setChartData] = useState({ data: [], labels: [] })
@@ -35,7 +22,7 @@ export const PieChart = ({ isColorBlind = false }) => {
 
 				summary.results.forEach((item) => {
 					data.push(item.count)
-					labels.push(item.item)
+					labels.push(`${item.item} (${item.count})`)
 				})
 
 				setChartData({ data, labels })
@@ -56,8 +43,25 @@ export const PieChart = ({ isColorBlind = false }) => {
 					datasets: [{ data: chartData.data, backgroundColor: colorPalette }],
 					labels: chartData.labels,
 				}}
+				legend={{
+					position: 'left',
+					labels: {
+						fontStyle: 'var(--fw-medium)',
+						fontColor: 'var(--blue9)',
+						padding: 16,
+					},
+				}}
+				options={{
+					title: {
+						display: true,
+						text: 'Number of results for Gene by organism',
+						fontSize: 18,
+						fontStyle: 'var(--fw-medium)',
+						fontColor: 'var(--blue9)',
+						padding: 16,
+					},
+				}}
 			/>
-			<S.Label>Number of results for Gene by organism</S.Label>
 		</>
 	)
 }
