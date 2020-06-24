@@ -1,4 +1,5 @@
 import { Card } from '@blueprintjs/core'
+import { css } from 'linaria'
 import React from 'react'
 
 import { PieChart } from './PieChart'
@@ -9,7 +10,11 @@ export default {
 }
 
 export const Chart = () => (
-	<Card>
+	<Card
+		className={css`
+			width: 500px;
+		`}
+	>
 		<PieChart />
 	</Card>
 )
