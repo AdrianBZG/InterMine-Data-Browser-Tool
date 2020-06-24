@@ -6,7 +6,7 @@ import { PieChart } from './PieChart'
 
 export default {
 	component: PieChart,
-	title: 'Components/Table and Chart',
+	title: 'Components/Data Visualization',
 }
 
 export const Chart = () => (
