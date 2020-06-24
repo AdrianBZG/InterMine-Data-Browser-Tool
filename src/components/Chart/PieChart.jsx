@@ -55,14 +55,19 @@ export const PieChart = ({ isColorBlind = false }) => {
 		<>
 			<Doughnut
 				data={{
-					datasets: [{ data: chartData.data, backgroundColor: colorPalette }],
+					datasets: [
+						{
+							data: chartData.data,
+							backgroundColor: colorPalette,
+						},
+					],
 					labels: chartData.labels,
 				}}
 				legend={{
 					position: 'left',
 					labels: {
 						fontStyle: 'var(--fw-medium)',
-						fontColor: 'var(--blue9)',
+						fontColor: '#05264c',
 						padding: 16,
 					},
 				}}
@@ -72,7 +77,7 @@ export const PieChart = ({ isColorBlind = false }) => {
 						text: 'Number of results for Gene by organism',
 						fontSize: 18,
 						fontStyle: 'var(--fw-medium)',
-						fontColor: 'var(--blue9)',
+						fontColor: '#05264c',
 						padding: 16,
 					},
 				}}
