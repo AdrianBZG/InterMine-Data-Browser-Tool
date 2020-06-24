@@ -8,10 +8,10 @@ import { geneQueryStub, mineUrl } from '../../stubs/utils'
 const scheme = [
 	pattern.draw('dot', '#898cff '),
 	'#90d4f7',
-	pattern.draw('diamond-box', '#f589b6'),
-	'#71e096',
-	pattern.draw('dot-dash', '#fcdc89'),
+	pattern.draw('dot-dash', '#71e096'),
+	'#fcdc89',
 	'#f5a26e',
+	pattern.draw('diagonal', '#f589b6'),
 	'#668de5',
 	'#ed6d79',
 	'#5ad0e5',
