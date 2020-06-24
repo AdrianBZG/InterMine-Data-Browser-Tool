@@ -7426,6 +7426,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chart.js@npm:^2.9.3":
+  version: 2.9.3
+  resolution: "chart.js@npm:2.9.3"
+  dependencies:
+    chartjs-color: ^2.1.0
+    moment: ^2.10.2
+  checksum: 8e3f10e003941c1c77a5209cd08ed342a41c7c6a2ed93722b7ea1366c804bb2349d957e066f2abb7a3399d6ebebe83a298a15cbc960bc64846bc127e94f77f27
+  languageName: node
+  linkType: hard
+
+"chartjs-color-string@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "chartjs-color-string@npm:0.6.0"
+  dependencies:
+    color-name: ^1.0.0
+  checksum: 29f7ef3ebf5af1a76034da3148e1f230eee0c0f6df497ab7072ce5fb9c11ff37f5f030d2a2a5f1fd9230895d9aa294b455c5dd0f0e04f38688c69d0ccbdca7dd
+  languageName: node
+  linkType: hard
+
+"chartjs-color@npm:^2.1.0":
+  version: 2.4.1
+  resolution: "chartjs-color@npm:2.4.1"
+  dependencies:
+    chartjs-color-string: ^0.6.0
+    color-convert: ^1.9.3
+  checksum: 850408dfcda057ef0115018d5c83b88f5539cf93bbae8389bd3c5caa405a18e1f1d89b22a26107e1559248206a4ad6243294a820d50f042c6782a1d9d09fb3de
+  languageName: node
+  linkType: hard
+
 "check-types@npm:^8.0.3":
   version: 8.0.3
   resolution: "check-types@npm:8.0.3"
@@ -7740,7 +7769,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-convert@npm:^1.9.0, color-convert@npm:^1.9.1":
+"color-convert@npm:^1.9.0, color-convert@npm:^1.9.1, color-convert@npm:^1.9.3":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
   dependencies:
@@ -8717,7 +8746,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-scale-chromatic@npm:^1.3.3":
+"d3-scale-chromatic@npm:^1.3.3, d3-scale-chromatic@npm:^1.5.0":
   version: 1.5.0
   resolution: "d3-scale-chromatic@npm:1.5.0"
   dependencies:
@@ -12573,9 +12602,11 @@ fsevents@^1.2.7:
     "@typescript-eslint/parser": 2.x
     babel-eslint: 10.x
     babel-preset-react-app: ^9.1.2
+    chart.js: ^2.9.3
     concurrently: ^5.2.0
     craco-linaria: ^1.1.2
     cross-env: ^7.0.2
+    d3-scale-chromatic: ^1.5.0
     eslint: 6.x
     eslint-config-prettier: ^6.11.0
     eslint-config-react-app: ^5.2.1
@@ -12592,10 +12623,12 @@ fsevents@^1.2.7:
     lint-staged: ">=10"
     node-sass: ^4.14.1
     node-sass-glob-importer: ^5.3.2
+    patternomaly: ^1.3.2
     prettier: ^2.0.5
     prettier-plugin-package: ^1.0.0
     prop-types: ^15.7.2
     react: ^16.13.1
+    react-chartjs-2: ^2.9.0
     react-dom: ^16.13.1
     react-scripts: 3.4.1
     serve: ^11.3.2
@@ -15615,6 +15648,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"moment@npm:^2.10.2":
+  version: 2.27.0
+  resolution: "moment@npm:2.27.0"
+  checksum: 72d9a7d8dba59e3d538440cdc0b59fa895b123361e370be231896478aaf157a484355ce32bd8daf6f731d6d1636d3a67ecb67531e536e093ca18b43e0cbae194
+  languageName: node
+  linkType: hard
+
 "move-concurrently@npm:^1.0.1":
   version: 1.0.1
   resolution: "move-concurrently@npm:1.0.1"
@@ -16952,6 +16992,13 @@ fsevents@^1.2.7:
   version: 4.0.0
   resolution: "path-type@npm:4.0.0"
   checksum: ef5835f2eb47e4d06004c7ec7bd51175c0455eaecd5ee99a9774bca5ef43242616e25b44ccc0ba86a0bf42b9f197550fcc0dfa7580e5ff9dca53c035e9bd86a9
+  languageName: node
+  linkType: hard
+
+"patternomaly@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "patternomaly@npm:1.3.2"
+  checksum: f9f7549ff71be0f6fccc5b30aaecc730ac4d57943783fafbea30b60051c018d98a549e81990f2f03fba63fff71a01b1fadaf2e9ec4fe833819bcf47ebf33fdac
   languageName: node
   linkType: hard
 
@@ -18698,6 +18745,20 @@ fsevents@^1.2.7:
     regenerator-runtime: ^0.13.3
     whatwg-fetch: ^3.0.0
   checksum: 94d24bf1d69a0cbb26d8adbb14ba600b29c7c5adc06c9f9c8337d0f8ee7358ee2c443d806f8ca96fdf002d7f37c1a5fae6a796f63164df44a4fc3996aeb2d71f
+  languageName: node
+  linkType: hard
+
+"react-chartjs-2@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "react-chartjs-2@npm:2.9.0"
+  dependencies:
+    lodash: ^4.17.4
+    prop-types: ^15.5.8
+  peerDependencies:
+    chart.js: ^2.3
+    react: ^0.14.0 || ^15.0.0 || ^16.0.0-beta || ^16.0.0
+    react-dom: ^0.14.0 || ^15.0.0 || ^16.0.0-beta || ^16.0.0
+  checksum: a5263e46c464734e92be24a271a3c34f93d110c2a40f3b6d822956514b994c014eabdd66ef153ab2e56d8e7e0d575ac2901c0016c0a33e8b2c9455a90def3963
   languageName: node
   linkType: hard
 
