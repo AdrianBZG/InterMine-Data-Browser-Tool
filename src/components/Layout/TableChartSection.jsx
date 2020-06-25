@@ -1,4 +1,4 @@
-import { css } from 'linaria'
+import { Card } from '@blueprintjs/core'
 import { styled } from 'linaria/react'
 import React from 'react'
 
@@ -10,11 +10,12 @@ const StyledTableChartsSection = styled.section`
 	overflow: auto;
 	height: calc(100vh - 3.643em);
 `
+
 const S = {
-	TableChartsSection: StyledTableChartsSection,
+	TableChartSection: StyledTableChartsSection,
 }
 
-export const TableChartsSection = () => {
+export const TableChartSection = () => {
 	return (
 		<S.TableChartSection id="Tablechart">
 			<ChartSection />

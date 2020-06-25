@@ -4,7 +4,7 @@ import React from 'react'
 import { ChartSection } from './Layout/ChartSection'
 import { ConstraintSection } from './Layout/ConstraintSection'
 import { Header } from './Layout/Header'
-import { TableSection } from './TableSection/TableSection'
+import { TableSection } from './Layout/TableSection'
 
 const StyledTableChartsSection = styled.section`
 	padding: 10px 30px 0;
