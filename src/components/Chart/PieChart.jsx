@@ -5,7 +5,7 @@ import { Doughnut } from 'react-chartjs-2'
 
 import { geneQueryStub, mineUrl } from '../../stubs/utils'
 
-const scheme = [
+const colorPalette = [
 	pattern.draw('dot', '#898cff '),
 	'#90d4f7',
 	pattern.draw('dot-dash', '#71e096'),
@@ -21,9 +21,8 @@ const scheme = [
 	'#67eebd',
 ]
 
-export const PieChart = ({ isColorBlind = false }) => {
+export const PieChart = () => {
 	const [chartData, setChartData] = useState({ data: [], labels: [] })
-	const colorPalette = isColorBlind ? pattern.generate(scheme) : scheme
 
 	const service = new imjs.Service({ root: mineUrl })
 	const query = new imjs.Query(geneQueryStub, service)
