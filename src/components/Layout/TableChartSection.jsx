@@ -17,7 +17,7 @@ const Chart = styled(Card)`
 `
 
 const S = {
-	TableChartsSection: StyledTableChartsSection,
+	TableChartSection: StyledTableChartsSection,
 	Chart: Chart,
 }
 
@@ -31,7 +31,7 @@ export const ChartSection = () => {
 	)
 }
 
-export const TableChartsSection = () => {
+export const TableChartSection = () => {
 	return (
 		<S.TableChartSection id="Tablechart">
 			<ChartSection />
