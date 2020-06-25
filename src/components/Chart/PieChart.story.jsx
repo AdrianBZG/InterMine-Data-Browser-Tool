@@ -2,10 +2,10 @@ import { Card } from '@blueprintjs/core'
 import { styled } from 'linaria/react'
 import React from 'react'
 
-import { PieChart } from './PieChart'
+import * as Chart from './PieChart'
 
 export default {
-	component: PieChart,
+	component: Chart.PieChart,
 	title: 'Components/Data Visualization',
 }
 
@@ -22,10 +22,10 @@ const S = {
 	PieWrapper: StyledPieWrapper,
 }
 
-export const Chart = () => (
+export const PieChart = () => (
 	<S.Card>
 		<S.PieWrapper>
-			<PieChart />
+			<Chart.PieChart />
 		</S.PieWrapper>
 	</S.Card>
 )
