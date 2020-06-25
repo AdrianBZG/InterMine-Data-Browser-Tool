@@ -23,6 +23,7 @@ const colorPalette = [
 
 export const BarChart = () => {
 	const [chartData, setChartData] = useState({ countData: [], labelsData: [], onHoverLabel: [] })
+	const [titles, setTitles] = useState([])
 	const service = new imjs.Service({ root: mineUrl })
 	const query = new imjs.Query(geneLengthQueryStub, service)
 
@@ -36,22 +37,26 @@ export const BarChart = () => {
 				const elementsPerBucket = (max - min) / buckets
 				const stdevFixed = parseFloat(stdev).toFixed(3)
 				const avgFixed = parseFloat(average).toFixed(3)
-				const chartTitle = `Distribution of ${uniqueValues} Gene Lengths`
-				const chartSubtitle = `Min: ${min} Max: ${max} Avg: ${avgFixed} Stdev: ${stdevFixed}`
 
 				const countData = []
 				const labelsData = []
 				const onHoverLabel = []
-				summary.results.forEach((item, i) => {
-					const lowerLimit = Math.round(min + elementsPerBucket * i)
-					const upperLimit = Math.round(min + elementsPerBucket * (i + 1))
+				summary.results.forEach((_, i) => {
+					if (i < summary.results.length - 1) {
+						const lowerLimit = Math.round(min + elementsPerBucket * i)
+						const upperLimit = Math.round(min + elementsPerBucket * (i + 1))
 
-					countData.push(Math.log2(summary.results[i].count + 1))
-					labelsData.push(`${lowerLimit} to ${upperLimit}`)
-					onHoverLabel.push(`${lowerLimit} to ${upperLimit}: ${summary.results[i].count} values`)
+						countData.push(Math.log2(summary.results[i].count + 1))
+						labelsData.push(`${lowerLimit} — ${upperLimit}`)
+						onHoverLabel.push(`${lowerLimit} to ${upperLimit}: ${summary.results[i].count} values`)
+					}
 				})
 
 				setChartData({ countData, labelsData, onHoverLabel })
+
+				const chartTitle = `Distribution of ${uniqueValues} Gene Lengths`
+				const chartSubtitle = `Min: ${min} Max: ${max} Avg: ${avgFixed} Stdev: ${stdevFixed}`
+				setTitles([chartTitle, chartSubtitle])
 			} catch (e) {
 				console.error(e.message)
 			}
@@ -79,7 +84,38 @@ export const BarChart = () => {
 					},
 				],
 			}}
-			options={{}}
+			options={{
+				legend: {
+					display: false,
+				},
+				title: {
+					display: true,
+					text: titles,
+					position: 'bottom',
+				},
+				scales: {
+					xAxes: [
+						{
+							gridLines: {
+								display: false,
+							},
+							ticks: {
+								display: true,
+							},
+						},
+					],
+					yAxes: [
+						{
+							gridLines: {
+								drawTicks: false,
+							},
+							ticks: {
+								display: false,
+							},
+						},
+					],
+				},
+			}}
 		/>
 	)
 }
