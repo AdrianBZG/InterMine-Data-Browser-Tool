@@ -14,7 +14,7 @@ const StyledCard = styled(Card)`
 `
 
 const StyledPieWrapper = styled.div`
-	max-width: 600px;
+	max-width: 650px;
 `
 
 const S = {

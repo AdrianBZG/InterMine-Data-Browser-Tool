@@ -55,7 +55,11 @@ export const BarChart = () => {
 				setChartData({ countData, labelsData, onHoverLabel })
 
 				const chartTitle = `Distribution of ${uniqueValues} Gene Lengths`
-				const chartSubtitle = `Min: ${min} Max: ${max} Avg: ${avgFixed} Stdev: ${stdevFixed}`
+				const chartSubtitle = `Min: ${min} 
+				Max: ${max} 
+				Avg: ${avgFixed} 
+				Stdev: ${stdevFixed}`
+
 				setTitles([chartTitle, chartSubtitle])
 			} catch (e) {
 				console.error(e.message)
@@ -92,6 +96,10 @@ export const BarChart = () => {
 					display: true,
 					text: titles,
 					position: 'bottom',
+					fontColor: '#05264c',
+					fontStyle: 'var(--fw-medium)',
+					lineHeight: 2,
+					padding: 32,
 				},
 				scales: {
 					xAxes: [
@@ -101,6 +109,9 @@ export const BarChart = () => {
 							},
 							ticks: {
 								display: true,
+								// font color doesn't take css vars
+								fontColor: '#05264c',
+								fontStyle: 'var(--fw-medium)',
 							},
 						},
 					],
