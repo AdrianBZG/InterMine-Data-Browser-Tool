@@ -11,25 +11,32 @@ const ChartCard = styled(Card)`
 	display: flex;
 `
 
-const ChartWrapper = styled.div`
-	max-width: 650px;
+const PieWrapper = styled.div`
+	width: 600px;
+	float: left;
+`
+
+const BarWrapper = styled.div`
+	width: 600px;
+	float: right;
 `
 
 const S = {
 	Card: ChartCard,
-	Wrapper: ChartWrapper,
+	PieWrapper,
+	BarWrapper,
 }
 
 export const ChartSection = () => {
 	return (
 		<section id="Chart">
 			<S.Card>
-				<S.Wrapper>
+				<S.PieWrapper>
 					<PieChart />
-				</S.Wrapper>
-				<S.Wrapper>
+				</S.PieWrapper>
+				<S.BarWrapper>
 					<BarChart />
-				</S.Wrapper>
+				</S.BarWrapper>
 			</S.Card>
 		</section>
 	)
