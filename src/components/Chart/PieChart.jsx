@@ -67,6 +67,7 @@ export const PieChart = ({ isColorBlind = false }) => {
 					position: 'left',
 					labels: {
 						fontStyle: 'var(--fw-medium)',
+						// canvas font color won't accept css variables for some reason
 						fontColor: '#05264c',
 						padding: 16,
 					},
