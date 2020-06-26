@@ -23,11 +23,11 @@
 		"lint": "concurrently \"yarn:lint:*\"",
 		"lint:css": "cross-env NODE_ENV=development stylelint src/**/*.js{x}",
 		"lint:js": "cross-env NODE_ENV=development eslint src/**/*.{js,jsx}",
-		"serve": "serve build",
+		"serve:app": "serve build",
 		"serve:orig": "serve orig_app",
 		"start": "yarn build:css && cross-env EXTEND_ESLINT=true craco start",
 		"storybook": "yarn build:css && cross-env EXTEND_ESLINT=true start-storybook -p 9000",
-		"storybook:build": "yarn build:css && cross-env EXTEND_ESLINT=true build-storybook -c .storybook -o .storybook-dist",
+		"storybook:build": "yarn build:css && cross-env EXTEND_ESLINT=true build-storybook --no-dll -c .storybook -o .storybook-dist",
 		"test": "craco test"
 	},
 	"dependencies": {
