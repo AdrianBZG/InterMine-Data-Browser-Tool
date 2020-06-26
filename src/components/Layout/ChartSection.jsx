@@ -5,39 +5,28 @@ import React from 'react'
 import { BarChart } from '../Chart/BarChart'
 import { PieChart } from '../Chart/PieChart'
 
-const ChartCard = styled(Card)`
-	height: 380px;
+const S_Card = styled(Card)`
+	height: 376px;
 	margin-bottom: 20px;
 	display: flex;
 `
 
-const PieWrapper = styled.div`
-	width: 600px;
-	float: left;
+const S_ChartContainer = styled.div`
+	height: 100%;
+	width: 45%;
 `
-
-const BarWrapper = styled.div`
-	width: 600px;
-	float: right;
-`
-
-const S = {
-	Card: ChartCard,
-	PieWrapper,
-	BarWrapper,
-}
 
 export const ChartSection = () => {
 	return (
-		<section id="Chart">
-			<S.Card>
-				<S.PieWrapper>
+		<section id="charts">
+			<S_Card>
+				<S_ChartContainer>
 					<PieChart />
-				</S.PieWrapper>
-				<S.BarWrapper>
+				</S_ChartContainer>
+				<S_ChartContainer>
 					<BarChart />
-				</S.BarWrapper>
-			</S.Card>
+				</S_ChartContainer>
+			</S_Card>
 		</section>
 	)
 }

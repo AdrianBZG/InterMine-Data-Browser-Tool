@@ -10,6 +10,7 @@
 		"simple-import-sort/sort": "error",
 		"sort-imports": "off",
 		"import/order": "off",
+		"react/jsx-pascal-case": "off",
 		"@blueprintjs/classes-constants": ["error"],
 		"@blueprintjs/html-components": ["error"],
 		"@blueprintjs/icon-components": ["error"]

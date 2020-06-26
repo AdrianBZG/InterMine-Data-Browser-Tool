@@ -1,29 +1,48 @@
 import imjs from 'imjs'
-import pattern from 'patternomaly'
 import React, { useEffect, useState } from 'react'
-import { Bar } from 'react-chartjs-2'
+import {
+	Bar,
+	BarChart as RBarChart,
+	Brush,
+	CartesianGrid,
+	Cell,
+	Label,
+	ResponsiveContainer,
+	Tooltip,
+	XAxis,
+} from 'recharts'
 
 import { geneLengthQueryStub, mineUrl } from '../../stubs/utils'
+import { DATA_VIZ_COLORS } from './dataVizColors'
 
-const colorPalette = [
-	pattern.draw('dot', '#898cff '),
-	'#90d4f7',
-	pattern.draw('dot-dash', '#71e096'),
-	'#fcdc89',
-	'#f5a26e',
-	pattern.draw('diagonal', '#f589b6'),
-	'#668de5',
-	'#ed6d79',
-	'#5ad0e5',
-	'#cff381',
-	'#f696e3',
-	'#bb96ff',
-	'#67eebd',
-]
+const renderCustomTick = ({ x, y, payload }) => {
+	return (
+		<g transform={`translate(${x},${y})`}>
+			<text
+				x={0}
+				y={0}
+				dy={10}
+				fontSize="var(--fs-desktopS1)"
+				fontStyle="var(--fw-medium)"
+				textAnchor="end"
+				fill="var(--grey5)"
+				transform="rotate(-55)"
+			>
+				{payload.value}
+			</text>
+		</g>
+	)
+}
+
+const colorizeBars = (data) =>
+	data.map((entry, index) => (
+		<Cell key={entry} fill={DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]} />
+	))
 
 export const BarChart = () => {
-	const [chartData, setChartData] = useState({ countData: [], labelsData: [], onHoverLabel: [] })
-	const [titles, setTitles] = useState([])
+	const [chartData, setChartData] = useState([])
+	const [titles, setTitles] = useState({ title: '', subtitle: '' })
+
 	const service = new imjs.Service({ root: mineUrl })
 	const query = new imjs.Query(geneLengthQueryStub, service)
 
@@ -38,29 +57,30 @@ export const BarChart = () => {
 				const stdevFixed = parseFloat(stdev).toFixed(3)
 				const avgFixed = parseFloat(average).toFixed(3)
 
-				const countData = []
-				const labelsData = []
-				const onHoverLabel = []
-				summary.results.forEach((_, i) => {
-					if (i < summary.results.length - 1) {
-						const lowerLimit = Math.round(min + elementsPerBucket * i)
-						const upperLimit = Math.round(min + elementsPerBucket * (i + 1))
+				const title = `Distribution of ${uniqueValues} Gene Lengths`
+				const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
 
-						countData.push(Math.log2(summary.results[i].count + 1))
-						labelsData.push(`${lowerLimit} — ${upperLimit}`)
-						onHoverLabel.push(`${lowerLimit} to ${upperLimit}: ${summary.results[i].count} values`)
-					}
+				const data = summary.results.flatMap((item, idx) => {
+					if (idx === summary.results.length - 1) return []
+
+					const lowerLimit = Math.round(min + elementsPerBucket * idx)
+					const upperLimit = Math.round(min + elementsPerBucket * (idx + 1))
+
+					const data = Math.log2(item.count + 1)
+					const distribution = `${lowerLimit} — ${upperLimit}`
+					const count = item.count
+
+					return [
+						{
+							data,
+							distribution,
+							count,
+						},
+					]
 				})
 
-				setChartData({ countData, labelsData, onHoverLabel })
-
-				const chartTitle = `Distribution of ${uniqueValues} Gene Lengths`
-				const chartSubtitle = `Min: ${min} 
-				Max: ${max} 
-				Avg: ${avgFixed} 
-				Stdev: ${stdevFixed}`
-
-				setTitles([chartTitle, chartSubtitle])
+				setTitles({ title, subtitle })
+				setChartData(data)
 			} catch (e) {
 				console.error(e.message)
 			}
@@ -71,62 +91,43 @@ export const BarChart = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	let moreColors = colorPalette
-
-	while (moreColors.length < chartData.countData.length) {
-		moreColors = [...moreColors, ...colorPalette]
-	}
-
 	return (
-		<Bar
-			data={{
-				labels: chartData.labelsData,
-				datasets: [
-					{
-						data: chartData.countData,
-						backgroundColor: moreColors,
-					},
-				],
-			}}
-			options={{
-				legend: {
-					display: false,
-				},
-				title: {
-					display: true,
-					text: titles,
-					position: 'bottom',
-					fontColor: '#05264c',
-					fontStyle: 'var(--fw-medium)',
-					lineHeight: 2,
-					padding: 32,
-				},
-				scales: {
-					xAxes: [
-						{
-							gridLines: {
-								display: false,
-							},
-							ticks: {
-								display: true,
-								// font color doesn't take css vars
-								fontColor: '#05264c',
-								fontStyle: 'var(--fw-medium)',
-							},
-						},
-					],
-					yAxes: [
-						{
-							gridLines: {
-								drawTicks: false,
-							},
-							ticks: {
-								display: false,
-							},
-						},
-					],
-				},
-			}}
-		/>
+		<ResponsiveContainer width="100%" height="100%">
+			<RBarChart data={chartData} barCategoryGap="20%" margin={{ left: 100, bottom: 200 }}>
+				<Bar dataKey="data">{colorizeBars(chartData)}</Bar>
+				<Tooltip
+					itemStyle={{
+						color: 'var(--blue9)',
+					}}
+					wrapperStyle={{
+						border: '2px solid var(--blue9)',
+						borderRadius: '3px',
+					}}
+					formatter={(_, __, props) => [props.payload.count, 'Total Values']}
+				/>
+				<CartesianGrid strokeDasharray="3 3" vertical={false} />
+				<XAxis dataKey="distribution" interval={0} tick={renderCustomTick}>
+					<Label
+						fill="var(--blue9)"
+						fontWeight={500}
+						value={titles.title}
+						offset={120}
+						position="bottom"
+					/>
+					<Label
+						fill="var(--blue9)"
+						fontWeight={500}
+						value={titles.subtitle}
+						position="bottom"
+						offset={150}
+					/>
+				</XAxis>
+				<Brush dataKey="distribution" y={290}>
+					<RBarChart>
+						<Bar dataKey="data">{colorizeBars(chartData)}</Bar>
+					</RBarChart>
+				</Brush>
+			</RBarChart>
+		</ResponsiveContainer>
 	)
 }

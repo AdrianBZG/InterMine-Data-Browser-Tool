@@ -1,28 +1,39 @@
 import imjs from 'imjs'
-import pattern from 'patternomaly'
 import React, { useEffect, useState } from 'react'
-import { Doughnut } from 'react-chartjs-2'
+import {
+	Cell,
+	Label,
+	Legend,
+	Pie,
+	PieChart as RPieChart,
+	ResponsiveContainer,
+	Text,
+	Tooltip,
+} from 'recharts'
 
 import { geneQueryStub, mineUrl } from '../../stubs/utils'
+import { DATA_VIZ_COLORS } from './dataVizColors'
 
-const colorPalette = [
-	pattern.draw('dot', '#898cff '),
-	'#90d4f7',
-	pattern.draw('dot-dash', '#71e096'),
-	'#fcdc89',
-	'#f5a26e',
-	pattern.draw('diagonal', '#f589b6'),
-	'#668de5',
-	'#ed6d79',
-	'#5ad0e5',
-	'#cff381',
-	'#f696e3',
-	'#bb96ff',
-	'#67eebd',
-]
+const renderLabelContent = (props) => {
+	const {
+		viewBox: { cx, cy },
+	} = props
+	const positioningProps = {
+		x: cx,
+		y: cy - cy * 0.95,
+		textAnchor: 'middle',
+		verticalAnchor: 'middle',
+	}
+
+	return (
+		<Text fill="var(--blue9)" fontSize="var(--fs-desktopS2)" {...positioningProps}>
+			{'Number of results for Genes by organism '}
+		</Text>
+	)
+}
 
 export const PieChart = () => {
-	const [chartData, setChartData] = useState({ data: [], labels: [] })
+	const [chartData, setChartData] = useState([])
 
 	const service = new imjs.Service({ root: mineUrl })
 	const query = new imjs.Query(geneQueryStub, service)
@@ -31,15 +42,13 @@ export const PieChart = () => {
 		const runQuery = async () => {
 			try {
 				const summary = await query.summarize('Gene.organism.shortName', 50)
-				const data = []
-				const labels = []
 
-				summary.results.forEach((item) => {
-					data.push(item.count)
-					labels.push(`${item.item} (${item.count})`)
-				})
+				const data = summary.results.map(({ item, count }) => ({
+					name: item,
+					value: count,
+				}))
 
-				setChartData({ data, labels })
+				setChartData(data)
 			} catch (e) {
 				console.error(e.message)
 			}
@@ -51,37 +60,40 @@ export const PieChart = () => {
 	}, [])
 
 	return (
-		<>
-			<Doughnut
-				data={{
-					datasets: [
-						{
-							data: chartData.data,
-							backgroundColor: colorPalette,
-						},
-					],
-					labels: chartData.labels,
-				}}
-				legend={{
-					position: 'left',
-					labels: {
-						fontStyle: 'var(--fw-medium)',
-						// canvas font color won't accept css variables for some reason
-						fontColor: '#05264c',
-						padding: 16,
-					},
-				}}
-				options={{
-					title: {
-						display: true,
-						text: 'Number of results for Gene by organism',
-						fontSize: 18,
-						fontStyle: 'var(--fw-medium)',
-						fontColor: '#05264c',
-						padding: 16,
-					},
-				}}
-			/>
-		</>
+		<ResponsiveContainer width="100%" height="100%">
+			<RPieChart>
+				<Pie
+					data={chartData}
+					dataKey="value"
+					nameKey="name"
+					cy="52%"
+					innerRadius={60}
+					paddingAngle={1}
+				>
+					{chartData.map((entry, index) => (
+						<Cell key={entry} fill={DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]} />
+					))}
+					<Label content={renderLabelContent} />
+				</Pie>
+				<Tooltip
+					labelStyle={{
+						color: 'var(--blue9)',
+					}}
+					contentStyle={{
+						borderRadius: '30px',
+					}}
+					wrapperStyle={{
+						border: '2px solid var(--blue9)',
+						borderRadius: '30px',
+					}}
+					separator=""
+					formatter={(value, name) => [value, `${name}: `]}
+				/>
+				<Legend
+					iconType="circle"
+					formatter={(value, _, index) => <span>{`${value} (${chartData[index].value})`}</span>}
+				/>
+			</RPieChart>
+		</ResponsiveContainer>
 	)
 }

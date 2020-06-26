@@ -9,23 +9,12 @@ export default {
 	title: 'Components/Data Visualization',
 }
 
-const StyledCard = styled(Card)`
+const S_Card = styled(Card)`
 	height: 376px;
 `
 
-const StyledPieWrapper = styled.div`
-	max-width: 650px;
-`
-
-const S = {
-	Card: StyledCard,
-	PieWrapper: StyledPieWrapper,
-}
-
 export const BarChart = () => (
-	<S.Card>
-		<S.PieWrapper>
-			<Chart.BarChart />
-		</S.PieWrapper>
-	</S.Card>
+	<S_Card>
+		<Chart.BarChart />
+	</S_Card>
 )
