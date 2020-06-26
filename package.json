@@ -16,17 +16,18 @@
 		"node": ">=10"
 	},
 	"scripts": {
-		"analyze": "cross-env ANALYZE=true npm run build",
-		"build": "craco build",
+		"analyze": "cross-env ANALYZE=true yarn run build",
+		"build": "yarn build:css && cross-env EXTEND_ESLINT=true craco build",
+		"build:css": "node-sass --importer=./node_modules/node-sass-magic-importer/dist/cli --include-path ./src  --include-path ./node_modules/ ./src/theme -o ./src/theme",
 		"eject": "craco eject",
 		"lint": "concurrently \"yarn:lint:*\"",
 		"lint:css": "cross-env NODE_ENV=development stylelint src/**/*.js{x}",
 		"lint:js": "cross-env NODE_ENV=development eslint src/**/*.{js,jsx}",
 		"serve": "serve build",
 		"serve:orig": "serve orig_app",
-		"start": "craco start",
-		"storybook": "start-storybook -p 9000",
-		"storybook:build": "build-storybook -c .storybook -o .storybook-dist",
+		"start": "yarn build:css && cross-env EXTEND_ESLINT=true craco start",
+		"storybook": "yarn build:css && cross-env EXTEND_ESLINT=true start-storybook -p 9000",
+		"storybook:build": "yarn build:css && cross-env EXTEND_ESLINT=true build-storybook -c .storybook -o .storybook-dist",
 		"test": "craco test"
 	},
 	"dependencies": {
@@ -71,7 +72,7 @@
 		"linaria": "next",
 		"lint-staged": ">=10",
 		"node-sass": "^4.14.1",
-		"node-sass-glob-importer": "^5.3.2",
+		"node-sass-magic-importer": "^5.3.2",
 		"prettier": "^2.0.5",
 		"prettier-plugin-package": "^1.0.0",
 		"prop-types": "^15.7.2",

@@ -36,3 +36,5 @@ src/.linaria_cache
 
 # Dev environment variables
 .env
+
+main.css

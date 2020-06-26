@@ -12456,7 +12456,7 @@ fsevents@^1.2.7:
     linaria: next
     lint-staged: ">=10"
     node-sass: ^4.14.1
-    node-sass-glob-importer: ^5.3.2
+    node-sass-magic-importer: ^5.3.2
     prettier: ^2.0.5
     prettier-plugin-package: ^1.0.0
     prop-types: ^15.7.2
@@ -15798,15 +15798,6 @@ fsevents@^1.2.7:
   version: 1.1.58
   resolution: "node-releases@npm:1.1.58"
   checksum: cd590a387e59206a3ed3c3624234f5848f8176e04f61b8e67c4f52df631c7e61f2ef2b7b320a2f5a42c92b65d31b2911d3a5aedacc86267e06f39155a6ce4d13
-  languageName: node
-  linkType: hard
-
-"node-sass-glob-importer@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "node-sass-glob-importer@npm:5.3.2"
-  dependencies:
-    node-sass-magic-importer: ^5.3.2
-  checksum: 418840e4ebeb10e9f32fc2fb645c0b5d42626092d301b4c5f030c675c0d296f50ac8c1893a24244f3e041f02d2f0dcdcbe6024069adf9bec778947db245b1591
   languageName: node
   linkType: hard
 

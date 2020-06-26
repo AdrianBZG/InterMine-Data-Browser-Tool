@@ -1,5 +1,6 @@
-const globImporter = require('node-sass-glob-importer')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { NormalModuleReplacementPlugin } = require('webpack')
+const { extractIcons } = require('../bin/generateIconPack')
+const path = require('path')
 
 module.exports = {
 	addons: [
@@ -24,19 +25,17 @@ module.exports = {
 			},
 		})
 
-		config.module.rules.push({
-			test: /\.scss$/,
-			use: [
-				{
-					loader: 'sass-loader',
-					options: {
-						sassOptions: {
-							importer: globImporter(),
-						},
-					},
-				},
-			],
-		})
+		if (configType === 'PRODUCTION') {
+			// ICON hack for blueprintjs
+			extractIcons()
+
+			config.plugins.push(
+				new NormalModuleReplacementPlugin(
+					/.*\/generated\/iconSvgPaths.*/,
+					path.join(__dirname, '..', 'node_modules', '@blueprintjs', 'ICON_HACK.js')
+				)
+			)
+		}
 
 		return config
 	},
