@@ -1,4 +1,4 @@
-const { IconSvgPaths16: Icons16 } = require('@blueprintjs/icons/lib/cjs/generated/COPIED_ICONS.js')
+const { IconSvgPaths16: Icons16 } = require('@blueprintjs/icons/lib/cjs/generated/iconSvgPaths.js')
 const fs = require('fs')
 const path = require('path')
 const { usedIcons } = require('../src/blueprintIcons')
