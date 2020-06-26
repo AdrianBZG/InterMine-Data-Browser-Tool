@@ -2,7 +2,7 @@ import { Button, Colors, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React, { useState } from 'react'
 
-import * as S from '../../shared/FormGroups'
+import * as S from './FormGroups'
 
 const AuthenticatedIcon = (isAuthenticated) => (
 	<Icon

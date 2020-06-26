@@ -4,8 +4,8 @@ import { Select } from '@blueprintjs/select'
 import { css } from 'linaria'
 import React from 'react'
 
-import * as S from '../../shared/FormGroups'
 import { NumberedSelectMenuItems } from '../Selects'
+import * as S from './FormGroups'
 
 export const Mine = ({ mine, mockMines, setMine }) => {
 	return (
