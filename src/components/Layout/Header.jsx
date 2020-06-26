@@ -19,6 +19,9 @@ const S_LogoContainter = styled.div`
 	border-bottom: 2px solid var(--blue5);
 `
 
+/**
+ * Composes elements that sit at the top bar of the app
+ */
 export const Header = () => {
 	return (
 		<>

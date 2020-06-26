@@ -3,10 +3,9 @@ import React from 'react'
 import { QueryController as QCont } from './QueryController'
 
 export default {
-	component: QCont,
 	title: 'Components/QueryController',
 	parameters: {
-		componentSubtitle: 'The QueryController maintains executes queries and maintains the history',
+		componentSubtitle: 'The QueryController executes queries and maintains the history',
 	},
 	decorators: [
 		(storyFn) => (

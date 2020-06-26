@@ -4,7 +4,6 @@ import * as Constraints from './'
 import { Constraint } from './ConstraintBase'
 
 export default {
-	component: Constraint,
 	title: 'Components/Constraint',
 	parameters: {
 		componentSubtitle:
