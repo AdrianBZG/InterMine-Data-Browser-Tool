@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 
 import { NumberedSelectMenuItems } from '../Selects'
 
-const StyledTabs = styled(Tabs)`
+const S_Tabs = styled(Tabs)`
 	margin-left: auto;
 	margin-right: 20px;
 
@@ -15,10 +15,6 @@ const StyledTabs = styled(Tabs)`
 		font-weight: var(--fw-light);
 	}
 `
-
-const S = {
-	Tabs: StyledTabs,
-}
 
 export const ClassSelector = () => {
 	const [visibleClasses, setVisibleClasses] = useState([{ name: 'Gene' }, { name: 'Protein' }])
@@ -35,11 +31,11 @@ export const ClassSelector = () => {
 
 	return (
 		<>
-			<S.Tabs id="classes-tab" large={true}>
+			<S_Tabs id="classes-tab" large={true}>
 				{visibleClasses.map((c) => (
 					<Tab key={c.name} id={c.name} title={c.name} />
 				))}
-			</S.Tabs>
+			</S_Tabs>
 			<Select
 				items={hiddenClasses}
 				filterable={true}

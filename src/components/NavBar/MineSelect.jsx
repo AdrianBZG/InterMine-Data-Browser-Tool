@@ -5,11 +5,11 @@ import { css } from 'linaria'
 import React from 'react'
 
 import { NumberedSelectMenuItems } from '../Selects'
-import * as S from './FormGroups'
+import { S_NavFormGroup } from './FormGroups'
 
 export const Mine = ({ mine, mockMines, setMine }) => {
 	return (
-		<S.NavFormGroup label="Mine" inline={true} labelFor="mine-select-button">
+		<S_NavFormGroup label="Mine" inline={true} labelFor="mine-select-button">
 			<Select
 				className={css`
 					margin-right: 30px;
@@ -30,6 +30,6 @@ export const Mine = ({ mine, mockMines, setMine }) => {
 					rightIcon={IconNames.CARET_DOWN}
 				/>
 			</Select>
-		</S.NavFormGroup>
+		</S_NavFormGroup>
 	)
 }

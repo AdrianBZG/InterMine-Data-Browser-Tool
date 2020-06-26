@@ -4,19 +4,14 @@ import { css } from 'linaria'
 import { styled } from 'linaria/react'
 import React from 'react'
 
-const StyledQueryController = styled.div`
+const S_QueryController = styled.div`
 	padding-top: 10px;
 	margin: 0 20px;
 `
 
-const StyledHeading = styled.span`
+const S_Heading = styled.span`
 	color: var(--blue9);
 `
-
-const S = {
-	Heading: StyledHeading,
-	QueryController: StyledQueryController,
-}
 
 const ViewAll = () => (
 	<Popover fill={true} usePortal={true} lazy={true} position="right">
@@ -42,7 +37,7 @@ const RunQuery = () => (
 
 export const QueryController = () => {
 	return (
-		<S.QueryController>
+		<S_QueryController>
 			<H5>
 				<span
 					className={css`
@@ -51,10 +46,10 @@ export const QueryController = () => {
 				>
 					4{' '}
 				</span>
-				<S.Heading>Constraints applied</S.Heading>
+				<S_Heading>Constraints applied</S_Heading>
 			</H5>
 			<ViewAll />
 			<RunQuery />
-		</S.QueryController>
+		</S_QueryController>
 	)
 }

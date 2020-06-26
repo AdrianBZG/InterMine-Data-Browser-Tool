@@ -9,13 +9,9 @@ import { ClassSelector } from './ClassSelector'
 import { Mine } from './MineSelect'
 import { ThemeControl } from './ThemeControl'
 
-const StyledNav = styled(Navbar)`
+const S_Navbar = styled(Navbar)`
 	padding: 0 30px 30px 40px;
 `
-
-const S = {
-	Navbar: StyledNav,
-}
 
 export const NavigationBar = () => {
 	const [mockMines] = useState([
@@ -26,7 +22,7 @@ export const NavigationBar = () => {
 	const [mine, setMine] = useState(mockMines[0])
 
 	return (
-		<S.Navbar>
+		<S_Navbar>
 			<Navbar.Group
 				className={css`
 					width: 100%;
@@ -46,6 +42,6 @@ export const NavigationBar = () => {
 					icon={IconNames.ERROR}
 				/>
 			</Navbar.Group>
-		</S.Navbar>
+		</S_Navbar>
 	)
 }

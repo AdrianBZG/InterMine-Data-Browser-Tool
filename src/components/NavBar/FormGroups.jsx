@@ -1,7 +1,7 @@
 import { Classes, FormGroup } from '@blueprintjs/core'
 import { styled } from 'linaria/react'
 
-export const NavFormGroup = styled(FormGroup)`
+export const S_NavFormGroup = styled(FormGroup)`
 	margin: unset;
 
 	&& > label.${Classes.LABEL} {

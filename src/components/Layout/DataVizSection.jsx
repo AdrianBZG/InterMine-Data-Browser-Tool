@@ -17,13 +17,13 @@ const S_ChartContainer = styled.div`
 	width: 45%;
 `
 
-const TableCard = styled(Card)`
+const S_TableCard = styled(Card)`
 	margin-bottom: 20px;
 	overflow: scroll;
 	padding-bottom: unset;
 `
 
-const StyledRowCount = styled.span`
+const S_RowCount = styled.span`
 	font-size: var(--fs-desktopM1);
 	font-weight: var(--fw-semibold);
 	margin-bottom: 20px;
@@ -31,23 +31,16 @@ const StyledRowCount = styled.span`
 	display: inline-block;
 `
 
-const StyledPagingRow = styled.div`
+const S_PagingRow = styled.div`
 	display: flex;
 	justify-content: space-between;
 `
 
-const StyledTableChartsSection = styled.section`
+const S_TableChartSection = styled.section`
 	padding: 10px 30px 0;
 	overflow: auto;
 	height: calc(100vh - 3.643em);
 `
-
-const S = {
-	TableCard,
-	RowCount: StyledRowCount,
-	PagingRow: StyledPagingRow,
-	TableChartSection: StyledTableChartsSection,
-}
 
 export const ChartSection = () => {
 	return (
@@ -67,23 +60,23 @@ export const ChartSection = () => {
 export const TableSection = () => {
 	return (
 		<section>
-			<S.TableCard>
+			<S_TableCard>
 				<TableActionButtons />
-				<S.PagingRow>
-					<S.RowCount>{`Showing ${rows.length} of ${rows.length} rows`}</S.RowCount>
+				<S_PagingRow>
+					<S_RowCount>{`Showing ${rows.length} of ${rows.length} rows`}</S_RowCount>
 					<TablePagingButtons />
-				</S.PagingRow>
+				</S_PagingRow>
 				<Table mineUrl={mineUrl} rows={rows} />
-			</S.TableCard>
+			</S_TableCard>
 		</section>
 	)
 }
 
 export const TableChartSection = () => {
 	return (
-		<S.TableChartSection id="Tablechart">
+		<S_TableChartSection id="Tablechart">
 			<ChartSection />
 			<TableSection />
-		</S.TableChartSection>
+		</S_TableChartSection>
 	)
 }

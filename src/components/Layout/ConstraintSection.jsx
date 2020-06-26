@@ -4,28 +4,22 @@ import React from 'react'
 import * as Constraints from '../Constraints'
 import { QueryController } from '../QueryController'
 
-const ConstraintWrapper = styled.li`
+const S_Constraint = styled.li`
 	margin: 0.875em 0;
 `
 
-const ConstraintList = styled.ul`
+const S_ConstraintList = styled.ul`
 	overflow: auto;
 	list-style: none;
 	padding: 0;
 	height: 77vh;
 `
 
-const ConstraintSectionWrapper = styled.section`
+const S_ConstraintSection = styled.section`
 	min-width: 230px;
 	border-right: 2px solid var(--blue5);
 	background-color: var(--solidWhite);
 `
-
-const S = {
-	Constraint: ConstraintWrapper,
-	ConstraintSection: ConstraintSectionWrapper,
-	ConstraintList,
-}
 
 const constraintMocks = [
 	Constraints.INTERMINE_LIST,
@@ -47,13 +41,13 @@ const constraintMocks = [
 
 export const ConstraintSection = () => {
 	return (
-		<S.ConstraintSection>
+		<S_ConstraintSection>
 			<QueryController />
-			<S.ConstraintList>
+			<S_ConstraintList>
 				{constraintMocks.map((c, idx) => (
-					<S.Constraint key={idx}>{Constraints.renderConstraint(c)}</S.Constraint>
+					<S_Constraint key={idx}>{Constraints.renderConstraint(c)}</S_Constraint>
 				))}
-			</S.ConstraintList>
-		</S.ConstraintSection>
+			</S_ConstraintList>
+		</S_ConstraintSection>
 	)
 }

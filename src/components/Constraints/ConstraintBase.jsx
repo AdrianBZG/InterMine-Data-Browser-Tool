@@ -4,7 +4,7 @@ import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-const CountTag = styled.div`
+const S_CountTag = styled.div`
 	display: flex;
 	align-self: flex-start;
 	margin-left: 5px;
@@ -20,18 +20,18 @@ const CountTag = styled.div`
 	}
 `
 
-const TagIcon = styled(Icon)`
+const S_TagIcon = styled(Icon)`
 	/* We need to override Blueprint styling to create our pill */
 	margin: -0.167em -0.167em !important;
 	align-self: flex-start;
 `
 
-const ConstraintLabel = styled.div`
+const S_ConstraintLabel = styled.div`
 	display: flex;
 	align-items: center;
 `
 
-const ConstraintIcon = styled.div`
+const S_ConstraintIcon = styled.div`
 	border-radius: 30px;
 	border: ${(props) => `0.167em solid ${props.labelBorderColor}`};
 	font-size: var(--fs-desktopS1);
@@ -44,13 +44,6 @@ const ConstraintIcon = styled.div`
 	align-items: center;
 	justify-content: center;
 `
-
-const S = {
-	ConstraintLabel,
-	ConstraintIcon,
-	CountTag,
-	TagIcon,
-}
 
 /**
  * A constraint is styled as a button that takes the full width of its container. Each
@@ -75,18 +68,18 @@ export const Constraint = ({
 			alignText="left"
 			aria-label={ariaLabel ? ariaLabel : constraintName}
 		>
-			<S.ConstraintLabel>
-				<S.ConstraintIcon labelBorderColor={labelBorderColor}>
+			<S_ConstraintLabel>
+				<S_ConstraintIcon labelBorderColor={labelBorderColor}>
 					<span>{labelText}</span>
-				</S.ConstraintIcon>
+				</S_ConstraintIcon>
 				{constraintName}
 				{constraintCount > 0 && (
-					<S.CountTag>
+					<S_CountTag>
 						{constraintCount > 1 && <small>{constraintCount}</small>}
-						<S.TagIcon icon={IconNames.TICK_CIRCLE} color="var(--green5)" />
-					</S.CountTag>
+						<S_TagIcon icon={IconNames.TICK_CIRCLE} color="var(--green5)" />
+					</S_CountTag>
 				)}
-			</S.ConstraintLabel>
+			</S_ConstraintLabel>
 		</Button>
 	)
 }

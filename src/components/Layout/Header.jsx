@@ -4,12 +4,12 @@ import React from 'react'
 import logo from '../../images/logo.png'
 import { NavigationBar } from '../NavBar/NavBar'
 
-const StyledHeader = styled.header`
+const S_Header = styled.header`
 	display: inline-flex;
 	width: 100%;
 `
 
-const LogoContainter = styled.div`
+const S_LogoContainter = styled.div`
 	min-width: 230px;
 	height: 43px;
 	display: inline-flex;
@@ -19,20 +19,15 @@ const LogoContainter = styled.div`
 	border-bottom: 2px solid var(--blue5);
 `
 
-const S = {
-	Header: StyledHeader,
-	LogoContainter,
-}
-
 export const Header = () => {
 	return (
 		<>
-			<S.Header>
-				<S.LogoContainter>
+			<S_Header>
+				<S_LogoContainter>
 					<img width="120px" src={logo} alt="Logo" />
-				</S.LogoContainter>
+				</S_LogoContainter>
 				<NavigationBar />
-			</S.Header>
+			</S_Header>
 		</>
 	)
 }
