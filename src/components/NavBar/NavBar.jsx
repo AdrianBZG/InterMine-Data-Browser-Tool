@@ -10,7 +10,7 @@ import { Mine } from './MineSelect'
 import { ThemeControl } from './ThemeControl'
 
 const S_Navbar = styled(Navbar)`
-	padding: 0 30px 30px 40px;
+	padding: 0 40px;
 `
 
 export const NavigationBar = () => {

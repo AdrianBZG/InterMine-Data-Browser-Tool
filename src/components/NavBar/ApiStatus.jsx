@@ -1,8 +1,18 @@
 import { Button, Colors, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
+import { styled } from 'linaria/react'
 import React, { useState } from 'react'
 
-import { S_NavFormGroup } from './FormGroups'
+const S_ApiLabel = styled.span`
+	font-size: var(--fs-desktopM2);
+	font-weight: var(--fw-regular);
+	margin-right: 8px;
+	margin-bottom: 0;
+`
+const S_ApiContainer = styled.div`
+	display: flex;
+	align-items: center;
+`
 
 const AuthenticatedIcon = (isAuthenticated) => (
 	<Icon
@@ -13,14 +23,16 @@ const AuthenticatedIcon = (isAuthenticated) => (
 
 export const ApiStatus = () => {
 	const [isAuthenticated, setAuthentication] = useState(false)
+
 	return (
-		<S_NavFormGroup label="Api" inline={true} labelFor="api-status">
+		<S_ApiContainer>
+			<S_ApiLabel>Api</S_ApiLabel>
 			<Button
 				aria-label="api-status"
 				small={true}
 				icon={AuthenticatedIcon(isAuthenticated)}
 				onClick={() => setAuthentication(!isAuthenticated)}
 			/>
-		</S_NavFormGroup>
+		</S_ApiContainer>
 	)
 }

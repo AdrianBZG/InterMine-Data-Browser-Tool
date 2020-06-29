@@ -6,12 +6,12 @@ import React, { useState } from 'react'
 
 import { NumberedSelectMenuItems } from '../Selects'
 
-const S_Tabs = styled(Tabs)`
+const S_ViewTabs = styled(Tabs)`
 	margin-left: auto;
 	margin-right: 20px;
 
 	.${Classes.TAB} {
-		font-size: var(--fs-desktopM3);
+		font-size: var(--fs-desktopM2);
 		font-weight: var(--fw-light);
 	}
 `
@@ -31,11 +31,11 @@ export const ClassSelector = () => {
 
 	return (
 		<>
-			<S_Tabs id="classes-tab" large={true}>
+			<S_ViewTabs id="classes-tab">
 				{visibleClasses.map((c) => (
 					<Tab key={c.name} id={c.name} title={c.name} />
 				))}
-			</S_Tabs>
+			</S_ViewTabs>
 			<Select
 				items={hiddenClasses}
 				filterable={true}
