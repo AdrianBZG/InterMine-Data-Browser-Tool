@@ -24,9 +24,6 @@ const S_ConstraintSection = styled.section`
 const constraintMocks = [
 	Constraints.INTERMINE_LIST,
 	Constraints.SYMBOL_CONSTRAINT,
-	Constraints.NAME,
-	Constraints.IDENTIFIERS,
-	Constraints.LENGTH,
 	Constraints.ORGANISM,
 	Constraints.PATHWAY_NAME,
 	Constraints.GO_ANNOTATION,
@@ -35,7 +32,6 @@ const constraintMocks = [
 	Constraints.DISEASES,
 	Constraints.CLIN_VAR,
 	Constraints.PROTEIN_DOMAIN_NAME,
-	Constraints.PHENOTYPE,
 	Constraints.DATASET_NAME,
 ]
 
