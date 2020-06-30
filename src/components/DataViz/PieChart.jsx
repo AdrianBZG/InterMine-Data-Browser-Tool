@@ -1,5 +1,4 @@
-import imjs from 'imjs'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
 	Cell,
 	Label,
@@ -10,54 +9,53 @@ import {
 	Text,
 	Tooltip,
 } from 'recharts'
+import { Machine } from 'xstate'
 
-import { geneQueryStub, mineUrl } from '../../stubs/utils'
+import { useMachineBus } from '../../machineBus'
+import { orrganismSummary } from '../../stubs/geneSummaries'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderLabelContent = (props) => {
 	const {
 		viewBox: { cx, cy },
 	} = props
-	const positioningProps = {
-		x: cx,
-		y: cy - cy * 0.95,
-		textAnchor: 'middle',
-		verticalAnchor: 'middle',
-	}
 
 	return (
-		<Text fill="var(--blue9)" fontSize="var(--fs-desktopS2)" {...positioningProps}>
+		<Text
+			fill="var(--blue9)"
+			fontSize="var(--fs-desktopS2)"
+			x={cx}
+			y={cy - cy * 0.95}
+			textAnchor="middle"
+			verticalAnchor="middle"
+		>
 			{'Number of results for Genes by organism '}
 		</Text>
 	)
 }
 
+export const PieChartMachine = Machine({
+	id: 'PieChart',
+	initial: 'idle',
+	context: {
+		classItems: orrganismSummary.results,
+	},
+	states: {
+		idle: {},
+	},
+})
+
 export const PieChart = () => {
-	const [chartData, setChartData] = useState([])
+	const [
+		{
+			context: { classItems },
+		},
+	] = useMachineBus(PieChartMachine)
 
-	const service = new imjs.Service({ root: mineUrl })
-	const query = new imjs.Query(geneQueryStub, service)
-
-	useEffect(() => {
-		const runQuery = async () => {
-			try {
-				const summary = await query.summarize('Gene.organism.shortName', 50)
-
-				const data = summary.results.map(({ item, count }) => ({
-					name: item,
-					value: count,
-				}))
-
-				setChartData(data)
-			} catch (e) {
-				console.error(e.message)
-			}
-		}
-
-		runQuery()
-		// we want to only run this once until we attach state
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	const chartData = classItems.map(({ item, count }) => ({
+		name: item,
+		value: count,
+	}))
 
 	return (
 		<ResponsiveContainer width="100%" height="100%">

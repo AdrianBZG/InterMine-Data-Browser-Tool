@@ -5037,6 +5037,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xstate/react@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@xstate/react@npm:0.8.1"
+  peerDependencies:
+    react: ^16.8.0
+    xstate: ^4.6.0
+  checksum: 0626d73b43a237ac648faafe9e0fe3b99b2b967fbb9a12ce3e617f84dbd62ff5bf4bf4a5ffdd4b1cd920d3ef8b975185f85158938f67419bcb004e4eec9abef4
+  languageName: node
+  linkType: hard
+
 "@xtuc/ieee754@npm:^1.2.0":
   version: 1.2.0
   resolution: "@xtuc/ieee754@npm:1.2.0"
@@ -12436,6 +12446,7 @@ fsevents@^1.2.7:
     "@testing-library/user-event": ^7.1.2
     "@typescript-eslint/eslint-plugin": 2.x
     "@typescript-eslint/parser": 2.x
+    "@xstate/react": ^0.8.1
     babel-eslint: 10.x
     babel-preset-react-app: ^9.1.2
     concurrently: ^5.2.0
@@ -12473,6 +12484,7 @@ fsevents@^1.2.7:
     stylelint-webpack-plugin: ^2.0.0
     underscore.string: ^3.3.5
     webpack-bundle-analyzer: ^3.8.0
+    xstate: ^4.10.0
   languageName: unknown
   linkType: soft
 
@@ -23631,6 +23643,13 @@ resolve@1.15.0:
   dependencies:
     "@babel/runtime-corejs3": ^7.8.3
   checksum: 2dcef4888ea32e7c01b8f42d1ee3df24970de14b299a8f534ccecf2252d297092f92d037502176ec334b6c8d7cd1dd3dba0d3cf949e26f418d50b46846268839
+  languageName: node
+  linkType: hard
+
+"xstate@npm:^4.10.0":
+  version: 4.10.0
+  resolution: "xstate@npm:4.10.0"
+  checksum: 2e2e1d539d1aee06d438a0c6b5d5c040c2e7ddc32907bf4d51737713b90bb1f7d6343d62f2b9e3daf90d7e6b8094fb832c34d428b748a63a82148a30d09a5494
   languageName: node
   linkType: hard
 

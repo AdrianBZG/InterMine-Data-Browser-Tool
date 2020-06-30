@@ -1,5 +1,4 @@
-import imjs from 'imjs'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
 	Bar,
 	BarChart as RBarChart,
@@ -11,8 +10,10 @@ import {
 	Tooltip,
 	XAxis,
 } from 'recharts'
+import { Machine } from 'xstate'
 
-import { geneLengthQueryStub, mineUrl } from '../../stubs/utils'
+import { useMachineBus } from '../../machineBus'
+import { lengthSummary } from '../../stubs/geneSummaries'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderCustomTick = ({ x, y, payload }) => {
@@ -39,57 +40,48 @@ const colorizeBars = (data) =>
 		<Cell key={entry} fill={DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]} />
 	))
 
+export const BarChartMachine = Machine({
+	id: 'BarChart',
+	initial: 'idle',
+	context: {
+		lengthSummary: lengthSummary.stats,
+		results: lengthSummary.results.slice(0, lengthSummary.results.length - 1),
+	},
+	states: {
+		idle: {},
+	},
+})
+
 export const BarChart = () => {
-	const [chartData, setChartData] = useState([])
-	const [titles, setTitles] = useState({ title: '', subtitle: '' })
+	const [
+		{
+			context: { lengthSummary, results },
+		},
+	] = useMachineBus(BarChartMachine)
 
-	const service = new imjs.Service({ root: mineUrl })
-	const query = new imjs.Query(geneLengthQueryStub, service)
+	const { max, min, buckets, uniqueValues, average, stdev } = lengthSummary
 
-	useEffect(() => {
-		const runQuery = async () => {
-			try {
-				const summary = await query.summarize('Gene.length', 50)
+	const elementsPerBucket = (max - min) / buckets
+	const stdevFixed = parseFloat(stdev).toFixed(3)
+	const avgFixed = parseFloat(average).toFixed(3)
 
-				const { max, min, buckets, uniqueValues, average, stdev } = summary.stats
+	const title = `Distribution of ${uniqueValues} Gene Lengths`
+	const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
 
-				const elementsPerBucket = (max - min) / buckets
-				const stdevFixed = parseFloat(stdev).toFixed(3)
-				const avgFixed = parseFloat(average).toFixed(3)
+	const chartData = results.map((item, idx) => {
+		const lowerLimit = Math.round(min + elementsPerBucket * idx)
+		const upperLimit = Math.round(min + elementsPerBucket * (idx + 1))
 
-				const title = `Distribution of ${uniqueValues} Gene Lengths`
-				const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
+		const data = Math.log2(item.count + 1)
+		const distribution = `${lowerLimit} — ${upperLimit}`
+		const count = item.count
 
-				const data = summary.results.flatMap((item, idx) => {
-					if (idx === summary.results.length - 1) return []
-
-					const lowerLimit = Math.round(min + elementsPerBucket * idx)
-					const upperLimit = Math.round(min + elementsPerBucket * (idx + 1))
-
-					const data = Math.log2(item.count + 1)
-					const distribution = `${lowerLimit} — ${upperLimit}`
-					const count = item.count
-
-					return [
-						{
-							data,
-							distribution,
-							count,
-						},
-					]
-				})
-
-				setTitles({ title, subtitle })
-				setChartData(data)
-			} catch (e) {
-				console.error(e.message)
-			}
+		return {
+			data,
+			distribution,
+			count,
 		}
-
-		runQuery()
-		// we only run this once for now until we hook in state
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	})
 
 	return (
 		<ResponsiveContainer width="100%" height="100%">
@@ -110,14 +102,14 @@ export const BarChart = () => {
 					<Label
 						fill="var(--blue9)"
 						fontWeight={500}
-						value={titles.title}
+						value={title}
 						offset={120}
 						position="bottom"
 					/>
 					<Label
 						fill="var(--blue9)"
 						fontWeight={500}
-						value={titles.subtitle}
+						value={subtitle}
 						position="bottom"
 						offset={150}
 					/>

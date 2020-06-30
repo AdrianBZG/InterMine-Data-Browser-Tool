@@ -2,11 +2,13 @@ import { Card } from '@blueprintjs/core'
 import { styled } from 'linaria/react'
 import React from 'react'
 
-import { humanMine25 as rows } from '../../stubs/humanMine25'
+import { MockMachineContext } from '../../machineBus'
+import { lengthSummary, orrganismSummary } from '../../stubs/geneSummaries'
+import { humanMine25 } from '../../stubs/humanMine25'
 import { mineUrl } from '../../stubs/utils'
-import { BarChart as Bar } from './BarChart'
-import { PieChart as Pie } from './PieChart'
-import { Table as TableComp } from './Table'
+import { BarChart as Bar, BarChartMachine } from './BarChart'
+import { PieChart as Pie, PieChartMachine } from './PieChart'
+import { Table as TableComp, TableChartMachine } from './Table'
 
 export default {
 	title: 'Components/Data Visualization',
@@ -21,10 +23,17 @@ const S_Card = styled(Card)`
 
 export const Empty = () => <></>
 
+const barMockMachine = BarChartMachine.withContext({
+	lengthSummary: lengthSummary.stats,
+	results: lengthSummary.results.slice(0, lengthSummary.results.length - 1),
+})
+
 export const BarChart = () => (
-	<S_Card>
-		<Bar />
-	</S_Card>
+	<MockMachineContext.Provider value={barMockMachine}>
+		<S_Card>
+			<Bar />
+		</S_Card>
+	</MockMachineContext.Provider>
 )
 
 BarChart.parameters = {
@@ -34,10 +43,14 @@ BarChart.parameters = {
 	},
 }
 
+const pieMockMachine = PieChartMachine.withContext({ classItems: orrganismSummary.results })
+
 export const PieChart = () => (
-	<S_Card>
-		<Pie />
-	</S_Card>
+	<MockMachineContext.Provider value={pieMockMachine}>
+		<S_Card>
+			<Pie />
+		</S_Card>
+	</MockMachineContext.Provider>
 )
 
 PieChart.parameters = {
@@ -47,10 +60,17 @@ PieChart.parameters = {
 	},
 }
 
+const tableMockMachine = TableChartMachine.withContext({
+	rows: humanMine25,
+	mineUrl,
+})
+
 export const Table = () => (
-	<Card>
-		<TableComp mineUrl={mineUrl} rows={rows} />
-	</Card>
+	<MockMachineContext.Provider value={tableMockMachine}>
+		<Card>
+			<TableComp />
+		</Card>
+	</MockMachineContext.Provider>
 )
 
 Table.parameters = {

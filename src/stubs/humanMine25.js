@@ -1,3 +1,6 @@
+/**
+ * The first 25 rows from a no constraint query against humanmine
+ */
 export const humanMine25 = [
 	[
 		{

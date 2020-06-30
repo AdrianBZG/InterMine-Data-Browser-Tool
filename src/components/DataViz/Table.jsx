@@ -5,6 +5,12 @@ import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { humanize, titleize } from 'underscore.string'
+import { Machine } from 'xstate'
+
+import { useMachineBus } from '../../machineBus'
+import { humanMine25 } from '../../stubs/humanMine25'
+import { mineUrl } from '../../stubs/utils'
+import { TableActionButtons, TablePagingButtons } from './'
 const StyledTable = styled(HTMLTable)`
 	width: 100%;
 `
@@ -63,28 +69,65 @@ const Cell = ({ cell, mineUrl }) => {
 	)
 }
 
-export const Table = ({ rows, mineUrl }) => {
+const S_PagingRow = styled.div`
+	display: flex;
+	justify-content: space-between;
+`
+const S_RowCount = styled.span`
+	font-size: var(--fs-desktopM1);
+	font-weight: var(--fw-semibold);
+	margin-bottom: 20px;
+	margin-left: 10px;
+	display: inline-block;
+`
+
+export const TableChartMachine = Machine({
+	id: 'TableChart',
+	initial: 'idle',
+	context: {
+		rows: humanMine25,
+		mineUrl,
+	},
+	states: {
+		idle: {},
+	},
+})
+
+export const Table = () => {
+	const [
+		{
+			context: { rows, mineUrl },
+		},
+	] = useMachineBus(TableChartMachine)
+
 	return (
-		<S.Table interactive={true} striped={true}>
-			<thead>
-				<tr>
-					{rows[0].map((r) => {
-						return <ColumnHeader key={r.column} columnName={r.column} />
+		<>
+			<TableActionButtons />
+			<S_PagingRow>
+				<S_RowCount>{`Showing ${rows.length} of ${rows.length} rows`}</S_RowCount>
+				<TablePagingButtons />
+			</S_PagingRow>
+			<S.Table interactive={true} striped={true}>
+				<thead>
+					<tr>
+						{rows[0].map((r) => {
+							return <ColumnHeader key={r.column} columnName={r.column} />
+						})}
+					</tr>
+				</thead>
+				<tbody>
+					{rows.map((row, colIdx) => {
+						return (
+							<tr key={colIdx}>
+								{row.map((cell, rowIdx) => (
+									<Cell key={`${colIdx}-${rowIdx}`} cell={cell} mineUrl={mineUrl} />
+								))}
+							</tr>
+						)
 					})}
-				</tr>
-			</thead>
-			<tbody>
-				{rows.map((row, colIdx) => {
-					return (
-						<tr key={colIdx}>
-							{row.map((cell, rowIdx) => (
-								<Cell key={`${colIdx}-${rowIdx}`} cell={cell} mineUrl={mineUrl} />
-							))}
-						</tr>
-					)
-				})}
-			</tbody>
-		</S.Table>
+				</tbody>
+			</S.Table>
+		</>
 	)
 }
 
