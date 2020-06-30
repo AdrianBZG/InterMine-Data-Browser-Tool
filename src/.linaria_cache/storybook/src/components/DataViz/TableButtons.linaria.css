@@ -1,0 +1,17 @@
+.ButtonRow_bwlzalz {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-pack: end;
+	-webkit-justify-content: flex-end;
+	-ms-flex-pack: end;
+	justify-content: flex-end;
+	margin-bottom: 40px;
+}
+.StyledCodeSnippet_s1neiskp {
+	margin: 0px 16px;
+}
+.StyledInputGroup_sge383f {
+	width: 30px;
+}

@@ -1,25 +1,7 @@
-import { styled } from 'linaria/react'
 import React from 'react'
 
 import * as Constraints from '../Constraints'
 import { QueryController } from '../QueryController'
-
-const S_Constraint = styled.li`
-	margin: 0.875em 0;
-`
-
-const S_ConstraintList = styled.ul`
-	overflow: auto;
-	list-style: none;
-	padding: 0;
-	height: 77vh;
-`
-
-const S_ConstraintSection = styled.section`
-	min-width: 230px;
-	border-right: 2px solid var(--blue5);
-	background-color: var(--solidWhite);
-`
 
 const constraintMocks = [
 	Constraints.INTERMINE_LIST,
@@ -37,13 +19,28 @@ const constraintMocks = [
 
 export const ConstraintSection = () => {
 	return (
-		<S_ConstraintSection>
+		<section
+			css={{
+				minWidth: 230,
+				borderRight: '2px solid var(--blue5)',
+				backgroundColor: 'var(--solidWhite)',
+			}}
+		>
 			<QueryController />
-			<S_ConstraintList>
+			<ul
+				css={{
+					overflow: 'auto',
+					listStyle: 'none',
+					padding: 0,
+					height: '77vh',
+				}}
+			>
 				{constraintMocks.map((c, idx) => (
-					<S_Constraint key={idx}>{Constraints.renderConstraint(c)}</S_Constraint>
+					<li css={{ margin: '0.875em 0' }} key={idx}>
+						{Constraints.renderConstraint(c)}
+					</li>
 				))}
-			</S_ConstraintList>
-		</S_ConstraintSection>
+			</ul>
+		</section>
 	)
 }

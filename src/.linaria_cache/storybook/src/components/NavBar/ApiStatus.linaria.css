@@ -1,0 +1,16 @@
+.S_ApiLabel_sj7miy8 {
+	font-size: var(--fs-desktopM2);
+	font-weight: var(--fw-regular);
+	margin-right: 8px;
+	margin-bottom: 0;
+}
+.S_ApiContainer_s1wsnews {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-align-items: center;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+}

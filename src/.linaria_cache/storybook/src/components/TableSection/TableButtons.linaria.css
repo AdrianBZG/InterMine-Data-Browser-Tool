@@ -1,0 +1,17 @@
+.ButtonRow_bri7fwq {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-pack: end;
+	-webkit-justify-content: flex-end;
+	-ms-flex-pack: end;
+	justify-content: flex-end;
+	margin-bottom: 40px;
+}
+.StyledCodeSnippet_s15klrmr {
+	margin: 0px 16px;
+}
+.StyledInputGroup_s18is4ye {
+	width: 30px;
+}

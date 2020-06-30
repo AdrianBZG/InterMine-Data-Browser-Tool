@@ -1,4 +1,3 @@
-const CracoLinariaPlugin = require('craco-linaria')
 const { when, whenDev, whenProd } = require('@craco/craco')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const StyleLintPlugin = require('stylelint-webpack-plugin')
@@ -6,7 +5,17 @@ const { NormalModuleReplacementPlugin } = require('webpack')
 const { extractIcons } = require('./bin/generateIconPack')
 const path = require('path')
 
+const emotionPresetOptions = {}
+
+const emotionBabelPreset = require('@emotion/babel-preset-css-prop').default(
+	undefined,
+	emotionPresetOptions
+)
+
 module.exports = {
+	babel: {
+		plugins: [...emotionBabelPreset.plugins],
+	},
 	webpack: {
 		plugins: [
 			...whenProd(() => {
@@ -35,9 +44,4 @@ module.exports = {
 			),
 		],
 	},
-	plugins: [
-		{
-			plugin: CracoLinariaPlugin,
-		},
-	],
 }

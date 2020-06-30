@@ -1,6 +1,5 @@
 import { Button, ButtonGroup } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { css } from 'linaria'
 import React, { useState } from 'react'
 
 export const ThemeControl = () => {
@@ -8,11 +7,7 @@ export const ThemeControl = () => {
 	const isLightTheme = selectedTheme === 'light'
 
 	return (
-		<ButtonGroup
-			className={css`
-				margin-left: auto;
-			`}
-		>
+		<ButtonGroup css={{ marginLeft: 'auto' }}>
 			<Button
 				active={isLightTheme}
 				intent={isLightTheme ? 'primary' : 'none'}

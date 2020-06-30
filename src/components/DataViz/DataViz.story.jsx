@@ -1,5 +1,5 @@
 import { Card } from '@blueprintjs/core'
-import { styled } from 'linaria/react'
+import styled from '@emotion/styled'
 import React from 'react'
 
 import { MockMachineContext } from '../../machineBus'

@@ -1,0 +1,41 @@
+.S_CountTag_s1n7bkib {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-align-self: flex-start;
+	-ms-flex-item-align: start;
+	align-self: flex-start;
+	margin-left: 5px;
+	font-size: var(--fs-desktopS1);
+	font-weight: var(--fw-medium);
+	line-height: 1;
+	border: 2px solid var(--green5);
+	border-radius: 10px;
+	height: 1.333em;
+}
+.S_CountTag_s1n7bkib > small {
+	margin: 0 0.833em;
+}
+.S_ConstraintIcon_savk6ts {
+	border-radius: 30px;
+	border: var(--savk6ts-0);
+	font-size: var(--fs-desktopS1);
+	font-weight: var(--fw-medium);
+	height: 2.5em;
+	line-height: 1;
+	margin-right: 0.625em;
+	width: 2.5em;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-align-items: center;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+}

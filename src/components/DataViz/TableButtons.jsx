@@ -1,27 +1,7 @@
 import { Button, ButtonGroup, InputGroup, MenuItem, Position, Tooltip } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
-import { styled } from 'linaria/react'
 import React, { useState } from 'react'
-
-const ButtonRow = styled.div`
-	display: flex;
-	justify-content: flex-end;
-	margin-bottom: 40px;
-`
-const StyledCodeSnippet = styled(ButtonGroup)`
-	margin: 0px 16px;
-`
-
-const StyledInputGroup = styled(InputGroup)`
-	width: 30px;
-`
-
-const S = {
-	ButtonRow,
-	CodeSnippet: StyledCodeSnippet,
-	PageInput: StyledInputGroup,
-}
 
 const SaveAsList = () => (
 	<Button outlined={true} intent="primary" icon={IconNames.CLOUD_UPLOAD} text="Save As List" />
@@ -35,7 +15,7 @@ const CodeSnippet = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
 
 	return (
-		<S.CodeSnippet>
+		<ButtonGroup css={{ margin: '0px 16px' }}>
 			<Button
 				outlined={true}
 				intent="primary"
@@ -50,7 +30,7 @@ const CodeSnippet = () => {
 			>
 				<Button outlined={true} intent="primary" icon={IconNames.CARET_DOWN} />
 			</Select>
-		</S.CodeSnippet>
+		</ButtonGroup>
 	)
 }
 
@@ -60,11 +40,17 @@ const Export = () => (
 
 export const TableActionButtons = () => {
 	return (
-		<S.ButtonRow>
+		<div
+			css={{
+				display: 'flex',
+				justifyContent: 'flex-end',
+				marginBottom: '40px',
+			}}
+		>
 			<SaveAsList />
 			<CodeSnippet />
 			<Export />
-		</S.ButtonRow>
+		</div>
 	)
 }
 
@@ -80,7 +66,7 @@ const PageButtons = () => {
 					onClick={() => setPageNumber(pageNumber - 1)}
 				/>
 			</Tooltip>
-			<S.PageInput value={pageNumber} round={false} />
+			<InputGroup css={{ width: '30px' }} value={`${pageNumber}`} round={false} />
 			<Tooltip content="Next Page" position={Position.TOP}>
 				<Button
 					icon={IconNames.CHEVRON_FORWARD}

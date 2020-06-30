@@ -1,7 +1,5 @@
 import { Classes, HTMLTable, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { css } from 'linaria'
-import { styled } from 'linaria/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { humanize, titleize } from 'underscore.string'
@@ -11,24 +9,6 @@ import { useMachineBus } from '../../machineBus'
 import { humanMine25 } from '../../stubs/humanMine25'
 import { mineUrl } from '../../stubs/utils'
 import { TableActionButtons, TablePagingButtons } from './'
-const StyledTable = styled(HTMLTable)`
-	width: 100%;
-`
-
-const StyledCell = styled.td`
-	&& a {
-		font-weight: normal;
-
-		& .${Classes.ICON} {
-			padding-right: 5px;
-		}
-	}
-`
-
-const S = {
-	Cell: StyledCell,
-	Table: StyledTable,
-}
 
 const ColumnHeader = ({ columnName }) => {
 	const name = titleize(humanize(columnName.replace(/\./g, ' ')))
@@ -38,13 +18,7 @@ const ColumnHeader = ({ columnName }) => {
 
 	return (
 		<th scope="col" title={`${className} ${specifier}`}>
-			<span
-				className={css`
-					display: block;
-				`}
-			>
-				{className}
-			</span>
+			<span css={{ display: 'block' }}>{className}</span>
 			<span>{specifier}</span>
 		</th>
 	)
@@ -54,7 +28,16 @@ const Cell = ({ cell, mineUrl }) => {
 	const cellValue = cell.value
 
 	return (
-		<S.Cell scope="row">
+		<td
+			css={{
+				'&& a': {
+					fontWeight: 'normal',
+					[`& .${Classes.ICON}`]: {
+						paddingRight: 5,
+					},
+				},
+			}}
+		>
 			{cellValue ? (
 				<div title={cellValue}>
 					<a href={`${mineUrl}${cell.url}`} target="_blank" rel="noopener noreferrer">
@@ -65,21 +48,9 @@ const Cell = ({ cell, mineUrl }) => {
 			) : (
 				<span className={Classes.TEXT_DISABLED}>No Value</span>
 			)}
-		</S.Cell>
+		</td>
 	)
 }
-
-const S_PagingRow = styled.div`
-	display: flex;
-	justify-content: space-between;
-`
-const S_RowCount = styled.span`
-	font-size: var(--fs-desktopM1);
-	font-weight: var(--fw-semibold);
-	margin-bottom: 20px;
-	margin-left: 10px;
-	display: inline-block;
-`
 
 export const TableChartMachine = Machine({
 	id: 'TableChart',
@@ -103,11 +74,22 @@ export const Table = () => {
 	return (
 		<>
 			<TableActionButtons />
-			<S_PagingRow>
-				<S_RowCount>{`Showing ${rows.length} of ${rows.length} rows`}</S_RowCount>
+			<div css={{ display: 'flex', justifyContent: 'space-between' }}>
+				<span
+					// @ts-ignore
+					css={{
+						fontSize: 'var(--fs-desktopM1)',
+						fontWeight: '(var(--fw-semibold)',
+						marginBottom: 20,
+						marginLeft: 10,
+						display: 'inline-flex',
+					}}
+				>
+					{`Showing ${rows.length} of ${rows.length} rows`}
+				</span>
 				<TablePagingButtons />
-			</S_PagingRow>
-			<S.Table interactive={true} striped={true}>
+			</div>
+			<HTMLTable css={{ width: '100%' }} interactive={true} striped={true}>
 				<thead>
 					<tr>
 						{rows[0].map((r) => {
@@ -126,7 +108,7 @@ export const Table = () => {
 						)
 					})}
 				</tbody>
-			</S.Table>
+			</HTMLTable>
 		</>
 	)
 }

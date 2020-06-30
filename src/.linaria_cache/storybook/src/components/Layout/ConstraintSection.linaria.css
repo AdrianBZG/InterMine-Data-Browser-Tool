@@ -1,0 +1,14 @@
+.S_Constraint_s1sz9642 {
+	margin: 0.875em 0;
+}
+.S_ConstraintList_s1vrnaez {
+	overflow: auto;
+	list-style: none;
+	padding: 0;
+	height: 77vh;
+}
+.S_ConstraintSection_s2tob0a {
+	min-width: 230px;
+	border-right: 2px solid var(--blue5);
+	background-color: var(--solidWhite);
+}

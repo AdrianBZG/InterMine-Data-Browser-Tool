@@ -4,7 +4,6 @@ module.exports = {
 		'stylelint-config-recommended',
 		'stylelint-config-prettier',
 		'stylelint-a11y/recommended',
-		'linaria/stylelint-config',
 	],
 	rules: {
 		'no-duplicate-selectors': null,

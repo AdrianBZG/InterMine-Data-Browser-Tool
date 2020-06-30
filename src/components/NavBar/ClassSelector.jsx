@@ -1,20 +1,9 @@
 import { Button, Classes, Tab, Tabs } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
-import { styled } from 'linaria/react'
 import React, { useState } from 'react'
 
 import { NumberedSelectMenuItems } from '../Selects'
-
-const S_ViewTabs = styled(Tabs)`
-	margin-left: auto;
-	margin-right: 20px;
-
-	.${Classes.TAB} {
-		font-size: var(--fs-desktopM2);
-		font-weight: var(--fw-light);
-	}
-`
 
 export const ClassSelector = () => {
 	const [visibleClasses, setVisibleClasses] = useState([{ name: 'Gene' }, { name: 'Protein' }])
@@ -31,11 +20,23 @@ export const ClassSelector = () => {
 
 	return (
 		<>
-			<S_ViewTabs id="classes-tab">
+			<Tabs
+				id="classes-tab"
+				// @ts-ignore
+				css={{
+					marginLeft: 'auto',
+					marginRight: 20,
+
+					[`.${Classes.TAB}`]: {
+						fontSize: 'var(--fs-desktopM2)',
+						fontWeight: 'var(--fw-light)',
+					},
+				}}
+			>
 				{visibleClasses.map((c) => (
 					<Tab key={c.name} id={c.name} title={c.name} />
 				))}
-			</S_ViewTabs>
+			</Tabs>
 			<Select
 				items={hiddenClasses}
 				filterable={true}

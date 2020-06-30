@@ -1,6 +1,6 @@
 import { Button, Icon, Popover } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { styled } from 'linaria/react'
+import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -18,17 +18,6 @@ const S_CountTag = styled.div`
 	& > small {
 		margin: 0 0.833em;
 	}
-`
-
-const S_TagIcon = styled(Icon)`
-	/* We need to override Blueprint styling to create our pill */
-	margin: -0.167em -0.167em !important;
-	align-self: flex-start;
-`
-
-const S_ConstraintLabel = styled.div`
-	display: flex;
-	align-items: center;
 `
 
 const S_ConstraintIcon = styled.div`
@@ -68,7 +57,7 @@ export const Constraint = ({
 			alignText="left"
 			aria-label={ariaLabel ? ariaLabel : constraintName}
 		>
-			<S_ConstraintLabel>
+			<div css={{ display: 'flex', alignItems: 'center' }}>
 				<S_ConstraintIcon labelBorderColor={labelBorderColor}>
 					<span>{labelText}</span>
 				</S_ConstraintIcon>
@@ -76,10 +65,14 @@ export const Constraint = ({
 				{constraintCount > 0 && (
 					<S_CountTag>
 						{constraintCount > 1 && <small>{constraintCount}</small>}
-						<S_TagIcon icon={IconNames.TICK_CIRCLE} color="var(--green5)" />
+						<Icon
+							css={{ margin: '-0.167em -0.167em !important', alignSelf: 'flex-start' }}
+							icon={IconNames.TICK_CIRCLE}
+							color="var(--green5)"
+						/>
 					</S_CountTag>
 				)}
-			</S_ConstraintLabel>
+			</div>
 		</Button>
 	)
 }

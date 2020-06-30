@@ -1,17 +1,6 @@
-import { Button, Colors, H5, Popover } from '@blueprintjs/core'
+import { Button, H5, Popover } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { css } from 'linaria'
-import { styled } from 'linaria/react'
 import React from 'react'
-
-const S_QueryController = styled.div`
-	padding-top: 10px;
-	margin: 0 20px;
-`
-
-const S_Heading = styled.span`
-	color: var(--blue9);
-`
 
 const ViewAll = () => (
 	<Popover fill={true} usePortal={true} lazy={true} position="right">
@@ -22,9 +11,7 @@ const ViewAll = () => (
 
 const RunQuery = () => (
 	<Popover
-		className={css`
-			margin-top: 40px;
-		`}
+		css={{ marginTop: 40 }}
 		wrapperTagName="div"
 		usePortal={true}
 		lazy={true}
@@ -37,19 +24,13 @@ const RunQuery = () => (
 
 export const QueryController = () => {
 	return (
-		<S_QueryController>
+		<div css={{ paddingTop: 10, margin: '0 20px' }}>
 			<H5>
-				<span
-					className={css`
-						color: ${Colors.BLUE5};
-					`}
-				>
-					4{' '}
-				</span>
-				<S_Heading>Constraints applied</S_Heading>
+				<span css={{ color: 'var(--red6' }}>4 </span>
+				<span css={{ color: 'var(--yellow8)' }}>Constraints applied</span>
 			</H5>
 			<ViewAll />
 			<RunQuery />
-		</S_QueryController>
+		</div>
 	)
 }

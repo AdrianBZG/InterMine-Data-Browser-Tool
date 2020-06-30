@@ -1,4 +1,3 @@
-import { styled } from 'linaria/react'
 import React from 'react'
 
 import { ConstraintSection as Constraints } from './ConstraintSection'
@@ -11,10 +10,6 @@ export default {
 		componentSubtitle: 'Layout Sections are html section groupings of components',
 	},
 }
-
-const S_ConstraintSection = styled.div`
-	max-width: 200px;
-`
 
 export const Header = () => <HeaderComp />
 Header.storyName = 'Header Section'
@@ -29,9 +24,9 @@ DataVizSection.parameters = {
 }
 
 export const ConstraintSection = () => (
-	<S_ConstraintSection>
+	<div css={{ maxWidth: 200 }}>
 		<Constraints />
-	</S_ConstraintSection>
+	</div>
 )
 
 ConstraintSection.parameters = {
