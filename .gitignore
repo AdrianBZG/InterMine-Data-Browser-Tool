@@ -24,7 +24,12 @@ yarn-debug.log*
 yarn-error.log*
 
 # Yarn
-*install-state.gz
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
 
 # Storybook
 .storybook-dist

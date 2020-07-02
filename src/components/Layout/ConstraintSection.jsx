@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as Constraints from '../Constraints'
-import { QueryController } from '../QueryController'
+import { QueryController } from '../QueryController/QueryController'
 
 const constraintMocks = [
 	Constraints.INTERMINE_LIST,

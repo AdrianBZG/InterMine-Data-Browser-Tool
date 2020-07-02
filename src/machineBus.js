@@ -2,7 +2,9 @@ import { useMachine } from '@xstate/react'
 import { createContext, useContext } from 'react'
 
 const enableMocks =
+	// istanbul ignore
 	process.env.NODE_ENV?.toLowerCase() === 'development' ||
+	process.env.NODE_ENV?.toLowerCase() === 'test' ||
 	process.env.STORYBOOK_USEMOCK?.toLowerCase() === 'true'
 
 export const MockMachineContext = createContext(null)
@@ -16,7 +18,14 @@ const interpretedMachines = new Set()
  * @param {?} event - a string or event object (see https://xstate.js.org/docs/guides/events.html#events)
  * @param {import('xstate').EventData} [payload] - the payload for the event
  */
-const sendToBus = (event, payload) => {}
+const sendToBus = (event, payload) => {
+	// istanbul ignore
+	interpretedMachines.forEach((m) => {
+		if (m.machine.handles(event)) {
+			m.send(event, payload)
+		}
+	})
+}
 
 /**
  * Interprets a machine and registers it on the service bus.
@@ -27,23 +36,25 @@ const sendToBus = (event, payload) => {}
  * @param { import('xstate').StateMachine} machine
  * @returns {[import('xstate').State, typeof sendToBus, import('xstate').Interpreter]}
  */
-export const useMachineBus = (machine) => {
-	let machineToInterpret = machine
+export const useMachineBus = (machine, { state = {}, ...restOptions } = {}) => {
+	let mockState = state
 
 	if (enableMocks) {
-		// We only use this during development or storybook configs, so it's
-		// safe to use inside the conditional here. It will either always be
-		// called, or not called at all.
+		// We only use this for storybook configs, so it's
+		// safe to use inside the conditional here. It will
+		// either always be called, or not called at all.
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const machineMock = useContext(MockMachineContext)
 
+		// istanbul ignore
 		if (machineMock?.id === machine.id) {
-			machineToInterpret = machineMock
+			mockState = machineMock.transition(machineMock.initialState, '')
 		}
 	}
 
-	const [state, , service] = useMachine(machineToInterpret)
+	// @ts-ignore
+	const [machineState, , service] = useMachine(machine, { ...restOptions, state: mockState })
 	interpretedMachines.add(service)
 
-	return [state, sendToBus, service]
+	return [machineState, sendToBus, service]
 }

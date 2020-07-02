@@ -1,3 +1,4 @@
+// ignore file coverage
 import { Card } from '@blueprintjs/core'
 import styled from '@emotion/styled'
 import React from 'react'
