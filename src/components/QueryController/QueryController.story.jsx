@@ -31,7 +31,7 @@ export const QueryController = () => {
 QueryController.decorators = [
 	(storyFn) => (
 		<div
-			style={{
+			css={{
 				maxWidth: '230px',
 				padding: '0 20px',
 				border: '1px solid black',

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ServiceContext, useMachineBus } from '../../machineBus2'
+import { ServiceContext, useMachineBus } from '../../machineBus'
 import { checkboxMachine, CheckboxPopup } from './CheckboxPopup'
 import { Constraint } from './Constraint'
 

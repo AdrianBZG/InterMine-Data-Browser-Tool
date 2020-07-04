@@ -1,7 +1,7 @@
 import React from 'react'
 import { Machine } from 'xstate'
 
-import { ServiceContext, useMachineBus } from '../../machineBus2'
+import { ServiceContext, useMachineBus } from '../../machineBus'
 import { organismSummary } from '../../stubs/geneSummaries'
 import { popupDecorator } from '../../utils/storybook'
 import { checkboxMachine, CheckboxPopup } from './CheckboxPopup'

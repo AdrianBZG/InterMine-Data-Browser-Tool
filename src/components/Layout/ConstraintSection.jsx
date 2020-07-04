@@ -1,8 +1,7 @@
 import React from 'react'
 import { Machine } from 'xstate'
 
-import { useMachineBus } from '../../machineBus'
-import { ServiceContext } from '../../machineBus2'
+import { ServiceContext, useMachineBus } from '../../machineBus'
 import { CheckboxPopup } from '../Constraints/CheckboxPopup'
 import { Constraint } from '../Constraints/Constraint'
 import { DATA_VIZ_COLORS } from '../DataViz/dataVizColors'

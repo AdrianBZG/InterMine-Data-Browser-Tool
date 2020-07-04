@@ -6,7 +6,7 @@ import React from 'react'
 import { Machine } from 'xstate'
 
 import { RECEIVE_SUMMARY } from '../../globalActions'
-import { useServiceContext } from '../../machineBus2'
+import { useServiceContext } from '../../machineBus'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from './actions'
 import { constraintPopupGlobalActions, constraintPopupStates } from './common'
 

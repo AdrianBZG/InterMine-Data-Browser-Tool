@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { useServiceContext } from '../../machineBus2'
+import { useServiceContext } from '../../machineBus'
 import { PopupCard } from '../Shared/PopupCard'
 import { APPLY_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from './actions'
 
