@@ -1,4 +1,4 @@
-export const orrganismSummary = {
+export const organismSummary = {
 	uniqueValues: 7,
 	modelName: 'genomic',
 	columnHeaders: ['item', 'count'],

@@ -12,7 +12,7 @@ import {
 import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
-import { orrganismSummary } from '../../stubs/geneSummaries'
+import { organismSummary } from '../../stubs/geneSummaries'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderLabelContent = (props) => {
@@ -38,7 +38,7 @@ export const PieChartMachine = Machine({
 	id: 'PieChart',
 	initial: 'idle',
 	context: {
-		classItems: orrganismSummary.results,
+		classItems: organismSummary.results,
 	},
 	states: {
 		idle: {},

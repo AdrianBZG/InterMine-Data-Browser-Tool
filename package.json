@@ -27,7 +27,7 @@
 		"serve:orig": "serve orig_app",
 		"start": "yarn build:css && cross-env EXTEND_ESLINT=true craco start",
 		"storybook": "yarn build:css && cross-env EXTEND_ESLINT=true start-storybook -p 9000",
-		"storybook:build": "yarn build:css && cross-env STORYBOOK_USEMOCK=true EXTEND_ESLINT=true build-storybook --no-dll -c .storybook -o .storybook-dist",
+		"storybook:build": "yarn build:css && cross-env STORYBOOK_USEMOCK=true EXTEND_ESLINT=true build-storybook --no-dll -c .storybook -o storybook-dist",
 		"test": "craco test"
 	},
 	"dependencies": {
@@ -36,18 +36,21 @@
 		"@emotion/babel-preset-css-prop": "^10.0.27",
 		"@emotion/core": "^10.0.28",
 		"@emotion/styled": "^10.0.27",
+		"@xstate/immer": "^0.1.0",
 		"@xstate/react": "^0.8.1",
 		"babel-plugin-emotion": "^10.0.33",
 		"imjs": "^4.0.0",
+		"immer": "^7.0.5",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
 		"recharts": "^1.8.5",
 		"underscore.string": "^3.3.5",
-		"xstate": "^4.10.0"
+		"xstate": "latest"
 	},
 	"devDependencies": {
 		"@blueprintjs/eslint-plugin": "^0.2.0",
 		"@craco/craco": "^5.6.4",
+		"@storybook/addon-actions": "^5.3.19",
 		"@storybook/addon-docs": "next",
 		"@storybook/addon-knobs": "next",
 		"@storybook/addon-links": "next",

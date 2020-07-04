@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import React from 'react'
 
 import { MockMachineContext } from '../../machineBus'
-import { lengthSummary, orrganismSummary } from '../../stubs/geneSummaries'
+import { lengthSummary, organismSummary } from '../../stubs/geneSummaries'
 import { humanMine25 } from '../../stubs/humanMine25'
 import { mineUrl } from '../../stubs/utils'
 import { BarChart as Bar, BarChartMachine } from './BarChart'
@@ -44,7 +44,7 @@ BarChart.parameters = {
 	},
 }
 
-const pieMockMachine = PieChartMachine.withContext({ classItems: orrganismSummary.results })
+const pieMockMachine = PieChartMachine.withContext({ classItems: organismSummary.results })
 
 export const PieChart = () => (
 	<MockMachineContext.Provider value={pieMockMachine}>

@@ -7,6 +7,7 @@ module.exports = {
 	addons: [
 		'@storybook/addon-knobs',
 		'@storybook/addon-links',
+		'@storybook/addon-actions/register',
 		'@storybook/preset-create-react-app',
 		{
 			name: '@storybook/addon-docs',
@@ -15,7 +16,13 @@ module.exports = {
 			},
 		},
 	],
-	stories: ['../README.story.mdx', '../docs/**/*.story.mdx', '../src/**/*.story.jsx'],
+	stories: [
+		'../README.story.mdx',
+		'../docs/**/*.story.mdx',
+		'../src/**/*.story.jsx',
+		'../docs/**/*.stories.mdx',
+		'../src/**/*.stories.jsx',
+	],
 	webpackFinal: async (config, { configType }) => {
 		const { hasFoundAny, matches } = getLoaders(config, loaderByName('babel-loader'))
 
