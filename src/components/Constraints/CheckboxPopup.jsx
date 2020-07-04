@@ -8,7 +8,7 @@ import { Machine } from 'xstate'
 import { RECEIVE_SUMMARY } from '../../globalActions'
 import { useServiceContext } from '../../machineBus'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from './actions'
-import { constraintPopupGlobalActions, constraintPopupStates } from './common'
+import { checkboxPopupStates, constraintPopupGlobalActions } from './common'
 
 export const CheckboxPopup = ({ title = '', description = '' }) => {
 	const [state, send] = useServiceContext()
@@ -65,7 +65,7 @@ export const checkboxMachine = Machine(
 			[RECEIVE_SUMMARY]: { target: 'noConstraintsSet', actions: 'setAvailableValues' },
 		},
 		states: {
-			...constraintPopupStates,
+			...checkboxPopupStates,
 		},
 	},
 	{

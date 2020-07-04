@@ -12,7 +12,7 @@ export const constraintPopupGlobalActions = {
 	[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
 }
 
-export const constraintPopupStates = {
+export const checkboxPopupStates = {
 	noConstraintsSet: {
 		on: {
 			[ADD_CONSTRAINT]: {
