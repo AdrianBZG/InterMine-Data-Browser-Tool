@@ -51,7 +51,7 @@ export const ConstraintPopupCard = ({ children }) => {
 					onClick={() => send(RESET_LOCAL_CONSTRAINT)}
 				/>
 				<Button
-					text="Add Constraint"
+					text="Apply Constraint"
 					css={{ maxWidth: '50%' }}
 					intent={!disableAll && enableAdd ? 'success' : 'none'}
 					disabled={disableAll || !enableAdd}
