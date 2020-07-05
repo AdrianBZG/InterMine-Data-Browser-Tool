@@ -11406,6 +11406,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"fuse.js@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "fuse.js@npm:6.4.0"
+  checksum: 29cdf1dddea7ff6c3047fd9fb44975aaa6633bba56d74890e8ad1343afc9989efb7fd25280b185c301081e9bf00ae173749d34566303ef15aaab11503cace277
+  languageName: node
+  linkType: hard
+
 "gauge@npm:~2.7.3":
   version: 2.7.4
   resolution: "gauge@npm:2.7.4"
@@ -12718,6 +12725,7 @@ fsevents@^1.2.7:
     eslint-plugin-react: 7.x
     eslint-plugin-react-hooks: 2.x
     eslint-plugin-simple-import-sort: ^5.0.3
+    fuse.js: ^6.4.0
     husky: ">=4"
     imjs: ^4.0.0
     immer: ^7.0.5

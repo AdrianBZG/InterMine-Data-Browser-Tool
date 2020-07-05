@@ -11,3 +11,14 @@ export const NumberedSelectMenuItems = (item, props) => {
 		/>
 	)
 }
+
+export const PlainSelectMenuItems = (item, props) => {
+	return (
+		<MenuItem
+			key={item.name}
+			text={item.name}
+			active={props.modifiers.active}
+			onClick={props.handleClick}
+		/>
+	)
+}

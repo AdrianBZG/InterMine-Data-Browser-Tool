@@ -1,7 +1,8 @@
 import React from 'react'
 
 import { ServiceContext, useMachineBus } from '../../machineBus'
-import { checkboxMachine, CheckboxPopup } from './CheckboxPopup'
+import { CheckboxPopup } from './CheckboxPopup'
+import { constraintMachineFactory } from './common'
 import { Constraint } from './Constraint'
 
 export default {
@@ -10,7 +11,7 @@ export default {
 }
 
 export const Example = () => {
-	const [state, send] = useMachineBus(checkboxMachine)
+	const [state, send] = useMachineBus(constraintMachineFactory({ id: 'mockmachine' }))
 
 	return (
 		<ServiceContext.Provider value={{ state, send }}>
