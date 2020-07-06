@@ -12747,6 +12747,7 @@ fsevents@^1.2.7:
     stylelint-config-recommended: ^3.0.0
     stylelint-declaration-block-no-ignored-properties: ^2.3.0
     stylelint-webpack-plugin: ^2.0.0
+    typescript: ^3.9.6
     underscore.string: ^3.3.5
     webpack-bundle-analyzer: ^3.8.0
     xstate: latest
@@ -22663,6 +22664,26 @@ resolve@1.15.0:
   version: 0.0.6
   resolution: "typedarray@npm:0.0.6"
   checksum: c9ef0176aaf32593514c31e5c6edc1db970847aff6e1f0a0570a6ac0cc996335792f394c2fcec59cc76691d22a01888ea073a2f3c6930cfcf7c519addf4e2ad7
+  languageName: node
+  linkType: hard
+
+typescript@^3.9.6:
+  version: 3.9.6
+  resolution: "typescript@npm:3.9.6"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 75d8e3610ca435b0feaa3eb714ef3aa9060ec72621da3c62c45ceee1d8d0ddcbd8ff2a816de2d24ab28dcd2249953edb640d34595d59e491656156da4c2903fc
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^3.9.6#builtin<compat/typescript>":
+  version: 3.9.6
+  resolution: "typescript@patch:typescript@npm%3A3.9.6#builtin<compat/typescript>::version=3.9.6&hash=0ea415"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: d52ac2f5b37d0a1fd4a4b8b071f7aaae314119032e51f99903354451fd82b54d0352279c018120436e190d154e9ebcf8236c26beb14a18cbfef521266cd5b2eb
   languageName: node
   linkType: hard
 

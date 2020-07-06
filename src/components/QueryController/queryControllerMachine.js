@@ -42,14 +42,15 @@ export const queryControllerMachine = Machine(
 	},
 	{
 		actions: {
-			addConstraint: assign((ctx, event) => {
-				// @ts-ignore
-				ctx.currentConstraints.push(event.constraint)
-				return ctx
+			// @ts-ignore
+			addConstraint: assign((ctx, { constraint }) => {
+				ctx.currentConstraints.push(constraint)
 			}),
-			removeConstraint: assign((ctx, event) => {
-				// @ts-ignore
-				ctx.currentConstraints = ctx.currentConstraints.filter((c) => c !== event.constraint)
+			// @ts-ignore
+			removeConstraint: assign((ctx, { constraint }) => {
+				ctx.currentConstraints = ctx.currentConstraints.filter((c) => {
+					return c.path === constraint.path
+				})
 			}),
 		},
 		guards: {

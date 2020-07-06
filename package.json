@@ -28,7 +28,9 @@
 		"start": "yarn build:css && cross-env EXTEND_ESLINT=true craco start",
 		"storybook": "yarn build:css && cross-env EXTEND_ESLINT=true start-storybook -p 9000",
 		"storybook:build": "yarn build:css && cross-env STORYBOOK_USEMOCK=true EXTEND_ESLINT=true build-storybook --no-dll -c .storybook -o storybook-dist",
-		"test": "craco test"
+		"test": "craco test",
+		"typecheck": "tsc",
+		"typecheck:watch": "tsc --watch"
 	},
 	"dependencies": {
 		"@blueprintjs/core": "^3.28.2",
@@ -94,6 +96,7 @@
 		"stylelint-config-recommended": "^3.0.0",
 		"stylelint-declaration-block-no-ignored-properties": "^2.3.0",
 		"stylelint-webpack-plugin": "^2.0.0",
+		"typescript": "^3.9.6",
 		"webpack-bundle-analyzer": "^3.8.0"
 	},
 	"resolutions": {

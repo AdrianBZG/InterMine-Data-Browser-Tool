@@ -9,7 +9,7 @@ import { PopupCard } from '../Shared/PopupCard'
 import { APPLY_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from './actions'
 
 export const ConstraintPopupCard = ({ children }) => {
-	const [state, send] = useServiceContext()
+	const [state, send] = useServiceContext('constraints')
 
 	const disableAll = state?.value === 'noConstraintsSet'
 	const enableAdd = state?.value === 'constraintsUpdated'

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ServiceContext, useMachineBus } from '../../machineBus'
+import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { organismSummary } from '../../stubs/geneSummaries'
 import { popupDecorator } from '../../utils/storybook'
 import { CheckboxPopup } from './CheckboxPopup'
@@ -13,11 +13,19 @@ export default {
 	decorators: [...popupDecorator],
 }
 
+/**
+ * @param {{
+ * 	initialState?: import('../../types').MachineFactoryOptions['initial'],
+ * 	selectedValues?: string[],
+ * 	availableValues?: any[],
+ * 	machine?: import('../../types').ConstraintStateMachine
+ * }} props
+ */
 const CheckboxBuilder = ({
-	initialState = '',
+	initialState,
 	selectedValues = [],
 	availableValues = organismSummary.results,
-	machine = null,
+	machine = undefined,
 }) => {
 	const [state, send] = useMachineBus(
 		machine ? machine : machineStub(initialState, availableValues, selectedValues)
@@ -25,11 +33,11 @@ const CheckboxBuilder = ({
 
 	return (
 		<div css={{ maxWidth: 500, minWidth: 376 }}>
-			<ServiceContext.Provider value={{ state, send }}>
+			<ConstraintServiceContext.Provider value={{ state, send }}>
 				<ConstraintPopupCard>
 					<CheckboxPopup />
 				</ConstraintPopupCard>
-			</ServiceContext.Provider>
+			</ConstraintServiceContext.Provider>
 		</div>
 	)
 }

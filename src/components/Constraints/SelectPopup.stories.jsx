@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ServiceContext, useMachineBus } from '../../machineBus'
+import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { popupDecorator } from '../../utils/storybook'
 import { constraintMachineFactory } from './common'
 import { ConstraintPopupCard } from './Constraint'
@@ -33,11 +33,11 @@ const SelectBuilder = ({
 
 	return (
 		<div css={{ maxWidth: 500, minWidth: 376 }}>
-			<ServiceContext.Provider value={{ state, send }}>
+			<ConstraintServiceContext.Provider value={{ state, send }}>
 				<ConstraintPopupCard>
 					<SelectPopup label="Protein Name" uniqueId={`select-${count++}`} />
 				</ConstraintPopupCard>
-			</ServiceContext.Provider>
+			</ConstraintServiceContext.Provider>
 		</div>
 	)
 }

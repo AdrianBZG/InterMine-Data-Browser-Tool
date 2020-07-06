@@ -10,25 +10,12 @@ const enableMocks =
 const serviceStations = new Map()
 export const MockMachineContext = createContext(null)
 
-/**
- * Interprets a machine and registers it on the service bus.
- * If a machine is provided through the MockMachineContext, it will
- * use that machine instead.
- *
- 
- * @param { import('xstate').StateMachine} machine
- * @returns {[import('xstate').State, typeof sendToBus, import('xstate').Interpreter]}
- */
+/** @type {import('./types').UseMachineBus} */
 export const useMachineBus = (machine, opts = {}) => {
+	const mockMachine = useContext(MockMachineContext)
 	let activeMachine = machine
 
-	if (enableMocks) {
-		// We only use this for storybook configs, so it's
-		// safe to use inside the conditional here. It will
-		// either always be called, or not called at all.
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const mockMachine = useContext(MockMachineContext)
-
+	if (enableMocks && mockMachine) {
 		// istanbul ignore
 		if (mockMachine?.id === machine.id) {
 			activeMachine = mockMachine
@@ -37,8 +24,15 @@ export const useMachineBus = (machine, opts = {}) => {
 
 	const [machineState, , service] = useMachine(activeMachine, opts)
 
+	/** @type {import('./types').SendToBusWrapper} */
 	const sendToBusWrapper = useMemo(() => {
 		return (event, payload) => {
+			const sendToAll = event?.to === '*'
+
+			if (sendToAll) {
+				return sendToBus(event, payload)
+			}
+
 			const receiver = serviceStations.get(event?.to ? event.to : service.sessionId)
 
 			if (receiver) {
@@ -65,7 +59,7 @@ export const useMachineBus = (machine, opts = {}) => {
  * Sends a message to all services on the bus. Only the active services
  * who are registered for the event will act.
  *
- * @param {?} event - a string or event object (see https://xstate.js.org/docs/guides/events.html#events)
+ * @param {import('./types').ConstraintEvents} event - a string or event object (see https://xstate.js.org/docs/guides/events.html#events)
  * @param {import('xstate').EventData} [payload] - the payload for the event
  */
 export const sendToBus = (event, payload) => {
@@ -77,9 +71,24 @@ export const sendToBus = (event, payload) => {
 	})
 }
 
-export const ServiceContext = createContext(null)
-export const useServiceContext = () => {
-	const service = useContext(ServiceContext)
+export const ConstraintServiceContext = createContext(null)
+export const QueryServiceContext = createContext(null)
+
+/** @type {import('./types').UseServiceContext} */
+export const useServiceContext = (serviceRequested = null) => {
+	const constraintService = useContext(ConstraintServiceContext)
+	const queryService = useContext(QueryServiceContext)
+
+	let service
+
+	if (serviceRequested === 'constraints') {
+		service = constraintService
+	}
+
+	if (serviceRequested === 'queryController') {
+		service = queryService
+	}
+
 	if (!service) {
 		throw Error('You MUST have a ServiceContext up the tree from this component')
 	}

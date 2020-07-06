@@ -7,7 +7,7 @@ import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from './actions'
 import { NoValuesProvided } from './NoValuesProvided'
 
 export const CheckboxPopup = ({ title = undefined, description = undefined }) => {
-	const [state, send] = useServiceContext()
+	const [state, send] = useServiceContext('constraints')
 
 	const { availableValues, selectedValues } = state?.context
 
@@ -17,10 +17,8 @@ export const CheckboxPopup = ({ title = undefined, description = undefined }) =>
 
 	const onChangeHandler = (constraint) => (e) => {
 		if (e.target.checked) {
-			// @ts-ignore
 			send({ type: ADD_CONSTRAINT, constraint })
 		} else {
-			// @ts-ignore
 			send({ type: REMOVE_CONSTRAINT, constraint })
 		}
 	}
@@ -34,7 +32,6 @@ export const CheckboxPopup = ({ title = undefined, description = undefined }) =>
 						key={value.item}
 						label={`${value.item} (${value.count})`}
 						checked={selectedValues.some((name) => name === value.item)}
-						// @ts-ignore
 						onChange={onChangeHandler(value.item)}
 					/>
 				)

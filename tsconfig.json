@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"baseUrl": ".",
+		"checkJs": true,
+		"allowJs": true,
+		"jsx": "react",
+		"lib": ["es2018", "es2019", "dom"],
+		"noEmit": true,
+		"esModuleInterop": true
+	},
+	"include": ["src/**/*"],
+	"exclude": ["**/node_modules/*", "src/blueprintIcons.js"],
+	"typeRoots": ["./node_modules/@types"]
+}

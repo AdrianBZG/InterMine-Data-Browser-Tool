@@ -18,7 +18,6 @@ export const PopupCard = ({ children, isOpen, boundary }) => {
 					usePortal={true}
 					lazy={true}
 					position="right"
-					// @ts-ignore
 					boundary={boundary}
 					popoverClassName={`${Classes.POPOVER_CONTENT_SIZING} ${css({
 						[`&& .${Classes.POPOVER_CONTENT}`]: {

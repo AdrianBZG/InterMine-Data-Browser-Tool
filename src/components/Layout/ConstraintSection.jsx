@@ -1,7 +1,7 @@
 import React from 'react'
 import { Machine } from 'xstate'
 
-import { ServiceContext, useMachineBus } from '../../machineBus'
+import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { CheckboxPopup } from '../Constraints/CheckboxPopup'
 import { Constraint } from '../Constraints/Constraint'
 import { DATA_VIZ_COLORS } from '../DataViz/dataVizColors'
@@ -36,14 +36,14 @@ const ConstraintBuilder = ({ name, label, color }) => {
 	const [state, send] = useMachineBus(mockCheckboxMachine)
 
 	return (
-		<ServiceContext.Provider value={{ state, send }}>
+		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<Constraint constraintIconText={label} constraintName={name} labelBorderColor={color}>
 				<CheckboxPopup
 					title="No items found"
 					description="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 				/>
 			</Constraint>
-		</ServiceContext.Provider>
+		</ConstraintServiceContext.Provider>
 	)
 }
 

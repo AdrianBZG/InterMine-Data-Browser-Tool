@@ -62,8 +62,8 @@ export const BarChart = () => {
 	const { max, min, buckets, uniqueValues, average, stdev } = lengthSummary
 
 	const elementsPerBucket = (max - min) / buckets
-	const stdevFixed = parseFloat(stdev).toFixed(3)
-	const avgFixed = parseFloat(average).toFixed(3)
+	const stdevFixed = parseFloat(`${stdev}`).toFixed(3)
+	const avgFixed = parseFloat(`${average}`).toFixed(3)
 
 	const title = `Distribution of ${uniqueValues} Gene Lengths`
 	const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
