@@ -78,6 +78,7 @@ CurrentConstraints.defaultProps = {
 	currentConstraints: [],
 }
 
+// Storybook export
 export const ViewAllPopup = () => {
 	return (
 		<>
@@ -124,10 +125,20 @@ const RunQuery = () => {
 export const QueryController = () => {
 	const [state, send] = useMachineBus(queryControllerMachine)
 
+	const { currentConstraints } = state.context
+
+	let color = 'var(--green5)'
+
+	if (currentConstraints.length === 26) {
+		color = 'var(--red5)'
+	} else if (currentConstraints.length > 14) {
+		color = 'var(--yellow5)'
+	}
+
 	return (
 		<div css={{ paddingTop: 10, margin: '0 20px' }}>
 			<H5>
-				<span css={{ color: 'var(--green5)' }}>4 </span>
+				<span css={{ color }}>{`${currentConstraints.length} `}</span>
 				<span css={{ color: 'var(--blue9)' }}>Constraints applied</span>
 			</H5>
 			<PopupCard>
