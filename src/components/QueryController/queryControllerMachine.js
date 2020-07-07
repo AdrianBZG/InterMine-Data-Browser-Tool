@@ -1,5 +1,9 @@
 import { assign } from '@xstate/immer'
-import { APPLY_CONSTRAINT_TO_QUERY, UNSET_CONSTRAINT } from 'src/actionConstants'
+import {
+	APPLY_CONSTRAINT_TO_QUERY,
+	DELETE_CONSTRAINT_FROM_QUERY,
+	UNSET_CONSTRAINT,
+} from 'src/actionConstants'
 import { sendToBus } from 'src/machineBus'
 import { Machine } from 'xstate'
 
@@ -11,6 +15,9 @@ export const queryControllerMachine = Machine(
 		initial: 'idle',
 		context: {
 			currentConstraints: [],
+		},
+		on: {
+			[DELETE_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
 		},
 		states: {
 			idle: {
@@ -47,7 +54,7 @@ export const queryControllerMachine = Machine(
 				ctx.currentConstraints.push(query)
 			}),
 			// @ts-ignore
-			removeConstraint: assign((ctx, { query }) => {
+			removeConstraint: assign((ctx, { type, query }) => {
 				const prevCount = ctx.currentConstraints.length
 				ctx.currentConstraints = ctx.currentConstraints.filter((c) => {
 					return c.path !== query.path
@@ -55,7 +62,7 @@ export const queryControllerMachine = Machine(
 
 				const nextCount = ctx.currentConstraints.length
 
-				if (nextCount !== prevCount) {
+				if (type !== DELETE_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
 					sendToBus({ type: UNSET_CONSTRAINT, path: query.path })
 				}
 			}),

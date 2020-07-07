@@ -6,6 +6,7 @@ import {
 	ADD_CONSTRAINT,
 	APPLY_CONSTRAINT,
 	APPLY_CONSTRAINT_TO_QUERY,
+	DELETE_CONSTRAINT_FROM_QUERY,
 	LOCK_ALL_CONSTRAINTS,
 	REMOVE_CONSTRAINT,
 	RESET_ALL_CONSTRAINTS,
@@ -36,6 +37,7 @@ export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path
 		},
 		states: {
 			noConstraintsSet: {
+				entry: 'resetConstraint',
 				on: {
 					[ADD_CONSTRAINT]: {
 						target: 'constraintsUpdated',
@@ -99,6 +101,10 @@ export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path
 				}
 
 				sendToBus({ query, to: '*', type: APPLY_CONSTRAINT_TO_QUERY })
+			},
+			resetConstraint: () => {
+				// @ts-ignore
+				sendToBus({ type: DELETE_CONSTRAINT_FROM_QUERY, query: { path } })
 			},
 		},
 		guards: {
