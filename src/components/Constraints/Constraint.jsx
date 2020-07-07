@@ -2,7 +2,7 @@ import { Button, ButtonGroup, Icon, Tag } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { APPLY_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/actionConstants'
 
 import { useServiceContext } from '../../machineBus'
@@ -76,7 +76,10 @@ const S_CountTag = styled.div`
 	font-size: var(--fs-desktopS1);
 	font-weight: var(--fw-medium);
 	line-height: 1;
-	border: 2px solid var(--green5);
+	border: ${({
+		// @ts-ignore
+		isUpdated,
+	}) => (isUpdated ? '2px solid var(--yellow5)' : '2px solid var(--green5)')};
 	border-radius: 10px;
 	height: 1.333em;
 
@@ -111,10 +114,20 @@ export const Constraint = ({
 	children = null,
 	constraintName,
 	labelBorderColor = 'black',
-	constraintCount = 0,
 	ariaLabel = '',
 	constraintIconText,
 }) => {
+	const [state] = useServiceContext('constraints')
+
+	const constraintCount = state.context.selectedValues.length
+
+	/**
+	 * This is used to decide the color for the count tag. Since it will only
+	 * ever be displayed when a constraint is actually set, we only care to know if
+	 * it has been updated so we can change its color.
+	 */
+	const isUpdated = state.matches('constraintsUpdated')
+
 	return (
 		<PopupCard boundary="viewport">
 			<Button
@@ -133,12 +146,13 @@ export const Constraint = ({
 					</S_ConstraintIcon>
 					{constraintName}
 					{constraintCount > 0 && (
-						<S_CountTag>
+						// @ts-ignore
+						<S_CountTag isUpdated={isUpdated}>
 							{constraintCount > 1 && <small>{constraintCount}</small>}
 							<Icon
 								css={{ margin: '-0.167em -0.167em !important', alignSelf: 'flex-start' }}
 								icon={IconNames.TICK_CIRCLE}
-								color="var(--green5)"
+								color={isUpdated ? 'var(--yellow5)' : 'var(--green5)'}
 							/>
 						</S_CountTag>
 					)}
