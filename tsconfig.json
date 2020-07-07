@@ -18,6 +18,13 @@
 		"strict": false
 	},
 	"include": ["src/**/*"],
-	"exclude": ["**/node_modules/*", "src/blueprintIcons.js"],
+	"exclude": [
+		"**/node_modules/*",
+		"src/blueprintIcons.js",
+		"build",
+		"orig_app",
+		"storybook-dist",
+		"docs"
+	],
 	"typeRoots": ["./node_modules/@types"]
 }
