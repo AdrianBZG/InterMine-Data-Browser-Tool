@@ -2,8 +2,8 @@ import React from 'react'
 
 import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { popupDecorator } from '../../utils/storybook'
-import { constraintMachineFactory } from './common'
 import { ConstraintPopupCard } from './Constraint'
+import { createConstraintMachine } from './createConstraintMachine'
 import { SelectPopup } from './SelectPopup'
 import { machineStub } from './utils'
 
@@ -19,8 +19,6 @@ const mockResults = [
 	{ item: 'Cytokine Signaling in immune system', count: 1393 },
 ]
 
-let count = 0
-
 const SelectBuilder = ({
 	initialState = undefined,
 	selectedValues = [],
@@ -35,7 +33,7 @@ const SelectBuilder = ({
 		<div css={{ maxWidth: 500, minWidth: 376 }}>
 			<ConstraintServiceContext.Provider value={{ state, send }}>
 				<ConstraintPopupCard>
-					<SelectPopup label="Protein Name" uniqueId={`select-${count++}`} />
+					<SelectPopup label="Protein Name" />
 				</ConstraintPopupCard>
 			</ConstraintServiceContext.Provider>
 		</div>
@@ -67,9 +65,10 @@ export const ConstraintsApplied = () => (
 export const Playground = () => (
 	<SelectBuilder
 		availableValues={mockResults}
-		machine={constraintMachineFactory({ id: 'select' }).withContext({
+		machine={createConstraintMachine({ id: 'select' }).withContext({
 			selectedValues: [],
 			availableValues: mockResults,
+			constraintPath: '',
 		})}
 	/>
 )

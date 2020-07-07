@@ -2,8 +2,8 @@ import React from 'react'
 
 import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { CheckboxPopup } from './CheckboxPopup'
-import { constraintMachineFactory } from './common'
 import { Constraint } from './Constraint'
+import { createConstraintMachine } from './createConstraintMachine'
 
 export default {
 	title: 'Components/Constraint',
@@ -11,14 +11,14 @@ export default {
 }
 
 export const Example = () => {
-	const [state, send] = useMachineBus(constraintMachineFactory({ id: 'mockmachine' }))
+	const [state, send] = useMachineBus(createConstraintMachine({ id: 'checkbox' }))
 
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<Constraint constraintName="Organism" constraintIconText="Or">
 				<CheckboxPopup
-					title="No organisms found"
-					description="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
+					nonIdealTitle="No organisms found"
+					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 				/>
 			</Constraint>
 		</ConstraintServiceContext.Provider>

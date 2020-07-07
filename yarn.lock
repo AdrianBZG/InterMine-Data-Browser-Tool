@@ -12731,6 +12731,8 @@ fsevents@^1.2.7:
     immer: ^7.0.5
     jest-axe: ^3.4.0
     lint-staged: ">=10"
+    nanoid: ^3.1.10
+    nanoid-dictionary: ^3.0.0
     node-sass: ^4.14.1
     node-sass-magic-importer: ^5.3.2
     prettier: ^2.0.5
@@ -15834,6 +15836,22 @@ fsevents@^1.2.7:
   dependencies:
     node-gyp: latest
   checksum: eeab7cf260362a578f0b8622716a76d19bc009722049c7274748644ce03b2aa38ca01b3ac730a0497fd2c1ec882a21a0592e800a903994ed4d32acd06bf7eba7
+  languageName: node
+  linkType: hard
+
+"nanoid-dictionary@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "nanoid-dictionary@npm:3.0.0"
+  checksum: ead5e5efb80dbc03aaabbd14f3440e29846286c55cad5ef3ef641145ba936671bfc4101f1fcf808c0ea52e811c45386d96497c70e3110655e51b072c85116050
+  languageName: node
+  linkType: hard
+
+"nanoid@npm:^3.1.10":
+  version: 3.1.10
+  resolution: "nanoid@npm:3.1.10"
+  bin:
+    nanoid: bin/nanoid.cjs
+  checksum: f8c796e6cb01d49d625533a4ad83ca9834375909cc3980a3fe953eb5be4d262f096f05bebe4bfe6d636a342ed319fd94d19de0ccec0fe863711e2ed2eaf6d33e
   languageName: node
   linkType: hard
 

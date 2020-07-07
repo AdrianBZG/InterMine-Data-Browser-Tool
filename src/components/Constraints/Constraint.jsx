@@ -3,10 +3,10 @@ import { IconNames } from '@blueprintjs/icons'
 import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { APPLY_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/actionConstants'
 
 import { useServiceContext } from '../../machineBus'
 import { PopupCard } from '../Shared/PopupCard'
-import { APPLY_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from './actions'
 
 export const ConstraintPopupCard = ({ children }) => {
 	const [state, send] = useServiceContext('constraints')

@@ -74,7 +74,6 @@ export const sendToBus = (event, payload) => {
 export const ConstraintServiceContext = createContext(null)
 export const QueryServiceContext = createContext(null)
 
-/** @type {import('./types').UseServiceContext} */
 export const useServiceContext = (serviceRequested = null) => {
 	const constraintService = useContext(ConstraintServiceContext)
 	const queryService = useContext(QueryServiceContext)

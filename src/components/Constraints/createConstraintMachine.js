@@ -1,35 +1,38 @@
 import { assign } from '@xstate/immer'
+import { sendToBus } from 'src/machineBus'
 import { Machine } from 'xstate'
 
-import { LOCK_ALL_CONSTRAINTS, RESET_ALL_CONSTRAINTS } from '../../globalActions'
 import {
 	ADD_CONSTRAINT,
 	APPLY_CONSTRAINT,
+	APPLY_CONSTRAINT_TO_QUERY,
+	LOCK_ALL_CONSTRAINTS,
 	REMOVE_CONSTRAINT,
+	RESET_ALL_CONSTRAINTS,
 	RESET_LOCAL_CONSTRAINT,
-} from './actions'
+	UNSET_CONSTRAINT,
+} from '../../actionConstants'
 
-/**
- * @param {{
- * 	id: string,
- * 	initial?: import('../../types').MachineFactoryOptions['initial']
- * }} options
- *
- * @returns
- */
-export const constraintMachineFactory = ({ id, initial = 'noConstraintsSet' }) => {
+/** @type {import('../../types').CreateConstraintMachine} */
+export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path = '', op }) => {
 	/** @type {import('../../types').ConstraintMachineConfig} */
 	const config = {
 		id,
 		initial,
 		context: {
+			constraintPath: path,
 			selectedValues: [],
-			availableValues: [],
+			availableValues: [
+				// fixme: remove this mock
+				{ item: 'one species', count: 0 },
+				{ item: 'two chemics', count: 0 },
+			],
 		},
 		on: {
 			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
 			[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
 			[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
+			[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
 		},
 		states: {
 			noConstraintsSet: {
@@ -45,7 +48,7 @@ export const constraintMachineFactory = ({ id, initial = 'noConstraintsSet' }) =
 				on: {
 					[ADD_CONSTRAINT]: { actions: 'addConstraint' },
 					[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
-					[APPLY_CONSTRAINT]: 'constraintsApplied',
+					[APPLY_CONSTRAINT]: { target: 'constraintsApplied', actions: 'applyConstraint' },
 				},
 			},
 			constraintsApplied: {
@@ -85,10 +88,26 @@ export const constraintMachineFactory = ({ id, initial = 'noConstraintsSet' }) =
 				// @ts-ignore
 				ctx.availableValues = event.values
 			}),
+			applyConstraint: (ctx) => {
+				const query = {
+					path,
+					op,
+					values: ctx.selectedValues,
+					itemDescription: ctx.selectedValues.map((selected) => {
+						return ctx.availableValues.find((v) => v.item === selected)
+					}),
+				}
+
+				sendToBus({ query, to: '*', type: APPLY_CONSTRAINT_TO_QUERY })
+			},
 		},
 		guards: {
 			constraintListIsEmpty: (ctx) => {
 				return ctx.selectedValues.length === 0
+			},
+			// @ts-ignore
+			pathMatches: (ctx, { path }) => {
+				return ctx.constraintPath === path
 			},
 		},
 	})

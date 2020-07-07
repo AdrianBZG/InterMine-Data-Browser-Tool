@@ -16,6 +16,9 @@ module.exports = {
 	babel: {
 		plugins: [...emotionBabelPreset.plugins],
 	},
+	typescript: {
+		enableTypeChecking: false,
+	},
 	webpack: {
 		plugins: [
 			...whenProd(() => {

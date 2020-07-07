@@ -1,46 +1,67 @@
 import React from 'react'
-import { Machine } from 'xstate'
 
 import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { CheckboxPopup } from '../Constraints/CheckboxPopup'
 import { Constraint } from '../Constraints/Constraint'
+import { createConstraintMachine } from '../Constraints/createConstraintMachine'
+import { SelectPopup } from '../Constraints/SelectPopup'
 import { DATA_VIZ_COLORS } from '../DataViz/dataVizColors'
 import { QueryController } from '../QueryController/QueryController'
 
-const constraintMocks = [
-	['Intermine List', 'IL'],
-	['Symbol', 'Sy'],
-	['Organism', 'Or'],
-	['Pathway Name', 'PN'],
-	['GO Annotation', 'GA'],
-	['Expression', 'Ex'],
-	['Interactions', 'In'],
+/** @type {{
+ * 	type: import('../../types').ConstraintMachineFactoryOpts['id']
+ * 	name: string
+ * 	label: string
+ * 	path: string
+ * 	op: import('../../types').ConstraintMachineFactoryOpts['op']
+ * }[]}
+ * */
+const defaultConstraints = [
+	{
+		type: 'checkbox',
+		name: 'Organism',
+		label: 'Or',
+		path: 'organism.shortname',
+		op: 'ONE OF',
+	},
+	{
+		type: 'select',
+		name: 'Pathway Name',
+		label: 'Pn',
+		path: 'pathways.name',
+		op: 'ONE OF',
+	},
+	{
+		type: 'select',
+		name: 'GO Annotation',
+		label: 'GA',
+		path: 'goAnnotation.ontologyTerm.name',
+		op: 'ONE OF',
+	},
 ]
 
-const mockCheckboxMachine = Machine({
-	id: 'mockmachine',
-	initial: 'noConstraintsSet',
-	context: {
-		selectedValues: [],
-		availableValues: [],
-	},
-	states: {
-		noConstraintsSet: {},
-		constraintsUpdated: {},
-		constraintsApplied: {},
-		constraintsLimitReached: {},
-	},
-})
+const ConstraintBuilder = ({ constraintConfig, color }) => {
+	const { type, name, label, path, op } = constraintConfig
 
-const ConstraintBuilder = ({ name, label, color }) => {
-	const [state, send] = useMachineBus(mockCheckboxMachine)
+	const [state, send] = useMachineBus(createConstraintMachine({ id: type, path, op }))
+
+	let Popup
+
+	switch (type) {
+		case 'checkbox':
+			Popup = CheckboxPopup
+			break
+		default:
+			Popup = SelectPopup
+			break
+	}
 
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<Constraint constraintIconText={label} constraintName={name} labelBorderColor={color}>
-				<CheckboxPopup
-					title="No items found"
-					description="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
+				<Popup
+					nonIdealTitle="No items found"
+					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 				/>
 			</Constraint>
 		</ConstraintServiceContext.Provider>
@@ -65,9 +86,12 @@ export const ConstraintSection = () => {
 					height: '77vh',
 				}}
 			>
-				{constraintMocks.map((c, idx) => (
+				{defaultConstraints.map((config, idx) => (
 					<li css={{ margin: '0.875em 0' }} key={idx}>
-						<ConstraintBuilder name={c[0]} label={c[1]} color={DATA_VIZ_COLORS[idx]} />
+						<ConstraintBuilder
+							constraintConfig={config}
+							color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
+						/>
 					</li>
 				))}
 			</ul>

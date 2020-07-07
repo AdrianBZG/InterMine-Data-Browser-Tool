@@ -20,8 +20,9 @@ export const PopupCard = ({ children, isOpen, boundary }) => {
 					position="right"
 					boundary={boundary}
 					popoverClassName={`${Classes.POPOVER_CONTENT_SIZING} ${css({
+						width: 376,
 						[`&& .${Classes.POPOVER_CONTENT}`]: {
-							maxWidth: 'fit-content',
+							maxWidth: '100%',
 							paddingTop: 8,
 						},
 					})} `}
@@ -29,7 +30,7 @@ export const PopupCard = ({ children, isOpen, boundary }) => {
 					isOpen={isOpen}
 				>
 					{target}
-					<div css={{ width: 'fit-content' }}>
+					<div>
 						<CloseButton />
 						{content}
 					</div>

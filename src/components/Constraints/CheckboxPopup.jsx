@@ -1,18 +1,23 @@
 import { Checkbox, Label } from '@blueprintjs/core'
-import PropTypes from 'prop-types'
 import React from 'react'
+import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
 
 import { useServiceContext } from '../../machineBus'
-import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from './actions'
 import { NoValuesProvided } from './NoValuesProvided'
 
-export const CheckboxPopup = ({ title = undefined, description = undefined }) => {
+export const CheckboxPopup = ({ nonIdealTitle = undefined, nonIdealDescription = undefined }) => {
 	const [state, send] = useServiceContext('constraints')
 
-	const { availableValues, selectedValues } = state?.context
+	const { selectedValues } = state?.context
+
+	const availableValues = [
+		// fixme: remove this mock
+		{ item: 'one species', count: 0 },
+		{ item: 'two chemics', count: 0 },
+	]
 
 	if (availableValues.length === 0) {
-		return <NoValuesProvided title={title} description={description} />
+		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
 	}
 
 	const onChangeHandler = (constraint) => (e) => {
@@ -38,9 +43,4 @@ export const CheckboxPopup = ({ title = undefined, description = undefined }) =>
 			})}
 		</div>
 	)
-}
-
-CheckboxPopup.propTypes = {
-	checkAll: PropTypes.bool,
-	disableAll: PropTypes.bool,
 }

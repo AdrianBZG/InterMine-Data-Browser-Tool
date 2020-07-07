@@ -3,18 +3,19 @@ import { IconNames } from '@blueprintjs/icons'
 import { Suggest } from '@blueprintjs/select'
 import Fuse from 'fuse.js'
 import React, { useMemo, useState } from 'react'
+import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
+import { generateId } from 'src/generateId'
 
 import { useServiceContext } from '../../machineBus'
 import { PlainSelectMenuItems } from '../Selects'
-import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from './actions'
 import { NoValuesProvided } from './NoValuesProvided'
 
 export const SelectPopup = ({
 	nonIdealTitle = undefined,
 	nonIdealDescription = undefined,
-	label,
-	uniqueId,
+	label = '',
 }) => {
+	const [uniqueId] = useState(() => `selectPopup-${generateId()}`)
 	const [state, send] = useServiceContext('constraints')
 	const { availableValues, selectedValues } = state.context
 

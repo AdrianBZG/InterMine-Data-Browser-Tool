@@ -1,4 +1,3 @@
-import { Card } from '@blueprintjs/core'
 import React from 'react'
 
 import { popupDecorator } from '../../utils/storybook'
@@ -20,9 +19,11 @@ Default.parameters = {
 export const WithConstraints = () => (
 	<Controller.ViewAllPopup
 		currentConstraints={[
-			'Gene.organism.shortName = M. musculus',
-			'Gene.organism.shortName = H. sapiens',
-			'Gene LOOKUP MGI:1918911',
+			{
+				path: 'organism.shortname',
+				op: 'ONE OF',
+				values: ['M. musculus', 'H. sapiens', 'R. rerio'],
+			},
 		]}
 	/>
 )

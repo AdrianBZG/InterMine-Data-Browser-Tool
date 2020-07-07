@@ -1,7 +1,9 @@
 import { assign } from '@xstate/immer'
+import { APPLY_CONSTRAINT_TO_QUERY, UNSET_CONSTRAINT } from 'src/actionConstants'
+import { sendToBus } from 'src/machineBus'
 import { Machine } from 'xstate'
 
-import { ADD_QUERY_CONSTRAINT, DELETE_QUERY_CONSTRAINT } from '../../actionConstants'
+import { DELETE_QUERY_CONSTRAINT } from '../../actionConstants'
 
 export const queryControllerMachine = Machine(
 	{
@@ -13,10 +15,8 @@ export const queryControllerMachine = Machine(
 		states: {
 			idle: {
 				on: {
-					[DELETE_QUERY_CONSTRAINT]: {
-						actions: 'removeConstraint',
-					},
-					[ADD_QUERY_CONSTRAINT]: [
+					[DELETE_QUERY_CONSTRAINT]: { actions: 'removeConstraint' },
+					[APPLY_CONSTRAINT_TO_QUERY]: [
 						{
 							target: 'constraintLimitReached',
 							cond: {
@@ -43,14 +43,21 @@ export const queryControllerMachine = Machine(
 	{
 		actions: {
 			// @ts-ignore
-			addConstraint: assign((ctx, { constraint }) => {
-				ctx.currentConstraints.push(constraint)
+			addConstraint: assign((ctx, { query }) => {
+				ctx.currentConstraints.push(query)
 			}),
 			// @ts-ignore
-			removeConstraint: assign((ctx, { constraint }) => {
+			removeConstraint: assign((ctx, { query }) => {
+				const prevCount = ctx.currentConstraints.length
 				ctx.currentConstraints = ctx.currentConstraints.filter((c) => {
-					return c.path === constraint.path
+					return c.path !== query.path
 				})
+
+				const nextCount = ctx.currentConstraints.length
+
+				if (nextCount !== prevCount) {
+					sendToBus({ type: UNSET_CONSTRAINT, path: query.path })
+				}
 			}),
 		},
 		guards: {

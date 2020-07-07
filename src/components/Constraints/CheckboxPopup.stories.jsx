@@ -4,8 +4,8 @@ import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { organismSummary } from '../../stubs/geneSummaries'
 import { popupDecorator } from '../../utils/storybook'
 import { CheckboxPopup } from './CheckboxPopup'
-import { constraintMachineFactory } from './common'
 import { ConstraintPopupCard } from './Constraint'
+import { createConstraintMachine } from './createConstraintMachine'
 import { machineStub } from './utils'
 
 export default {
@@ -15,7 +15,7 @@ export default {
 
 /**
  * @param {{
- * 	initialState?: import('../../types').MachineFactoryOptions['initial'],
+ * 	initialState?: import('../../types').ConstraintMachineFactoryOpts['initial'],
  * 	selectedValues?: string[],
  * 	availableValues?: any[],
  * 	machine?: import('../../types').ConstraintStateMachine
@@ -65,9 +65,10 @@ export const ConstraintsApplied = () => (
 )
 
 export const Playground = () => {
-	const machine = constraintMachineFactory({ id: 'checkbox' }).withContext({
+	const machine = createConstraintMachine({ id: 'checkbox' }).withContext({
 		selectedValues: [],
 		availableValues: organismSummary.results,
+		constraintPath: '',
 	})
 
 	return <CheckboxBuilder machine={machine} />

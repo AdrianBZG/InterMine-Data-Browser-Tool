@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "esnext",
 		"moduleResolution": "node",
 		"baseUrl": ".",
 		"checkJs": true,
@@ -8,7 +8,14 @@
 		"jsx": "react",
 		"lib": ["es2018", "es2019", "dom"],
 		"noEmit": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"target": "es5",
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"strict": false
 	},
 	"include": ["src/**/*"],
 	"exclude": ["**/node_modules/*", "src/blueprintIcons.js"],
