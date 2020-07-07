@@ -1,14 +1,28 @@
-import { Button, Classes, Divider, FormGroup, H4, MenuItem } from '@blueprintjs/core'
+import { Button, Divider, FormGroup, H4, MenuItem } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Suggest } from '@blueprintjs/select'
 import Fuse from 'fuse.js'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
 import { generateId } from 'src/generateId'
 
 import { useServiceContext } from '../../machineBus'
-import { PlainSelectMenuItems } from '../Selects'
 import { NoValuesProvided } from './NoValuesProvided'
+
+/**
+ * Renders the menu item for the drop down available menu items
+ */
+const itemRenderer = (item, props) => {
+	return (
+		<MenuItem
+			key={item.name}
+			text={item.name}
+			active={props.modifiers.active}
+			onClick={props.handleClick}
+			shouldDismissPopover={false}
+		/>
+	)
+}
 
 export const SelectPopup = ({
 	nonIdealTitle = undefined,
@@ -102,13 +116,13 @@ export const SelectPopup = ({
 					// @ts-ignore
 					id={`selectPopup-${uniqueId}`}
 					items={availableValues.map((i) => ({ name: i.item, count: i.count }))}
-					itemRenderer={PlainSelectMenuItems}
 					inputValueRenderer={renderInputValue}
 					itemListPredicate={filterQuery}
 					fill={true}
 					onItemSelect={handleItemSelect}
 					resetOnSelect={true}
 					noResults={<MenuItem disabled={true} text="No results match your entry" />}
+					itemRenderer={itemRenderer}
 				/>
 			</FormGroup>
 		</div>
