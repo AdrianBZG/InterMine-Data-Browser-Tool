@@ -37,7 +37,6 @@ const CurrentConstraints = () => {
 	return (
 		<ul css={{ padding: '0 16px', listStyle: 'none' }}>
 			{currentConstraints.flatMap((constraintConfig) => {
-				console.log({ constraintConfig })
 				return (
 					<li key={constraintConfig.path} css={{ alignItems: 'center', padding: '6px 0' }}>
 						<div css={{ display: 'flex' }}>
