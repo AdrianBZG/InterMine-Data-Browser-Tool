@@ -8,13 +8,7 @@ import { NoValuesProvided } from './NoValuesProvided'
 export const CheckboxPopup = ({ nonIdealTitle = undefined, nonIdealDescription = undefined }) => {
 	const [state, send] = useServiceContext('constraints')
 
-	const { selectedValues } = state?.context
-
-	const availableValues = [
-		// fixme: remove this mock
-		{ item: 'one species', count: 0 },
-		{ item: 'two chemics', count: 0 },
-	]
+	const { availableValues, selectedValues } = state?.context
 
 	if (availableValues.length === 0) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />

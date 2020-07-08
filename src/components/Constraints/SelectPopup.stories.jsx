@@ -65,10 +65,15 @@ export const ConstraintsApplied = () => (
 export const Playground = () => (
 	<SelectBuilder
 		availableValues={mockResults}
-		machine={createConstraintMachine({ id: 'select' }).withContext({
+		machine={createConstraintMachine({
+			id: 'select',
+			constraintItemsQuery: {},
+		}).withContext({
 			selectedValues: [],
 			availableValues: mockResults,
 			constraintPath: '',
+			constraintItemsQuery: {},
+			classView: '',
 		})}
 	/>
 )

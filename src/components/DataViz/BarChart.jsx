@@ -1,3 +1,5 @@
+import { ELEVATION_0 } from '@blueprintjs/core/lib/esm/common/classes'
+import { assign } from '@xstate/immer'
 import React from 'react'
 import {
 	Bar,
@@ -10,10 +12,11 @@ import {
 	Tooltip,
 	XAxis,
 } from 'recharts'
+import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import { fetchSummary } from 'src/fetchSummary'
 import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
-import { lengthSummary } from '../../stubs/geneSummaries'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderCustomTick = ({ x, y, payload }) => {
@@ -40,26 +43,96 @@ const colorizeBars = (data) =>
 		<Cell key={entry} fill={DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]} />
 	))
 
-export const BarChartMachine = Machine({
-	id: 'BarChart',
-	initial: 'idle',
-	context: {
-		lengthSummary: lengthSummary.stats,
-		results: lengthSummary.results.slice(0, lengthSummary.results.length - 1),
+export const BarChartMachine = Machine(
+	{
+		id: 'BarChart',
+		initial: 'idle',
+		context: {
+			lengthStats: {
+				min: 0,
+				max: 0,
+				buckets: 0,
+				uniqueValues: 0,
+				average: ELEVATION_0,
+				stdev: 0,
+			},
+			lengthSummary: [],
+			classView: '',
+		},
+		states: {
+			idle: {
+				on: {
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
+				},
+			},
+			loading: {
+				invoke: {
+					id: 'fetchGeneLength',
+					src: 'fetchGeneLength',
+					onDone: {
+						target: 'idle',
+						actions: 'setLengthSummary',
+					},
+				},
+			},
+		},
 	},
-	states: {
-		idle: {},
-	},
-})
+	{
+		actions: {
+			// @ts-ignore
+			setLengthSummary: assign((ctx, { data }) => {
+				ctx.lengthStats = data.lengthStats
+				ctx.lengthSummary = data.lengthSummary
+				ctx.classView = data.classView
+			}),
+		},
+		guards: {
+			isNotInitialized: () => true,
+		},
+		services: {
+			fetchGeneLength: async (
+				_ctx,
+				{ type, globalConfig: { classView, rootUrl }, query: nextQuery }
+			) => {
+				let query = nextQuery
+				let path = 'length'
+
+				if (type === FETCH_INITIAL_SUMMARY) {
+					query = {
+						from: classView,
+						select: ['length', 'primaryIdentifier'],
+						model: {
+							name: 'genomic',
+						},
+						orderBy: [
+							{
+								path: 'length',
+								direction: 'ASC',
+							},
+						],
+					}
+				}
+
+				const summary = await fetchSummary({ rootUrl, query, path })
+
+				return {
+					classView,
+					lengthStats: summary.stats,
+					lengthSummary: summary.results.slice(0, summary.results.length - 1),
+				}
+			},
+		},
+	}
+)
 
 export const BarChart = () => {
 	const [
 		{
-			context: { lengthSummary, results },
+			context: { lengthStats, lengthSummary },
 		},
 	] = useMachineBus(BarChartMachine)
 
-	const { max, min, buckets, uniqueValues, average, stdev } = lengthSummary
+	const { max, min, buckets, uniqueValues, average, stdev } = lengthStats
 
 	const elementsPerBucket = (max - min) / buckets
 	const stdevFixed = parseFloat(`${stdev}`).toFixed(3)
@@ -68,7 +141,7 @@ export const BarChart = () => {
 	const title = `Distribution of ${uniqueValues} Gene Lengths`
 	const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
 
-	const chartData = results.map((item, idx) => {
+	const chartData = lengthSummary.map((item, idx) => {
 		const lowerLimit = Math.round(min + elementsPerBucket * idx)
 		const upperLimit = Math.round(min + elementsPerBucket * (idx + 1))
 

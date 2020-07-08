@@ -15,7 +15,7 @@ export default {
 
 /**
  * @param {{
- * 	initialState?: import('../../types').ConstraintMachineFactoryOpts['initial'],
+ * 	initialState?: import('../../types').ConstraintMachineOpts['initial'],
  * 	selectedValues?: string[],
  * 	availableValues?: any[],
  * 	machine?: import('../../types').ConstraintStateMachine
@@ -65,10 +65,15 @@ export const ConstraintsApplied = () => (
 )
 
 export const Playground = () => {
-	const machine = createConstraintMachine({ id: 'checkbox' }).withContext({
+	const machine = createConstraintMachine({
+		id: 'checkbox',
+		constraintItemsQuery: {},
+	}).withContext({
 		selectedValues: [],
 		availableValues: organismSummary.results,
 		constraintPath: '',
+		classView: '',
+		constraintItemsQuery: {},
 	})
 
 	return <CheckboxBuilder machine={machine} />

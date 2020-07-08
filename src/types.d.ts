@@ -1,4 +1,8 @@
-import { ADD_QUERY_CONSTRAINT, DELETE_QUERY_CONSTRAINT } from 'src/actionConstants'
+import {
+	ADD_QUERY_CONSTRAINT,
+	DELETE_QUERY_CONSTRAINT,
+	SET_INITIAL_ORGANISMS,
+} from 'src/actionConstants'
 import {
 	EventData,
 	EventObject,
@@ -27,6 +31,7 @@ import { LOCK_ALL_CONSTRAINTS, RESET_ALL_CONSTRAINTS } from './globalActions'
  */
 export interface ConstraintMachineSchema extends StateSchema {
 	states: {
+		init: {}
 		noConstraintsSet: {}
 		constraintsUpdated: {}
 		constraintsApplied: {}
@@ -38,6 +43,8 @@ export interface ConstraintMachineContext {
 	selectedValues: string[]
 	availableValues: any[]
 	constraintPath: string
+	classView: string
+	constraintItemsQuery: { [key: string]: any }
 }
 
 export type ConstraintEvents = EventObject &
@@ -50,6 +57,11 @@ export type ConstraintEvents = EventObject &
 		| { to?: string; type: typeof APPLY_CONSTRAINT }
 		| { to?: string; type: typeof APPLY_CONSTRAINT_TO_QUERY; query: QueryConfig }
 		| { to?: string; type: typeof DELETE_QUERY_CONSTRAINT; path: string }
+		| {
+				to?: string
+				type: typeof SET_INITIAL_ORGANISMS
+				globalConfig: { rootUrl: string; classView: string }
+		  }
 	)
 
 export type ConstraintMachineConfig = MachineConfig<
@@ -68,6 +80,34 @@ export type ConstraintStateMachine =
 			ConstraintTypeState
 	  >
 	| StateNode<ConstraintMachineContext, any, ConstraintEvents, any>
+
+type ConstraintMachineTypes = 'checkbox' | 'select'
+
+export type ConstraintMachineOpts = {
+	id: ConstraintMachineTypes
+	initial?:
+		| 'init'
+		| 'noConstraintsSet'
+		| 'constraintsUpdated'
+		| 'constraintsApplied'
+		| 'constraintLimitReached'
+	path?: string
+	op?: ImjsOperations
+	constraintItemsQuery: { [key: string]: any }
+}
+
+export type CreateConstraintMachine = (
+	options: ConstraintMachineOpts
+) => StateMachine<ConstraintMachineContext, any, ConstraintEvents, any>
+
+export type ConstraintConfig = {
+	type: ConstraintMachineTypes
+	name: string
+	label: string
+	path: string
+	op: string
+	valuesQuery: { [key: string]: any }
+}
 
 /**
  *
@@ -141,18 +181,3 @@ export type SendToBusWrapper = (
 	ConstraintMachineSchema,
 	ConstraintTypeState
 > | void
-
-type ConstraintMachineFactoryOpts = {
-	id: 'checkbox' | 'select'
-	initial?:
-		| 'noConstraintsSet'
-		| 'constraintsUpdated'
-		| 'constraintsApplied'
-		| 'constraintLimitReached'
-	path?: string
-	op?: ImjsOperations
-}
-
-export type CreateConstraintMachine = (
-	options: ConstraintMachineFactoryOpts
-) => StateMachine<ConstraintMachineContext, any, ConstraintEvents, any>

@@ -11,7 +11,9 @@ export default {
 }
 
 export const Example = () => {
-	const [state, send] = useMachineBus(createConstraintMachine({ id: 'checkbox' }))
+	const [state, send] = useMachineBus(
+		createConstraintMachine({ id: 'checkbox', constraintItemsQuery: {} })
+	)
 
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>

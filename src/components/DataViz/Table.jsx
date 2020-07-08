@@ -11,14 +11,15 @@ import {
 } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
+import { assign } from '@xstate/immer'
 import React, { useState } from 'react'
+import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import { fetchTable } from 'src/fetchSummary'
 import { noop } from 'src/utils'
 import { humanize, titleize } from 'underscore.string'
 import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
-import { humanMine25 } from '../../stubs/humanMine25'
-import { mineUrl } from '../../stubs/utils'
 
 const TableActionButtons = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
@@ -132,17 +133,75 @@ const Cell = ({ cell, mineUrl }) => {
 	)
 }
 
-export const TableChartMachine = Machine({
-	id: 'TableChart',
-	initial: 'idle',
-	context: {
-		rows: humanMine25,
-		mineUrl,
+export const TableChartMachine = Machine(
+	{
+		id: 'TableChart',
+		initial: 'idle',
+		context: {
+			rows: [[]],
+			mineUrl: '',
+		},
+		states: {
+			idle: {
+				on: {
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
+				},
+			},
+			loading: {
+				invoke: {
+					id: 'fetchTableRows',
+					src: 'fetchTable',
+					onDone: {
+						target: 'idle',
+						actions: 'setTableRows',
+					},
+					onError: { actions: console.log },
+				},
+			},
+		},
 	},
-	states: {
-		idle: {},
-	},
-})
+	{
+		guards: {
+			isNotInitialized: (ctx) => {
+				return ctx.rows[0].length === 0
+			},
+		},
+		actions: {
+			// @ts-ignore
+			setTableRows: assign((ctx, { data }) => {
+				ctx.rows = data.summary
+				ctx.mineUrl = data.rootUrl
+				ctx.classView = data.classView
+			}),
+		},
+		services: {
+			fetchTable: async (_ctx, event) => {
+				const {
+					type,
+					globalConfig: { classView, rootUrl },
+					query: nextQuery,
+				} = event
+
+				let query = nextQuery
+
+				if (type === FETCH_INITIAL_SUMMARY) {
+					query = {
+						from: classView,
+						select: ['*'],
+					}
+				}
+
+				const summary = await fetchTable({ rootUrl, query, page: { start: 1, size: 25 } })
+
+				return {
+					classView,
+					rootUrl,
+					summary,
+				}
+			},
+		},
+	}
+)
 
 export const Table = () => {
 	const [

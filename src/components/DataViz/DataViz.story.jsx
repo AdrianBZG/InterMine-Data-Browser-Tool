@@ -25,6 +25,7 @@ const S_Card = styled(Card)`
 export const Empty = () => <></>
 
 const barMockMachine = BarChartMachine.withContext({
+	// @ts-ignore
 	lengthSummary: lengthSummary.stats,
 	results: lengthSummary.results.slice(0, lengthSummary.results.length - 1),
 })
@@ -44,7 +45,11 @@ BarChart.parameters = {
 	},
 }
 
-const pieMockMachine = PieChartMachine.withContext({ classItems: organismSummary.results })
+const pieMockMachine = PieChartMachine.withContext({
+	allClassOrganisms: organismSummary.results,
+	filteredItems: [],
+	classView: '',
+})
 
 export const PieChart = () => (
 	<MockMachineContext.Provider value={pieMockMachine}>

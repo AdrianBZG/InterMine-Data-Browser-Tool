@@ -8,21 +8,21 @@ import { SelectPopup } from '../Constraints/SelectPopup'
 import { DATA_VIZ_COLORS } from '../DataViz/dataVizColors'
 import { QueryController } from '../QueryController/QueryController'
 
-/** @type {{
- * 	type: import('../../types').ConstraintMachineFactoryOpts['id']
- * 	name: string
- * 	label: string
- * 	path: string
- * 	op: import('../../types').ConstraintMachineFactoryOpts['op']
- * }[]}
- * */
+/** @type {import('../../types').ConstraintConfig[]} */
 const defaultConstraints = [
 	{
 		type: 'checkbox',
 		name: 'Organism',
 		label: 'Or',
-		path: 'organism.shortname',
+		path: 'organism.shortName',
 		op: 'ONE OF',
+		valuesQuery: {
+			select: ['primaryIdentifier'],
+			model: {
+				name: 'genomic',
+			},
+			where: [],
+		},
 	},
 	{
 		type: 'select',
@@ -30,6 +30,18 @@ const defaultConstraints = [
 		label: 'Pn',
 		path: 'pathways.name',
 		op: 'ONE OF',
+		valuesQuery: {
+			select: ['pathways.name', 'primaryIdentifier'],
+			model: {
+				name: 'genomic',
+			},
+			orderBy: [
+				{
+					path: 'pathways.name',
+					direction: 'ASC',
+				},
+			],
+		},
 	},
 	{
 		type: 'select',
@@ -37,13 +49,27 @@ const defaultConstraints = [
 		label: 'GA',
 		path: 'goAnnotation.ontologyTerm.name',
 		op: 'ONE OF',
+		valuesQuery: {
+			select: ['goAnnotation.ontologyTerm.name', 'primaryIdentifier'],
+			model: {
+				name: 'genomic',
+			},
+			orderBy: [
+				{
+					path: 'goAnnotation.ontologyTerm.name',
+					direction: 'ASC',
+				},
+			],
+		},
 	},
 ]
 
 const ConstraintBuilder = ({ constraintConfig, color }) => {
-	const { type, name, label, path, op } = constraintConfig
+	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
 
-	const [state, send] = useMachineBus(createConstraintMachine({ id: type, path, op }))
+	const [state, send] = useMachineBus(
+		createConstraintMachine({ id: type, path, op, constraintItemsQuery })
+	)
 
 	let Popup
 

@@ -2,6 +2,8 @@
  * global - can be used by anyone
  */
 export const RECEIVE_SUMMARY = 'global/fetch/receive_summary'
+export const FETCH_UPDATED_SUMMARY = 'global/fetch/updated_summary'
+export const FETCH_INITIAL_SUMMARY = 'global/fetch/initial_summary'
 
 export const LOCK_ALL_CONSTRAINTS = 'global/contraint/limit_reached'
 export const RESET_ALL_CONSTRAINTS = 'global/constraint/remove_all'
@@ -18,7 +20,14 @@ export const ADD_QUERY_CONSTRAINT = 'queryController/constraint/add'
 /**
  * constraints
  */
-export const ADD_CONSTRAINT = 'checkbox/constraint/add'
-export const REMOVE_CONSTRAINT = 'checkbox/constraint/remove'
-export const APPLY_CONSTRAINT = 'checkbox/constraint/apply'
-export const RESET_LOCAL_CONSTRAINT = 'checkbox/constraint/reset'
+export const ADD_CONSTRAINT = 'constraintFactory/add'
+export const REMOVE_CONSTRAINT = 'constraintFactory/remove'
+export const APPLY_CONSTRAINT = 'constraintFactory/apply'
+export const RESET_LOCAL_CONSTRAINT = 'constraintFactory/reset'
+
+export const FETCH_CONSTRAINT_ITEMS = 'constraintFactory/init'
+
+/**
+ * Pie Chart
+ */
+export const SET_INITIAL_ORGANISMS = 'pieChart/fetch/initial'

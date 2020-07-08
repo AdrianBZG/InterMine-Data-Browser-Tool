@@ -1,4 +1,5 @@
 import { assign } from '@xstate/immer'
+import { fetchSummary } from 'src/fetchSummary'
 import { sendToBus } from 'src/machineBus'
 import { Machine } from 'xstate'
 
@@ -7,6 +8,7 @@ import {
 	APPLY_CONSTRAINT,
 	APPLY_CONSTRAINT_TO_QUERY,
 	DELETE_CONSTRAINT_FROM_QUERY,
+	FETCH_INITIAL_SUMMARY,
 	LOCK_ALL_CONSTRAINTS,
 	REMOVE_CONSTRAINT,
 	RESET_ALL_CONSTRAINTS,
@@ -15,7 +17,13 @@ import {
 } from '../../actionConstants'
 
 /** @type {import('../../types').CreateConstraintMachine} */
-export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path = '', op }) => {
+export const createConstraintMachine = ({
+	id,
+	initial = 'noConstraintsSet',
+	path = '',
+	op,
+	constraintItemsQuery,
+}) => {
 	/** @type {import('../../types').ConstraintMachineConfig} */
 	const config = {
 		id,
@@ -23,19 +31,34 @@ export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path
 		context: {
 			constraintPath: path,
 			selectedValues: [],
-			availableValues: [
-				// fixme: remove this mock
-				{ item: 'one species', count: 0 },
-				{ item: 'two chemics', count: 0 },
-			],
+			availableValues: [],
+			classView: '',
+			constraintItemsQuery,
 		},
 		on: {
 			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
 			[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
 			[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
 			[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
+			// make a global action listener since we don't store them in local storage, and need
+			// to fetch them even if the rest of the state is rehydrated.
+			[FETCH_INITIAL_SUMMARY]: { target: 'init', cond: 'hasNotInitialized' },
 		},
 		states: {
+			init: {
+				invoke: {
+					id: 'fetchInitialValues',
+					src: 'fetchInitialValues',
+					onDone: {
+						target: 'noConstraintsSet',
+						actions: 'setAvailableValues',
+					},
+					onError: {
+						target: 'noConstraintsSet',
+						actions: (ctx, event) => console.error(`FETCH: ${path}`, { ctx, event }),
+					},
+				},
+			},
 			noConstraintsSet: {
 				entry: 'resetConstraint',
 				on: {
@@ -86,9 +109,11 @@ export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path
 			removeAll: assign((ctx) => {
 				ctx.selectedValues = []
 			}),
-			setAvailableValues: assign((ctx, event) => {
+			// @ts-ignore
+			setAvailableValues: assign((ctx, { data }) => {
 				// @ts-ignore
-				ctx.availableValues = event.values
+				ctx.availableValues = data.items
+				ctx.classView = data.classView
 			}),
 			applyConstraint: (ctx) => {
 				const query = {
@@ -114,6 +139,31 @@ export const createConstraintMachine = ({ id, initial = 'noConstraintsSet', path
 			// @ts-ignore
 			pathMatches: (ctx, { path }) => {
 				return ctx.constraintPath === path
+			},
+			hasNotInitialized: (ctx) => {
+				return ctx.availableValues.length === 0
+			},
+		},
+		services: {
+			fetchInitialValues: async (ctx, event) => {
+				const { constraintItemsQuery, constraintPath } = ctx
+
+				const {
+					globalConfig: { rootUrl, classView },
+				} = event
+
+				const query = {
+					...constraintItemsQuery,
+					from: classView,
+				}
+
+				const summary = await fetchSummary({ rootUrl, query, path: constraintPath })
+
+				return {
+					classView,
+					// fixme: return all results after menu has been virtualized
+					items: summary.results.slice(0, 20),
+				}
 			},
 		},
 	})
