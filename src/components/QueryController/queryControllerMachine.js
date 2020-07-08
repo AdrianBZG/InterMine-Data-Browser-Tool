@@ -51,7 +51,12 @@ export const queryControllerMachine = Machine(
 		actions: {
 			// @ts-ignore
 			addConstraint: assign((ctx, { query }) => {
-				ctx.currentConstraints.push(query)
+				const withQueryRemoved = ctx.currentConstraints.filter((c) => {
+					return c.path !== query.path
+				})
+
+				withQueryRemoved.push(query)
+				ctx.currentConstraints = withQueryRemoved
 			}),
 			// @ts-ignore
 			removeConstraint: assign((ctx, { type, query }) => {
