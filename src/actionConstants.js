@@ -11,6 +11,8 @@ export const APPLY_CONSTRAINT_TO_QUERY = 'global/constraint/addQuery'
 export const DELETE_CONSTRAINT_FROM_QUERY = 'global/constraint/deleteQuery'
 export const UNSET_CONSTRAINT = 'global/constraint/unset'
 
+export const SET_AVAILABLE_COLUMNS = 'global/table/set_columns'
+
 /**
  * query controller
  */

@@ -187,11 +187,13 @@ export const BarChart = () => {
 						offset={150}
 					/>
 				</XAxis>
-				<Brush dataKey="distribution" y={290}>
-					<RBarChart>
-						<Bar dataKey="data">{colorizeBars(chartData)}</Bar>
-					</RBarChart>
-				</Brush>
+				{chartData.length > 0 && (
+					<Brush dataKey="distribution" y={290}>
+						<RBarChart>
+							<Bar dataKey="data">{colorizeBars(chartData)}</Bar>
+						</RBarChart>
+					</Brush>
+				)}
 			</RBarChart>
 		</ResponsiveContainer>
 	)

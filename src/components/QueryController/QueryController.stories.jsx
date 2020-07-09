@@ -12,6 +12,9 @@ export default {
 }
 
 const machine = queryControllerMachine.withContext({
+	rootUrl: '',
+	selectedPaths: [],
+	classView: '',
 	currentConstraints: [
 		{
 			path: 'organism.shortname',

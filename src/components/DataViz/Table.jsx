@@ -13,13 +13,17 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import { assign } from '@xstate/immer'
 import React, { useState } from 'react'
-import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import {
+	FETCH_INITIAL_SUMMARY,
+	FETCH_UPDATED_SUMMARY,
+	SET_AVAILABLE_COLUMNS,
+} from 'src/actionConstants'
 import { fetchTable } from 'src/fetchSummary'
 import { noop } from 'src/utils'
 import { humanize, titleize } from 'underscore.string'
 import { Machine } from 'xstate'
 
-import { useMachineBus } from '../../machineBus'
+import { sendToBus, useMachineBus } from '../../machineBus'
 
 const TableActionButtons = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
@@ -145,6 +149,7 @@ export const TableChartMachine = Machine(
 			idle: {
 				on: {
 					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
+					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 				},
 			},
 			loading: {
@@ -191,7 +196,10 @@ export const TableChartMachine = Machine(
 					}
 				}
 
-				const summary = await fetchTable({ rootUrl, query, page: { start: 1, size: 25 } })
+				const summary = await fetchTable({ rootUrl, query, page: { start: 0, size: 25 } })
+				const headers = summary[0].map((item) => item.column)
+
+				sendToBus({ type: SET_AVAILABLE_COLUMNS, selectedPaths: headers })
 
 				return {
 					classView,

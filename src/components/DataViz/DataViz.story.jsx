@@ -47,7 +47,7 @@ BarChart.parameters = {
 
 const pieMockMachine = PieChartMachine.withContext({
 	allClassOrganisms: organismSummary.results,
-	filteredItems: [],
+	filteredOrganisms: [],
 	classView: '',
 })
 

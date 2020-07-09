@@ -2,6 +2,8 @@ import { assign } from '@xstate/immer'
 import {
 	APPLY_CONSTRAINT_TO_QUERY,
 	DELETE_CONSTRAINT_FROM_QUERY,
+	FETCH_INITIAL_SUMMARY,
+	SET_AVAILABLE_COLUMNS,
 	UNSET_CONSTRAINT,
 } from 'src/actionConstants'
 import { sendToBus } from 'src/machineBus'
@@ -15,9 +17,18 @@ export const queryControllerMachine = Machine(
 		initial: 'idle',
 		context: {
 			currentConstraints: [],
+			classView: '',
+			selectedPaths: [],
+			rootUrl: '',
 		},
 		on: {
+			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectPaths' },
 			[DELETE_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
+			[FETCH_INITIAL_SUMMARY]: {
+				target: 'idle',
+				cond: 'isNotInitialized',
+				actions: 'initializeMachine',
+			},
 		},
 		states: {
 			idle: {
@@ -50,32 +61,51 @@ export const queryControllerMachine = Machine(
 	{
 		actions: {
 			// @ts-ignore
+			initializeMachine: assign((ctx, { globalConfig }) => {
+				ctx.classView = globalConfig.classView
+				ctx.rootUrl = globalConfig.rootUrl
+			}),
+			// @ts-ignore
 			addConstraint: assign((ctx, { query }) => {
 				const withQueryRemoved = ctx.currentConstraints.filter((c) => {
 					return c.path !== query.path
 				})
 
+				if (query.itemDescription) {
+					delete query.itemDescription
+				}
 				withQueryRemoved.push(query)
 				ctx.currentConstraints = withQueryRemoved
 			}),
 			// @ts-ignore
-			removeConstraint: assign((ctx, { type, query }) => {
+			removeConstraint: assign((ctx, { type, path }) => {
 				const prevCount = ctx.currentConstraints.length
 				ctx.currentConstraints = ctx.currentConstraints.filter((c) => {
-					return c.path !== query.path
+					return c.path !== path
 				})
 
 				const nextCount = ctx.currentConstraints.length
 
+				// The constraint is being deleted internally, and needs to be synced
+				// with the constraint machines
 				if (type !== DELETE_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
-					sendToBus({ type: UNSET_CONSTRAINT, path: query.path })
+					const constraintPath = path.slice(path.indexOf('.') + 1)
+
+					sendToBus({ type: UNSET_CONSTRAINT, path: constraintPath })
 				}
+			}),
+			// @ts-ignore
+			setSelectPaths: assign((ctx, { selectedPaths }) => {
+				ctx.selectedPaths = selectedPaths
 			}),
 		},
 		guards: {
 			canAddConstraint: (context, _, { cond }) => {
 				// @ts-ignore
 				return context.currentConstraints.length + 1 === cond.maxConstraints
+			},
+			isNotInitialized: (ctx) => {
+				return ctx.classView === ''
 			},
 		},
 	}

@@ -1,10 +1,10 @@
-import { Button, Divider, H4, H5, NonIdealState, Popover } from '@blueprintjs/core'
+import { Button, Divider, H4, H5, NonIdealState, PopoverPosition, Tooltip } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { DELETE_QUERY_CONSTRAINT } from '../../actionConstants'
-import { QueryServiceContext, useMachineBus, useServiceContext } from '../../machineBus'
+import { DELETE_QUERY_CONSTRAINT, FETCH_UPDATED_SUMMARY } from '../../actionConstants'
+import { QueryServiceContext, sendToBus, useMachineBus, useServiceContext } from '../../machineBus'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { PopupCard } from '../Shared/PopupCard'
 import { queryControllerMachine } from './queryControllerMachine'
@@ -45,7 +45,7 @@ const CurrentConstraints = () => {
 								icon={IconNames.REMOVE}
 								small={true}
 								minimal={true}
-								onClick={() => send({ type: DELETE_QUERY_CONSTRAINT, query: constraintConfig })}
+								onClick={() => send({ type: DELETE_QUERY_CONSTRAINT, path: constraintConfig.path })}
 								aria-label={`reset constraint ${constraintConfig.path.replace(/\./g, ' ')}`}
 								css={{ marginRight: 4 }}
 							/>
@@ -107,25 +107,12 @@ ViewAllPopup.defaultProps = {
 	currentConstraints: [],
 }
 
-const RunQuery = () => {
-	return (
-		<Popover
-			css={{ marginTop: 40 }}
-			wrapperTagName="div"
-			usePortal={true}
-			lazy={true}
-			position="right"
-		>
-			<Button text="Run Query" intent="success" rightIcon={IconNames.PLAY} />
-			<div style={{ height: 100 }}>Hey ma, Look! A popup!</div>
-		</Popover>
-	)
-}
+const CODES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
 export const QueryController = () => {
 	const [state, send] = useMachineBus(queryControllerMachine)
 
-	const { currentConstraints } = state.context
+	const { currentConstraints, classView, selectedPaths, rootUrl } = state.context
 
 	let color = 'var(--green5)'
 
@@ -133,6 +120,29 @@ export const QueryController = () => {
 		color = 'var(--red5)'
 	} else if (currentConstraints.length > 14) {
 		color = 'var(--yellow5)'
+	}
+
+	const runQuery = () => {
+		let constraintLogic = ''
+
+		const codedConstraints = currentConstraints.map((con, idx) => {
+			const code = CODES[idx]
+			constraintLogic = constraintLogic === '' ? `(${code})` : `${constraintLogic} AND (${code})`
+
+			return {
+				...con,
+				code,
+			}
+		})
+
+		const query = {
+			from: classView,
+			select: selectedPaths,
+			constraintLogic,
+			where: codedConstraints,
+		}
+
+		sendToBus({ type: FETCH_UPDATED_SUMMARY, query, globalConfig: { classView, rootUrl } })
 	}
 
 	return (
@@ -147,7 +157,20 @@ export const QueryController = () => {
 					<ViewAllPopup />
 				</QueryServiceContext.Provider>
 			</PopupCard>
-			<RunQuery />
+			<Tooltip
+				css={{ marginTop: 40, display: 'inline-block' }}
+				content="You have not added or updated any constraints"
+				position={PopoverPosition.RIGHT}
+				disabled={currentConstraints.length > 0}
+			>
+				<Button
+					text="Run Query"
+					intent={currentConstraints.length === 0 ? 'none' : 'success'}
+					disabled={currentConstraints.length === 0}
+					rightIcon={IconNames.PLAY}
+					onClick={runQuery}
+				/>
+			</Tooltip>
 		</div>
 	)
 }

@@ -57,6 +57,8 @@ export type ConstraintEvents = EventObject &
 		| { to?: string; type: typeof APPLY_CONSTRAINT }
 		| { to?: string; type: typeof APPLY_CONSTRAINT_TO_QUERY; query: QueryConfig }
 		| { to?: string; type: typeof DELETE_QUERY_CONSTRAINT; path: string }
+		| { to?: string; type: typeof SET_AVAILABLE_COLUMNS; selectedPaths: string[] }
+		| { to?: string; type: typeof FETCH_UPDATED_SUMMARY; query: { [key: string]: any } }
 		| {
 				to?: string
 				type: typeof SET_INITIAL_ORGANISMS

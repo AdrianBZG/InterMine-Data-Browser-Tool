@@ -1,5 +1,5 @@
 import { assign } from '@xstate/immer'
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import {
 	Cell,
 	Label,
@@ -10,12 +10,11 @@ import {
 	Text,
 	Tooltip,
 } from 'recharts'
-import { FETCH_INITIAL_SUMMARY, SET_INITIAL_ORGANISMS } from 'src/actionConstants'
+import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/actionConstants'
 import { fetchSummary } from 'src/fetchSummary'
 import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
-import { useGlobalSetup } from '../App'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderLabelContent = (props) => {
@@ -43,13 +42,14 @@ export const PieChartMachine = Machine(
 		initial: 'idle',
 		context: {
 			allClassOrganisms: [],
-			filteredItems: [],
+			filteredOrganisms: [],
 			classView: '',
 		},
 		states: {
 			idle: {
 				on: {
 					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
+					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 				},
 			},
 			loading: {
@@ -76,8 +76,7 @@ export const PieChartMachine = Machine(
 					ctx.allClassOrganisms = data.summary
 				}
 
-				ctx.filteredItems = data.summary
-				ctx.classView = data.classView
+				ctx.filteredOrganisms = data.summary
 			}),
 		},
 		guards: {
@@ -94,16 +93,16 @@ export const PieChartMachine = Machine(
 				} = event
 
 				const path = 'organism.shortName'
-				let query = nextQuery
+				let query = {
+					...nextQuery,
+					from: classView,
+					model: {
+						name: 'genomic',
+					},
+				}
 
 				if (type === FETCH_INITIAL_SUMMARY) {
-					query = {
-						from: classView,
-						select: ['primaryIdentifier'],
-						model: {
-							name: 'genomic',
-						},
-					}
+					query.select = ['primaryIdentifier']
 				}
 
 				const summary = await fetchSummary({ rootUrl, query, path })
@@ -117,21 +116,15 @@ export const PieChartMachine = Machine(
 )
 
 export const PieChart = () => {
-	const globalConfig = useGlobalSetup()
-
-	const [state, send] = useMachineBus(PieChartMachine)
-	const { allClassOrganisms } = state.context
-
-	useEffect(() => {
-		send({ type: SET_INITIAL_ORGANISMS, globalConfig })
-	}, [globalConfig, send])
+	const [state] = useMachineBus(PieChartMachine)
+	const { filteredOrganisms, classView } = state.context
 
 	const chartData = useMemo(() => {
-		return allClassOrganisms.map(({ item, count }) => ({
+		return filteredOrganisms.map(({ item, count }) => ({
 			name: item,
 			value: count,
 		}))
-	}, [allClassOrganisms])
+	}, [filteredOrganisms])
 
 	return (
 		<ResponsiveContainer width="100%" height="100%">
@@ -147,7 +140,7 @@ export const PieChart = () => {
 					{chartData.map((entry, index) => (
 						<Cell key={entry} fill={DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]} />
 					))}
-					<Label classView={globalConfig.classView} content={renderLabelContent} />
+					<Label classView={classView} content={renderLabelContent} />
 				</Pie>
 				<Tooltip
 					labelStyle={{

@@ -1,11 +1,14 @@
 import imjs from 'imjs'
 
+import { formatConstraintPath } from './utils'
+
 export const fetchSummary = async ({ rootUrl, query, path }) => {
-	console.log({ rootUrl, query, path })
 	const service = new imjs.Service({ root: rootUrl })
 	const q = new imjs.Query(query, service)
 
-	return await q.summarize(`${query.from}.${path}`)
+	const fullPath = formatConstraintPath({ classView: query.from, path })
+
+	return await q.summarize(fullPath)
 }
 
 export const fetchTable = async ({ rootUrl, query, page }) => {

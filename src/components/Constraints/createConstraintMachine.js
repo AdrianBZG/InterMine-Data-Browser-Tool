@@ -1,6 +1,7 @@
 import { assign } from '@xstate/immer'
 import { fetchSummary } from 'src/fetchSummary'
 import { sendToBus } from 'src/machineBus'
+import { formatConstraintPath } from 'src/utils'
 import { Machine } from 'xstate'
 
 import {
@@ -115,21 +116,25 @@ export const createConstraintMachine = ({
 				ctx.availableValues = data.items
 				ctx.classView = data.classView
 			}),
-			applyConstraint: (ctx) => {
+			applyConstraint: ({ classView, constraintPath, selectedValues, availableValues }) => {
 				const query = {
-					path,
 					op,
-					values: ctx.selectedValues,
-					itemDescription: ctx.selectedValues.map((selected) => {
-						return ctx.availableValues.find((v) => v.item === selected)
+					path: formatConstraintPath({ classView, path: constraintPath }),
+					values: selectedValues,
+					// used to render the constraints as a list
+					itemDescription: selectedValues.map((selected) => {
+						return availableValues.find((v) => v.item === selected)
 					}),
 				}
 
-				sendToBus({ query, to: '*', type: APPLY_CONSTRAINT_TO_QUERY })
+				sendToBus({ query, type: APPLY_CONSTRAINT_TO_QUERY })
 			},
-			resetConstraint: () => {
+			resetConstraint: ({ classView, constraintPath }) => {
 				// @ts-ignore
-				sendToBus({ type: DELETE_CONSTRAINT_FROM_QUERY, query: { path } })
+				sendToBus({
+					type: DELETE_CONSTRAINT_FROM_QUERY,
+					path: formatConstraintPath({ classView, path: constraintPath }),
+				})
 			},
 		},
 		guards: {
