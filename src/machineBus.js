@@ -27,13 +27,7 @@ export const useMachineBus = (machine, opts = {}) => {
 	/** @type {import('./types').SendToBusWrapper} */
 	const sendToBusWrapper = useMemo(() => {
 		return (event, payload) => {
-			const sendToAll = event?.to === '*'
-
-			if (sendToAll) {
-				return sendToBus(event, payload)
-			}
-
-			const receiver = serviceStations.get(event?.to ? event.to : service.sessionId)
+			const receiver = serviceStations.get(service.sessionId)
 
 			if (receiver) {
 				receiver.send(event, payload)
