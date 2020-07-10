@@ -1,4 +1,5 @@
 import { assign } from '@xstate/immer'
+import FlexSearch from 'flexsearch'
 import { fetchSummary } from 'src/fetchSummary'
 import { sendToBus } from 'src/machineBus'
 import { formatConstraintPath } from 'src/utils'
@@ -30,11 +31,13 @@ export const createConstraintMachine = ({
 		id,
 		initial,
 		context: {
+			type: id,
 			constraintPath: path,
 			selectedValues: [],
 			availableValues: [],
 			classView: '',
 			constraintItemsQuery,
+			searchIndex: null,
 		},
 		on: {
 			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
@@ -115,6 +118,24 @@ export const createConstraintMachine = ({
 				// @ts-ignore
 				ctx.availableValues = data.items
 				ctx.classView = data.classView
+
+				if (ctx.type === 'select') {
+					// prebuild search index for the dropdown select menu
+					// @ts-ignore
+					const searchIndex = new FlexSearch({
+						encode: 'advanced',
+						tokenize: 'reverse',
+						suggest: true,
+						cache: true,
+					})
+
+					data.items.forEach((item) => {
+						// @ts-ignore
+						searchIndex.add(item.item, item.item)
+					})
+
+					ctx.searchIndex = searchIndex
+				}
 			}),
 			applyConstraint: ({ classView, constraintPath, selectedValues, availableValues }) => {
 				const query = {
@@ -166,8 +187,7 @@ export const createConstraintMachine = ({
 
 				return {
 					classView,
-					// fixme: return all results after menu has been virtualized
-					items: summary.results.slice(0, 20),
+					items: summary.results,
 				}
 			},
 		},

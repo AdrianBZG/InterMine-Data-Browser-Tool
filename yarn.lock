@@ -4764,6 +4764,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-window@npm:^1.8.2":
+  version: 1.8.2
+  resolution: "@types/react-window@npm:1.8.2"
+  dependencies:
+    "@types/react": "*"
+  checksum: 9124565e95741f7cc0082aeeb9638cb4bb756c7921f04983f99d86582d1c4caeec1806d3231250e39e0270ba222b6e7e05d55e7afdb59f394219362ab7f76648
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:*":
   version: 16.9.35
   resolution: "@types/react@npm:16.9.35"
@@ -11055,6 +11064,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flexsearch@npm:^0.6.32":
+  version: 0.6.32
+  resolution: "flexsearch@npm:0.6.32"
+  checksum: 8f9c852f98e15f7a4f402162b902422d267af875995e4bfe2ed422151431c36146cc40348b7411fe772a8f6ba65fa954bfd1cf437e81e36e581dd351a9e7fa38
+  languageName: node
+  linkType: hard
+
 "flow-parser@npm:0.*":
   version: 0.127.0
   resolution: "flow-parser@npm:0.127.0"
@@ -11403,13 +11419,6 @@ fsevents@^1.2.7:
   version: 3.6.1
   resolution: "fuse.js@npm:3.6.1"
   checksum: 2eebc6f8f74abdbf65557f2fe81679ddfb20890482343892bfef43742ad3b7146cc9b89f5b12a40b35ecdfb1d8401848d567fc727261fa90fa87e899e8ec6112
-  languageName: node
-  linkType: hard
-
-"fuse.js@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "fuse.js@npm:6.4.0"
-  checksum: 29cdf1dddea7ff6c3047fd9fb44975aaa6633bba56d74890e8ad1343afc9989efb7fd25280b185c301081e9bf00ae173749d34566303ef15aaab11503cace277
   languageName: node
   linkType: hard
 
@@ -12706,6 +12715,7 @@ fsevents@^1.2.7:
     "@testing-library/react": ^10.4.3
     "@testing-library/user-event": ^12.0.11
     "@types/dotenv": ^8.2.0
+    "@types/react-window": ^1.8.2
     "@typescript-eslint/eslint-plugin": 2.x
     "@typescript-eslint/parser": 2.x
     "@xstate/immer": ^0.1.0
@@ -12725,7 +12735,7 @@ fsevents@^1.2.7:
     eslint-plugin-react: 7.x
     eslint-plugin-react-hooks: 2.x
     eslint-plugin-simple-import-sort: ^5.0.3
-    fuse.js: ^6.4.0
+    flexsearch: ^0.6.32
     husky: ">=4"
     imjs: ^4.0.0
     immer: ^7.0.5
@@ -12735,13 +12745,13 @@ fsevents@^1.2.7:
     nanoid-dictionary: ^3.0.0
     node-sass: ^4.14.1
     node-sass-magic-importer: ^5.3.2
-    object-hash: ^2.0.3
     prettier: ^2.0.5
     prettier-plugin-package: ^1.0.0
     prop-types: ^15.7.2
     react: ^16.13.1
     react-dom: ^16.13.1
     react-scripts: 3.4.1
+    react-window: ^1.8.5
     recharts: ^1.8.5
     serve: ^11.3.2
     stylelint: ^13.6.0
@@ -15305,7 +15315,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"memoize-one@npm:^5.0.0":
+"memoize-one@npm:>=3.1.1 <6, memoize-one@npm:^5.0.0":
   version: 5.1.1
   resolution: "memoize-one@npm:5.1.1"
   checksum: e7c4a9cceca71334bf09c38818c375a280dc6e8ec03a92701c16199763269ce756b7b0b370f4b464c071045349fb7b3e4a3cc7460a3f46a277f394d8634a6eb5
@@ -16353,7 +16363,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object-hash@npm:^2.0.1, object-hash@npm:^2.0.3":
+"object-hash@npm:^2.0.1":
   version: 2.0.3
   resolution: "object-hash@npm:2.0.3"
   checksum: e633ae67cd6c5f3cd52af5bef0fe7f25d597b415a6d92a601be0b97a47642908cf333cedfc9e848d25b6c51fd6cf6e64ff6eb3af710eae249a42f6a69ad6b12d
@@ -19328,6 +19338,19 @@ fsevents@^1.2.7:
     react: ">=16.6.0"
     react-dom: ">=16.6.0"
   checksum: e14446123f820e804335c64be5270333c29e8cfaa43dfc33387e132c5d521cf4a0a7c2408058a147b254ae82a6569f373394d83e977ef340d6937bc2f4ff7d6c
+  languageName: node
+  linkType: hard
+
+"react-window@npm:^1.8.5":
+  version: 1.8.5
+  resolution: "react-window@npm:1.8.5"
+  dependencies:
+    "@babel/runtime": ^7.0.0
+    memoize-one: ">=3.1.1 <6"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0
+    react-dom: ^15.0.0 || ^16.0.0
+  checksum: b0bee0c769109337557dc4c1488d20e4e957f27082418b22d6dd28b62946623e31ad34936c8d836eb8c61734f2d2b0ff5c71ab2dbc40e71060c1124607e2a986
   languageName: node
   linkType: hard
 

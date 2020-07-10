@@ -45,6 +45,8 @@ export interface ConstraintMachineContext {
 	constraintPath: string
 	classView: string
 	constraintItemsQuery: { [key: string]: any }
+	searchIndex?: any
+	type: ConstraintMachineTypes
 }
 
 export type ConstraintEvents = EventObject &

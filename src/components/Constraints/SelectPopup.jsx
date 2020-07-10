@@ -1,28 +1,98 @@
-import { Button, Divider, FormGroup, H4, MenuItem } from '@blueprintjs/core'
+import { Button, Classes, Divider, FormGroup, H4, Menu, MenuItem } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Suggest } from '@blueprintjs/select'
-import Fuse from 'fuse.js'
 import React, { useEffect, useRef, useState } from 'react'
+import { FixedSizeList as List } from 'react-window'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
 import { generateId } from 'src/generateId'
 
 import { useServiceContext } from '../../machineBus'
 import { NoValuesProvided } from './NoValuesProvided'
 
-/**
- * Renders the menu item for the drop down available menu items
- */
-const itemRenderer = (item, props) => {
+const ConstraintItem = ({ index, style, data }) => {
+	const { filteredItems, activeItem, handleItemSelect, infoText } = data
+
+	if (index === 0) {
+		return <MenuItem disabled={true} text={infoText} />
+	}
+
+	// subtract 1 because we're adding an informative menu item before all items
+	const name = filteredItems[index - 1].name
+
 	return (
 		<MenuItem
-			key={item.name}
-			text={item.name}
-			active={props.modifiers.active}
-			onClick={props.handleClick}
-			shouldDismissPopover={false}
+			key={name}
+			text={name}
+			style={style}
+			active={name === activeItem.name}
+			onClick={() => handleItemSelect({ name })}
 		/>
 	)
 }
+
+const VirtualizedMenu = ({
+	filteredItems,
+	itemsParentRef,
+	query,
+	activeItem,
+	handleItemSelect,
+}) => {
+	const listRef = useRef(null)
+
+	const isPlural = filteredItems.length > 1 ? 's' : ''
+	const infoText =
+		query === ''
+			? `Showing ${filteredItems.length} Item${isPlural}`
+			: `Found ${filteredItems.length} item${isPlural} matching "${query}"`
+
+	useEffect(() => {
+		if (listRef?.current) {
+			const itemLocation = filteredItems.findIndex((item) => item.name === activeItem.name)
+			// add one to offset the menu description item
+			listRef.current.scrollToItem(itemLocation + 1)
+		}
+	}, [activeItem, filteredItems])
+
+	const ulWrapper = ({ children, style }) => {
+		return (
+			<Menu style={style} ulRef={itemsParentRef}>
+				{children}
+			</Menu>
+		)
+	}
+
+	return (
+		<List
+			ref={listRef}
+			height={Math.min(200, (filteredItems.length + 1) * 30)}
+			itemSize={30}
+			width={300}
+			// add 1 because we're adding an informative menu item before all items
+			itemCount={filteredItems.length + 1}
+			innerElementType={ulWrapper}
+			className={Classes.MENU}
+			style={{ listStyle: 'none' }}
+			itemData={{
+				filteredItems,
+				activeItem,
+				handleItemSelect,
+				infoText,
+			}}
+		>
+			{ConstraintItem}
+		</List>
+	)
+}
+
+const renderMenu = (handleItemSelect) => ({ filteredItems, itemsParentRef, query, activeItem }) => (
+	<VirtualizedMenu
+		filteredItems={filteredItems}
+		itemsParentRef={itemsParentRef}
+		query={query}
+		activeItem={activeItem}
+		handleItemSelect={handleItemSelect}
+	/>
+)
 
 export const SelectPopup = ({
 	nonIdealTitle = undefined,
@@ -31,16 +101,7 @@ export const SelectPopup = ({
 }) => {
 	const [uniqueId] = useState(() => `selectPopup-${generateId()}`)
 	const [state, send] = useServiceContext('constraints')
-	const { availableValues, selectedValues } = state.context
-
-	const fuse = useRef(new Fuse([]))
-
-	useEffect(() => {
-		fuse.current = new Fuse(availableValues, {
-			keys: ['item'],
-			useExtendedSearch: true,
-		})
-	}, [availableValues])
+	const { availableValues, selectedValues, searchIndex } = state.context
 
 	if (availableValues.length === 0) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
@@ -50,27 +111,31 @@ export const SelectPopup = ({
 	// the value directly to the added constraints list when clicked, so we reset the input here
 	const renderInputValue = () => ''
 
+	const filterQuery = (query, items) => {
+		if (query === '') {
+			return items.filter((i) => !selectedValues.includes(i.name))
+		}
+
+		// flexSearch's default result limit is set 1000, so we set it to the length of all items
+		const results = searchIndex.search(query, availableValues.length)
+
+		return results.flatMap((value) => {
+			if (selectedValues.includes(value)) {
+				return []
+			}
+
+			const item = items.find((it) => it.name === value)
+
+			return [{ name: item.name, count: item.count }]
+		})
+	}
+
 	const handleItemSelect = ({ name }) => {
 		send({ type: ADD_CONSTRAINT, constraint: name })
 	}
 
 	const handleButtonClick = (constraint) => () => {
 		send({ type: REMOVE_CONSTRAINT, constraint })
-	}
-
-	const filterQuery = (query, items) => {
-		if (query === '') {
-			return items.filter((i) => !selectedValues.includes(i.name))
-		}
-
-		const fuseResults = fuse.current.search(query)
-		return fuseResults.flatMap((r) => {
-			if (selectedValues.includes(r.item.item)) {
-				return []
-			}
-
-			return [{ name: r.item.item, count: r.item.count }]
-		})
 	}
 
 	return (
@@ -117,12 +182,12 @@ export const SelectPopup = ({
 					id={`selectPopup-${uniqueId}`}
 					items={availableValues.map((i) => ({ name: i.item, count: i.count }))}
 					inputValueRenderer={renderInputValue}
-					itemListPredicate={filterQuery}
 					fill={true}
-					onItemSelect={handleItemSelect}
 					resetOnSelect={true}
-					noResults={<MenuItem disabled={true} text="No results match your entry" />}
-					itemRenderer={itemRenderer}
+					itemListRenderer={renderMenu(handleItemSelect)}
+					onItemSelect={handleItemSelect}
+					itemListPredicate={filterQuery}
+					popoverProps={{ captureDismiss: true }}
 				/>
 			</FormGroup>
 		</div>
