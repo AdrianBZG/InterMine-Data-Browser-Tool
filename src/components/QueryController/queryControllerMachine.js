@@ -71,9 +71,6 @@ export const queryControllerMachine = Machine(
 					return c.path !== query.path
 				})
 
-				if (query.itemDescription) {
-					delete query.itemDescription
-				}
 				withQueryRemoved.push(query)
 				ctx.currentConstraints = withQueryRemoved
 			}),

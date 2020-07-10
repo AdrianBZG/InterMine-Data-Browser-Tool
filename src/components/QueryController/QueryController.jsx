@@ -54,7 +54,7 @@ const CurrentConstraints = () => {
 							</span>
 						</div>
 						<ul css={{ listStyle: 'none', paddingLeft: 36 }}>
-							{constraintConfig.itemDescription.map((value) => {
+							{constraintConfig.valuesDescription.map((value) => {
 								return (
 									<li key={value.item}>{`${getOperantSymbol(constraintConfig.op)} ${value.item} (${
 										value.count

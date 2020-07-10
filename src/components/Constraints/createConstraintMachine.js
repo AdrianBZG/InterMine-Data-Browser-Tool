@@ -122,7 +122,7 @@ export const createConstraintMachine = ({
 					path: formatConstraintPath({ classView, path: constraintPath }),
 					values: selectedValues,
 					// used to render the constraints as a list
-					itemDescription: selectedValues.map((selected) => {
+					valuesDescription: selectedValues.map((selected) => {
 						return availableValues.find((v) => v.item === selected)
 					}),
 				}
