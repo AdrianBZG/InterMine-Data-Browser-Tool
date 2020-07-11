@@ -9,6 +9,9 @@ const enableMocks =
 
 const serviceStations = new Map()
 export const MockMachineContext = createContext(null)
+export const ConstraintServiceContext = createContext(null)
+export const QueryServiceContext = createContext(null)
+export const SupervisorServiceContext = createContext(null)
 
 /** @type {import('./types').UseMachineBus} */
 export const useMachineBus = (machine, opts = {}) => {
@@ -65,12 +68,10 @@ export const sendToBus = (event, payload) => {
 	})
 }
 
-export const ConstraintServiceContext = createContext(null)
-export const QueryServiceContext = createContext(null)
-
 export const useServiceContext = (serviceRequested = null) => {
 	const constraintService = useContext(ConstraintServiceContext)
 	const queryService = useContext(QueryServiceContext)
+	const supervisorService = useContext(SupervisorServiceContext)
 
 	let service
 
@@ -80,6 +81,10 @@ export const useServiceContext = (serviceRequested = null) => {
 
 	if (serviceRequested === 'queryController') {
 		service = queryService
+	}
+
+	if (serviceRequested === 'supervisor') {
+		service = supervisorService
 	}
 
 	if (!service) {

@@ -46,10 +46,10 @@ export const createConstraintMachine = ({
 			[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
 			// make a global action listener since we don't store them in local storage, and need
 			// to fetch them even if the rest of the state is rehydrated.
-			[FETCH_INITIAL_SUMMARY]: { target: 'init', cond: 'hasNotInitialized' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 		},
 		states: {
-			init: {
+			loading: {
 				invoke: {
 					id: 'fetchInitialValues',
 					src: 'fetchInitialValues',
@@ -58,11 +58,12 @@ export const createConstraintMachine = ({
 						actions: 'setAvailableValues',
 					},
 					onError: {
-						target: 'noConstraintsSet',
+						target: 'noConstraintItems',
 						actions: (ctx, event) => console.error(`FETCH: ${path}`, { ctx, event }),
 					},
 				},
 			},
+			noConstraintItems: {},
 			noConstraintsSet: {
 				entry: 'resetConstraint',
 				on: {

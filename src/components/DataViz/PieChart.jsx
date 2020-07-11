@@ -1,5 +1,5 @@
 import { assign } from '@xstate/immer'
-import React, { useMemo } from 'react'
+import React from 'react'
 import {
 	Cell,
 	Label,
@@ -48,7 +48,7 @@ export const PieChartMachine = Machine(
 		states: {
 			idle: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 				},
 			},
@@ -79,11 +79,6 @@ export const PieChartMachine = Machine(
 				ctx.filteredOrganisms = data.summary
 			}),
 		},
-		guards: {
-			isNotInitialized: (ctx) => {
-				return ctx.allClassOrganisms.length === 0
-			},
-		},
 		services: {
 			fetchItems: async (_ctx, event) => {
 				const {
@@ -105,7 +100,8 @@ export const PieChartMachine = Machine(
 					query.select = ['primaryIdentifier']
 				}
 
-				const summary = await fetchSummary({ rootUrl, query, path })
+				const summary = await fetchSummary({ rootUrl: `${rootUrl}/service`, query, path })
+
 				return {
 					classView,
 					summary: summary.results,
@@ -119,12 +115,10 @@ export const PieChart = () => {
 	const [state] = useMachineBus(PieChartMachine)
 	const { filteredOrganisms, classView } = state.context
 
-	const chartData = useMemo(() => {
-		return filteredOrganisms.map(({ item, count }) => ({
-			name: item,
-			value: count,
-		}))
-	}, [filteredOrganisms])
+	const chartData = filteredOrganisms.map(({ item, count }) => ({
+		name: item,
+		value: count,
+	}))
 
 	return (
 		<ResponsiveContainer width="100%" height="100%">

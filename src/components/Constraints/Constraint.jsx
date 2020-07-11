@@ -11,13 +11,17 @@ import { PopupCard } from '../Shared/PopupCard'
 export const ConstraintPopupCard = ({ children }) => {
 	const [state, send] = useServiceContext('constraints')
 
-	const disableAll = state?.value === 'noConstraintsSet'
-	const enableAdd = state?.value === 'constraintsUpdated'
-	const constraintSet = !disableAll && state?.value !== 'constraintsUpdated'
+	const disableAllButtons =
+		state.matches('noConstraintsSet') ||
+		state.matches('loading') ||
+		state.matches('noConstraintItems')
 
-	const borderColor = constraintSet ? 'var(--blue4)' : 'var(--grey4)'
-	const iconColor = constraintSet ? 'var(--green5)' : 'var(--grey4)'
-	const textColor = constraintSet ? 'var(--blue9)' : 'var(--grey4)'
+	const enableAdd = state.matches('constraintsUpdated')
+	const constraintApplied = !disableAllButtons && !enableAdd
+
+	const borderColor = constraintApplied ? 'var(--blue4)' : 'var(--grey4)'
+	const iconColor = constraintApplied ? 'var(--green5)' : 'var(--grey4)'
+	const textColor = constraintApplied ? 'var(--blue9)' : 'var(--grey4)'
 
 	return (
 		<>
@@ -30,7 +34,7 @@ export const ConstraintPopupCard = ({ children }) => {
 					}}
 					// @ts-ignore
 					intent="" // HACK - decreases blueprintjs css specificity
-					icon={constraintSet ? IconNames.TICK_CIRCLE : IconNames.DISABLE}
+					icon={constraintApplied ? IconNames.TICK_CIRCLE : IconNames.DISABLE}
 					minimal={true}
 				>
 					<span
@@ -46,15 +50,15 @@ export const ConstraintPopupCard = ({ children }) => {
 				<Button
 					text="Reset Constraint"
 					css={{ maxWidth: '50%' }}
-					intent={!disableAll && constraintSet ? 'danger' : 'none'}
-					disabled={disableAll || !constraintSet}
+					intent={!disableAllButtons && constraintApplied ? 'danger' : 'none'}
+					disabled={disableAllButtons || !constraintApplied}
 					onClick={() => send(RESET_LOCAL_CONSTRAINT)}
 				/>
 				<Button
 					text="Apply Constraint"
 					css={{ maxWidth: '50%' }}
-					intent={!disableAll && enableAdd ? 'success' : 'none'}
-					disabled={disableAll || !enableAdd}
+					intent={!disableAllButtons && enableAdd ? 'success' : 'none'}
+					disabled={disableAllButtons || !enableAdd}
 					onClick={() => send(APPLY_CONSTRAINT)}
 				/>
 			</ButtonGroup>

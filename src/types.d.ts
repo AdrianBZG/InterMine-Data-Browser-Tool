@@ -31,8 +31,9 @@ import { LOCK_ALL_CONSTRAINTS, RESET_ALL_CONSTRAINTS } from './globalActions'
  */
 export interface ConstraintMachineSchema extends StateSchema {
 	states: {
-		init: {}
+		loading: {}
 		noConstraintsSet: {}
+		noConstraintItems: {}
 		constraintsUpdated: {}
 		constraintsApplied: {}
 		constraintLimitReached: {}
@@ -90,8 +91,9 @@ type ConstraintMachineTypes = 'checkbox' | 'select'
 export type ConstraintMachineOpts = {
 	id: ConstraintMachineTypes
 	initial?:
-		| 'init'
+		| 'loading'
 		| 'noConstraintsSet'
+		| 'noConstraintItems'
 		| 'constraintsUpdated'
 		| 'constraintsApplied'
 		| 'constraintLimitReached'

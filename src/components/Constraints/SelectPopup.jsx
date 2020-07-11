@@ -1,4 +1,13 @@
-import { Button, Classes, Divider, FormGroup, H4, Menu, MenuItem } from '@blueprintjs/core'
+import {
+	Button,
+	Classes,
+	Divider,
+	FormGroup,
+	H4,
+	Menu,
+	MenuItem,
+	NonIdealState,
+} from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Suggest } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
@@ -103,14 +112,14 @@ export const SelectPopup = ({
 	const [state, send] = useServiceContext('constraints')
 	const { availableValues, selectedValues, searchIndex } = state.context
 
-	if (availableValues.length === 0) {
+	const isLoading = state.matches('loading')
+	if (state.matches('noConstraintItems')) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
 	}
 
 	// Blueprintjs requires a value renderer to display a value when selected. But we add
 	// the value directly to the added constraints list when clicked, so we reset the input here
 	const renderInputValue = () => ''
-
 	const filterQuery = (query, items) => {
 		if (query === '') {
 			return items.filter((i) => !selectedValues.includes(i.name))
@@ -176,6 +185,12 @@ export const SelectPopup = ({
 					<Divider />
 				</>
 			)}
+			{isLoading && (
+				<NonIdealState
+					title="Fetching constraint items from the mine."
+					description="Please be patient, this may take some time."
+				/>
+			)}
 			<FormGroup labelFor={uniqueId} label={label} css={{ paddingTop: 24 }}>
 				<Suggest
 					// @ts-ignore
@@ -183,6 +198,7 @@ export const SelectPopup = ({
 					items={availableValues.map((i) => ({ name: i.item, count: i.count }))}
 					inputValueRenderer={renderInputValue}
 					fill={true}
+					className={isLoading ? Classes.SKELETON : ''}
 					resetOnSelect={true}
 					itemListRenderer={renderMenu(handleItemSelect)}
 					onItemSelect={handleItemSelect}

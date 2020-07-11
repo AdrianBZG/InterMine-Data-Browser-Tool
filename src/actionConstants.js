@@ -33,3 +33,8 @@ export const FETCH_CONSTRAINT_ITEMS = 'constraintFactory/init'
  * Pie Chart
  */
 export const SET_INITIAL_ORGANISMS = 'pieChart/fetch/initial'
+
+/**
+ * Supervisor
+ */
+export const CHANGE_MINE = 'supervisor/mine/change'

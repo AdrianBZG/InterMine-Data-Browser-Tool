@@ -26,7 +26,6 @@ export const queryControllerMachine = Machine(
 			[DELETE_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
 			[FETCH_INITIAL_SUMMARY]: {
 				target: 'idle',
-				cond: 'isNotInitialized',
 				actions: 'initializeMachine',
 			},
 		},
@@ -100,9 +99,6 @@ export const queryControllerMachine = Machine(
 			canAddConstraint: (context, _, { cond }) => {
 				// @ts-ignore
 				return context.currentConstraints.length + 1 === cond.maxConstraints
-			},
-			isNotInitialized: (ctx) => {
-				return ctx.classView === ''
 			},
 		},
 	}

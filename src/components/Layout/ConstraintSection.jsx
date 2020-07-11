@@ -56,7 +56,7 @@ const defaultConstraints = [
 			},
 			orderBy: [
 				{
-					path: 'goAnnotation.ontologyTerm.name',
+					path: 'Gene.goAnnotation.ontologyTerm.name',
 					direction: 'ASC',
 				},
 			],

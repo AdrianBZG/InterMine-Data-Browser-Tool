@@ -62,7 +62,7 @@ export const BarChartMachine = Machine(
 		states: {
 			idle: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
 			},
 			loading: {
@@ -72,6 +72,10 @@ export const BarChartMachine = Machine(
 					onDone: {
 						target: 'idle',
 						actions: 'setLengthSummary',
+					},
+					onError: {
+						target: 'idle',
+						actions: (ctx, event) => console.error('FETCH: Gene Length Chart', { ctx, event }),
 					},
 				},
 			},
@@ -85,9 +89,6 @@ export const BarChartMachine = Machine(
 				ctx.lengthSummary = data.lengthSummary
 				ctx.classView = data.classView
 			}),
-		},
-		guards: {
-			isNotInitialized: () => true,
 		},
 		services: {
 			fetchGeneLength: async (

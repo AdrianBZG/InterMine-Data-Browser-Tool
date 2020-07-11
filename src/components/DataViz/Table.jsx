@@ -13,11 +13,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import { assign } from '@xstate/immer'
 import React, { useState } from 'react'
-import {
-	FETCH_INITIAL_SUMMARY,
-	FETCH_UPDATED_SUMMARY,
-	SET_AVAILABLE_COLUMNS,
-} from 'src/actionConstants'
+import { FETCH_INITIAL_SUMMARY, SET_AVAILABLE_COLUMNS } from 'src/actionConstants'
 import { fetchTable } from 'src/fetchSummary'
 import { noop } from 'src/utils'
 import { humanize, titleize } from 'underscore.string'
@@ -148,8 +144,7 @@ export const TableChartMachine = Machine(
 		states: {
 			idle: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isNotInitialized' },
-					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
 			},
 			loading: {
@@ -160,23 +155,19 @@ export const TableChartMachine = Machine(
 						target: 'idle',
 						actions: 'setTableRows',
 					},
-					onError: { actions: console.log },
+					onError: {
+						actions: (ctx, event) => console.error('FETCH: Loading Table Rows', { ctx, event }),
+					},
 				},
 			},
 		},
 	},
 	{
-		guards: {
-			isNotInitialized: (ctx) => {
-				return ctx.rows[0].length === 0
-			},
-		},
 		actions: {
 			// @ts-ignore
 			setTableRows: assign((ctx, { data }) => {
 				ctx.rows = data.summary
 				ctx.mineUrl = data.rootUrl
-				ctx.classView = data.classView
 			}),
 		},
 		services: {
