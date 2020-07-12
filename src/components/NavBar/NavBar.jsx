@@ -1,24 +1,49 @@
-import { Button, ButtonGroup, Classes, Navbar, Tab, Tabs } from '@blueprintjs/core'
+import { Button, ButtonGroup, Classes, Menu, MenuItem, Navbar, Tab, Tabs } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useState } from 'react'
+import { CHANGE_CLASS } from 'src/actionConstants'
+import { useServiceContext } from 'src/machineBus'
+import { pluralizeFilteredCount } from 'src/utils'
 
 import { NumberedSelectMenuItems } from '../Selects'
 import { Mine } from './MineSelect'
 
-export const NavigationBar = () => {
-	const [visibleClasses, setVisibleClasses] = useState([{ name: 'Gene' }, { name: 'Protein' }])
-	const [hiddenClasses, setHiddenClasses] = useState([
-		{ name: 'Enhancer' },
-		{ name: 'Chromosomal Duplication' },
-		{ name: 'GWAS' },
-	])
+const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
+	const renderedItems = filteredItems.map(renderItem)
+	const infoText = pluralizeFilteredCount(filteredItems, query)
 
+	return (
+		<Menu ulRef={itemsParentRef}>
+			<MenuItem disabled={true} text={infoText} />
+			{renderedItems}
+		</Menu>
+	)
+}
+
+export const NavigationBar = () => {
 	const [selectedTheme, changeTheme] = useState('light')
 	const isLightTheme = selectedTheme === 'light'
-	const handleClassSelect = (newClass) => {
-		setVisibleClasses([...visibleClasses, newClass])
-		setHiddenClasses(hiddenClasses.filter((c) => c.name !== newClass.name))
+
+	const [state, send] = useServiceContext('supervisor')
+	const { classView, modelClasses, classSearchIndex } = state.context
+
+	const classDisplayName =
+		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
+
+	const handleClassSelect = ({ name }) => {
+		send({ type: CHANGE_CLASS, newClass: name })
+	}
+
+	const filterQuery = (query, items) => {
+		if (query === '') {
+			return items
+		}
+
+		// flexSearch's default result limit is set 1000, so we set it to the length of all items
+		const results = classSearchIndex.search(query, modelClasses.length)
+
+		return results.map((name) => ({ name }))
 	}
 
 	return (
@@ -30,6 +55,7 @@ export const NavigationBar = () => {
 				  */}
 				<Tabs
 					id="classes-tab"
+					selectedTabId={classView}
 					// @ts-ignore
 					css={{
 						marginLeft: 'auto',
@@ -40,21 +66,22 @@ export const NavigationBar = () => {
 						},
 					}}
 				>
-					{visibleClasses.map((c) => (
-						<Tab key={c.name} id={c.name} title={c.name} />
-					))}
+					<Tab key="Templates" id="Templates" title="Templates" />
+					<Tab key={classView} id={classView} title={classDisplayName} />
 				</Tabs>
 				<Select
-					items={hiddenClasses}
+					items={state.context.modelClasses}
 					filterable={true}
 					itemRenderer={NumberedSelectMenuItems}
 					onItemSelect={handleClassSelect}
+					itemListRenderer={renderMenu}
+					itemListPredicate={filterQuery}
 				>
 					<Button
 						aria-label="select the views you'd like to query"
 						// used to override `Blueprintjs` styles for a small button
 						small={true}
-						text="add view"
+						text="change view"
 						alignText="left"
 						rightIcon={IconNames.CARET_DOWN}
 					/>

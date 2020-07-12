@@ -2,9 +2,10 @@
 import '@emotion/core'
 
 import { assign } from '@xstate/immer'
-import axios from 'axios'
+import FlexSearch from 'flexsearch'
 import React, { useEffect } from 'react'
-import { CHANGE_MINE, FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import { fetchClasses, fetchInstances } from 'src/fetchSummary'
 import { sendToBus, SupervisorServiceContext, useMachineBus } from 'src/machineBus'
 import { Machine } from 'xstate'
 
@@ -15,20 +16,22 @@ import { Header } from './Layout/Header'
 const supervisorMachine = Machine(
 	{
 		id: 'Supervisor',
-		initial: 'init',
+		initial: 'loading',
 		context: {
 			classView: 'Gene',
 			intermines: [],
+			modelClasses: [],
+			classSearchIndex: null,
 			selectedMine: {
 				rootUrl: 'https://www.humanmine.org/humanmine',
 				name: 'HumanMine',
 			},
 		},
 		states: {
-			init: {
+			loading: {
 				invoke: {
 					id: 'fetchMines',
-					src: 'fetchMines',
+					src: 'fetchMinesAndClasses',
 					onDone: {
 						target: 'idle',
 						actions: 'setIntermines',
@@ -43,6 +46,7 @@ const supervisorMachine = Machine(
 			idle: {
 				on: {
 					[CHANGE_MINE]: { actions: 'changeMine' },
+					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
 			},
 		},
@@ -54,20 +58,40 @@ const supervisorMachine = Machine(
 				ctx.selectedMine = ctx.intermines.find((mine) => mine.name === newMine)
 			}),
 			// @ts-ignore
+			changeClass: assign((ctx, { newClass }) => {
+				ctx.classView = newClass
+			}),
+			// @ts-ignore
 			setIntermines: assign((ctx, { data }) => {
 				ctx.intermines = data.intermines
+				ctx.modelClasses = data.modelClasses.sort()
+
+				// @ts-ignore
+				const searchIndex = new FlexSearch({
+					encode: 'advanced',
+					tokenize: 'reverse',
+					suggest: true,
+					cache: true,
+				})
+
+				ctx.modelClasses.forEach((item) => {
+					// @ts-ignore
+					searchIndex.add(item.displayName, item.displayName)
+				})
+
+				ctx.classSearchIndex = searchIndex
 			}),
 		},
 		services: {
-			fetchMines: async (ctx, event) => {
-				const results = await axios.get('https://registry.intermine.org/service/instances', {
-					params: {
-						mine: 'prod',
-					},
-				})
+			fetchMinesAndClasses: async (ctx, event) => {
+				const [instancesResult, classesResult] = await Promise.all([
+					fetchInstances(),
+					fetchClasses(ctx.selectedMine.rootUrl),
+				])
 
 				return {
-					intermines: results.data.instances.map((mine) => ({
+					modelClasses: Object.entries(classesResult.classes).map(([_key, value]) => value),
+					intermines: instancesResult.data.instances.map((mine) => ({
 						name: mine.name,
 						rootUrl: mine.url,
 					})),

@@ -61,6 +61,8 @@ export const queryControllerMachine = Machine(
 		actions: {
 			// @ts-ignore
 			initializeMachine: assign((ctx, { globalConfig }) => {
+				ctx.currentConstraints = []
+				ctx.selectedPaths = []
 				ctx.classView = globalConfig.classView
 				ctx.rootUrl = globalConfig.rootUrl
 			}),

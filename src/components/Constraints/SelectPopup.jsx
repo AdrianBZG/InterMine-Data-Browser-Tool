@@ -14,6 +14,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
 import { generateId } from 'src/generateId'
+import { pluralizeFilteredCount } from 'src/utils'
 
 import { useServiceContext } from '../../machineBus'
 import { NoValuesProvided } from './NoValuesProvided'
@@ -47,12 +48,7 @@ const VirtualizedMenu = ({
 	handleItemSelect,
 }) => {
 	const listRef = useRef(null)
-
-	const isPlural = filteredItems.length > 1 ? 's' : ''
-	const infoText =
-		query === ''
-			? `Showing ${filteredItems.length} Item${isPlural}`
-			: `Found ${filteredItems.length} item${isPlural} matching "${query}"`
+	const infoText = pluralizeFilteredCount(filteredItems, query)
 
 	useEffect(() => {
 		if (listRef?.current) {

@@ -116,9 +116,10 @@ export const createConstraintMachine = ({
 			}),
 			// @ts-ignore
 			setAvailableValues: assign((ctx, { data }) => {
-				// @ts-ignore
 				ctx.availableValues = data.items
 				ctx.classView = data.classView
+				ctx.selectedValues = []
+				ctx.searchIndex = null
 
 				if (ctx.type === 'select') {
 					// prebuild search index for the dropdown select menu
