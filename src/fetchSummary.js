@@ -3,8 +3,20 @@ import imjs from 'imjs'
 
 import { formatConstraintPath } from './utils'
 
+const serviceCache = {}
+
+const getService = (rootUrl) => {
+	let service = serviceCache[rootUrl]
+	if (!service) {
+		service = new imjs.Service({ root: rootUrl })
+		serviceCache[rootUrl] = service
+	}
+
+	return service
+}
+
 export const fetchSummary = async ({ rootUrl, query, path }) => {
-	const service = new imjs.Service({ root: rootUrl })
+	const service = getService(rootUrl)
 	const q = new imjs.Query(query, service)
 
 	const fullPath = formatConstraintPath({ classView: query.from, path })
@@ -13,8 +25,7 @@ export const fetchSummary = async ({ rootUrl, query, path }) => {
 }
 
 export const fetchTable = async ({ rootUrl, query, page }) => {
-	const service = new imjs.Service({ root: rootUrl })
-
+	const service = getService(rootUrl)
 	return await service.tableRows(query, page)
 }
 
@@ -26,8 +37,8 @@ export const fetchInstances = async () => {
 	})
 }
 
-export const fetchClasses = async (url) => {
-	const service = new imjs.Service({ root: url })
+export const fetchClasses = async (rootUrl) => {
+	const service = getService(rootUrl)
 
 	return await service.fetchModel()
 }

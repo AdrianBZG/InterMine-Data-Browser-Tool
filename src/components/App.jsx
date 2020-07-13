@@ -2,7 +2,6 @@
 import '@emotion/core'
 
 import { assign } from '@xstate/immer'
-import FlexSearch from 'flexsearch'
 import React, { useEffect } from 'react'
 import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
 import { fetchClasses, fetchInstances } from 'src/fetchSummary'
@@ -65,21 +64,6 @@ const supervisorMachine = Machine(
 			setIntermines: assign((ctx, { data }) => {
 				ctx.intermines = data.intermines
 				ctx.modelClasses = data.modelClasses.sort()
-
-				// @ts-ignore
-				const searchIndex = new FlexSearch({
-					encode: 'advanced',
-					tokenize: 'reverse',
-					suggest: true,
-					cache: true,
-				})
-
-				ctx.modelClasses.forEach((item) => {
-					// @ts-ignore
-					searchIndex.add(item.displayName, item.displayName)
-				})
-
-				ctx.classSearchIndex = searchIndex
 			}),
 		},
 		services: {

@@ -26,7 +26,6 @@ export const ADD_CONSTRAINT = 'constraintFactory/add'
 export const REMOVE_CONSTRAINT = 'constraintFactory/remove'
 export const APPLY_CONSTRAINT = 'constraintFactory/apply'
 export const RESET_LOCAL_CONSTRAINT = 'constraintFactory/reset'
-
 export const FETCH_CONSTRAINT_ITEMS = 'constraintFactory/init'
 
 /**

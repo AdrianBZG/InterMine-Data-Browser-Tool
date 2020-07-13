@@ -33,6 +33,7 @@ const SelectBuilder = ({
 		<div css={{ maxWidth: 500, minWidth: 376 }}>
 			<ConstraintServiceContext.Provider value={{ state, send }}>
 				<ConstraintPopupCard>
+					{/* @ts-ignore */}
 					<SelectPopup label="Protein Name" />
 				</ConstraintPopupCard>
 			</ConstraintServiceContext.Provider>

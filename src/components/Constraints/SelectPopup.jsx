@@ -27,7 +27,7 @@ const ConstraintItem = ({ index, style, data }) => {
 	}
 
 	// subtract 1 because we're adding an informative menu item before all items
-	const name = filteredItems[index - 1].name
+	const name = filteredItems[index - 1].item
 
 	return (
 		<MenuItem
@@ -52,7 +52,7 @@ const VirtualizedMenu = ({
 
 	useEffect(() => {
 		if (listRef?.current) {
-			const itemLocation = filteredItems.findIndex((item) => item.name === activeItem.name)
+			const itemLocation = filteredItems.findIndex((item) => item.item === activeItem.name)
 			// add one to offset the menu description item
 			listRef.current.scrollToItem(itemLocation + 1)
 		}
@@ -103,10 +103,11 @@ export const SelectPopup = ({
 	nonIdealTitle = undefined,
 	nonIdealDescription = undefined,
 	label = '',
+	searchIndex,
 }) => {
 	const [uniqueId] = useState(() => `selectPopup-${generateId()}`)
 	const [state, send] = useServiceContext('constraints')
-	const { availableValues, selectedValues, searchIndex } = state.context
+	const { availableValues, selectedValues } = state.context
 
 	const isLoading = state.matches('loading')
 	if (state.matches('noConstraintItems')) {
@@ -117,22 +118,14 @@ export const SelectPopup = ({
 	// the value directly to the added constraints list when clicked, so we reset the input here
 	const renderInputValue = () => ''
 	const filterQuery = (query, items) => {
-		if (query === '') {
+		if (query === '' && searchIndex) {
 			return items.filter((i) => !selectedValues.includes(i.name))
 		}
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		const results = searchIndex.search(query, availableValues.length)
+		const results = searchIndex.current.search(query, availableValues.length)
 
-		return results.flatMap((value) => {
-			if (selectedValues.includes(value)) {
-				return []
-			}
-
-			const item = items.find((it) => it.name === value)
-
-			return [{ name: item.name, count: item.count }]
-		})
+		return results
 	}
 
 	const handleItemSelect = ({ name }) => {
@@ -191,7 +184,7 @@ export const SelectPopup = ({
 				<Suggest
 					// @ts-ignore
 					id={`selectPopup-${uniqueId}`}
-					items={availableValues.map((i) => ({ name: i.item, count: i.count }))}
+					items={availableValues}
 					inputValueRenderer={renderInputValue}
 					fill={true}
 					className={isLoading ? Classes.SKELETON : ''}

@@ -36,7 +36,7 @@ export const NavigationBar = () => {
 	}
 
 	const filterQuery = (query, items) => {
-		if (query === '') {
+		if (query === '' || !classSearchIndex) {
 			return items
 		}
 

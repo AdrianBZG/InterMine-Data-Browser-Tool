@@ -1,4 +1,5 @@
-import React from 'react'
+import FlexSearch from 'flexsearch'
+import React, { useEffect, useRef } from 'react'
 
 import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { CheckboxPopup } from '../Constraints/CheckboxPopup'
@@ -71,6 +72,30 @@ const ConstraintBuilder = ({ constraintConfig, color }) => {
 		createConstraintMachine({ id: type, path, op, constraintItemsQuery })
 	)
 
+	const searchIndex = useRef(null)
+	const { availableValues } = state.context
+
+	useEffect(() => {
+		if (type === 'select' && searchIndex.current === null && availableValues.length > 0) {
+			// @ts-ignore
+			const index = new FlexSearch({
+				encode: 'advanced',
+				tokenize: 'reverse',
+				suggest: true,
+				cache: true,
+				doc: {
+					id: 'item',
+					field: 'item',
+				},
+			})
+
+			// @ts-ignore
+			index.add(availableValues)
+
+			searchIndex.current = index
+		}
+	}, [availableValues, type])
+
 	let Popup
 
 	switch (type) {
@@ -88,6 +113,8 @@ const ConstraintBuilder = ({ constraintConfig, color }) => {
 				<Popup
 					nonIdealTitle="No items found"
 					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
+					// @ts-ignore
+					searchIndex={searchIndex}
 				/>
 			</Constraint>
 		</ConstraintServiceContext.Provider>
