@@ -13,7 +13,11 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import { assign } from '@xstate/immer'
 import React, { useState } from 'react'
-import { FETCH_INITIAL_SUMMARY, SET_AVAILABLE_COLUMNS } from 'src/actionConstants'
+import {
+	FETCH_INITIAL_SUMMARY,
+	FETCH_UPDATED_SUMMARY,
+	SET_AVAILABLE_COLUMNS,
+} from 'src/actionConstants'
 import { fetchTable } from 'src/fetchSummary'
 import { noop } from 'src/utils'
 import { humanize, titleize } from 'underscore.string'
@@ -149,6 +153,7 @@ export const TableChartMachine = Machine(
 		on: {
 			// Making it global ensure we update the table when the mine/class changes
 			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
 			idle: {},

@@ -12,7 +12,7 @@ import {
 	Tooltip,
 	XAxis,
 } from 'recharts'
-import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/actionConstants'
 import { fetchSummary } from 'src/fetchSummary'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
 import { Machine } from 'xstate'
@@ -74,6 +74,7 @@ export const BarChartMachine = Machine(
 		on: {
 			// Making it global ensures that we retry when the mine or class changes
 			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
 			idle: {},

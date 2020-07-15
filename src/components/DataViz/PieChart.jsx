@@ -11,7 +11,7 @@ import {
 	Text,
 	Tooltip,
 } from 'recharts'
-import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/actionConstants'
 import { fetchSummary } from 'src/fetchSummary'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
 import { Machine } from 'xstate'
@@ -72,6 +72,7 @@ export const PieChartMachine = Machine(
 		on: {
 			// Making it global ensure we update the table when the mine/class changes
 			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
 			idle: {},
