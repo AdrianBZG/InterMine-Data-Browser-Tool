@@ -95,7 +95,7 @@ export const BarChartMachine = Machine(
 			noGeneLengths: {},
 			pending: {
 				after: {
-					500: 'idle',
+					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'noGeneLengths' }],
 				},
 			},
 		},
@@ -110,6 +110,11 @@ export const BarChartMachine = Machine(
 			}),
 			// @ts-ignore
 			logErrorToConsole: (ctx, event) => console.warn(event.data),
+		},
+		guards: {
+			hasSummary: (ctx) => {
+				return ctx.lengthSummary.length > 0
+			},
 		},
 		services: {
 			fetchGeneLength: async (
