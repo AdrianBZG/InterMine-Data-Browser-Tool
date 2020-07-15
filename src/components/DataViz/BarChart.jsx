@@ -19,6 +19,7 @@ import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
 import { barChartLoadingData } from '../loadingData/barChartData'
+import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderCustomTick = (isLoading) => ({ x, y, payload }) => {
@@ -70,12 +71,12 @@ export const BarChartMachine = Machine(
 			lengthSummary: [],
 			classView: '',
 		},
+		on: {
+			// Making it global ensures that we retry when the mine or class changes
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+		},
 		states: {
-			idle: {
-				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-				},
-			},
+			idle: {},
 			loading: {
 				invoke: {
 					id: 'fetchGeneLength',
@@ -85,11 +86,12 @@ export const BarChartMachine = Machine(
 						actions: 'setLengthSummary',
 					},
 					onError: {
-						target: 'idle',
-						actions: (ctx, event) => console.error('FETCH: Gene Length Chart', { ctx, event }),
+						target: 'noGeneLengths',
+						actions: 'logErrorToConsole',
 					},
 				},
 			},
+			noGeneLengths: {},
 			pending: {
 				after: {
 					500: 'idle',
@@ -105,6 +107,8 @@ export const BarChartMachine = Machine(
 				ctx.lengthSummary = data.lengthSummary
 				ctx.classView = data.classView
 			}),
+			// @ts-ignore
+			logErrorToConsole: (ctx, event) => console.warn(event.data),
 		},
 		services: {
 			fetchGeneLength: async (
@@ -173,6 +177,15 @@ export const BarChart = () => {
 			count,
 		}
 	})
+
+	if (state.matches('noGeneLengths')) {
+		return (
+			<NonIdealStateWarning
+				title="No Gene lengths available"
+				description="The mine/class combination does not provide gene lengths. If you feel this is an error, please contact support"
+			/>
+		)
+	}
 
 	return (
 		<>

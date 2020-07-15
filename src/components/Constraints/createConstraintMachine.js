@@ -36,7 +36,6 @@ export const createConstraintMachine = ({
 			availableValues: [],
 			classView: '',
 			constraintItemsQuery,
-			searchIndex: null,
 		},
 		on: {
 			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
@@ -58,12 +57,13 @@ export const createConstraintMachine = ({
 					},
 					onError: {
 						target: 'noConstraintItems',
-						actions: (ctx, event) => console.error(`FETCH: ${path}`, { ctx, event }),
+						actions: 'logErrorToConsole',
 					},
 				},
 			},
 			noConstraintItems: {},
 			noConstraintsSet: {
+				always: [{ target: 'noConstraintItems', cond: 'hasNoConstraintItems' }],
 				entry: 'resetConstraint',
 				on: {
 					[ADD_CONSTRAINT]: {
@@ -73,7 +73,7 @@ export const createConstraintMachine = ({
 				},
 			},
 			constraintsUpdated: {
-				always: [{ target: 'noConstraintsSet', cond: 'constraintListIsEmpty' }],
+				always: [{ target: 'noConstraintsSet', cond: 'selectedListIsEmpty' }],
 				on: {
 					[ADD_CONSTRAINT]: { actions: 'addConstraint' },
 					[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
@@ -103,6 +103,8 @@ export const createConstraintMachine = ({
 	return Machine(config, {
 		actions: {
 			// @ts-ignore
+			logErrorToConsole: (_, event) => console.warn(event.data),
+			// @ts-ignore
 			addConstraint: assign((ctx, { constraint }) => {
 				ctx.selectedValues.push(constraint)
 			}),
@@ -118,7 +120,6 @@ export const createConstraintMachine = ({
 				ctx.availableValues = data.items
 				ctx.classView = data.classView
 				ctx.selectedValues = []
-				ctx.searchIndex = null
 			}),
 			applyConstraint: ({ classView, constraintPath, selectedValues, availableValues }) => {
 				const query = {
@@ -142,8 +143,11 @@ export const createConstraintMachine = ({
 			},
 		},
 		guards: {
-			constraintListIsEmpty: (ctx) => {
+			selectedListIsEmpty: (ctx) => {
 				return ctx.selectedValues.length === 0
+			},
+			hasNoConstraintItems: (ctx) => {
+				return ctx.availableValues.length === 0
 			},
 			// @ts-ignore
 			pathMatches: (ctx, { path }) => {

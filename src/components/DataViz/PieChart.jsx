@@ -11,13 +11,14 @@ import {
 	Text,
 	Tooltip,
 } from 'recharts'
-import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/actionConstants'
+import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
 import { fetchSummary } from 'src/fetchSummary'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
 import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
 import { pieChartLoadingData } from '../loadingData/pieChartData'
+import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
 const renderLabelContent = (props) => {
@@ -68,13 +69,12 @@ export const PieChartMachine = Machine(
 			allClassOrganisms: [],
 			classView: '',
 		},
+		on: {
+			// Making it global ensure we update the table when the mine/class changes
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+		},
 		states: {
-			idle: {
-				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
-				},
-			},
+			idle: {},
 			loading: {
 				invoke: {
 					id: 'fetchPieChartValues',
@@ -89,10 +89,11 @@ export const PieChartMachine = Machine(
 					},
 				},
 			},
+			hasNoSummary: {},
 			// delay the finished transition to avoid quick flashes of animations
 			pending: {
 				after: {
-					500: 'idle',
+					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'hasNoSummary' }],
 				},
 			},
 		},
@@ -102,7 +103,11 @@ export const PieChartMachine = Machine(
 			// @ts-ignore
 			setClassItems: assign((ctx, { data }) => {
 				ctx.allClassOrganisms = data.summary
+				ctx.classView = data.classView
 			}),
+		},
+		guards: {
+			hasSummary: (ctx) => ctx.allClassOrganisms.length > 0,
 		},
 		services: {
 			fetchItems: async (_ctx, event) => {
@@ -143,6 +148,15 @@ export const PieChart = () => {
 	const isLoading = !state.matches('idle')
 	const data = isLoading ? pieChartLoadingData : allClassOrganisms
 
+	if (state.matches('hasNoSummary')) {
+		return (
+			<NonIdealStateWarning
+				title="No Organism Summary available"
+				description="The mine/class combination did not return any organism summaries. If you feel this an error, please contact support"
+			/>
+		)
+	}
+
 	return (
 		<>
 			<ResponsiveContainer
@@ -167,7 +181,7 @@ export const PieChart = () => {
 								fill={isLoading ? 'var(--grey2)' : DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]}
 							/>
 						))}
-						<Label classView={classView} content={renderLabelContent} />
+						{classView && <Label classView={classView} content={renderLabelContent} />}
 						{isLoading && <Label position="center" content={renderLoadingLabel} />}
 					</Pie>
 					{!isLoading && (

@@ -21,6 +21,7 @@ import { Machine } from 'xstate'
 
 import { sendToBus, useMachineBus } from '../../machineBus'
 import { tableLoadingData } from '../loadingData/tableResults'
+import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 
 const TableActionButtons = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
@@ -145,12 +146,12 @@ export const TableChartMachine = Machine(
 			rows: [[]],
 			mineUrl: '',
 		},
+		on: {
+			// Making it global ensure we update the table when the mine/class changes
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+		},
 		states: {
-			idle: {
-				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-				},
-			},
+			idle: {},
 			loading: {
 				invoke: {
 					id: 'fetchTableRows',
@@ -164,9 +165,11 @@ export const TableChartMachine = Machine(
 					},
 				},
 			},
+			noTableSummary: {},
 			pending: {
 				after: {
-					500: 'idle',
+					// Delay the rendering in case the table is currently rendering
+					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'noTableSummary' }],
 				},
 			},
 		},
@@ -178,6 +181,11 @@ export const TableChartMachine = Machine(
 				ctx.rows = data.summary
 				ctx.mineUrl = data.rootUrl
 			}),
+		},
+		guards: {
+			hasSummary: (ctx) => {
+				return ctx.rows[0]?.length > 0
+			},
 		},
 		services: {
 			fetchTable: async (_ctx, event) => {
@@ -197,14 +205,15 @@ export const TableChartMachine = Machine(
 				}
 
 				const summary = await fetchTable({ rootUrl, query, page: { start: 0, size: 25 } })
-				const headers = summary[0].map((item) => item.column)
+				const hasSummary = summary.length > 0
+				const headers = hasSummary ? summary[0].map((item) => item.column) : []
 
 				sendToBus({ type: SET_AVAILABLE_COLUMNS, selectedPaths: headers })
 
 				return {
 					classView,
 					rootUrl,
-					summary,
+					summary: hasSummary ? summary : [[]],
 				}
 			},
 		},
@@ -217,6 +226,15 @@ export const Table = () => {
 	const { rows: actualData, mineUrl } = state.context
 	const isLoading = !state.matches('idle')
 	const rows = isLoading ? tableLoadingData : actualData
+
+	if (state.matches('noTableSummary')) {
+		return (
+			<NonIdealStateWarning
+				title="No Table results available"
+				description="The mine/class combination did not return any table data. If you feel this is an error, please contact support"
+			/>
+		)
+	}
 
 	return (
 		<>

@@ -19,7 +19,18 @@ export const fetchSummary = async ({ rootUrl, query, path }) => {
 	const service = getService(rootUrl)
 	const q = new imjs.Query(query, service)
 
-	const fullPath = formatConstraintPath({ classView: query.from, path })
+	let fullPath
+	try {
+		fullPath = formatConstraintPath({ classView: query.from, path })
+
+		// make sure the path exists
+		await service.makePath(fullPath)
+	} catch (e) {
+		const err = new Error()
+		err.message = `The mine at ${rootUrl} does not contain the path ${fullPath}`
+
+		throw err
+	}
 
 	return await q.summarize(fullPath)
 }

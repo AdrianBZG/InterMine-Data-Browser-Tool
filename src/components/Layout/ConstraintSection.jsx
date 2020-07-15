@@ -100,6 +100,10 @@ const ConstraintBuilder = ({ constraintConfig, color }) => {
 			break
 	}
 
+	if (state.matches('noConstraintItems') || state.matches('loading')) {
+		return null
+	}
+
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<Constraint constraintIconText={label} constraintName={name} labelBorderColor={color}>
