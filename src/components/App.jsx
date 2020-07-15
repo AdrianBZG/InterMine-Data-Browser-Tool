@@ -54,6 +54,8 @@ const supervisorMachine = Machine(
 			// @ts-ignore
 			changeMine: assign((ctx, { newMine }) => {
 				ctx.selectedMine = ctx.intermines.find((mine) => mine.name === newMine)
+				// set it back to default
+				ctx.classView = 'Gene'
 			}),
 			// @ts-ignore
 			changeClass: assign((ctx, { newClass }) => {
