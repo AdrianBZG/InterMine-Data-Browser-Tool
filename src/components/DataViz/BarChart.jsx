@@ -123,9 +123,6 @@ export const BarChartMachine = Machine(
 					query = {
 						from: classView,
 						select: ['length', 'primaryIdentifier'],
-						model: {
-							name: 'genomic',
-						},
 						orderBy: [
 							{
 								path: 'length',
@@ -135,6 +132,7 @@ export const BarChartMachine = Machine(
 					}
 				}
 
+				query.model = { name: 'genomic' }
 				const summary = await fetchSummary({ rootUrl, query, path })
 
 				return {
