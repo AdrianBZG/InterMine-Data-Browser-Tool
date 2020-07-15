@@ -1,4 +1,4 @@
-import { ELEVATION_0 } from '@blueprintjs/core/lib/esm/common/classes'
+import { ProgressBar } from '@blueprintjs/core'
 import { assign } from '@xstate/immer'
 import React from 'react'
 import {
@@ -14,33 +14,44 @@ import {
 } from 'recharts'
 import { FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
 import { fetchSummary } from 'src/fetchSummary'
+import { blinkingSkeletonAnimation } from 'src/styleUtils'
 import { Machine } from 'xstate'
 
 import { useMachineBus } from '../../machineBus'
+import { barChartLoadingData } from '../loadingData/barChartData'
 import { DATA_VIZ_COLORS } from './dataVizColors'
 
-const renderCustomTick = ({ x, y, payload }) => {
+const renderCustomTick = (isLoading) => ({ x, y, payload }) => {
 	return (
 		<g transform={`translate(${x},${y})`}>
-			<text
-				x={0}
-				y={0}
-				dy={10}
-				fontSize="var(--fs-desktopS1)"
-				fontStyle="var(--fw-medium)"
-				textAnchor="end"
-				fill="var(--grey5)"
-				transform="rotate(-55)"
-			>
-				{payload.value}
-			</text>
+			{isLoading ? (
+				<rect width={5} height={50} fill="var(--grey2)" transform="rotate(45)">
+					{payload.value}
+				</rect>
+			) : (
+				<text
+					x={0}
+					y={0}
+					dy={10}
+					fontSize="var(--fs-desktopS1)"
+					fontStyle="var(--fw-medium)"
+					textAnchor="end"
+					fill="var(--grey5)"
+					transform="rotate(-55)"
+				>
+					{payload.value}
+				</text>
+			)}
 		</g>
 	)
 }
 
-const colorizeBars = (data) =>
+const colorizeBars = (data, isLoading) =>
 	data.map((entry, index) => (
-		<Cell key={entry} fill={DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]} />
+		<Cell
+			key={entry}
+			fill={isLoading ? 'var(--grey2)' : DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]}
+		/>
 	))
 
 export const BarChartMachine = Machine(
@@ -53,7 +64,7 @@ export const BarChartMachine = Machine(
 				max: 0,
 				buckets: 0,
 				uniqueValues: 0,
-				average: ELEVATION_0,
+				average: 0,
 				stdev: 0,
 			},
 			lengthSummary: [],
@@ -70,13 +81,18 @@ export const BarChartMachine = Machine(
 					id: 'fetchGeneLength',
 					src: 'fetchGeneLength',
 					onDone: {
-						target: 'idle',
+						target: 'pending',
 						actions: 'setLengthSummary',
 					},
 					onError: {
 						target: 'idle',
 						actions: (ctx, event) => console.error('FETCH: Gene Length Chart', { ctx, event }),
 					},
+				},
+			},
+			pending: {
+				after: {
+					500: 'idle',
 				},
 			},
 		},
@@ -127,11 +143,12 @@ export const BarChartMachine = Machine(
 )
 
 export const BarChart = () => {
-	const [
-		{
-			context: { lengthStats, lengthSummary },
-		},
-	] = useMachineBus(BarChartMachine)
+	const [state] = useMachineBus(BarChartMachine)
+
+	const { lengthSummary, lengthStats } = state.context
+
+	const isLoading = !state.matches('idle')
+	const summary = isLoading ? barChartLoadingData : lengthSummary
 
 	const { max, min, buckets, uniqueValues, average, stdev } = lengthStats
 
@@ -142,7 +159,7 @@ export const BarChart = () => {
 	const title = `Distribution of ${uniqueValues} Gene Lengths`
 	const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
 
-	const chartData = lengthSummary.map((item, idx) => {
+	const chartData = summary.map((item, idx) => {
 		const lowerLimit = Math.round(min + elementsPerBucket * idx)
 		const upperLimit = Math.round(min + elementsPerBucket * (idx + 1))
 
@@ -158,44 +175,60 @@ export const BarChart = () => {
 	})
 
 	return (
-		<ResponsiveContainer width="100%" height="100%">
-			<RBarChart data={chartData} barCategoryGap="20%" margin={{ left: 100, bottom: 200 }}>
-				<Bar dataKey="data">{colorizeBars(chartData)}</Bar>
-				<Tooltip
-					itemStyle={{
-						color: 'var(--blue9)',
-					}}
-					wrapperStyle={{
-						border: '2px solid var(--blue9)',
-						borderRadius: '3px',
-					}}
-					formatter={(_, __, props) => [props.payload.count, 'Total Values']}
-				/>
-				<CartesianGrid strokeDasharray="3 3" vertical={false} />
-				<XAxis dataKey="distribution" interval={0} tick={renderCustomTick}>
-					<Label
-						fill="var(--blue9)"
-						fontWeight={500}
-						value={title}
-						offset={120}
-						position="bottom"
-					/>
-					<Label
-						fill="var(--blue9)"
-						fontWeight={500}
-						value={subtitle}
-						position="bottom"
-						offset={150}
-					/>
-				</XAxis>
-				{chartData.length > 0 && (
-					<Brush dataKey="distribution" y={290}>
-						<RBarChart>
-							<Bar dataKey="data">{colorizeBars(chartData)}</Bar>
-						</RBarChart>
-					</Brush>
-				)}
-			</RBarChart>
-		</ResponsiveContainer>
+		<>
+			<ResponsiveContainer
+				width="100%"
+				height="95%"
+				css={isLoading ? blinkingSkeletonAnimation : {}}
+			>
+				<RBarChart data={chartData} barCategoryGap="20%" margin={{ left: 100, bottom: 200 }}>
+					<Bar dataKey="data">{colorizeBars(chartData, isLoading)}</Bar>
+					{!isLoading && (
+						<Tooltip
+							itemStyle={{
+								color: 'var(--blue9)',
+							}}
+							wrapperStyle={{
+								border: '2px solid var(--blue9)',
+								borderRadius: '3px',
+							}}
+							formatter={(_, __, props) => [props.payload.count, 'Total Values']}
+						/>
+					)}
+					<CartesianGrid strokeDasharray="3 3" vertical={false} />
+					<XAxis dataKey="distribution" interval={0} tick={renderCustomTick(isLoading)}>
+						<Label
+							fill="var(--blue9)"
+							fontWeight={500}
+							value={isLoading ? 'Loading Bar data' : title}
+							offset={120}
+							position="bottom"
+						/>
+						<Label
+							fill="var(--blue9)"
+							fontWeight={500}
+							value={subtitle}
+							position="bottom"
+							offset={150}
+							content={
+								isLoading
+									? () => <rect width="70%" height={16} y={250} x="25%" fill="var(--grey2)" />
+									: null
+							}
+						/>
+					</XAxis>
+					{chartData.length > 0 && (
+						<Brush dataKey="distribution" y={280}>
+							<RBarChart>
+								<Bar dataKey="data">{colorizeBars(chartData, isLoading)}</Bar>
+							</RBarChart>
+						</Brush>
+					)}
+				</RBarChart>
+			</ResponsiveContainer>
+			{isLoading && (
+				<ProgressBar intent="primary" css={{ width: '50%', marginLeft: '35%', marginTop: 20 }} />
+			)}
+		</>
 	)
 }

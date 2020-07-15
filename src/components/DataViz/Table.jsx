@@ -20,6 +20,7 @@ import { humanize, titleize } from 'underscore.string'
 import { Machine } from 'xstate'
 
 import { sendToBus, useMachineBus } from '../../machineBus'
+import { tableLoadingData } from '../loadingData/tableResults'
 
 const TableActionButtons = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
@@ -91,7 +92,7 @@ const TablePagingButtons = () => {
 	)
 }
 
-const ColumnHeader = ({ columnName }) => {
+const ColumnHeader = ({ columnName, isLoading }) => {
 	const name = titleize(humanize(columnName.replace(/\./g, ' ')))
 	const words = name.split(' ')
 	const className = words.shift()
@@ -99,14 +100,17 @@ const ColumnHeader = ({ columnName }) => {
 
 	return (
 		<th scope="col" title={`${className} ${specifier}`}>
-			<span css={{ display: 'block' }}>{className}</span>
-			<span>{specifier}</span>
+			<span css={{ display: 'block' }} className={isLoading ? Classes.SKELETON : ''}>
+				{className}
+			</span>
+			{isLoading ? null : <span>{specifier}</span>}
 		</th>
 	)
 }
 
-const Cell = ({ cell, mineUrl }) => {
+const Cell = ({ cell, mineUrl, isLoading }) => {
 	const cellValue = cell.value
+	const skeletonClass = isLoading ? Classes.SKELETON : ''
 
 	return (
 		<td
@@ -120,14 +124,14 @@ const Cell = ({ cell, mineUrl }) => {
 			}}
 		>
 			{cellValue ? (
-				<div title={cellValue}>
+				<div title={cellValue} className={skeletonClass}>
 					<a href={`${mineUrl}${cell.url}`} target="_blank" rel="noopener noreferrer">
 						<Icon icon={IconNames.GLOBE_NETWORK} />
 						{cellValue}
 					</a>
 				</div>
 			) : (
-				<span className={Classes.TEXT_DISABLED}>No Value</span>
+				<span className={`${Classes.TEXT_DISABLED} ${skeletonClass}`}>No Value</span>
 			)}
 		</td>
 	)
@@ -152,12 +156,17 @@ export const TableChartMachine = Machine(
 					id: 'fetchTableRows',
 					src: 'fetchTable',
 					onDone: {
-						target: 'idle',
+						target: 'pending',
 						actions: 'setTableRows',
 					},
 					onError: {
 						actions: (ctx, event) => console.error('FETCH: Loading Table Rows', { ctx, event }),
 					},
+				},
+			},
+			pending: {
+				after: {
+					500: 'idle',
 				},
 			},
 		},
@@ -203,11 +212,11 @@ export const TableChartMachine = Machine(
 )
 
 export const Table = () => {
-	const [
-		{
-			context: { rows, mineUrl },
-		},
-	] = useMachineBus(TableChartMachine)
+	const [state] = useMachineBus(TableChartMachine)
+
+	const { rows: actualData, mineUrl } = state.context
+	const isLoading = !state.matches('idle')
+	const rows = isLoading ? tableLoadingData : actualData
 
 	return (
 		<>
@@ -217,11 +226,12 @@ export const Table = () => {
 					// @ts-ignore
 					css={{
 						fontSize: 'var(--fs-desktopM1)',
-						fontWeight: '(var(--fw-semibold)',
+						fontWeight: 'var(--fw-regular)',
 						marginBottom: 20,
 						marginLeft: 10,
 						display: 'inline-flex',
 					}}
+					className={isLoading ? Classes.SKELETON : ''}
 				>
 					{`Showing ${rows.length} of ${rows.length} rows`}
 				</span>
@@ -231,7 +241,7 @@ export const Table = () => {
 				<thead>
 					<tr>
 						{rows[0].map((r) => {
-							return <ColumnHeader key={r.column} columnName={r.column} />
+							return <ColumnHeader isLoading={isLoading} key={r.column} columnName={r.column} />
 						})}
 					</tr>
 				</thead>
@@ -240,7 +250,12 @@ export const Table = () => {
 						return (
 							<tr key={colIdx}>
 								{row.map((cell, rowIdx) => (
-									<Cell key={`${colIdx}-${rowIdx}`} cell={cell} mineUrl={mineUrl} />
+									<Cell
+										key={`${colIdx}-${rowIdx}`}
+										cell={cell}
+										mineUrl={mineUrl}
+										isLoading={isLoading}
+									/>
 								))}
 							</tr>
 						)

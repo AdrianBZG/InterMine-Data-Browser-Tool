@@ -118,7 +118,7 @@ export const SelectPopup = ({
 	// the value directly to the added constraints list when clicked, so we reset the input here
 	const renderInputValue = () => ''
 	const filterQuery = (query, items) => {
-		if (query === '' && searchIndex) {
+		if (query === '' && searchIndex?.current !== null) {
 			return items.filter((i) => !selectedValues.includes(i.name))
 		}
 
