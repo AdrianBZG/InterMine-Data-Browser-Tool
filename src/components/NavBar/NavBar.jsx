@@ -1,8 +1,9 @@
 import { Button, ButtonGroup, Classes, Menu, MenuItem, Navbar, Tab, Tabs } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CHANGE_CLASS } from 'src/actionConstants'
+import { buildSearchIndex } from 'src/buildSearchIndex'
 import { useServiceContext } from 'src/machineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
@@ -26,7 +27,22 @@ export const NavigationBar = () => {
 	const isLightTheme = selectedTheme === 'light'
 
 	const [state, send] = useServiceContext('supervisor')
-	const { classView, modelClasses, classSearchIndex } = state.context
+	const { classView, modelClasses } = state.context
+	const classSearchIndex = useRef(null)
+
+	useEffect(() => {
+		const indexClasses = async () => {
+			if (modelClasses.length > 0) {
+				classSearchIndex.current = await buildSearchIndex({
+					docId: 'name',
+					docField: 'displayName',
+					values: modelClasses,
+				})
+			}
+		}
+
+		indexClasses()
+	}, [modelClasses])
 
 	const classDisplayName =
 		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
@@ -36,14 +52,12 @@ export const NavigationBar = () => {
 	}
 
 	const filterQuery = (query, items) => {
-		if (query === '' || !classSearchIndex) {
+		if (query === '' || !classSearchIndex?.current) {
 			return items
 		}
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		const results = classSearchIndex.search(query, modelClasses.length)
-
-		return results.map((name) => ({ name }))
+		return classSearchIndex.current.search(query, modelClasses.length)
 	}
 
 	return (
@@ -76,6 +90,7 @@ export const NavigationBar = () => {
 					onItemSelect={handleClassSelect}
 					itemListRenderer={renderMenu}
 					itemListPredicate={filterQuery}
+					resetOnClose={true}
 				>
 					<Button
 						aria-label="select the views you'd like to query"

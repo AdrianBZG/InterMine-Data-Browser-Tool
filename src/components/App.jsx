@@ -20,7 +20,6 @@ const supervisorMachine = Machine(
 			classView: 'Gene',
 			intermines: [],
 			modelClasses: [],
-			classSearchIndex: null,
 			selectedMine: {
 				rootUrl: 'https://www.humanmine.org/humanmine',
 				name: 'HumanMine',
@@ -44,7 +43,7 @@ const supervisorMachine = Machine(
 			},
 			idle: {
 				on: {
-					[CHANGE_MINE]: { actions: 'changeMine' },
+					[CHANGE_MINE]: { target: 'loading', actions: 'changeMine' },
 					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
 			},
@@ -63,22 +62,37 @@ const supervisorMachine = Machine(
 			// @ts-ignore
 			setIntermines: assign((ctx, { data }) => {
 				ctx.intermines = data.intermines
-				ctx.modelClasses = data.modelClasses.sort()
+				ctx.modelClasses = data.modelClasses
+					.sort()
+					.map((cl) => ({ displayName: cl.displayName, name: cl.name }))
 			}),
 		},
 		services: {
 			fetchMinesAndClasses: async (ctx, event) => {
-				const [instancesResult, classesResult] = await Promise.all([
-					fetchInstances(),
-					fetchClasses(ctx.selectedMine.rootUrl),
-				])
+				let instances
+				let modelClasses
+
+				if (ctx.intermines.length === 0) {
+					const [instancesResult, classesResult] = await Promise.all([
+						fetchInstances(),
+						fetchClasses(ctx.selectedMine.rootUrl),
+					])
+
+					instances = instancesResult
+					modelClasses = classesResult
+				} else {
+					modelClasses = await fetchClasses(ctx.selectedMine.rootUrl)
+				}
 
 				return {
-					modelClasses: Object.entries(classesResult.classes).map(([_key, value]) => value),
-					intermines: instancesResult.data.instances.map((mine) => ({
-						name: mine.name,
-						rootUrl: mine.url,
-					})),
+					modelClasses: Object.entries(modelClasses.classes).map(([_key, value]) => value),
+					intermines:
+						ctx.intermines.length > 0
+							? ctx.intermines
+							: instances.data.instances.map((mine) => ({
+									name: mine.name,
+									rootUrl: mine.url,
+							  })),
 				}
 			},
 		},

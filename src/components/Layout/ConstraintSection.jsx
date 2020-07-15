@@ -1,6 +1,5 @@
-import FlexSearch from 'flexsearch'
 import React, { useEffect, useRef } from 'react'
-import { indexWorker } from 'src/searchIndex'
+import { buildSearchIndex } from 'src/buildSearchIndex'
 
 import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
 import { CheckboxPopup } from '../Constraints/CheckboxPopup'
@@ -79,41 +78,11 @@ const ConstraintBuilder = ({ constraintConfig, color }) => {
 	useEffect(() => {
 		const buildIndex = async () => {
 			if (type === 'select' && searchIndex.current === null && availableValues.length > 0) {
-				// The configuration *must* be the same for import and export
-				const indexConfig = {
-					encode: 'advanced',
-					tokenize: 'reverse',
-					suggest: true,
-					cache: true,
-					doc: {
-						id: 'item',
-						field: 'item',
-					},
-				}
-
-				const exportConfig = {
-					index: true,
-					doc: true,
-				}
-
-				// @ts-ignore
-				const index = new FlexSearch(indexConfig)
-
-				if (typeof window !== 'undefined' && window.Worker) {
-					const serializedIndex = await indexWorker.index({
-						values: availableValues,
-						indexConfig,
-						exportConfig,
-					})
-
-					// @ts-ignore
-					index.import(serializedIndex, exportConfig)
-				} else {
-					// @ts-ignore
-					index.add(availableValues)
-				}
-
-				searchIndex.current = index
+				searchIndex.current = await buildSearchIndex({
+					docId: 'item',
+					docField: 'item',
+					values: availableValues,
+				})
 			}
 		}
 
