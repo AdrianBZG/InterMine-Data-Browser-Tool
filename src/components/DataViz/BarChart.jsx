@@ -117,28 +117,23 @@ export const BarChartMachine = Machine(
 			},
 		},
 		services: {
-			fetchGeneLength: async (
-				_ctx,
-				{ type, globalConfig: { classView, rootUrl }, query: nextQuery }
-			) => {
-				let query = nextQuery
-				let path = 'length'
-
-				if (type === FETCH_INITIAL_SUMMARY) {
-					query = {
-						from: classView,
-						select: ['length', 'primaryIdentifier'],
-						orderBy: [
-							{
-								path: 'length',
-								direction: 'ASC',
-							},
-						],
-					}
+			fetchGeneLength: async (_ctx, { globalConfig: { classView, rootUrl }, query: nextQuery }) => {
+				let query = {
+					...nextQuery,
+					from: classView,
+					select: ['length', 'primaryIdentifier'],
+					model: {
+						name: 'genomic',
+					},
+					orderBy: [
+						{
+							path: 'length',
+							direction: 'ASC',
+						},
+					],
 				}
 
-				query.model = { name: 'genomic' }
-				const summary = await fetchSummary({ rootUrl, query, path })
+				const summary = await fetchSummary({ rootUrl, query, path: 'length' })
 
 				return {
 					classView,

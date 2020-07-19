@@ -113,25 +113,20 @@ export const PieChartMachine = Machine(
 		services: {
 			fetchItems: async (_ctx, event) => {
 				const {
-					type,
 					globalConfig: { classView, rootUrl },
 					query: nextQuery,
 				} = event
 
-				const path = 'organism.shortName'
 				let query = {
 					...nextQuery,
 					from: classView,
+					select: ['primaryIdentifier'],
 					model: {
 						name: 'genomic',
 					},
 				}
 
-				if (type === FETCH_INITIAL_SUMMARY) {
-					query.select = ['primaryIdentifier']
-				}
-
-				const summary = await fetchSummary({ rootUrl: `${rootUrl}/service`, query, path })
+				const summary = await fetchSummary({ rootUrl, query, path: 'organism.shortName' })
 
 				return {
 					classView,
