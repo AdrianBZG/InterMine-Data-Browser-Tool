@@ -2,6 +2,7 @@
 import '@emotion/core'
 
 import { assign } from '@xstate/immer'
+import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
 import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
 import { fetchClasses, fetchInstances } from 'src/fetchSummary'
@@ -12,6 +13,10 @@ import { ConstraintSection } from './Layout/ConstraintSection'
 import { ChartSection, TableSection } from './Layout/DataVizSection'
 import { Header } from './Layout/Header'
 
+enableMapSet()
+
+const isProduction = process.env.NODE_ENV === 'production'
+
 const supervisorMachine = Machine(
 	{
 		id: 'Supervisor',
@@ -21,8 +26,10 @@ const supervisorMachine = Machine(
 			intermines: [],
 			modelClasses: [],
 			selectedMine: {
-				rootUrl: 'https://www.humanmine.org/humanmine',
-				name: 'HumanMine',
+				name: isProduction ? 'HumanMine' : 'biotestmine',
+				rootUrl: isProduction
+					? 'https://www.humanmine.org/humanmine'
+					: 'http://localhost:9999/biotestmine',
 			},
 		},
 		states: {

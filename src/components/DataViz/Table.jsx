@@ -2,6 +2,7 @@ import {
 	Button,
 	ButtonGroup,
 	Classes,
+	ControlGroup,
 	HTMLTable,
 	Icon,
 	InputGroup,
@@ -12,20 +13,41 @@ import {
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import { assign } from '@xstate/immer'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDebounce } from 'react-use'
 import {
+	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
 	FETCH_UPDATED_SUMMARY,
 	SET_AVAILABLE_COLUMNS,
 } from 'src/actionConstants'
 import { fetchTable } from 'src/fetchSummary'
-import { noop } from 'src/utils'
 import { humanize, titleize } from 'underscore.string'
 import { Machine } from 'xstate'
 
-import { sendToBus, useMachineBus } from '../../machineBus'
+import { sendToBus, TableServiceContext, useMachineBus, useServiceContext } from '../../machineBus'
 import { tableLoadingData } from '../loadingData/tableResults'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
+
+const refreshCache = ({ tableRows, cache, visibleRows, startPage }) => {
+	const pages = []
+
+	tableRows.forEach((row, idx) => {
+		const currentPage = pages[pages.length - 1]
+
+		if (idx % visibleRows === 0) {
+			pages.push([row])
+		} else {
+			currentPage.push(row)
+		}
+	})
+
+	pages.forEach((page, idx) => {
+		cache.set(idx + startPage, page)
+	})
+
+	return cache
+}
 
 const TableActionButtons = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
@@ -72,28 +94,91 @@ const TableActionButtons = () => {
 }
 
 const TablePagingButtons = () => {
+	const [state, send] = useServiceContext('table')
 	const [pageNumber, setPageNumber] = useState(1)
 
+	const { pageNumber: pageInMachine, visibleRows, totalRows } = state.context
+
+	useEffect(() => {
+		setPageNumber(pageInMachine)
+	}, [pageInMachine])
+
+	useDebounce(
+		() => {
+			// @ts-ignore Allow empty values so the user can input single digit pages
+			if (pageNumber === pageInMachine || pageNumber === '') {
+				return
+			}
+
+			send({ type: CHANGE_PAGE, pageNumber })
+		},
+		500,
+		[pageNumber]
+	)
+
+	const handleOnChange = (e) => {
+		const input = e.target.value
+
+		if (isNaN(input)) {
+			return
+		}
+
+		if (input === '') {
+			// @ts-ignore Allow empty values so the user can input single digit pages
+			setPageNumber('')
+		} else {
+			setPageNumber(parseInt(input))
+		}
+	}
+
+	const isFirstPage = pageNumber * visibleRows === visibleRows
+	const totalPages = Math.ceil(totalRows / visibleRows)
+	const pageCount = totalPages <= 1 ? `${totalPages} page` : `${totalPages} pages`
+	const isLastPage = pageNumber === totalPages
+
 	return (
-		<div>
-			<ButtonGroup>
-				<Tooltip content="Previous Page" position={Position.TOP}>
-					<Button
-						icon={IconNames.CHEVRON_BACKWARD}
-						disabled={pageNumber === 1}
-						onClick={() => setPageNumber(pageNumber - 1)}
-					/>
-				</Tooltip>
-				<InputGroup css={{ width: '30px' }} onChange={noop} value={`${pageNumber}`} round={false} />
-				<Tooltip content="Next Page" position={Position.TOP}>
-					<Button
-						icon={IconNames.CHEVRON_FORWARD}
-						disabled={pageNumber === 3}
-						onClick={() => setPageNumber(pageNumber + 1)}
-					/>
-				</Tooltip>
-			</ButtonGroup>
-		</div>
+		<ControlGroup css={{ justifyContent: 'flex-end' }}>
+			<span css={{ alignSelf: 'center', paddingRight: 12, fontSize: 'var(--fs-desktopM1)' }}>
+				Page
+			</span>
+			<Tooltip content="Go to 1st Page" position={Position.TOP}>
+				<Button
+					icon={IconNames.CHEVRON_BACKWARD}
+					disabled={isFirstPage}
+					onClick={() => setPageNumber(1)}
+				/>
+			</Tooltip>
+			<Tooltip content="Previous Page" position={Position.TOP}>
+				<Button
+					icon={IconNames.CHEVRON_LEFT}
+					disabled={isFirstPage}
+					onClick={() => setPageNumber(pageNumber - 1)}
+				/>
+			</Tooltip>
+			<InputGroup
+				css={{ maxWidth: '15%' }}
+				onChange={handleOnChange}
+				value={`${pageNumber}`}
+				round={false}
+			/>
+			<Tooltip content="Next Page" position={Position.TOP}>
+				<Button
+					icon={IconNames.CHEVRON_RIGHT}
+					disabled={isLastPage}
+					onClick={() => setPageNumber(pageNumber + 1)}
+				/>
+			</Tooltip>
+			<Tooltip content="Go to last Page" position={Position.TOP}>
+				<Button
+					icon={IconNames.CHEVRON_FORWARD}
+					disabled={isLastPage}
+					onClick={() => setPageNumber(totalPages)}
+				/>
+			</Tooltip>
+			<span
+				css={{ alignSelf: 'center', paddingLeft: 10, fontSize: 'var(--fs-desktopM1)' }}
+			>{`of ${pageCount}`}</span>
+		</ControlGroup>
 	)
 }
 
@@ -147,26 +232,52 @@ export const TableChartMachine = Machine(
 		id: 'TableChart',
 		initial: 'idle',
 		context: {
-			rows: [[]],
+			totalRows: 0,
+			visibleRows: 25,
+			cacheFactor: 20,
+			pageNumber: 1,
+			pages: new Map(),
+			lastQuery: {},
 			mineUrl: '',
 		},
 		on: {
 			// Making it global ensure we update the table when the mine/class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCache' },
+			[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCache' },
 		},
 		states: {
-			idle: {},
-			loading: {
+			idle: {
+				on: {
+					[CHANGE_PAGE]: [
+						{ actions: 'updatePageNumber', cond: 'hasPageInCache' },
+						{ target: 'fetchNewPages' },
+					],
+				},
+			},
+			fetchInitialRows: {
 				invoke: {
-					id: 'fetchTableRows',
-					src: 'fetchTable',
+					id: 'fetchInitialRows',
+					src: 'fetchInitialRows',
 					onDone: {
 						target: 'pending',
-						actions: 'setTableRows',
+						actions: ['setInitialRows', 'refreshCache', 'setLastQuery'],
 					},
 					onError: {
 						actions: (ctx, event) => console.error('FETCH: Loading Table Rows', { ctx, event }),
+					},
+				},
+			},
+			fetchNewPages: {
+				invoke: {
+					id: 'fetchNewPages',
+					src: 'fetchNewPages',
+					onDone: {
+						target: 'pending',
+						actions: ['updatePageNumber', 'refreshCache'],
+					},
+					onError: {
+						actions: (ctx, event) =>
+							console.error('FETCH: Could not fetch new Table Rows', { ctx, event }),
 					},
 				},
 			},
@@ -181,35 +292,61 @@ export const TableChartMachine = Machine(
 	},
 	{
 		actions: {
+			bustCache: assign((ctx) => {
+				ctx.pages = new Map()
+			}),
 			// @ts-ignore
-			setTableRows: assign((ctx, { data }) => {
-				ctx.rows = data.summary
+			setInitialRows: assign((ctx, { data }) => {
 				ctx.mineUrl = data.rootUrl
+				ctx.totalRows = data.totalRows
+				// reset the page in case this is an updated query
+				ctx.pageNumber = 1
+			}),
+			// @ts-ignore
+			setLastQuery: assign((ctx, { data }) => {
+				ctx.lastQuery = data.query
+			}),
+			// @ts-ignore
+			refreshCache: assign((ctx, { data }) => {
+				ctx.pages = refreshCache({
+					tableRows: data.summary,
+					cache: ctx.pages,
+					visibleRows: ctx.visibleRows,
+					startPage: data.startPage,
+				})
+			}),
+			// @ts-ignore
+			updatePageNumber: assign((ctx, event) => {
+				// If the page number is being updated after fetching, the value will be provided in the data prop
+				// @ts-ignore
+				const pageNumber = event?.data ? event.data.pageNumber : event.pageNumber
+				ctx.pageNumber = pageNumber
 			}),
 		},
 		guards: {
 			hasSummary: (ctx) => {
-				return ctx.rows[0]?.length > 0
+				return ctx.totalRows > 0
+			},
+			// @ts-ignore
+			hasPageInCache: (ctx, { pageNumber }) => {
+				return ctx.pages.has(pageNumber)
 			},
 		},
 		services: {
-			fetchTable: async (_ctx, event) => {
-				const {
-					type,
-					globalConfig: { classView, rootUrl },
-					query: nextQuery,
-				} = event
-
-				let query = nextQuery
-
-				if (type === FETCH_INITIAL_SUMMARY) {
-					query = {
-						from: classView,
-						select: ['*'],
-					}
+			fetchInitialRows: async (ctx, { globalConfig }) => {
+				const { classView, rootUrl } = globalConfig
+				const query = {
+					from: classView,
+					select: ['*'],
 				}
 
-				const summary = await fetchTable({ rootUrl, query, page: { start: 0, size: 25 } })
+				const page = {
+					start: 0,
+					size: ctx.visibleRows * ctx.cacheFactor,
+				}
+
+				const { totalRows, summary } = await fetchTable({ rootUrl, query, page })
+
 				const hasSummary = summary.length > 0
 				const headers = hasSummary ? summary[0].map((item) => item.column) : []
 
@@ -218,7 +355,44 @@ export const TableChartMachine = Machine(
 				return {
 					classView,
 					rootUrl,
+					totalRows,
+					query,
 					summary: hasSummary ? summary : [[]],
+					// pages are **NOT** zero indexed. Page 1 === start 1
+					startPage: 1,
+				}
+			},
+			fetchNewPages: async (ctx, { pageNumber }) => {
+				const currentPage = ctx.pageNumber
+				const isPagingForward = currentPage < pageNumber
+				const size = ctx.visibleRows * ctx.cacheFactor
+
+				/**
+				 * When paging backwards, we need to start our calculations to properly fetch the cacheFactor
+				 *
+				 * For e.g
+				 * cacheFactor = 20
+				 * currentPage = 223
+				 * requestedPage = 222
+				 *
+				 * We need pages 203-222 for a total of 20 pages
+				 * 222 - 20 = 202 // wrong
+				 * 223 - 20 = 203 // correct
+				 */
+				const startPage = isPagingForward ? pageNumber : pageNumber + 1 - ctx.cacheFactor
+				const startRow = startPage * ctx.visibleRows - ctx.visibleRows
+
+				const page = {
+					start: Math.max(0, startRow),
+					size,
+				}
+
+				const { summary } = await fetchTable({ rootUrl: ctx.mineUrl, query: ctx.lastQuery, page })
+
+				return {
+					pageNumber,
+					summary,
+					startPage,
 				}
 			},
 		},
@@ -226,11 +400,13 @@ export const TableChartMachine = Machine(
 )
 
 export const Table = () => {
-	const [state] = useMachineBus(TableChartMachine)
+	const [state, send] = useMachineBus(TableChartMachine)
 
-	const { rows: actualData, mineUrl } = state.context
+	const { pages, mineUrl, totalRows, pageNumber, visibleRows } = state.context
 	const isLoading = !state.matches('idle')
-	const rows = isLoading ? tableLoadingData : actualData
+	const rows = isLoading
+		? tableLoadingData
+		: pages.get(pageNumber) ?? [[]] /** ensure a 2D array on 1st render */
 
 	if (state.matches('noTableSummary')) {
 		return (
@@ -241,22 +417,29 @@ export const Table = () => {
 		)
 	}
 
+	const previousPage = pageNumber - 1
+	const previousPageLastRow = previousPage * visibleRows
+	const currentPageFirstRow = previousPageLastRow + 1
+	const currentPageLastRow = Math.min(
+		totalRows,
+		currentPageFirstRow + (visibleRows - 1) /** subtract the first row */
+	)
+
 	return (
-		<>
+		<TableServiceContext.Provider value={{ state, send }}>
 			<TableActionButtons />
-			<div css={{ display: 'flex', justifyContent: 'space-between' }}>
+			<div css={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
 				<span
 					// @ts-ignore
 					css={{
 						fontSize: 'var(--fs-desktopM1)',
 						fontWeight: 'var(--fw-regular)',
-						marginBottom: 20,
 						marginLeft: 10,
-						display: 'inline-flex',
+						alignSelf: 'center',
 					}}
 					className={isLoading ? Classes.SKELETON : ''}
 				>
-					{`Showing ${rows.length} of ${rows.length} rows`}
+					{`Showing ${currentPageFirstRow} to ${currentPageLastRow} of ${totalRows} rows`}
 				</span>
 				<TablePagingButtons />
 			</div>
@@ -285,6 +468,6 @@ export const Table = () => {
 					})}
 				</tbody>
 			</HTMLTable>
-		</>
+		</TableServiceContext.Provider>
 	)
 }

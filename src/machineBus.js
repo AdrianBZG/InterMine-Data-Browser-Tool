@@ -12,6 +12,7 @@ export const MockMachineContext = createContext(null)
 export const ConstraintServiceContext = createContext(null)
 export const QueryServiceContext = createContext(null)
 export const SupervisorServiceContext = createContext(null)
+export const TableServiceContext = createContext(null)
 
 /** @type {import('./types').UseMachineBus} */
 export const useMachineBus = (machine, opts = {}) => {
@@ -72,6 +73,7 @@ export const useServiceContext = (serviceRequested = null) => {
 	const constraintService = useContext(ConstraintServiceContext)
 	const queryService = useContext(QueryServiceContext)
 	const supervisorService = useContext(SupervisorServiceContext)
+	const tableService = useContext(TableServiceContext)
 
 	let service
 
@@ -85,6 +87,10 @@ export const useServiceContext = (serviceRequested = null) => {
 
 	if (serviceRequested === 'supervisor') {
 		service = supervisorService
+	}
+
+	if (serviceRequested === 'table') {
+		service = tableService
 	}
 
 	if (!service) {

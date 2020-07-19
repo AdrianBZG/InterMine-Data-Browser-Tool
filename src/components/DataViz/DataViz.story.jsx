@@ -65,7 +65,9 @@ PieChart.parameters = {
 	},
 }
 
+// @ts-ignore
 const tableMockMachine = TableChartMachine.withContext({
+	// @ts-ignore
 	rows: humanMine25,
 	mineUrl,
 })

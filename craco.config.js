@@ -14,7 +14,17 @@ const emotionBabelPreset = require('@emotion/babel-preset-css-prop').default(
 
 module.exports = {
 	babel: {
-		plugins: [...emotionBabelPreset.plugins],
+		plugins: [
+			...emotionBabelPreset.plugins,
+			[
+				'import',
+				{
+					libraryName: 'react-use',
+					libraryDirectory: 'lib',
+					camel2DashComponentName: false,
+				},
+			],
+		],
 	},
 	typescript: {
 		enableTypeChecking: false,

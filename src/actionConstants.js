@@ -38,3 +38,8 @@ export const SET_INITIAL_ORGANISMS = 'pieChart/fetch/initial'
  */
 export const CHANGE_MINE = 'supervisor/mine/change'
 export const CHANGE_CLASS = 'supervisor/class/change'
+
+/**
+ * Table
+ */
+export const CHANGE_PAGE = 'table/page/change'

@@ -37,7 +37,13 @@ export const fetchSummary = async ({ rootUrl, query, path }) => {
 
 export const fetchTable = async ({ rootUrl, query, page }) => {
 	const service = getService(rootUrl)
-	return await service.tableRows(query, page)
+	const summary = await service.tableRows(query, page)
+	const totalRows = await service.count(query)
+
+	return {
+		summary,
+		totalRows,
+	}
 }
 
 export const fetchInstances = async () => {

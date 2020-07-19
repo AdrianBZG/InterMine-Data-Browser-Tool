@@ -16,6 +16,8 @@ exports.usedIcons = [
 	IconNames.ARCHIVE,
 	IconNames.CHEVRON_BACKWARD,
 	IconNames.CHEVRON_FORWARD,
+	IconNames.CHEVRON_LEFT,
+	IconNames.CHEVRON_RIGHT,
 	IconNames.WARNING_SIGN,
 	IconNames.REMOVE,
 	IconNames.DELETE,
