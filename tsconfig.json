@@ -20,7 +20,6 @@
 		"downlevelIteration": true
 	},
 	"include": ["src/**/*"],
-	"files": ["src/components/Constraints/TemplateConstraint.stories.jsx"],
 	"exclude": [
 		"**/node_modules/*",
 		"src/blueprintIcons.js",

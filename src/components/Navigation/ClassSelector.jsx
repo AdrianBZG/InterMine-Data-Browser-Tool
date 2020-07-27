@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useState } from 'react'
 
-import { NumberedSelectMenuItems } from '../Selects'
+import { NumberedSelectMenuItems } from './Shared/Selects'
 
 export const ClassSelector = () => {
 	const [visibleClasses, setVisibleClasses] = useState([{ name: 'Gene' }, { name: 'Protein' }])

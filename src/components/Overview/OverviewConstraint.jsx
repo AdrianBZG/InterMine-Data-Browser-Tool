@@ -3,13 +3,14 @@ import { IconNames } from '@blueprintjs/icons'
 import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
-import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/actionConstants'
 import { buildSearchIndex } from 'src/buildSearchIndex'
-import { CheckboxPopup } from 'src/components/Constraints/CheckboxPopup'
-import { createConstraintMachine } from 'src/components/Constraints/createConstraintMachine'
-import { SelectPopup } from 'src/components/Constraints/SelectPopup'
-import { PopupCard } from 'src/components/Shared/PopupCard'
+import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
 import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/machineBus'
+
+import { PopupCard } from '../Shared/PopupCard'
+import { CheckboxWidget } from '../Widgets/CheckboxWidget'
+import { SuggestWidget } from '../Widgets/SuggestWidget'
+import { createConstraintMachine } from './createConstraintMachine'
 
 const ConstraintCard = ({ children }) => {
 	const [state, send] = useServiceContext('constraints')
@@ -94,6 +95,7 @@ const S_CountTag = styled.div`
 		margin: 0 0.833em;
 	}
 `
+
 const S_ConstraintIcon = styled.div`
 	border-radius: 30px;
 	border: ${(props) =>
@@ -141,10 +143,10 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 
 	switch (type) {
 		case 'checkbox':
-			ConstraintWidget = CheckboxPopup
+			ConstraintWidget = CheckboxWidget
 			break
 		default:
-			ConstraintWidget = SelectPopup
+			ConstraintWidget = SuggestWidget
 			break
 	}
 

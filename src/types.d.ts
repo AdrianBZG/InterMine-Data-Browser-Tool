@@ -3,7 +3,7 @@ import {
 	DELETE_QUERY_CONSTRAINT,
 	SET_INITIAL_ORGANISMS,
 	TOGGLE_CATEGORY_VISIBILITY,
-} from 'src/actionConstants'
+} from 'src/eventConstants'
 import {
 	EventData,
 	EventObject,

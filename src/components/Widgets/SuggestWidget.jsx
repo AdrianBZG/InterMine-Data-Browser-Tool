@@ -2,12 +2,12 @@ import { Classes, FormGroup, H6, Menu, MenuItem, NonIdealState, Tag, Text } from
 import { Suggest } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
-import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
+import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/eventConstants'
 import { generateId } from 'src/generateId'
+import { useServiceContext } from 'src/machineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
-import { useServiceContext } from '../../machineBus'
-import { NoValuesProvided } from './NoValuesProvided'
+import { NoValuesProvided } from '../Shared/NoValuesProvided'
 
 const ConstraintItem = ({ index, style, data }) => {
 	const { filteredItems, activeItem, handleItemSelect, infoText } = data
@@ -82,6 +82,10 @@ const VirtualizedMenu = ({
 	)
 }
 
+/**
+ * This bit of indirection is needed since Blueprintjs requires a regular function to render a filtered list,
+ * but the rules of react require that hooks be at the top level of either another hook or a react component.
+ */
 const renderMenu = (handleItemSelect) => ({ filteredItems, itemsParentRef, query, activeItem }) => (
 	<VirtualizedMenu
 		filteredItems={filteredItems}
@@ -92,7 +96,7 @@ const renderMenu = (handleItemSelect) => ({ filteredItems, itemsParentRef, query
 	/>
 )
 
-export const SelectPopup = ({
+export const SuggestWidget = ({
 	nonIdealTitle = undefined,
 	nonIdealDescription = undefined,
 	label = '',

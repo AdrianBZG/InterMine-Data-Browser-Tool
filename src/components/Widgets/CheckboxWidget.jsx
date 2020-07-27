@@ -1,11 +1,11 @@
 import { Checkbox, Label } from '@blueprintjs/core'
 import React from 'react'
-import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/actionConstants'
+import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/eventConstants'
+import { useServiceContext } from 'src/machineBus'
 
-import { useServiceContext } from '../../machineBus'
-import { NoValuesProvided } from './NoValuesProvided'
+import { NoValuesProvided } from '../Shared/NoValuesProvided'
 
-export const CheckboxPopup = ({ nonIdealTitle = undefined, nonIdealDescription = undefined }) => {
+export const CheckboxWidget = ({ nonIdealTitle = undefined, nonIdealDescription = undefined }) => {
 	const [state, send] = useServiceContext('constraints')
 
 	const { availableValues, selectedValues } = state?.context

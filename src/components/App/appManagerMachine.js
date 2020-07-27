@@ -1,33 +1,21 @@
-// import so that the IDE can add the css prop to components
-import '@emotion/core'
-
 import { assign } from '@xstate/immer'
-import { enableMapSet } from 'immer'
-import React, { useEffect } from 'react'
 import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
 	CHANGE_MINE,
-	FETCH_INITIAL_SUMMARY,
 	TOGGLE_CATEGORY_VISIBILITY,
 	TOGGLE_VIEW_IS_LOADING,
 	UPDATE_TEMPLATE_QUERIES,
-} from 'src/actionConstants'
+} from 'src/eventConstants'
 import { fetchClasses, fetchInstances } from 'src/fetchSummary'
-import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
 import { forwardTo, Machine } from 'xstate'
 
-import { ConstraintSection } from './Layout/ConstraintSection'
-import { ChartSection, TableSection } from './Layout/DataVizSection'
-import { Header } from './Layout/Header'
 import { templateViewMachine } from './templateViewMachine'
-
-enableMapSet()
 
 // Todo: Change this after fixing biotestmine dev environment
 const isProduction = true
 
-/** @type {import('../types').ConstraintConfig[]} */
+/** @type {import('../../types').ConstraintConfig[]} */
 const defaultQueries = [
 	{
 		type: 'checkbox',
@@ -83,7 +71,7 @@ const defaultQueries = [
 	},
 ]
 
-const appManagerMachine = Machine(
+export const appManagerMachine = Machine(
 	{
 		id: 'AppManager',
 		initial: 'loading',
@@ -247,65 +235,3 @@ const appManagerMachine = Machine(
 		},
 	}
 )
-
-export const App = () => {
-	const [state, send] = useMachineBus(appManagerMachine)
-
-	const {
-		appView,
-		classView,
-		possibleQueries,
-		categories,
-		selectedMine,
-		showAllLabel,
-		viewIsLoading,
-	} = state.context
-
-	const rootUrl = selectedMine.rootUrl
-
-	useEffect(() => {
-		if (state.matches('defaultView')) {
-			sendToBus({ type: FETCH_INITIAL_SUMMARY, globalConfig: { rootUrl, classView } })
-		}
-	}, [rootUrl, classView, state])
-
-	const toggleCategory = ({ isVisible, tagName }) => {
-		send({ type: TOGGLE_CATEGORY_VISIBILITY, isVisible, tagName })
-	}
-
-	return (
-		<div className="light-theme">
-			<AppManagerServiceContext.Provider value={{ state, send }}>
-				<Header />
-			</AppManagerServiceContext.Provider>
-			<main
-				css={{
-					display: 'grid',
-					gridTemplateColumns: '230px 1fr',
-				}}
-			>
-				<ConstraintSection
-					queries={possibleQueries}
-					view={appView}
-					classCategoryTags={Object.values(categories)}
-					isLoading={viewIsLoading}
-					toggleCategory={toggleCategory}
-					showAllLabel={showAllLabel}
-					classView={classView}
-					rootUrl={rootUrl}
-					showAll={categories[showAllLabel]?.isVisible ?? true}
-				/>
-				<section
-					css={{
-						padding: '10px 30px 0',
-						overflow: 'auto',
-						height: 'calc(100vh - 3.643em)',
-					}}
-				>
-					<ChartSection />
-					<TableSection />
-				</section>
-			</main>
-		</div>
-	)
-}

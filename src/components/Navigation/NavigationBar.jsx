@@ -2,14 +2,17 @@ import { Button, ButtonGroup, Menu, MenuItem, Navbar } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
-import { CHANGE_CLASS } from 'src/actionConstants'
 import { buildSearchIndex } from 'src/buildSearchIndex'
+import { CHANGE_CLASS } from 'src/eventConstants'
 import { useServiceContext } from 'src/machineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
-import { NumberedSelectMenuItems } from '../Selects'
+import { NumberedSelectMenuItems } from '../Shared/Selects'
 import { Mine } from './MineSelect'
 
+/**
+ *
+ */
 const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	const renderedItems = filteredItems.map(renderItem)
 	const infoText = pluralizeFilteredCount(filteredItems, query)
@@ -22,6 +25,9 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	)
 }
 
+/**
+ *
+ */
 export const NavigationBar = () => {
 	const [selectedTheme, changeTheme] = useState('light')
 	const isLightTheme = selectedTheme === 'light'

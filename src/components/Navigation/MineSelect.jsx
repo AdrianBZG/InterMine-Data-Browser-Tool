@@ -2,10 +2,10 @@ import { Button, Colors, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useState } from 'react'
-import { CHANGE_MINE } from 'src/actionConstants'
+import { CHANGE_MINE } from 'src/eventConstants'
 import { useServiceContext } from 'src/machineBus'
 
-import { NumberedSelectMenuItems } from '../Selects'
+import { NumberedSelectMenuItems } from '../Shared/Selects'
 
 const AuthenticatedIcon = (isAuthenticated) => (
 	<Icon

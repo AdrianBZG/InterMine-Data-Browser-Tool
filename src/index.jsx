@@ -5,7 +5,7 @@ import { FocusStyleManager } from '@blueprintjs/core'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { App } from './components/App'
+import { App } from './components/App/App'
 import * as serviceWorker from './serviceWorker'
 
 FocusStyleManager.onlyShowFocusOnTabs()

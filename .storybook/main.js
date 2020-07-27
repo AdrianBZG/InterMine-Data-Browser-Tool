@@ -23,7 +23,6 @@ module.exports = {
 		// '../docs/**/*.stories.mdx',
 		// '../src/**/*.story.jsx',
 		// '../src/**/*.stories.jsx',
-		'../src/**/TemplateConstraint.stories.jsx',
 	],
 	webpackFinal: async (config, { configType }) => {
 		const { hasFoundAny, matches } = getLoaders(config, loaderByName('babel-loader'))

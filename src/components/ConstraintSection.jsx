@@ -1,13 +1,13 @@
 import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React, { useState } from 'react'
-import { CHANGE_CONSTRAINT_VIEW } from 'src/actionConstants'
+import { CHANGE_CONSTRAINT_VIEW } from 'src/eventConstants'
 import { sendToBus } from 'src/machineBus'
 
-import { OverviewConstraint } from '../Constraints/OverviewConstraint'
-import { TemplateQuery } from '../Constraints/TemplateQuery'
-import { DATA_VIZ_COLORS } from '../DataViz/dataVizColors'
-import { QueryController } from '../QueryController/QueryController'
+import { DATA_VIZ_COLORS } from './dataVizColors'
+import { OverviewConstraint } from './Overview/OverviewConstraint'
+import { QueryController } from './QueryController/QueryController'
+import { TemplateQuery } from './Templates/TemplateQuery'
 
 const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, showAllLabel }) => {
 	const [showCategories, setShowCategories] = useState(false)

@@ -1,9 +1,4 @@
 import { assign } from '@xstate/immer'
-import { fetchSummary } from 'src/fetchSummary'
-import { sendToBus } from 'src/machineBus'
-import { formatConstraintPath } from 'src/utils'
-import { Machine } from 'xstate'
-
 import {
 	ADD_CONSTRAINT,
 	APPLY_DATA_BROWSER_CONSTRAINT,
@@ -15,7 +10,11 @@ import {
 	RESET_ALL_CONSTRAINTS,
 	RESET_LOCAL_CONSTRAINT,
 	UNSET_CONSTRAINT,
-} from '../../actionConstants'
+} from 'src/eventConstants'
+import { fetchSummary } from 'src/fetchSummary'
+import { sendToBus } from 'src/machineBus'
+import { formatConstraintPath } from 'src/utils'
+import { Machine } from 'xstate'
 
 /** @type {import('../../types').CreateConstraintMachine} */
 export const createConstraintMachine = ({

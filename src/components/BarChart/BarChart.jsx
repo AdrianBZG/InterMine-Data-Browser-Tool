@@ -1,5 +1,4 @@
 import { ProgressBar } from '@blueprintjs/core'
-import { assign } from '@xstate/immer'
 import React from 'react'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
@@ -14,15 +13,13 @@ import {
 	Tooltip,
 	XAxis,
 } from 'recharts'
-import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/actionConstants'
-import { fetchSummary } from 'src/fetchSummary'
+import { useMachineBus } from 'src/machineBus'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
-import { Machine } from 'xstate'
+import { barChartLoadingData } from 'src/utils/loadingData/barChartData'
 
-import { useMachineBus } from '../../machineBus'
-import { barChartLoadingData } from '../loadingData/barChartData'
+import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
-import { DATA_VIZ_COLORS } from './dataVizColors'
+import { BarChartMachine } from './barChartMachine'
 
 const renderCustomTick = (isLoading) => ({ x, y, payload }) => {
 	return (
@@ -56,96 +53,6 @@ const colorizeBars = (data, isLoading) =>
 			fill={isLoading ? 'var(--grey2)' : DATA_VIZ_COLORS[index % DATA_VIZ_COLORS.length]}
 		/>
 	))
-
-export const BarChartMachine = Machine(
-	{
-		id: 'BarChart',
-		initial: 'noGeneLengths',
-		context: {
-			lengthStats: {
-				min: 0,
-				max: 0,
-				buckets: 0,
-				uniqueValues: 0,
-				average: 0,
-				stdev: 0,
-			},
-			lengthSummary: [],
-			classView: '',
-		},
-		on: {
-			// Making it global ensures that we retry when the mine or class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
-		},
-		states: {
-			idle: {},
-			loading: {
-				invoke: {
-					id: 'fetchGeneLength',
-					src: 'fetchGeneLength',
-					onDone: {
-						target: 'pending',
-						actions: 'setLengthSummary',
-					},
-					onError: {
-						target: 'noGeneLengths',
-						actions: 'logErrorToConsole',
-					},
-				},
-			},
-			noGeneLengths: {},
-			pending: {
-				after: {
-					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'noGeneLengths' }],
-				},
-			},
-		},
-	},
-	{
-		actions: {
-			// @ts-ignore
-			setLengthSummary: assign((ctx, { data }) => {
-				ctx.lengthStats = data.lengthStats
-				ctx.lengthSummary = data.lengthSummary
-				ctx.classView = data.classView
-			}),
-			// @ts-ignore
-			logErrorToConsole: (ctx, event) => console.warn(event.data),
-		},
-		guards: {
-			hasSummary: (ctx) => {
-				return ctx.lengthSummary.length > 0
-			},
-		},
-		services: {
-			fetchGeneLength: async (_ctx, { globalConfig: { classView, rootUrl }, query: nextQuery }) => {
-				let query = {
-					...nextQuery,
-					from: classView,
-					select: ['length', 'primaryIdentifier'],
-					model: {
-						name: 'genomic',
-					},
-					orderBy: [
-						{
-							path: 'length',
-							direction: 'ASC',
-						},
-					],
-				}
-
-				const summary = await fetchSummary({ rootUrl, query, path: 'length' })
-
-				return {
-					classView,
-					lengthStats: summary.stats,
-					lengthSummary: summary.results.slice(0, summary.results.length - 1),
-				}
-			},
-		},
-	}
-)
 
 export const BarChart = () => {
 	const isFirstRender = useFirstMountState()
