@@ -1,4 +1,4 @@
-import { Button, Classes } from '@blueprintjs/core'
+import { AnchorButton, Button, Classes, PopoverPosition, Tooltip } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React from 'react'
 
@@ -25,3 +25,23 @@ export const CloseButton = () => (
 		/>
 	</div>
 )
+
+export const RunQueryButton = ({ isDisabled = false, intent = 'success', handleOnClick }) => {
+	return (
+		<Tooltip
+			css={{ marginTop: 20, display: 'inline-block' }}
+			content="You have not added or updated any constraints"
+			position={PopoverPosition.RIGHT}
+			disabled={!isDisabled}
+		>
+			<AnchorButton
+				text="Run Query"
+				// @ts-ignore
+				intent={intent}
+				disabled={isDisabled}
+				rightIcon={IconNames.PLAY}
+				onClick={handleOnClick}
+			/>
+		</Tooltip>
+	)
+}

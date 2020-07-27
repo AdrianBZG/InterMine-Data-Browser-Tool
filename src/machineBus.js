@@ -7,12 +7,13 @@ const enableMocks =
 	process.env.NODE_ENV?.toLowerCase() === 'test' ||
 	process.env.STORYBOOK_USEMOCK?.toLowerCase() === 'true'
 
-const serviceStations = new Map()
 export const MockMachineContext = createContext(null)
 export const ConstraintServiceContext = createContext(null)
 export const QueryServiceContext = createContext(null)
-export const SupervisorServiceContext = createContext(null)
+export const AppManagerServiceContext = createContext(null)
 export const TableServiceContext = createContext(null)
+
+const serviceStations = new Map()
 
 /** @type {import('./types').UseMachineBus} */
 export const useMachineBus = (machine, opts = {}) => {
@@ -50,6 +51,11 @@ export const useMachineBus = (machine, opts = {}) => {
 		serviceStations.set(service.sessionId, service)
 	}
 
+	// Remove the service from the station when components unmount
+	service.onStop(() => {
+		serviceStations.delete(service.sessionId)
+	})
+
 	return [machineState, sendToBusWrapper, service]
 }
 
@@ -72,7 +78,7 @@ export const sendToBus = (event, payload) => {
 export const useServiceContext = (serviceRequested = null) => {
 	const constraintService = useContext(ConstraintServiceContext)
 	const queryService = useContext(QueryServiceContext)
-	const supervisorService = useContext(SupervisorServiceContext)
+	const appManagerService = useContext(AppManagerServiceContext)
 	const tableService = useContext(TableServiceContext)
 
 	let service
@@ -85,8 +91,8 @@ export const useServiceContext = (serviceRequested = null) => {
 		service = queryService
 	}
 
-	if (serviceRequested === 'supervisor') {
-		service = supervisorService
+	if (serviceRequested === 'appManager') {
+		service = appManagerService
 	}
 
 	if (serviceRequested === 'table') {

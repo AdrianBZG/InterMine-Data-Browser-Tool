@@ -4,27 +4,98 @@ import '@emotion/core'
 import { assign } from '@xstate/immer'
 import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
-import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY } from 'src/actionConstants'
+import {
+	CHANGE_CLASS,
+	CHANGE_CONSTRAINT_VIEW,
+	CHANGE_MINE,
+	FETCH_INITIAL_SUMMARY,
+	TOGGLE_CATEGORY_VISIBILITY,
+	TOGGLE_VIEW_IS_LOADING,
+	UPDATE_TEMPLATE_QUERIES,
+} from 'src/actionConstants'
 import { fetchClasses, fetchInstances } from 'src/fetchSummary'
-import { sendToBus, SupervisorServiceContext, useMachineBus } from 'src/machineBus'
-import { Machine } from 'xstate'
+import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
+import { forwardTo, Machine } from 'xstate'
 
 import { ConstraintSection } from './Layout/ConstraintSection'
 import { ChartSection, TableSection } from './Layout/DataVizSection'
 import { Header } from './Layout/Header'
+import { templateViewMachine } from './templateViewMachine'
 
 enableMapSet()
 
-const isProduction = process.env.NODE_ENV === 'production'
+// Todo: Change this after fixing biotestmine dev environment
+const isProduction = true
 
-const supervisorMachine = Machine(
+/** @type {import('../types').ConstraintConfig[]} */
+const defaultQueries = [
 	{
-		id: 'Supervisor',
+		type: 'checkbox',
+		name: 'Organism',
+		label: 'Or',
+		path: 'organism.shortName',
+		op: 'ONE OF',
+		valuesQuery: {
+			select: ['primaryIdentifier'],
+			model: {
+				name: 'genomic',
+			},
+			where: [],
+		},
+	},
+	{
+		type: 'select',
+		name: 'Pathway Name',
+		label: 'Pn',
+		path: 'pathways.name',
+		op: 'ONE OF',
+		valuesQuery: {
+			select: ['pathways.name', 'primaryIdentifier'],
+			model: {
+				name: 'genomic',
+			},
+			orderBy: [
+				{
+					path: 'pathways.name',
+					direction: 'ASC',
+				},
+			],
+		},
+	},
+	{
+		type: 'select',
+		name: 'GO Annotation',
+		label: 'GA',
+		path: 'goAnnotation.ontologyTerm.name',
+		op: 'ONE OF',
+		valuesQuery: {
+			select: ['goAnnotation.ontologyTerm.name', 'primaryIdentifier'],
+			model: {
+				name: 'genomic',
+			},
+			orderBy: [
+				{
+					path: 'Gene.goAnnotation.ontologyTerm.name',
+					direction: 'ASC',
+				},
+			],
+		},
+	},
+]
+
+const appManagerMachine = Machine(
+	{
+		id: 'AppManager',
 		initial: 'loading',
 		context: {
+			appView: 'defaultView',
 			classView: 'Gene',
 			intermines: [],
 			modelClasses: [],
+			showAllLabel: 'Show All',
+			possibleQueries: defaultQueries,
+			categories: {},
+			viewIsLoading: false,
 			selectedMine: {
 				name: isProduction ? 'HumanMine' : 'biotestmine',
 				rootUrl: isProduction
@@ -32,32 +103,87 @@ const supervisorMachine = Machine(
 					: 'http://localhost:9999/biotestmine',
 			},
 		},
+		on: {
+			[CHANGE_MINE]: { target: 'loading', actions: 'changeMine' },
+			[CHANGE_CLASS]: { actions: ['changeClass'] },
+			[UPDATE_TEMPLATE_QUERIES]: { actions: 'updateTemplateQueries' },
+			[TOGGLE_VIEW_IS_LOADING]: { actions: 'toggleViewIsLoading' },
+			[TOGGLE_CATEGORY_VISIBILITY]: { actions: 'forwardToTemplateView' },
+			[CHANGE_CONSTRAINT_VIEW]: [
+				{ target: 'defaultView', cond: 'isDefaultView' },
+				{ target: 'templateView', cond: 'isTemplateView' },
+				{ target: 'invalidAppView' },
+			],
+		},
 		states: {
 			loading: {
+				on: {
+					[CHANGE_CLASS]: { actions: 'changeClass' },
+				},
 				invoke: {
 					id: 'fetchMines',
 					src: 'fetchMinesAndClasses',
 					onDone: {
-						target: 'idle',
+						target: 'defaultView',
 						actions: 'setIntermines',
 					},
 					onError: {
-						target: 'idle',
+						target: 'defaultView',
 						actions: (ctx, event) =>
 							console.error('FETCH: could not retrieve intermines', { ctx, event }),
 					},
 				},
 			},
-			idle: {
+			defaultView: {
+				entry: ['setBrowserView', 'setPossibleOverviewQueries'],
 				on: {
-					[CHANGE_MINE]: { target: 'loading', actions: 'changeMine' },
 					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
 			},
+			templateView: {
+				entry: ['setTemplateView', 'clearPossibleQueries'],
+				on: {
+					[CHANGE_CLASS]: { actions: ['changeClass', 'forwardToTemplateView'] },
+				},
+				invoke: {
+					id: 'templateView',
+					src: templateViewMachine,
+					data: {
+						// Hack until xstate v5 introduces shallow merging
+						...templateViewMachine.context,
+						classView: (ctx) => ctx.classView,
+						showAllLabel: (ctx) => ctx.showAllLabel,
+						rootUrl: (ctx) => ctx.selectedMine.rootUrl,
+					},
+				},
+			},
+			invalidAppView: {},
 		},
 	},
 	{
 		actions: {
+			forwardToTemplateView: forwardTo('templateView'),
+			// @ts-ignore
+			toggleViewIsLoading: assign((ctx, { isLoading }) => {
+				ctx.viewIsLoading = isLoading
+			}),
+			// @ts-ignore
+			updateTemplateQueries: assign((ctx, { queries, categories }) => {
+				ctx.possibleQueries = queries
+				ctx.categories = categories
+			}),
+			setTemplateView: assign((ctx) => {
+				ctx.appView = 'templateView'
+			}),
+			clearPossibleQueries: assign((ctx) => {
+				ctx.possibleQueries = []
+			}),
+			setPossibleOverviewQueries: assign((ctx) => {
+				ctx.possibleQueries = defaultQueries
+			}),
+			setBrowserView: assign((ctx) => {
+				ctx.appView = 'defaultView'
+			}),
 			// @ts-ignore
 			changeMine: assign((ctx, { newMine }) => {
 				ctx.selectedMine = ctx.intermines.find((mine) => mine.name === newMine)
@@ -76,8 +202,22 @@ const supervisorMachine = Machine(
 					.map((cl) => ({ displayName: cl.displayName, name: cl.name }))
 			}),
 		},
+		guards: {
+			// @ts-ignore
+			isDefaultView: (_, { newTabId }) => {
+				return newTabId === 'defaultView'
+			},
+			// @ts-ignore
+			isTemplateView: (_, { newTabId }) => {
+				return newTabId === 'templateView'
+			},
+			// @ts-ignore
+			showAllCategories: (ctx, { tagName }) => {
+				return tagName === ctx.showAllLabel
+			},
+		},
 		services: {
-			fetchMinesAndClasses: async (ctx, event) => {
+			fetchMinesAndClasses: async (ctx) => {
 				let instances
 				let modelClasses
 
@@ -109,27 +249,52 @@ const supervisorMachine = Machine(
 )
 
 export const App = () => {
-	const [state, send] = useMachineBus(supervisorMachine)
+	const [state, send] = useMachineBus(appManagerMachine)
 
-	const { classView, selectedMine } = state.context
+	const {
+		appView,
+		classView,
+		possibleQueries,
+		categories,
+		selectedMine,
+		showAllLabel,
+		viewIsLoading,
+	} = state.context
+
 	const rootUrl = selectedMine.rootUrl
 
 	useEffect(() => {
-		sendToBus({ type: FETCH_INITIAL_SUMMARY, globalConfig: { rootUrl, classView } })
-	}, [rootUrl, classView])
+		if (state.matches('defaultView')) {
+			sendToBus({ type: FETCH_INITIAL_SUMMARY, globalConfig: { rootUrl, classView } })
+		}
+	}, [rootUrl, classView, state])
+
+	const toggleCategory = ({ isVisible, tagName }) => {
+		send({ type: TOGGLE_CATEGORY_VISIBILITY, isVisible, tagName })
+	}
 
 	return (
 		<div className="light-theme">
-			<SupervisorServiceContext.Provider value={{ state, send }}>
+			<AppManagerServiceContext.Provider value={{ state, send }}>
 				<Header />
-			</SupervisorServiceContext.Provider>
+			</AppManagerServiceContext.Provider>
 			<main
 				css={{
 					display: 'grid',
 					gridTemplateColumns: '230px 1fr',
 				}}
 			>
-				<ConstraintSection />
+				<ConstraintSection
+					queries={possibleQueries}
+					view={appView}
+					classCategoryTags={Object.values(categories)}
+					isLoading={viewIsLoading}
+					toggleCategory={toggleCategory}
+					showAllLabel={showAllLabel}
+					classView={classView}
+					rootUrl={rootUrl}
+					showAll={categories[showAllLabel]?.isVisible ?? true}
+				/>
 				<section
 					css={{
 						padding: '10px 30px 0',

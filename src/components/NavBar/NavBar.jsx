@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Classes, Menu, MenuItem, Navbar, Tab, Tabs } from '@blueprintjs/core'
+import { Button, ButtonGroup, Menu, MenuItem, Navbar } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
@@ -26,9 +26,12 @@ export const NavigationBar = () => {
 	const [selectedTheme, changeTheme] = useState('light')
 	const isLightTheme = selectedTheme === 'light'
 
-	const [state, send] = useServiceContext('supervisor')
+	const [state, send] = useServiceContext('appManager')
 	const { classView, modelClasses } = state.context
 	const classSearchIndex = useRef(null)
+
+	const classDisplayName =
+		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
 
 	useEffect(() => {
 		const indexClasses = async () => {
@@ -43,9 +46,6 @@ export const NavigationBar = () => {
 
 		indexClasses()
 	}, [modelClasses])
-
-	const classDisplayName =
-		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
 
 	const handleClassSelect = ({ name }) => {
 		send({ type: CHANGE_CLASS, newClass: name })
@@ -65,42 +65,39 @@ export const NavigationBar = () => {
 			<Navbar.Group css={{ width: '100%' }}>
 				<Mine />
 				{/* 
-						Navigation Tabs
+						Selected Class view
 				  */}
-				<Tabs
-					id="classes-tab"
-					selectedTabId={classView}
-					// @ts-ignore
-					css={{
-						marginLeft: 'auto',
-						marginRight: 20,
-						[`.${Classes.TAB}`]: {
+				<div css={{ display: 'flex', marginLeft: 'auto', marginRight: 20 }}>
+					<span
+						// @ts-ignore
+						css={{
 							fontSize: 'var(--fs-desktopM2)',
-							fontWeight: 'var(--fw-light)',
-						},
-					}}
-				>
-					<Tab key="Templates" id="Templates" title="Templates" />
-					<Tab key={classView} id={classView} title={classDisplayName} />
-				</Tabs>
-				<Select
-					items={state.context.modelClasses}
-					filterable={true}
-					itemRenderer={NumberedSelectMenuItems}
-					onItemSelect={handleClassSelect}
-					itemListRenderer={renderMenu}
-					itemListPredicate={filterQuery}
-					resetOnClose={true}
-				>
-					<Button
-						aria-label="select the views you'd like to query"
-						// used to override `Blueprintjs` styles for a small button
-						small={true}
-						text="change view"
-						alignText="left"
-						rightIcon={IconNames.CARET_DOWN}
-					/>
-				</Select>
+							fontWeight: 'var(--fw-regular)',
+							marginRight: 8,
+							marginBottom: 0,
+						}}
+					>
+						{classDisplayName}
+					</span>
+					<Select
+						items={state.context.modelClasses}
+						filterable={true}
+						itemRenderer={NumberedSelectMenuItems}
+						onItemSelect={handleClassSelect}
+						itemListRenderer={renderMenu}
+						itemListPredicate={filterQuery}
+						resetOnClose={true}
+					>
+						<Button
+							aria-label="select the views you'd like to query"
+							// used to override `Blueprintjs` styles for a small button
+							small={true}
+							text="change view"
+							alignText="left"
+							rightIcon={IconNames.CARET_DOWN}
+						/>
+					</Select>
+				</div>
 				{/* 
 						Theme controls
 				 */}

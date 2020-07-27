@@ -1,13 +1,125 @@
-import { Button, Divider, H4, H5, NonIdealState, PopoverPosition, Tooltip } from '@blueprintjs/core'
+import { Button, Divider, H4, H5, NonIdealState } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
+import { assign } from '@xstate/immer'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { Machine } from 'xstate'
 
-import { DELETE_QUERY_CONSTRAINT, FETCH_UPDATED_SUMMARY } from '../../actionConstants'
+import {
+	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
+	CHANGE_CONSTRAINT_VIEW,
+	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
+	DELETE_QUERY_CONSTRAINT,
+	FETCH_INITIAL_SUMMARY,
+	FETCH_UPDATED_SUMMARY,
+	SET_AVAILABLE_COLUMNS,
+	UNSET_CONSTRAINT,
+} from '../../actionConstants'
 import { QueryServiceContext, sendToBus, useMachineBus, useServiceContext } from '../../machineBus'
+import { RunQueryButton } from '../Shared/Buttons'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { PopupCard } from '../Shared/PopupCard'
-import { queryControllerMachine } from './queryControllerMachine'
+
+const queryControllerMachine = Machine(
+	{
+		id: 'QueryController',
+		initial: 'idle',
+		context: {
+			currentConstraints: [],
+			appView: 'defaultView',
+			classView: '',
+			selectedPaths: [],
+			rootUrl: '',
+		},
+		on: {
+			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectPaths' },
+			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
+			[FETCH_INITIAL_SUMMARY]: {
+				target: 'idle',
+				actions: 'initializeMachine',
+			},
+		},
+		states: {
+			idle: {
+				on: {
+					[DELETE_QUERY_CONSTRAINT]: { actions: 'removeConstraint' },
+					[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
+					[APPLY_OVERVIEW_CONSTRAINT_TO_QUERY]: [
+						{
+							target: 'constraintLimitReached',
+							cond: {
+								type: 'canAddConstraint',
+								maxConstraints: 26,
+							},
+							actions: 'addConstraint',
+						},
+						{
+							actions: 'addConstraint',
+						},
+					],
+				},
+			},
+			constraintLimitReached: {
+				on: {
+					[DELETE_QUERY_CONSTRAINT]: {
+						actions: 'removeConstraint',
+					},
+				},
+			},
+		},
+	},
+	{
+		actions: {
+			// @ts-ignore
+			setAppView: assign((ctx, { newTabId }) => {
+				ctx.appView = newTabId
+			}),
+			// @ts-ignore
+			initializeMachine: assign((ctx, { globalConfig }) => {
+				ctx.currentConstraints = []
+				ctx.selectedPaths = []
+				ctx.classView = globalConfig.classView
+				ctx.rootUrl = globalConfig.rootUrl
+			}),
+			// @ts-ignore
+			addConstraint: assign((ctx, { query }) => {
+				const withQueryRemoved = ctx.currentConstraints.filter((c) => {
+					return c.path !== query.path
+				})
+
+				withQueryRemoved.push(query)
+				ctx.currentConstraints = withQueryRemoved
+			}),
+			// @ts-ignore
+			removeConstraint: assign((ctx, { type, path }) => {
+				const prevCount = ctx.currentConstraints.length
+				ctx.currentConstraints = ctx.currentConstraints.filter((c) => {
+					return c.path !== path
+				})
+
+				const nextCount = ctx.currentConstraints.length
+
+				// The constraint is being deleted internally, and needs to be synced
+				// with the constraint machines
+				if (type !== DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
+					const constraintPath = path.slice(path.indexOf('.') + 1)
+
+					sendToBus({ type: UNSET_CONSTRAINT, path: constraintPath })
+				}
+			}),
+			// @ts-ignore
+			setSelectPaths: assign((ctx, { selectedPaths }) => {
+				ctx.selectedPaths = selectedPaths
+			}),
+		},
+		guards: {
+			canAddConstraint: (context, _, { cond }) => {
+				// @ts-ignore
+				return context.currentConstraints.length + 1 === cond.maxConstraints
+			},
+		},
+	}
+)
 
 const getOperantSymbol = (operant) => {
 	switch (operant) {
@@ -112,7 +224,7 @@ const CODES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 export const QueryController = () => {
 	const [state, send] = useMachineBus(queryControllerMachine)
 
-	const { currentConstraints, classView, selectedPaths, rootUrl } = state.context
+	const { currentConstraints, classView, selectedPaths, rootUrl, appView } = state.context
 
 	let color = 'var(--green5)'
 
@@ -145,10 +257,12 @@ export const QueryController = () => {
 		sendToBus({ type: FETCH_UPDATED_SUMMARY, query, globalConfig: { classView, rootUrl } })
 	}
 
-	return (
-		<div css={{ paddingTop: 10, margin: '0 20px' }}>
+	const BrowserConstraintViewAll = () => (
+		<>
 			<H5>
-				<span css={{ color }}>{`${currentConstraints.length} `}</span>
+				<span
+					css={{ color, display: 'inline-block', marginRight: 4 }}
+				>{`${currentConstraints.length}`}</span>
 				<span css={{ color: 'var(--blue9)' }}>Constraints applied</span>
 			</H5>
 			<PopupCard>
@@ -157,20 +271,17 @@ export const QueryController = () => {
 					<ViewAllPopup />
 				</QueryServiceContext.Provider>
 			</PopupCard>
-			<Tooltip
-				css={{ marginTop: 40, display: 'inline-block' }}
-				content="You have not added or updated any constraints"
-				position={PopoverPosition.RIGHT}
-				disabled={currentConstraints.length > 0}
-			>
-				<Button
-					text="Run Query"
-					intent={currentConstraints.length === 0 ? 'none' : 'success'}
-					disabled={currentConstraints.length === 0}
-					rightIcon={IconNames.PLAY}
-					onClick={runQuery}
-				/>
-			</Tooltip>
+		</>
+	)
+
+	return (
+		<div css={{ paddingTop: 10, margin: '0 20px' }}>
+			{appView === 'defaultView' && <BrowserConstraintViewAll />}
+			<RunQueryButton
+				intent={currentConstraints.length === 0 ? 'none' : 'success'}
+				isDisabled={currentConstraints.length === 0}
+				handleOnClick={runQuery}
+			/>
 		</div>
 	)
 }

@@ -6,9 +6,9 @@ import { Machine } from 'xstate'
 
 import {
 	ADD_CONSTRAINT,
-	APPLY_CONSTRAINT,
-	APPLY_CONSTRAINT_TO_QUERY,
-	DELETE_CONSTRAINT_FROM_QUERY,
+	APPLY_DATA_BROWSER_CONSTRAINT,
+	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
+	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 	FETCH_INITIAL_SUMMARY,
 	LOCK_ALL_CONSTRAINTS,
 	REMOVE_CONSTRAINT,
@@ -77,7 +77,10 @@ export const createConstraintMachine = ({
 				on: {
 					[ADD_CONSTRAINT]: { actions: 'addConstraint' },
 					[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
-					[APPLY_CONSTRAINT]: { target: 'constraintsApplied', actions: 'applyConstraint' },
+					[APPLY_DATA_BROWSER_CONSTRAINT]: {
+						target: 'constraintsApplied',
+						actions: 'applyOverviewConstraint',
+					},
 				},
 			},
 			constraintsApplied: {
@@ -121,7 +124,9 @@ export const createConstraintMachine = ({
 				ctx.classView = data.classView
 				ctx.selectedValues = []
 			}),
-			applyConstraint: ({ classView, constraintPath, selectedValues, availableValues }) => {
+			applyOverviewConstraint: (ctx) => {
+				const { classView, constraintPath, selectedValues, availableValues } = ctx
+
 				const query = {
 					op,
 					path: formatConstraintPath({ classView, path: constraintPath }),
@@ -132,12 +137,12 @@ export const createConstraintMachine = ({
 					}),
 				}
 
-				sendToBus({ query, type: APPLY_CONSTRAINT_TO_QUERY })
+				sendToBus({ query, type: APPLY_OVERVIEW_CONSTRAINT_TO_QUERY })
 			},
 			resetConstraint: ({ classView, constraintPath }) => {
 				// @ts-ignore
 				sendToBus({
-					type: DELETE_CONSTRAINT_FROM_QUERY,
+					type: DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 					path: formatConstraintPath({ classView, path: constraintPath }),
 				})
 			},

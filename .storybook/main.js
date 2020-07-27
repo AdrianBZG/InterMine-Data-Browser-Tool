@@ -17,11 +17,13 @@ module.exports = {
 		},
 	],
 	stories: [
-		'../README.story.mdx',
-		'../docs/**/*.story.mdx',
-		'../src/**/*.story.jsx',
-		'../docs/**/*.stories.mdx',
-		'../src/**/*.stories.jsx',
+		// Todo: Re-enable these after fixing them
+		// '../README.story.mdx',
+		// '../docs/**/*.story.mdx',
+		// '../docs/**/*.stories.mdx',
+		// '../src/**/*.story.jsx',
+		// '../src/**/*.stories.jsx',
+		'../src/**/TemplateConstraint.stories.jsx',
 	],
 	webpackFinal: async (config, { configType }) => {
 		const { hasFoundAny, matches } = getLoaders(config, loaderByName('babel-loader'))
@@ -46,6 +48,9 @@ module.exports = {
 				)
 			)
 		}
+
+		// Allow absolute imports
+		config.resolve.modules = [...(config.resolve.modules || []), path.resolve(__dirname, '..')]
 
 		return config
 	},

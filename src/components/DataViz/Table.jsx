@@ -15,6 +15,8 @@ import { Select } from '@blueprintjs/select'
 import { assign } from '@xstate/immer'
 import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
+// use direct import because babel is not properly changing it in webpack
+import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import {
 	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
@@ -230,7 +232,7 @@ const Cell = ({ cell, mineUrl, isLoading }) => {
 export const TableChartMachine = Machine(
 	{
 		id: 'TableChart',
-		initial: 'idle',
+		initial: 'noTableSummary',
 		context: {
 			totalRows: 0,
 			visibleRows: 25,
@@ -333,12 +335,14 @@ export const TableChartMachine = Machine(
 			},
 		},
 		services: {
-			fetchInitialRows: async (ctx, { globalConfig }) => {
+			fetchInitialRows: async (ctx, { globalConfig, query: maybeQuery }) => {
 				const { classView, rootUrl } = globalConfig
-				const query = {
-					from: classView,
-					select: ['*'],
-				}
+				const query = maybeQuery
+					? maybeQuery
+					: {
+							from: classView,
+							select: ['*'],
+					  }
 
 				const page = {
 					start: 0,
@@ -400,6 +404,7 @@ export const TableChartMachine = Machine(
 )
 
 export const Table = () => {
+	const isFirstRender = useFirstMountState()
 	const [state, send] = useMachineBus(TableChartMachine)
 
 	const { pages, mineUrl, totalRows, pageNumber, visibleRows } = state.context
@@ -409,12 +414,12 @@ export const Table = () => {
 		: pages.get(pageNumber) ?? [[]] /** ensure a 2D array on 1st render */
 
 	if (state.matches('noTableSummary')) {
-		return (
-			<NonIdealStateWarning
-				title="No Table results available"
-				description="The mine/class combination did not return any table data. If you feel this is an error, please contact support"
-			/>
-		)
+		const title = isFirstRender ? 'No query has been executed' : 'No Table results available'
+		const description = isFirstRender
+			? 'Define the constraints to the left, and execute a query to see visual data results'
+			: 'The mine/class combination did not return any table data. If you feel this is an error, please contact support'
+
+		return <NonIdealStateWarning title={title} description={description} />
 	}
 
 	const previousPage = pageNumber - 1

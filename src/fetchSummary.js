@@ -46,6 +46,12 @@ export const fetchTable = async ({ rootUrl, query, page }) => {
 	}
 }
 
+export const fetchTemplates = async ({ rootUrl }) => {
+	const service = getService(rootUrl)
+
+	return await service.fetchTemplates()
+}
+
 export const fetchInstances = async () => {
 	return axios.get('https://registry.intermine.org/service/instances', {
 		params: {
@@ -58,4 +64,10 @@ export const fetchClasses = async (rootUrl) => {
 	const service = getService(rootUrl)
 
 	return await service.fetchModel()
+}
+
+export const fetchPathValues = async ({ path, rootUrl }) => {
+	const service = getService(rootUrl)
+
+	return await service.pathValues(path)
 }

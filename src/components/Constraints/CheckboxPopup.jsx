@@ -10,7 +10,7 @@ export const CheckboxPopup = ({ nonIdealTitle = undefined, nonIdealDescription =
 
 	const { availableValues, selectedValues } = state?.context
 
-	if (availableValues.length === 0) {
+	if (availableValues?.length === 0) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
 	}
 
@@ -25,11 +25,12 @@ export const CheckboxPopup = ({ nonIdealTitle = undefined, nonIdealDescription =
 	return (
 		<div>
 			<Label className="sr-only">Select organisms to set constraints</Label>
-			{availableValues.map((value) => {
+			{availableValues?.map((value) => {
+				const label = value.count ? `${value.item} (${value.count})` : `${value.item}`
 				return (
 					<Checkbox
 						key={value.item}
-						label={`${value.item} (${value.count})`}
+						label={label}
 						checked={selectedValues.some((name) => name === value.item)}
 						onChange={onChangeHandler(value.item)}
 					/>

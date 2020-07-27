@@ -7,6 +7,7 @@ exports.usedIcons = [
 	IconNames.UNLOCK,
 	IconNames.LOCK,
 	IconNames.CARET_DOWN,
+	IconNames.CARET_RIGHT,
 	IconNames.ERROR,
 	IconNames.FLASH,
 	IconNames.MOON,
@@ -21,4 +22,5 @@ exports.usedIcons = [
 	IconNames.WARNING_SIGN,
 	IconNames.REMOVE,
 	IconNames.DELETE,
+	IconNames.INFO_SIGN,
 ]

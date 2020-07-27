@@ -1,14 +1,4 @@
-import {
-	Button,
-	Classes,
-	Divider,
-	FormGroup,
-	H4,
-	Menu,
-	MenuItem,
-	NonIdealState,
-} from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
+import { Classes, FormGroup, H6, Menu, MenuItem, NonIdealState, Tag, Text } from '@blueprintjs/core'
 import { Suggest } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
@@ -26,15 +16,16 @@ const ConstraintItem = ({ index, style, data }) => {
 		return <MenuItem disabled={true} text={infoText} />
 	}
 
+	const valueProp = 'item' in activeItem ? 'item' : 'value'
 	// subtract 1 because we're adding an informative menu item before all items
-	const name = filteredItems[index - 1].item
+	const name = filteredItems[index - 1][valueProp]
 
 	return (
 		<MenuItem
 			key={name}
 			text={name}
 			style={style}
-			active={name === activeItem.name}
+			active={name === activeItem[valueProp]}
 			onClick={() => handleItemSelect({ name })}
 		/>
 	)
@@ -52,7 +43,9 @@ const VirtualizedMenu = ({
 
 	useEffect(() => {
 		if (listRef?.current) {
-			const itemLocation = filteredItems.findIndex((item) => item.item === activeItem.name)
+			const itemLocation = filteredItems.findIndex((item) => {
+				return item.item === activeItem.item || item.value === activeItem.value
+			})
 			// add one to offset the menu description item
 			listRef.current.scrollToItem(itemLocation + 1)
 		}
@@ -109,8 +102,8 @@ export const SelectPopup = ({
 	const [state, send] = useServiceContext('constraints')
 	const { availableValues, selectedValues } = state.context
 
-	const isLoading = state.matches('loading')
-	if (state.matches('noConstraintItems')) {
+	const isLoading = state.matches('loading') || state.matches('pending')
+	if (state.matches('noConstraintItems') || state.matches('noValuesForConstraint')) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
 	}
 
@@ -118,12 +111,12 @@ export const SelectPopup = ({
 	// the value directly to the added constraints list when clicked, so we reset the input here
 	const renderInputValue = () => ''
 	const filterQuery = (query, items) => {
-		if (query === '' && searchIndex?.current !== null) {
+		if (query === '' || searchIndex === null) {
 			return items.filter((i) => !selectedValues.includes(i.name))
 		}
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		const results = searchIndex.current.search(query, availableValues.length)
+		const results = searchIndex.search(query, availableValues.length)
 
 		return results
 	}
@@ -132,47 +125,24 @@ export const SelectPopup = ({
 		send({ type: ADD_CONSTRAINT, constraint: name })
 	}
 
-	const handleButtonClick = (constraint) => () => {
-		send({ type: REMOVE_CONSTRAINT, constraint })
-	}
-
 	return (
 		<div>
 			{selectedValues.length > 0 && (
-				<>
-					<H4 css={{ paddingTop: 8, marginBottom: 4 }}>
-						{`${selectedValues.length > 1 ? 'Constraints' : 'Constraint'} Added`}
-					</H4>
-					<ul css={{ padding: '0 16px', listStyle: 'none', marginTop: 0 }}>
-						{selectedValues.map((constraint) => {
-							return (
-								<li
-									key={constraint}
-									css={{
-										display: 'flex',
-										alignItems: 'center',
-										padding: '6px 0',
-									}}
-								>
-									<Button
-										intent="danger"
-										icon={IconNames.REMOVE}
-										small={true}
-										minimal={true}
-										// We handle
-										onClick={handleButtonClick(constraint)}
-										aria-label={`delete ${constraint}`}
-										css={{ marginRight: 4 }}
-									/>
-									<span css={{ fontSize: 'var(--fs-desktopM1)', display: 'inline-block' }}>
-										{constraint}
-									</span>
-								</li>
-							)
-						})}
-					</ul>
-					<Divider />
-				</>
+				<div css={{ display: 'flex', alignItems: 'center' }}>
+					{state.context.op && <H6 css={{ margin: '0 10px 0 0' }}>{state.context.op}</H6>}
+					<div css={{ maxWidth: '50%' }}>
+						{selectedValues.map((val) => (
+							<Tag
+								key={val}
+								intent="primary"
+								css={{ margin: 4 }}
+								onRemove={() => send({ type: REMOVE_CONSTRAINT, constraint: val })}
+							>
+								<Text ellipsize={true}>{val}</Text>
+							</Tag>
+						))}
+					</div>
+				</div>
 			)}
 			{isLoading && (
 				<NonIdealState
@@ -180,7 +150,7 @@ export const SelectPopup = ({
 					description="Please be patient, this may take some time."
 				/>
 			)}
-			<FormGroup labelFor={uniqueId} label={label} css={{ paddingTop: 24 }}>
+			<FormGroup labelFor={uniqueId} label={label} css={{ paddingTop: 14 }}>
 				<Suggest
 					// @ts-ignore
 					id={`selectPopup-${uniqueId}`}
@@ -190,7 +160,6 @@ export const SelectPopup = ({
 					className={isLoading ? Classes.SKELETON : ''}
 					resetOnSelect={true}
 					itemListRenderer={renderMenu(handleItemSelect)}
-					onItemSelect={handleItemSelect}
 					itemListPredicate={filterQuery}
 					popoverProps={{ captureDismiss: true }}
 				/>

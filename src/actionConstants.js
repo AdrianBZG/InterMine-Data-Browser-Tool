@@ -7,8 +7,8 @@ export const FETCH_INITIAL_SUMMARY = 'global/fetch/initial_summary'
 
 export const LOCK_ALL_CONSTRAINTS = 'global/contraint/limit_reached'
 export const RESET_ALL_CONSTRAINTS = 'global/constraint/remove_all'
-export const APPLY_CONSTRAINT_TO_QUERY = 'global/constraint/addQuery'
-export const DELETE_CONSTRAINT_FROM_QUERY = 'global/constraint/deleteQuery'
+export const APPLY_OVERVIEW_CONSTRAINT_TO_QUERY = 'global/constraint/addToQuery'
+export const DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY = 'global/constraint/deleteQuery'
 export const UNSET_CONSTRAINT = 'global/constraint/unset'
 
 export const SET_AVAILABLE_COLUMNS = 'global/table/set_columns'
@@ -24,9 +24,11 @@ export const ADD_QUERY_CONSTRAINT = 'queryController/constraint/add'
  */
 export const ADD_CONSTRAINT = 'constraintFactory/add'
 export const REMOVE_CONSTRAINT = 'constraintFactory/remove'
-export const APPLY_CONSTRAINT = 'constraintFactory/apply'
+export const APPLY_DATA_BROWSER_CONSTRAINT = 'constraintFactory/apply'
 export const RESET_LOCAL_CONSTRAINT = 'constraintFactory/reset'
 export const FETCH_CONSTRAINT_ITEMS = 'constraintFactory/init'
+export const ADD_TEMPLATE_CONSTRAINT = 'constraint/template/add'
+export const TEMPLATE_CONSTRAINT_UPDATED = 'constraint/template/updated'
 
 /**
  * Pie Chart
@@ -34,12 +36,17 @@ export const FETCH_CONSTRAINT_ITEMS = 'constraintFactory/init'
 export const SET_INITIAL_ORGANISMS = 'pieChart/fetch/initial'
 
 /**
- * Supervisor
+ * AppManager
  */
-export const CHANGE_MINE = 'supervisor/mine/change'
-export const CHANGE_CLASS = 'supervisor/class/change'
+export const CHANGE_MINE = 'appManager/mine/change'
+export const CHANGE_CLASS = 'appManager/class/change'
+export const CHANGE_CONSTRAINT_VIEW = 'appManager/view/change'
+export const TOGGLE_CATEGORY_VISIBILITY = 'appManager/category/visibility'
+export const TOGGLE_VIEW_IS_LOADING = 'appManager/view/isLoading'
 
 /**
  * Table
  */
 export const CHANGE_PAGE = 'table/page/change'
+
+export const UPDATE_TEMPLATE_QUERIES = 'templateView/templates/update'

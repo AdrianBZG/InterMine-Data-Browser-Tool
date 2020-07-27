@@ -1,124 +1,134 @@
-import React, { useEffect, useRef } from 'react'
-import { buildSearchIndex } from 'src/buildSearchIndex'
+import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs/core'
+import { IconNames } from '@blueprintjs/icons'
+import React, { useState } from 'react'
+import { CHANGE_CONSTRAINT_VIEW } from 'src/actionConstants'
+import { sendToBus } from 'src/machineBus'
 
-import { ConstraintServiceContext, useMachineBus } from '../../machineBus'
-import { CheckboxPopup } from '../Constraints/CheckboxPopup'
-import { Constraint } from '../Constraints/Constraint'
-import { createConstraintMachine } from '../Constraints/createConstraintMachine'
-import { SelectPopup } from '../Constraints/SelectPopup'
+import { OverviewConstraint } from '../Constraints/OverviewConstraint'
+import { TemplateQuery } from '../Constraints/TemplateQuery'
 import { DATA_VIZ_COLORS } from '../DataViz/dataVizColors'
 import { QueryController } from '../QueryController/QueryController'
 
-/** @type {import('../../types').ConstraintConfig[]} */
-const defaultConstraints = [
-	{
-		type: 'checkbox',
-		name: 'Organism',
-		label: 'Or',
-		path: 'organism.shortName',
-		op: 'ONE OF',
-		valuesQuery: {
-			select: ['primaryIdentifier'],
-			model: {
-				name: 'genomic',
-			},
-			where: [],
-		},
-	},
-	{
-		type: 'select',
-		name: 'Pathway Name',
-		label: 'Pn',
-		path: 'pathways.name',
-		op: 'ONE OF',
-		valuesQuery: {
-			select: ['pathways.name', 'primaryIdentifier'],
-			model: {
-				name: 'genomic',
-			},
-			orderBy: [
-				{
-					path: 'pathways.name',
-					direction: 'ASC',
-				},
-			],
-		},
-	},
-	{
-		type: 'select',
-		name: 'GO Annotation',
-		label: 'GA',
-		path: 'goAnnotation.ontologyTerm.name',
-		op: 'ONE OF',
-		valuesQuery: {
-			select: ['goAnnotation.ontologyTerm.name', 'primaryIdentifier'],
-			model: {
-				name: 'genomic',
-			},
-			orderBy: [
-				{
-					path: 'Gene.goAnnotation.ontologyTerm.name',
-					direction: 'ASC',
-				},
-			],
-		},
-	},
-]
+const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, showAllLabel }) => {
+	const [showCategories, setShowCategories] = useState(false)
 
-const ConstraintBuilder = ({ constraintConfig, color }) => {
-	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
+	return (
+		<>
+			<Button
+				icon={showCategories ? IconNames.CARET_DOWN : IconNames.CARET_RIGHT}
+				fill={true}
+				alignText="left"
+				text="Select Categories"
+				minimal={true}
+				large={true}
+				onClick={() => setShowCategories(!showCategories)}
+			/>
+			<Collapse isOpen={showCategories} css={{ marginTop: 10 }}>
+				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
+					{classCategoryTags.map(({ tagName, isVisible, count }) => {
+						if (count === 0 && tagName !== showAllLabel) {
+							return null
+						}
 
-	const [state, send] = useMachineBus(
-		createConstraintMachine({ id: type, path, op, constraintItemsQuery })
+						let isEnabled = false
+						if (showAll) {
+							isEnabled = tagName === showAllLabel
+						} else {
+							isEnabled = isVisible
+						}
+
+						return (
+							<Tag
+								key={tagName}
+								intent="primary"
+								interactive={true}
+								onClick={() => handleCategoryToggle({ isVisible: !isVisible, tagName })}
+								minimal={!isEnabled || count === 0}
+								css={{ margin: 4 }}
+							>
+								{`${tagName} ${count ?? 0}`}
+							</Tag>
+						)
+					})}
+				</div>
+			</Collapse>
+		</>
 	)
+}
 
-	const searchIndex = useRef(null)
-	const { availableValues } = state.context
-
-	useEffect(() => {
-		const buildIndex = async () => {
-			if (type === 'select' && searchIndex.current === null && availableValues.length > 0) {
-				searchIndex.current = await buildSearchIndex({
-					docId: 'item',
-					docField: 'item',
-					values: availableValues,
-				})
-			}
-		}
-
-		buildIndex()
-	}, [availableValues, type])
-
-	let Popup
-
-	switch (type) {
-		case 'checkbox':
-			Popup = CheckboxPopup
-			break
-		default:
-			Popup = SelectPopup
-			break
-	}
-
-	if (state.matches('noConstraintItems') || state.matches('loading')) {
+const TemplatesList = ({
+	isLoading,
+	queries,
+	showAll,
+	classCategoryTags,
+	showAllLabel,
+	handleCategoryToggle,
+	classView,
+	rootUrl,
+}) => {
+	if (isLoading) {
 		return null
 	}
 
 	return (
-		<ConstraintServiceContext.Provider value={{ state, send }}>
-			<Constraint constraintIconText={label} constraintName={name} labelBorderColor={color}>
-				<Popup
-					nonIdealTitle="No items found"
-					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
-					// @ts-ignore
-					searchIndex={searchIndex}
-				/>
-			</Constraint>
-		</ConstraintServiceContext.Provider>
+		<div>
+			<Divider css={{ margin: '10px 0' }} />
+			<ShowCategories
+				handleCategoryToggle={handleCategoryToggle}
+				classCategoryTags={classCategoryTags}
+				showAllLabel={showAllLabel}
+				showAll={showAll}
+			/>
+			<Divider css={{ margin: 0 }} />
+			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0, height: '77vh' }}>
+				{queries.map((template) => (
+					<li key={template.name} css={{ margin: '0.875em 0' }}>
+						<TemplateQuery classView={classView} rootUrl={rootUrl} template={template} />
+					</li>
+				))}
+			</ul>
+		</div>
 	)
 }
 
-export const ConstraintSection = () => {
+const OverviewConstraintList = ({ queries, isLoading }) => {
+	if (isLoading) {
+		return null
+	}
+	return (
+		<ul
+			css={{
+				overflow: 'auto',
+				listStyle: 'none',
+				padding: 0,
+				height: '77vh',
+			}}
+		>
+			{queries.map((config, idx) => (
+				<li css={{ margin: '0.875em 0' }} key={idx}>
+					<OverviewConstraint
+						constraintConfig={config}
+						color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
+					/>
+				</li>
+			))}
+		</ul>
+	)
+}
+
+export const ConstraintSection = ({
+	queries,
+	isLoading,
+	view,
+	showAllLabel,
+	classCategoryTags,
+	toggleCategory,
+	classView,
+	rootUrl,
+	showAll,
+}) => {
+	const isTemplateView = view === 'templateView'
+
 	return (
 		<section
 			css={{
@@ -127,24 +137,36 @@ export const ConstraintSection = () => {
 				backgroundColor: 'var(--solidWhite)',
 			}}
 		>
-			<QueryController />
-			<ul
+			<Tabs
+				id="constraint-tabs"
+				selectedTabId={view}
+				large={true}
+				onChange={(newTabId) => sendToBus({ type: CHANGE_CONSTRAINT_VIEW, newTabId })}
 				css={{
-					overflow: 'auto',
-					listStyle: 'none',
-					padding: 0,
-					height: '77vh',
+					marginBottom: 10,
+					[`&& .${Classes.TAB_LIST}`]: { margin: '10px 20px 0' },
 				}}
 			>
-				{defaultConstraints.map((config, idx) => (
-					<li css={{ margin: '0.875em 0' }} key={idx}>
-						<ConstraintBuilder
-							constraintConfig={config}
-							color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
-						/>
-					</li>
-				))}
-			</ul>
+				<Tab id="defaultView" title="Overview" />
+				<Tab id="templateView" title="Templates" />
+			</Tabs>
+			{isTemplateView ? (
+				<TemplatesList
+					isLoading={isLoading}
+					queries={queries}
+					showAll={showAll}
+					classCategoryTags={classCategoryTags}
+					showAllLabel={showAllLabel}
+					handleCategoryToggle={toggleCategory}
+					classView={classView}
+					rootUrl={rootUrl}
+				/>
+			) : (
+				<>
+					<QueryController />
+					<OverviewConstraintList queries={queries} isLoading={isLoading} />
+				</>
+			)}
 		</section>
 	)
 }

@@ -2,13 +2,16 @@ import { Button, ButtonGroup, Icon, Tag } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
-import React from 'react'
-import { APPLY_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/actionConstants'
+import React, { useEffect, useRef } from 'react'
+import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/actionConstants'
+import { buildSearchIndex } from 'src/buildSearchIndex'
+import { CheckboxPopup } from 'src/components/Constraints/CheckboxPopup'
+import { createConstraintMachine } from 'src/components/Constraints/createConstraintMachine'
+import { SelectPopup } from 'src/components/Constraints/SelectPopup'
+import { PopupCard } from 'src/components/Shared/PopupCard'
+import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/machineBus'
 
-import { useServiceContext } from '../../machineBus'
-import { PopupCard } from '../Shared/PopupCard'
-
-export const ConstraintPopupCard = ({ children }) => {
+const ConstraintCard = ({ children }) => {
 	const [state, send] = useServiceContext('constraints')
 
 	const disableAllButtons =
@@ -59,14 +62,14 @@ export const ConstraintPopupCard = ({ children }) => {
 					css={{ maxWidth: '50%' }}
 					intent={!disableAllButtons && enableAdd ? 'success' : 'none'}
 					disabled={disableAllButtons || !enableAdd}
-					onClick={() => send(APPLY_CONSTRAINT)}
+					onClick={() => send(APPLY_DATA_BROWSER_CONSTRAINT)}
 				/>
 			</ButtonGroup>
 		</>
 	)
 }
 
-ConstraintPopupCard.propTypes = {
+ConstraintCard.propTypes = {
 	/**
 	 * Whether the contrainst is set
 	 */
@@ -91,7 +94,6 @@ const S_CountTag = styled.div`
 		margin: 0 0.833em;
 	}
 `
-
 const S_ConstraintIcon = styled.div`
 	border-radius: 30px;
 	border: ${(props) =>
@@ -109,21 +111,46 @@ const S_ConstraintIcon = styled.div`
 	align-items: center;
 	justify-content: center;
 `
-/**
- * A constraint is styled as a button that takes the full width of its container. Each
- * constraint manages its own internal state with a state machine, and syncs back to the
- * history component using the event bus.
- */
-export const Constraint = ({
-	children = null,
-	constraintName,
-	labelBorderColor = 'black',
-	ariaLabel = '',
-	constraintIconText,
-}) => {
-	const [state] = useServiceContext('constraints')
+
+export const OverviewConstraint = ({ constraintConfig, color }) => {
+	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
+
+	const [state, send] = useMachineBus(
+		createConstraintMachine({ id: type, path, op, constraintItemsQuery })
+	)
 
 	const constraintCount = state.context.selectedValues.length
+	const searchIndex = useRef(null)
+	const { availableValues } = state.context
+
+	useEffect(() => {
+		const buildIndex = async () => {
+			if (type === 'select' && searchIndex.current === null && availableValues.length > 0) {
+				searchIndex.current = await buildSearchIndex({
+					docId: 'item',
+					docField: 'item',
+					values: availableValues,
+				})
+			}
+		}
+
+		buildIndex()
+	}, [availableValues, type])
+
+	let ConstraintWidget
+
+	switch (type) {
+		case 'checkbox':
+			ConstraintWidget = CheckboxPopup
+			break
+		default:
+			ConstraintWidget = SelectPopup
+			break
+	}
+
+	if (state.matches('noConstraintItems') || state.matches('loading')) {
+		return null
+	}
 
 	/**
 	 * This is used to decide the color for the count tag. Since it will only
@@ -133,63 +160,39 @@ export const Constraint = ({
 	const isUpdated = state.matches('constraintsUpdated')
 
 	return (
-		<PopupCard boundary="viewport">
-			<Button
-				minimal={true}
-				large={true}
-				fill={true}
-				alignText="left"
-				aria-label={ariaLabel ? ariaLabel : constraintName}
-			>
-				<div css={{ display: 'flex', alignItems: 'center' }}>
-					<S_ConstraintIcon
-						// @ts-ignore
-						labelBorderColor={labelBorderColor}
-					>
-						<span>{constraintIconText}</span>
-					</S_ConstraintIcon>
-					{constraintName}
-					{constraintCount > 0 && (
-						// @ts-ignore
-						<S_CountTag isUpdated={isUpdated}>
-							{constraintCount > 1 && <small>{constraintCount}</small>}
-							<Icon
-								css={{ margin: '-0.167em -0.167em !important', alignSelf: 'flex-start' }}
-								icon={IconNames.TICK_CIRCLE}
-								color={isUpdated ? 'var(--yellow5)' : 'var(--green5)'}
-							/>
-						</S_CountTag>
-					)}
+		<ConstraintServiceContext.Provider value={{ state, send }}>
+			<PopupCard boundary="viewport">
+				<Button minimal={true} large={true} fill={true} alignText="left" aria-label={name}>
+					<div css={{ display: 'flex', alignItems: 'center' }}>
+						{/**@ts-ignore **/}
+						<S_ConstraintIcon labelBorderColor={color}>
+							<span>{label}</span>
+						</S_ConstraintIcon>
+						{name}
+						{constraintCount > 0 && (
+							// @ts-ignore
+							<S_CountTag isUpdated={isUpdated}>
+								{constraintCount > 1 && <small>{constraintCount}</small>}
+								<Icon
+									css={{ margin: '-0.167em -0.167em !important', alignSelf: 'flex-start' }}
+									icon={IconNames.TICK_CIRCLE}
+									color={isUpdated ? 'var(--yellow5)' : 'var(--green5)'}
+								/>
+							</S_CountTag>
+						)}
+					</div>
+				</Button>
+				<div>
+					<ConstraintCard>
+						<ConstraintWidget
+							nonIdealTitle="No items found"
+							nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
+							// @ts-ignore
+							searchIndex={searchIndex.current}
+						/>
+					</ConstraintCard>
 				</div>
-			</Button>
-			<div>
-				<ConstraintPopupCard>{children}</ConstraintPopupCard>
-			</div>
-		</PopupCard>
+			</PopupCard>
+		</ConstraintServiceContext.Provider>
 	)
 }
-
-const propTypes = {
-	/**
-	 * Name of the constraint
-	 */
-	constraintName: PropTypes.string,
-	/**
-	 * Text for the label icon
-	 */
-	constraintIconTExt: PropTypes.string,
-	/**
-	 * Label icon border color
-	 */
-	labelBorderColor: PropTypes.string,
-	/**
-	 * The number of constraints applied
-	 */
-	constraintCount: PropTypes.number,
-	/**
-	 * The text to be read by a screenreader
-	 */
-	ariaLabel: PropTypes.string,
-}
-
-Constraint.propTypes = propTypes

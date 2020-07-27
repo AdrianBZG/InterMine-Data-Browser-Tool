@@ -1,6 +1,8 @@
 import { ProgressBar } from '@blueprintjs/core'
 import { assign } from '@xstate/immer'
 import React from 'react'
+// use direct import because babel is not properly changing it in webpack
+import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import {
 	Bar,
 	BarChart as RBarChart,
@@ -58,7 +60,7 @@ const colorizeBars = (data, isLoading) =>
 export const BarChartMachine = Machine(
 	{
 		id: 'BarChart',
-		initial: 'idle',
+		initial: 'noGeneLengths',
 		context: {
 			lengthStats: {
 				min: 0,
@@ -146,6 +148,7 @@ export const BarChartMachine = Machine(
 )
 
 export const BarChart = () => {
+	const isFirstRender = useFirstMountState()
 	const [state] = useMachineBus(BarChartMachine)
 
 	const { lengthSummary, lengthStats } = state.context
@@ -178,12 +181,12 @@ export const BarChart = () => {
 	})
 
 	if (state.matches('noGeneLengths')) {
-		return (
-			<NonIdealStateWarning
-				title="No Gene lengths available"
-				description="The mine/class combination does not provide gene lengths. If you feel this is an error, please contact support"
-			/>
-		)
+		const title = isFirstRender ? 'No query has been executed' : 'No Gene lengths available'
+		const description = isFirstRender
+			? 'Define the constraints to the left, and execute a query to see visual data results'
+			: 'The mine/class combination does not provide gene lengths. If you feel this is an error, please contact support'
+
+		return <NonIdealStateWarning title={title} description={description} />
 	}
 
 	return (

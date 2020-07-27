@@ -1,6 +1,8 @@
 import { ProgressBar } from '@blueprintjs/core'
 import { assign } from '@xstate/immer'
 import React from 'react'
+// use direct import because babel is not properly changing it in webpack
+import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import {
 	Cell,
 	Label,
@@ -60,11 +62,10 @@ const renderLoadingLabel = (props) => {
 		</>
 	)
 }
-
 export const PieChartMachine = Machine(
 	{
 		id: 'PieChart',
-		initial: 'idle',
+		initial: 'hasNoSummary',
 		context: {
 			allClassOrganisms: [],
 			classView: '',
@@ -138,6 +139,7 @@ export const PieChartMachine = Machine(
 )
 
 export const PieChart = () => {
+	const isFirstRender = useFirstMountState()
 	const [state] = useMachineBus(PieChartMachine)
 	const { allClassOrganisms, classView } = state.context
 
@@ -145,12 +147,12 @@ export const PieChart = () => {
 	const data = isLoading ? pieChartLoadingData : allClassOrganisms
 
 	if (state.matches('hasNoSummary')) {
-		return (
-			<NonIdealStateWarning
-				title="No Organism Summary available"
-				description="The mine/class combination did not return any organism summaries. If you feel this an error, please contact support"
-			/>
-		)
+		const title = isFirstRender ? 'No query has been executed' : 'No Organism Summary available'
+		const description = isFirstRender
+			? 'Define the constraints to the left, and execute a query to see visual data results'
+			: 'The mine/class combination did not return any organism summaries. If you feel this an error, please contact support'
+
+		return <NonIdealStateWarning title={title} description={description} />
 	}
 
 	return (
