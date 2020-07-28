@@ -115,12 +115,12 @@ export const SuggestWidget = ({
 	// the value directly to the added constraints list when clicked, so we reset the input here
 	const renderInputValue = () => ''
 	const filterQuery = (query, items) => {
-		if (query === '' || searchIndex === null) {
+		if (query === '' || searchIndex.current === null) {
 			return items.filter((i) => !selectedValues.includes(i.name))
 		}
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		const results = searchIndex.search(query, availableValues.length)
+		const results = searchIndex.current.search(query, availableValues.length)
 
 		return results
 	}

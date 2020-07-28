@@ -190,7 +190,7 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 							nonIdealTitle="No items found"
 							nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 							// @ts-ignore
-							searchIndex={searchIndex.current}
+							searchIndex={searchIndex}
 						/>
 					</ConstraintCard>
 				</div>
