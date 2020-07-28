@@ -16,25 +16,18 @@ import { sendToBus } from 'src/machineBus'
 import { formatConstraintPath } from 'src/utils'
 import { Machine } from 'xstate'
 
-/** @type {import('../../types').CreateConstraintMachine} */
-export const createConstraintMachine = ({
-	id,
-	initial = 'noConstraintsSet',
-	path = '',
-	op,
-	constraintItemsQuery,
-}) => {
-	/** @type {import('../../types').ConstraintMachineConfig} */
-	const config = {
-		id,
-		initial,
+export const overviewConstraintMachine = Machine(
+	{
+		id: 'constraint machine',
+		initial: 'noConstraintsSet',
 		context: {
-			type: id,
-			constraintPath: path,
+			type: '',
+			op: '',
+			constraintPath: '',
 			selectedValues: [],
 			availableValues: [],
 			classView: '',
-			constraintItemsQuery,
+			constraintItemsQuery: {},
 		},
 		on: {
 			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
@@ -100,9 +93,8 @@ export const createConstraintMachine = ({
 				},
 			},
 		},
-	}
-
-	return Machine(config, {
+	},
+	{
 		actions: {
 			// @ts-ignore
 			logErrorToConsole: (_, event) => console.warn(event.data),
@@ -124,7 +116,7 @@ export const createConstraintMachine = ({
 				ctx.selectedValues = []
 			}),
 			applyOverviewConstraint: (ctx) => {
-				const { classView, constraintPath, selectedValues, availableValues } = ctx
+				const { classView, constraintPath, selectedValues, availableValues, op } = ctx
 
 				const query = {
 					op,
@@ -182,5 +174,5 @@ export const createConstraintMachine = ({
 				}
 			},
 		},
-	})
-}
+	}
+)

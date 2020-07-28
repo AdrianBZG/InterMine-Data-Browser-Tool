@@ -10,7 +10,7 @@ import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/
 import { PopupCard } from '../Shared/PopupCard'
 import { CheckboxWidget } from '../Widgets/CheckboxWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
-import { createConstraintMachine } from './createConstraintMachine'
+import { overviewConstraintMachine } from './overviewConstraintMachine'
 
 const ConstraintCard = ({ children }) => {
 	const [state, send] = useServiceContext('constraints')
@@ -118,7 +118,13 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
 
 	const [state, send] = useMachineBus(
-		createConstraintMachine({ id: type, path, op, constraintItemsQuery })
+		overviewConstraintMachine.withContext({
+			...overviewConstraintMachine.context,
+			op,
+			type,
+			constraintPath: path,
+			constraintItemsQuery,
+		})
 	)
 
 	const constraintCount = state.context.selectedValues.length
