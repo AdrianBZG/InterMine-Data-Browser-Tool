@@ -1,4 +1,3 @@
-import { assign } from '@xstate/immer'
 import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
@@ -8,7 +7,7 @@ import {
 	UPDATE_TEMPLATE_QUERIES,
 } from 'src/eventConstants'
 import { fetchClasses, fetchInstances } from 'src/fetchSummary'
-import { forwardTo, Machine } from 'xstate'
+import { assign, forwardTo, Machine } from 'xstate'
 
 import { templateViewMachine } from './templateViewMachine'
 
@@ -71,6 +70,56 @@ const defaultQueries = [
 	},
 ]
 
+const forwardToTemplateView = forwardTo('templateView')
+
+const toggleViewIsLoading = assign({
+	// @ts-ignore
+	viewIsLoading: (_, { isLoading }) => isLoading,
+})
+
+const updateTemplateQueries = assign({
+	// @ts-ignore
+	possibleQueries: (_, { queries }) => queries,
+	// @ts-ignore
+	categories: (_, { categories }) => categories,
+})
+
+const setTemplateView = assign({
+	appView: () => 'templateView',
+})
+
+const clearPossibleQueries = assign({
+	possibleQueries: () => [],
+})
+
+const setPossibleOverviewQueries = assign({
+	possibleQueries: () => defaultQueries,
+})
+
+const setDefaultView = assign({
+	appView: () => 'defaultView',
+})
+
+const changeMine = assign({
+	// @ts-ignore
+	selectedMine: (ctx, { newMine }) => ctx.intermines.find((mine) => mine.name === newMine),
+	// Reset the class
+	classView: () => 'Gene',
+})
+
+const changeClass = assign({
+	// @ts-ignore
+	classView: (_, { newClass }) => newClass,
+})
+
+const setMineConfiguration = assign({
+	// @ts-ignore
+	intermines: (_, { data }) => data.intermines,
+	// @ts-ignore
+	modelClasses: (_, { data }) =>
+		data.modelClasses.sort().map((cl) => ({ displayName: cl.displayName, name: cl.name })),
+})
+
 export const appManagerMachine = Machine(
 	{
 		id: 'AppManager',
@@ -113,7 +162,7 @@ export const appManagerMachine = Machine(
 					src: 'fetchMinesAndClasses',
 					onDone: {
 						target: 'defaultView',
-						actions: 'setIntermines',
+						actions: 'setMineConfiguration',
 					},
 					onError: {
 						target: 'defaultView',
@@ -123,7 +172,7 @@ export const appManagerMachine = Machine(
 				},
 			},
 			defaultView: {
-				entry: ['setBrowserView', 'setPossibleOverviewQueries'],
+				entry: ['setDefaultView', 'setPossibleOverviewQueries'],
 				on: {
 					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
@@ -150,45 +199,16 @@ export const appManagerMachine = Machine(
 	},
 	{
 		actions: {
-			forwardToTemplateView: forwardTo('templateView'),
-			// @ts-ignore
-			toggleViewIsLoading: assign((ctx, { isLoading }) => {
-				ctx.viewIsLoading = isLoading
-			}),
-			// @ts-ignore
-			updateTemplateQueries: assign((ctx, { queries, categories }) => {
-				ctx.possibleQueries = queries
-				ctx.categories = categories
-			}),
-			setTemplateView: assign((ctx) => {
-				ctx.appView = 'templateView'
-			}),
-			clearPossibleQueries: assign((ctx) => {
-				ctx.possibleQueries = []
-			}),
-			setPossibleOverviewQueries: assign((ctx) => {
-				ctx.possibleQueries = defaultQueries
-			}),
-			setBrowserView: assign((ctx) => {
-				ctx.appView = 'defaultView'
-			}),
-			// @ts-ignore
-			changeMine: assign((ctx, { newMine }) => {
-				ctx.selectedMine = ctx.intermines.find((mine) => mine.name === newMine)
-				// set it back to default
-				ctx.classView = 'Gene'
-			}),
-			// @ts-ignore
-			changeClass: assign((ctx, { newClass }) => {
-				ctx.classView = newClass
-			}),
-			// @ts-ignore
-			setIntermines: assign((ctx, { data }) => {
-				ctx.intermines = data.intermines
-				ctx.modelClasses = data.modelClasses
-					.sort()
-					.map((cl) => ({ displayName: cl.displayName, name: cl.name }))
-			}),
+			forwardToTemplateView,
+			toggleViewIsLoading,
+			updateTemplateQueries,
+			setTemplateView,
+			clearPossibleQueries,
+			setPossibleOverviewQueries,
+			setDefaultView,
+			changeMine,
+			changeClass,
+			setMineConfiguration,
 		},
 		guards: {
 			// @ts-ignore

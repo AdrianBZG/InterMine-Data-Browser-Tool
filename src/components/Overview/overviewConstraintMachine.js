@@ -1,4 +1,3 @@
-import { assign } from '@xstate/immer'
 import {
 	ADD_CONSTRAINT,
 	APPLY_DATA_BROWSER_CONSTRAINT,
@@ -14,7 +13,55 @@ import {
 import { fetchSummary } from 'src/fetchSummary'
 import { sendToBus } from 'src/machineBus'
 import { formatConstraintPath } from 'src/utils'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
+
+import { logErrorToConsole } from '../../utils'
+
+const addConstraint = assign({
+	// @ts-ignore
+	selectedValues: (ctx, { constraint }) => [...ctx.selectedValues, constraint],
+})
+
+const removeConstraint = assign({
+	// @ts-ignore
+	selectedValues: (ctx, { constraint }) => ctx.selectedValues.filter((name) => name !== constraint),
+})
+
+const removeAll = assign({
+	selectedValues: () => [],
+})
+
+const setAvailableValues = assign({
+	// @ts-ignore
+	availableValues: (_, { data }) => data.items,
+	// @ts-ignore
+	classView: (_, { data }) => data.classView,
+	selectedValues: () => [],
+})
+
+const applyOverviewConstraint = (ctx) => {
+	const { classView, constraintPath, selectedValues, availableValues, op } = ctx
+
+	const query = {
+		op,
+		path: formatConstraintPath({ classView, path: constraintPath }),
+		values: selectedValues,
+		// used to render the constraints as a list
+		valuesDescription: selectedValues.map((selected) => {
+			return availableValues.find((v) => v.item === selected)
+		}),
+	}
+
+	sendToBus({ query, type: APPLY_OVERVIEW_CONSTRAINT_TO_QUERY })
+}
+
+const resetConstraint = ({ classView, constraintPath }) => {
+	// @ts-ignore
+	sendToBus({
+		type: DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
+		path: formatConstraintPath({ classView, path: constraintPath }),
+	})
+}
 
 export const overviewConstraintMachine = Machine(
 	{
@@ -96,47 +143,13 @@ export const overviewConstraintMachine = Machine(
 	},
 	{
 		actions: {
-			// @ts-ignore
-			logErrorToConsole: (_, event) => console.warn(event.data),
-			// @ts-ignore
-			addConstraint: assign((ctx, { constraint }) => {
-				ctx.selectedValues.push(constraint)
-			}),
-			// @ts-ignore
-			removeConstraint: assign((ctx, { constraint }) => {
-				ctx.selectedValues = ctx.selectedValues.filter((name) => name !== constraint)
-			}),
-			removeAll: assign((ctx) => {
-				ctx.selectedValues = []
-			}),
-			// @ts-ignore
-			setAvailableValues: assign((ctx, { data }) => {
-				ctx.availableValues = data.items
-				ctx.classView = data.classView
-				ctx.selectedValues = []
-			}),
-			applyOverviewConstraint: (ctx) => {
-				const { classView, constraintPath, selectedValues, availableValues, op } = ctx
-
-				const query = {
-					op,
-					path: formatConstraintPath({ classView, path: constraintPath }),
-					values: selectedValues,
-					// used to render the constraints as a list
-					valuesDescription: selectedValues.map((selected) => {
-						return availableValues.find((v) => v.item === selected)
-					}),
-				}
-
-				sendToBus({ query, type: APPLY_OVERVIEW_CONSTRAINT_TO_QUERY })
-			},
-			resetConstraint: ({ classView, constraintPath }) => {
-				// @ts-ignore
-				sendToBus({
-					type: DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
-					path: formatConstraintPath({ classView, path: constraintPath }),
-				})
-			},
+			logErrorToConsole,
+			addConstraint,
+			removeConstraint,
+			removeAll,
+			setAvailableValues,
+			applyOverviewConstraint,
+			resetConstraint,
 		},
 		guards: {
 			selectedListIsEmpty: (ctx) => {

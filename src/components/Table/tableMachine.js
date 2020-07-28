@@ -1,4 +1,3 @@
-import { assign } from '@xstate/immer'
 import {
 	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
@@ -7,27 +6,60 @@ import {
 } from 'src/eventConstants'
 import { fetchTable } from 'src/fetchSummary'
 import { sendToBus } from 'src/machineBus'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
 
-const refreshCache = ({ tableRows, cache, visibleRows, startPage }) => {
-	const pages = []
+const bustCache = assign({
+	pages: () => new Map(),
+})
 
-	tableRows.forEach((row, idx) => {
-		const currentPage = pages[pages.length - 1]
+const setInitialRows = assign({
+	// @ts-ignore
+	mineUrl: (_, { data }) => data.rootUrl,
+	// @ts-ignore
+	totalRows: (_, { data }) => data.totalRows,
+	// @ts-ignore
+	pageNumber: (_, { data }) => 1,
+})
 
-		if (idx % visibleRows === 0) {
-			pages.push([row])
-		} else {
-			currentPage.push(row)
-		}
-	})
+const setLastQuery = assign({
+	// @ts-ignore
+	lastQuery: (_, { data }) => data.query,
+})
 
-	pages.forEach((page, idx) => {
-		cache.set(idx + startPage, page)
-	})
+const refreshCache = assign({
+	// @ts-ignore
+	pages: (ctx, { data }) => {
+		const tableRows = data.summary
+		const cache = ctx.pages
+		const visibleRows = ctx.visibleRows
+		const startPage = data.startPage
+		const pages = []
 
-	return cache
-}
+		tableRows.forEach((row, idx) => {
+			const currentPage = pages[pages.length - 1]
+
+			if (idx % visibleRows === 0) {
+				pages.push([row])
+			} else {
+				currentPage.push(row)
+			}
+		})
+
+		pages.forEach((page, idx) => {
+			cache.set(idx + startPage, page)
+		})
+
+		return cache
+	},
+})
+
+const updatePageNumber = assign({
+	pageNumber: (_, event) => {
+		// If the page number is being updated after fetching, the value will be provided in the data prop
+		// @ts-ignore
+		return event?.data ? event.data.pageNumber : event.pageNumber
+	},
+})
 
 export const TableChartMachine = Machine(
 	{
@@ -94,36 +126,11 @@ export const TableChartMachine = Machine(
 	},
 	{
 		actions: {
-			bustCache: assign((ctx) => {
-				ctx.pages = new Map()
-			}),
-			// @ts-ignore
-			setInitialRows: assign((ctx, { data }) => {
-				ctx.mineUrl = data.rootUrl
-				ctx.totalRows = data.totalRows
-				// reset the page in case this is an updated query
-				ctx.pageNumber = 1
-			}),
-			// @ts-ignore
-			setLastQuery: assign((ctx, { data }) => {
-				ctx.lastQuery = data.query
-			}),
-			// @ts-ignore
-			refreshCache: assign((ctx, { data }) => {
-				ctx.pages = refreshCache({
-					tableRows: data.summary,
-					cache: ctx.pages,
-					visibleRows: ctx.visibleRows,
-					startPage: data.startPage,
-				})
-			}),
-			// @ts-ignore
-			updatePageNumber: assign((ctx, event) => {
-				// If the page number is being updated after fetching, the value will be provided in the data prop
-				// @ts-ignore
-				const pageNumber = event?.data ? event.data.pageNumber : event.pageNumber
-				ctx.pageNumber = pageNumber
-			}),
+			bustCache,
+			setInitialRows,
+			setLastQuery,
+			refreshCache,
+			updatePageNumber,
 		},
 		guards: {
 			hasSummary: (ctx) => {

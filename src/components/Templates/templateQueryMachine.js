@@ -1,33 +1,38 @@
-import { assign } from '@xstate/immer'
 import {
 	ADD_TEMPLATE_CONSTRAINT,
 	FETCH_UPDATED_SUMMARY,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/machineBus'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
 
 /**
  *
  */
-// @ts-ignore
-const setQueries = assign((ctx, { path, selectedValues }) => {
-	const query = ctx.template.where.find((con) => con.path === path)
-	if ('value' in query) {
-		query.value = selectedValues[0]
-	} else {
-		query.values = selectedValues
-	}
+const setQueries = assign({
+	// @ts-ignore
+	template: (ctx, { path, selectedValues }) => {
+		const updatedQuery = { ...ctx.template, where: [...ctx.template.where] }
 
-	sendToBus({ type: TEMPLATE_CONSTRAINT_UPDATED, path })
+		const query = updatedQuery.where.find((con) => con.path === path)
+		if ('value' in query) {
+			query.value = selectedValues[0]
+		} else {
+			query.values = selectedValues
+		}
+
+		sendToBus({ type: TEMPLATE_CONSTRAINT_UPDATED, path })
+
+		return updatedQuery
+	},
 })
 
 /**
  *
  */
-// @ts-ignore
-const setActiveQuery = assign((ctx, { query }) => {
-	ctx.isActiveQuery = query.name === ctx.template.name
+const setActiveQuery = assign({
+	// @ts-ignore
+	isActiveQuery: (ctx, { query }) => query.name === ctx.template.name,
 })
 
 /**

@@ -1,4 +1,3 @@
-import { assign } from '@xstate/immer'
 import {
 	ADD_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
@@ -7,7 +6,34 @@ import {
 } from 'src/eventConstants'
 import { fetchPathValues } from 'src/fetchSummary'
 import { sendToBus } from 'src/machineBus'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
+
+import { logErrorToConsole } from '../../utils'
+
+const addConstraint = assign({
+	// @ts-ignore
+	selectedValues: (ctx, { constraint }) => {
+		return ctx.op === 'ONE OF' ? [...ctx.selectedValues, constraint] : [constraint]
+	},
+})
+
+const removeConstraint = assign({
+	// @ts-ignore
+	selectedValues: (ctx, { constraint }) => ctx.selectedValues.filter((name) => name !== constraint),
+})
+
+const setAvailableValues = assign({
+	// @ts-ignore
+	availableValues: (_, { data }) => data.values,
+})
+
+const updateTemplateQuery = (ctx) => {
+	sendToBus({
+		type: ADD_TEMPLATE_CONSTRAINT,
+		path: ctx.path,
+		selectedValues: ctx.selectedValues,
+	})
+}
 
 export const templateConstraintMachine = Machine(
 	{
@@ -58,32 +84,11 @@ export const templateConstraintMachine = Machine(
 	},
 	{
 		actions: {
-			// @ts-ignore
-			logErrorToConsole: (_, event) => console.warn(event.data),
-			// @ts-ignore
-			addConstraint: assign((ctx, { constraint }) => {
-				if (ctx.op === 'ONE OF') {
-					ctx.selectedValues.push(constraint)
-				} else {
-					ctx.selectedValues = [constraint]
-				}
-			}),
-			// @ts-ignore
-			removeConstraint: assign((ctx, { constraint }) => {
-				ctx.selectedValues = ctx.selectedValues.filter((name) => name !== constraint)
-			}),
-			// @ts-ignore
-			setAvailableValues: assign((ctx, { data }) => {
-				const { values } = data
-				ctx.availableValues = values.map((val) => ({ ...val, item: val.value }))
-			}),
-			updateTemplateQuery: (ctx) => {
-				sendToBus({
-					type: ADD_TEMPLATE_CONSTRAINT,
-					path: ctx.path,
-					selectedValues: ctx.selectedValues,
-				})
-			},
+			logErrorToConsole,
+			addConstraint,
+			removeConstraint,
+			setAvailableValues,
+			updateTemplateQuery,
 		},
 		guards: {
 			// @ts-ignore

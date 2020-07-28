@@ -113,7 +113,7 @@ const CODES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 export const QueryController = () => {
 	const [state, send] = useMachineBus(queryControllerMachine)
 
-	const { currentConstraints, classView, selectedPaths, rootUrl, appView } = state.context
+	const { currentConstraints, classView, selectedPaths, rootUrl } = state.context
 
 	let color = 'var(--green5)'
 
@@ -165,7 +165,7 @@ export const QueryController = () => {
 
 	return (
 		<div css={{ paddingTop: 10, margin: '0 20px' }}>
-			{appView === 'defaultView' && <BrowserConstraintViewAll />}
+			<BrowserConstraintViewAll />
 			<RunQueryButton
 				intent={currentConstraints.length === 0 ? 'none' : 'success'}
 				isDisabled={currentConstraints.length === 0}

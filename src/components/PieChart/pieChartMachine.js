@@ -1,7 +1,13 @@
-import { assign } from '@xstate/immer'
 import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { fetchSummary } from 'src/fetchSummary'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
+
+const setSummaryResults = assign({
+	// @ts-ignore
+	allClassOrganisms: (_, { data }) => data.summary,
+	// @ts-ignore
+	classView: (_, { data }) => data.classView,
+})
 
 export const PieChartMachine = Machine(
 	{
@@ -24,7 +30,7 @@ export const PieChartMachine = Machine(
 					src: 'fetchItems',
 					onDone: {
 						target: 'pending',
-						actions: 'setClassItems',
+						actions: 'setSummaryResults',
 					},
 					onError: {
 						target: 'idle',
@@ -43,11 +49,7 @@ export const PieChartMachine = Machine(
 	},
 	{
 		actions: {
-			// @ts-ignore
-			setClassItems: assign((ctx, { data }) => {
-				ctx.allClassOrganisms = data.summary
-				ctx.classView = data.classView
-			}),
+			setSummaryResults,
 		},
 		guards: {
 			hasSummary: (ctx) => ctx.allClassOrganisms.length > 0,

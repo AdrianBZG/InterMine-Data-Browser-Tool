@@ -21,3 +21,5 @@ export const getTagCategories = (tags) => {
 
 	return categories.length > 0 ? categories : ['Misc']
 }
+
+export const logErrorToConsole = (_, event) => console.warn(event.data)

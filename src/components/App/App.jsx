@@ -7,7 +7,7 @@ import React, { useEffect } from 'react'
 import { FETCH_INITIAL_SUMMARY, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
 import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
 
-import { logo } from '../../images/logo.png'
+import logo from '../../images/logo.png'
 import { BarChart } from '../BarChart/BarChart'
 import { ConstraintSection } from '../ConstraintSection'
 import { NavigationBar } from '../Navigation/NavigationBar'

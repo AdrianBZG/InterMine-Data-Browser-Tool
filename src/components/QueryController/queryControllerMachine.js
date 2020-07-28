@@ -1,7 +1,5 @@
-import { assign } from '@xstate/immer'
 import {
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
-	CHANGE_CONSTRAINT_VIEW,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 	DELETE_QUERY_CONSTRAINT,
 	FETCH_INITIAL_SUMMARY,
@@ -9,7 +7,56 @@ import {
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/machineBus'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
+
+const initializeMachine = assign({
+	currentConstraints: () => [],
+	selectedPaths: () => [],
+	// @ts-ignore
+	classView: (_, { globalConfig }) => globalConfig.classView,
+	// @ts-ignore
+	rootUrl: (_, { globalConfig }) => globalConfig.rootUrl,
+})
+
+const addConstraint = assign({
+	// @ts-ignore
+	currentConstraints: (ctx, { query }) => {
+		const withQueryRemoved = ctx.currentConstraints.filter((c) => {
+			return c.path !== query.path
+		})
+
+		withQueryRemoved.push(query)
+
+		return withQueryRemoved
+	},
+})
+
+const removeConstraint = assign({
+	// @ts-ignore
+	currentConstraints: (ctx, { type, path }) => {
+		const prevCount = ctx.currentConstraints.length
+		const withoutQuery = ctx.currentConstraints.filter((c) => {
+			return c.path !== path
+		})
+
+		const nextCount = withoutQuery.length
+
+		// The constraint is being deleted internally, and needs to be synced
+		// with the constraint machines
+		if (type !== DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
+			const constraintPath = path.slice(path.indexOf('.') + 1)
+
+			sendToBus({ type: UNSET_CONSTRAINT, path: constraintPath })
+		}
+
+		return withoutQuery
+	},
+})
+
+const setSelectedPaths = assign({
+	// @ts-ignore
+	selectedPaths: (_, { selectedPaths }) => selectedPaths,
+})
 
 /**
  *
@@ -20,13 +67,12 @@ export const queryControllerMachine = Machine(
 		initial: 'idle',
 		context: {
 			currentConstraints: [],
-			appView: 'defaultView',
 			classView: '',
 			selectedPaths: [],
 			rootUrl: '',
 		},
 		on: {
-			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectPaths' },
+			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths' },
 			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
 			[FETCH_INITIAL_SUMMARY]: {
 				target: 'idle',
@@ -37,7 +83,6 @@ export const queryControllerMachine = Machine(
 			idle: {
 				on: {
 					[DELETE_QUERY_CONSTRAINT]: { actions: 'removeConstraint' },
-					[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
 					[APPLY_OVERVIEW_CONSTRAINT_TO_QUERY]: [
 						{
 							target: 'constraintLimitReached',
@@ -64,47 +109,10 @@ export const queryControllerMachine = Machine(
 	},
 	{
 		actions: {
-			// @ts-ignore
-			setAppView: assign((ctx, { newTabId }) => {
-				ctx.appView = newTabId
-			}),
-			// @ts-ignore
-			initializeMachine: assign((ctx, { globalConfig }) => {
-				ctx.currentConstraints = []
-				ctx.selectedPaths = []
-				ctx.classView = globalConfig.classView
-				ctx.rootUrl = globalConfig.rootUrl
-			}),
-			// @ts-ignore
-			addConstraint: assign((ctx, { query }) => {
-				const withQueryRemoved = ctx.currentConstraints.filter((c) => {
-					return c.path !== query.path
-				})
-
-				withQueryRemoved.push(query)
-				ctx.currentConstraints = withQueryRemoved
-			}),
-			// @ts-ignore
-			removeConstraint: assign((ctx, { type, path }) => {
-				const prevCount = ctx.currentConstraints.length
-				ctx.currentConstraints = ctx.currentConstraints.filter((c) => {
-					return c.path !== path
-				})
-
-				const nextCount = ctx.currentConstraints.length
-
-				// The constraint is being deleted internally, and needs to be synced
-				// with the constraint machines
-				if (type !== DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
-					const constraintPath = path.slice(path.indexOf('.') + 1)
-
-					sendToBus({ type: UNSET_CONSTRAINT, path: constraintPath })
-				}
-			}),
-			// @ts-ignore
-			setSelectPaths: assign((ctx, { selectedPaths }) => {
-				ctx.selectedPaths = selectedPaths
-			}),
+			initializeMachine,
+			addConstraint,
+			removeConstraint,
+			setSelectedPaths,
 		},
 		guards: {
 			canAddConstraint: (context, _, { cond }) => {

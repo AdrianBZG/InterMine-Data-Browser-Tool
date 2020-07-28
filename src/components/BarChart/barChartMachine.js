@@ -1,7 +1,17 @@
-import { assign } from '@xstate/immer'
 import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { fetchSummary } from 'src/fetchSummary'
-import { Machine } from 'xstate'
+import { assign, Machine } from 'xstate'
+
+import { logErrorToConsole } from '../../utils'
+
+const setLengthSummary = assign({
+	// @ts-ignore
+	lengthStats: (_, { data }) => data.lengthStats,
+	// @ts-ignore
+	lengthSummary: (_, { data }) => data.lengthSummary,
+	// @ts-ignore
+	classView: (_, { data }) => data.classView,
+})
 
 export const BarChartMachine = Machine(
 	{
@@ -50,14 +60,8 @@ export const BarChartMachine = Machine(
 	},
 	{
 		actions: {
-			// @ts-ignore
-			setLengthSummary: assign((ctx, { data }) => {
-				ctx.lengthStats = data.lengthStats
-				ctx.lengthSummary = data.lengthSummary
-				ctx.classView = data.classView
-			}),
-			// @ts-ignore
-			logErrorToConsole: (ctx, event) => console.warn(event.data),
+			setLengthSummary,
+			logErrorToConsole,
 		},
 		guards: {
 			hasSummary: (ctx) => {
