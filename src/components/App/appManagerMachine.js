@@ -180,8 +180,8 @@ export const appManagerMachine = Machine(
 					? 'https://www.humanmine.org/humanmine'
 					: 'http://localhost:9999/biotestmine',
 			},
-			// We have to keep the template context here because it is an invoked machine and clears its
-			// context when the state in which it was invoked is exited. Therefore we have to pass the previous
+			// We have to keep the template context here because it is an invoked machine and when it exits,
+			// the state it was called in, it clears its context. Therefore we have to pass the previous
 			// context to the template machine to rehydrate it.
 			templates: Object.create(null),
 			templatesForClassView: [],

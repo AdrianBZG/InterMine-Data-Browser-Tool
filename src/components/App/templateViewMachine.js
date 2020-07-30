@@ -175,11 +175,7 @@ export const templateViewMachine = Machine(
 		states: {
 			init: {
 				always: [
-					{
-						target: 'allCategories',
-						cond: 'hasTemplates',
-						actions: ['updateParent'],
-					},
+					{ target: 'allCategories', cond: 'hasTemplates', actions: ['updateParent'] },
 					{ target: 'loadTemplates' },
 				],
 			},
