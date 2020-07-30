@@ -3,9 +3,29 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
+import { ADD_LIST_CONSTRAINT, ADD_LIST_TAG } from 'src/eventConstants'
+import { sendToBus } from 'src/machineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
-import { NumberedSelectMenuItems } from '../Shared/Selects'
+import { InfoIconPopover } from '../Shared/InfoIconPopover'
+
+export const ListMenuItems = (item, props) => {
+	return (
+		<MenuItem
+			key={item.listName}
+			text={item.displayName}
+			active={props.modifiers.active}
+			onClick={props.handleClick}
+			icon={
+				<InfoIconPopover
+					title={item.displayName}
+					description={item.description}
+					position="left-top"
+				/>
+			}
+		/>
+	)
+}
 /**
  *
  */
@@ -21,37 +41,41 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	)
 }
 
-export const ClassSelector = ({ handleClassSelect, modelClasses, classView }) => {
-	const classSearchIndex = useRef(null)
-
-	const classDisplayName =
-		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
+export const ListSelector = ({ listsForCurrentClass }) => {
+	const listSearchIndex = useRef(null)
 
 	useEffect(() => {
 		const indexClasses = async () => {
-			if (modelClasses.length > 0) {
-				classSearchIndex.current = await buildSearchIndex({
-					docId: 'name',
+			if (listsForCurrentClass.length > 0) {
+				listSearchIndex.current = await buildSearchIndex({
+					docId: 'listName',
 					docField: 'displayName',
-					values: modelClasses,
+					values: listsForCurrentClass,
 				})
 			}
 		}
 
 		indexClasses()
-	}, [modelClasses])
+	}, [listsForCurrentClass])
 
 	const filterQuery = (query, items) => {
-		if (query === '' || !classSearchIndex?.current) {
+		if (query === '' || !listSearchIndex?.current) {
 			return items
 		}
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		return classSearchIndex.current.search(query, modelClasses.length)
+		return listSearchIndex.current.search(query, listsForCurrentClass.length)
+	}
+
+	const handleListSelect = ({ listName }) => {
+		// @ts-ignore
+		sendToBus({ type: ADD_LIST_CONSTRAINT, listName })
+		// @ts-ignore
+		sendToBus({ type: ADD_LIST_TAG, listName })
 	}
 
 	return (
-		<div css={{ display: 'flex', marginLeft: 100, marginRight: 20 }}>
+		<div css={{ display: 'flex', marginLeft: 40, marginRight: 20 }}>
 			<span
 				// @ts-ignore
 				css={{
@@ -61,22 +85,23 @@ export const ClassSelector = ({ handleClassSelect, modelClasses, classView }) =>
 					marginBottom: 0,
 				}}
 			>
-				{classDisplayName}
+				Lists
 			</span>
 			<Select
-				items={modelClasses}
+				items={listsForCurrentClass}
 				filterable={true}
-				itemRenderer={NumberedSelectMenuItems}
-				onItemSelect={handleClassSelect}
+				itemRenderer={ListMenuItems}
+				onItemSelect={handleListSelect}
 				itemListRenderer={renderMenu}
 				itemListPredicate={filterQuery}
 				resetOnClose={true}
+				popoverProps={{ boundary: 'window', usePortal: true, lazy: true }}
 			>
 				<Button
-					aria-label="select the views you'd like to query"
+					aria-label="select the lists you wish to filter by"
 					// used to override `Blueprintjs` styles for a small button
 					small={true}
-					text="change view"
+					text="filter by list"
 					alignText="left"
 					rightIcon={IconNames.CARET_DOWN}
 				/>

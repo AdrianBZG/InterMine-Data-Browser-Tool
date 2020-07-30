@@ -6,7 +6,7 @@ import {
 	TOGGLE_VIEW_IS_LOADING,
 	UPDATE_TEMPLATE_QUERIES,
 } from 'src/eventConstants'
-import { fetchClasses, fetchInstances } from 'src/fetchSummary'
+import { fetchClasses, fetchInstances, fetchLists } from 'src/fetchSummary'
 import { assign, forwardTo, Machine } from 'xstate'
 
 import { templateViewMachine } from './templateViewMachine'
@@ -118,6 +118,32 @@ const setMineConfiguration = assign({
 	// @ts-ignore
 	modelClasses: (_, { data }) =>
 		data.modelClasses.sort().map((cl) => ({ displayName: cl.displayName, name: cl.name })),
+	// @ts-ignore
+	lists: (_, { data }) => data.lists,
+})
+
+const filterListsForClass = assign({
+	listsForCurrentClass: (ctx) => {
+		/**
+		 * Lists are a class instance, and can't be cloned when building the search index
+		 * in a service worker. So we have to extract the values we need, namely just the name
+		 * and description
+		 */
+		// return ctx.lists.filter((list) => list.type === ctx.classView)
+		return ctx.lists.flatMap((list) => {
+			if (list.type !== ctx.classView) {
+				return []
+			}
+
+			return [
+				{
+					listName: list.name,
+					displayName: list.name.replace(/_/g, ' ').replace(/:/g, ': '),
+					description: list.description,
+				},
+			]
+		})
+	},
 })
 
 export const appManagerMachine = Machine(
@@ -129,6 +155,13 @@ export const appManagerMachine = Machine(
 			classView: 'Gene',
 			intermines: [],
 			modelClasses: [],
+			lists: [],
+			listsForCurrentClass: [],
+			listConstraint: {
+				path: 'Gene',
+				op: 'IN',
+				values: [],
+			},
 			showAllLabel: 'Show All',
 			possibleQueries: defaultQueries,
 			categories: {},
@@ -158,11 +191,11 @@ export const appManagerMachine = Machine(
 					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
 				invoke: {
-					id: 'fetchMines',
-					src: 'fetchMinesAndClasses',
+					id: 'fetchMineConfig',
+					src: 'fetchMineConfiguration',
 					onDone: {
 						target: 'defaultView',
-						actions: 'setMineConfiguration',
+						actions: ['setMineConfiguration', 'filterListsForClass'],
 					},
 					onError: {
 						target: 'defaultView',
@@ -209,6 +242,7 @@ export const appManagerMachine = Machine(
 			changeMine,
 			changeClass,
 			setMineConfiguration,
+			filterListsForClass,
 		},
 		guards: {
 			// @ts-ignore
@@ -225,24 +259,34 @@ export const appManagerMachine = Machine(
 			},
 		},
 		services: {
-			fetchMinesAndClasses: async (ctx) => {
+			fetchMineConfiguration: async (ctx) => {
 				let instances
 				let modelClasses
+				let lists
 
 				if (ctx.intermines.length === 0) {
-					const [instancesResult, classesResult] = await Promise.all([
+					const [instancesResult, classesResult, listsResult] = await Promise.all([
 						fetchInstances(),
 						fetchClasses(ctx.selectedMine.rootUrl),
+						fetchLists(ctx.selectedMine.rootUrl),
 					])
 
 					instances = instancesResult
 					modelClasses = classesResult
+					lists = listsResult
 				} else {
-					modelClasses = await fetchClasses(ctx.selectedMine.rootUrl)
+					const [classesResult, listsResult] = await Promise.all([
+						fetchClasses(ctx.selectedMine.rootUrl),
+						fetchLists(ctx.selectedMine.rootUrl),
+					])
+
+					modelClasses = classesResult
+					lists = listsResult
 				}
 
 				return {
 					modelClasses: Object.entries(modelClasses.classes).map(([_key, value]) => value),
+					lists,
 					intermines:
 						ctx.intermines.length > 0
 							? ctx.intermines

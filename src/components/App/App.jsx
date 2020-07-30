@@ -9,7 +9,7 @@ import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/machineB
 
 import logo from '../../images/logo.png'
 import { BarChart } from '../BarChart/BarChart'
-import { ConstraintSection } from '../ConstraintSection'
+import { ConstraintSection } from '../ConstraintSection/ConstraintSection'
 import { NavigationBar } from '../Navigation/NavigationBar'
 import { PieChart } from '../PieChart/PieChart'
 import { Table } from '../Table/Table'

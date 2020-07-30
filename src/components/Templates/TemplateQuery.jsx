@@ -1,20 +1,13 @@
-import {
-	Button,
-	Classes,
-	Divider,
-	H5,
-	Icon,
-	Popover,
-	PopoverInteractionKind,
-	Text,
-} from '@blueprintjs/core'
+import { Button, Classes, Divider, H5, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { ConstraintServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
 
+import { CODES, listConstraintQuery } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'
+import { InfoIconPopover } from '../Shared/InfoIconPopover'
 import { PopupCard } from '../Shared/PopupCard'
 import { CheckboxWidget } from '../Widgets/CheckboxWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
@@ -69,19 +62,6 @@ const ConstraintWidget = ({ constraint, rootUrl }) => {
 	)
 }
 
-const InfoIcon = ({ description }) => (
-	<Popover
-		interactionKind={PopoverInteractionKind.HOVER_TARGET_ONLY}
-		boundary="viewport"
-		css={{ marginRight: 20, marginLeft: 5 }}
-	>
-		<Icon icon={IconNames.INFO_SIGN} color="var(--grey5)" iconSize={20} />
-		<div css={{ maxWidth: 500, padding: 20 }}>
-			<Text>{description ? description : 'No Description Provided'}</Text>
-		</div>
-	</Popover>
-)
-
 export const TemplateQuery = ({ classView, rootUrl, template }) => {
 	// We don't provide default values for the templates
 	const withNoDefaults = [...template.where].map((con) => {
@@ -101,13 +81,32 @@ export const TemplateQuery = ({ classView, rootUrl, template }) => {
 	}
 
 	const [state] = useMachineBus(
-		templateQueryMachine.withContext({ template: templateQuery, isActiveQuery: false })
+		templateQueryMachine.withContext({
+			...templateQueryMachine.context,
+			template: templateQuery,
+			isActiveQuery: false,
+		})
 	)
 
-	const { isActiveQuery } = state.context
+	const { isActiveQuery, listNames, template: updatedTemplate } = state.context
 
 	const showDivider = (idx) =>
 		editableConstraints.length > 1 && idx < editableConstraints.length - 1
+
+	const nextCode = CODES[updatedTemplate.where.length]
+	const query = {
+		...updatedTemplate,
+		constraintLogic: `${updatedTemplate.constraintLogic} and ${nextCode}`,
+		where: [
+			...updatedTemplate.where,
+			{
+				...listConstraintQuery,
+				path: classView,
+				values: listNames,
+				code: nextCode,
+			},
+		],
+	}
 
 	return (
 		<PopupCard boundary="viewport">
@@ -117,7 +116,8 @@ export const TemplateQuery = ({ classView, rootUrl, template }) => {
 					fill={true}
 					alignText="left"
 					minimal={true}
-					icon={<InfoIcon description={template?.description} />}
+					// @ts-ignore
+					icon={<InfoIconPopover description={template?.description} />}
 					rightIcon={
 						isActiveQuery ? (
 							<Icon icon={IconNames.TICK_CIRCLE} intent="success" iconSize={20} />
@@ -137,8 +137,8 @@ export const TemplateQuery = ({ classView, rootUrl, template }) => {
 				<RunQueryButton
 					handleOnClick={() => {
 						sendToBus({
+							query,
 							type: FETCH_UPDATED_SUMMARY,
-							query: state.context.template,
 							globalConfig: { classView, rootUrl },
 						})
 					}}

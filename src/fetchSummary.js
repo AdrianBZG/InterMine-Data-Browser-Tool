@@ -71,3 +71,9 @@ export const fetchPathValues = async ({ path, rootUrl }) => {
 
 	return await service.pathValues(path)
 }
+
+export const fetchLists = async (rootUrl) => {
+	const service = getService(rootUrl)
+
+	return await service.fetchLists()
+}

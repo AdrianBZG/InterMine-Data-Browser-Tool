@@ -14,7 +14,7 @@ const AuthenticatedIcon = (isAuthenticated) => (
 	/>
 )
 
-export const Mine = () => {
+export const MineSelector = () => {
 	const [isAuthenticated, setAuthentication] = useState(false)
 	const [state, send] = useServiceContext('appManager')
 

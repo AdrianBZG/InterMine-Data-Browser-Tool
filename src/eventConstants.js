@@ -43,6 +43,8 @@ export const CHANGE_CLASS = 'appManager/class/change'
 export const CHANGE_CONSTRAINT_VIEW = 'appManager/view/change'
 export const TOGGLE_CATEGORY_VISIBILITY = 'appManager/category/visibility'
 export const TOGGLE_VIEW_IS_LOADING = 'appManager/view/isLoading'
+export const ADD_LIST_CONSTRAINT = 'appManager/lists/add'
+export const REMOVE_LIST_CONSTRAINT = 'appManager/lists/remove'
 
 /**
  * Table
@@ -50,3 +52,9 @@ export const TOGGLE_VIEW_IS_LOADING = 'appManager/view/isLoading'
 export const CHANGE_PAGE = 'table/page/change'
 
 export const UPDATE_TEMPLATE_QUERIES = 'templateView/templates/update'
+
+/**
+ * Constraint Section
+ */
+export const ADD_LIST_TAG = 'constraintSection/listTag/add'
+export const REMOVE_LIST_TAG = 'constraintSection/listTag/remove'

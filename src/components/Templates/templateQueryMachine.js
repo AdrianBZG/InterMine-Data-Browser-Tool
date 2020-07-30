@@ -1,6 +1,8 @@
 import {
+	ADD_LIST_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
 	FETCH_UPDATED_SUMMARY,
+	REMOVE_LIST_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/machineBus'
@@ -36,6 +38,22 @@ const setActiveQuery = assign({
 })
 
 /**
+ *
+ */
+const addListConstraint = assign({
+	// @ts-ignore
+	listNames: (ctx, { listName }) => [...ctx.listNames, listName],
+})
+
+/**
+ *
+ */
+const removeListConstraint = assign({
+	// @ts-ignore
+	listNames: (ctx, { listName }) => ctx.listNames.filter((list) => list !== listName),
+})
+
+/**
  * @returns {boolean}
  */
 const templateHasQuery = (ctx, { path }) => {
@@ -52,12 +70,15 @@ export const templateQueryMachine = Machine(
 		context: {
 			template: null,
 			isActiveQuery: false,
+			listNames: [],
 		},
 		states: {
 			idle: {
 				on: {
 					[ADD_TEMPLATE_CONSTRAINT]: { actions: 'setQueries', cond: 'templateHasQuery' },
 					[FETCH_UPDATED_SUMMARY]: { actions: 'setActiveQuery' },
+					[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
+					[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
 				},
 			},
 		},
@@ -66,6 +87,8 @@ export const templateQueryMachine = Machine(
 		actions: {
 			setQueries,
 			setActiveQuery,
+			addListConstraint,
+			removeListConstraint,
 		},
 		guards: {
 			// @ts-ignore

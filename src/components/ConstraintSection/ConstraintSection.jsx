@@ -1,13 +1,14 @@
-import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs/core'
+import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag, Text } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React, { useState } from 'react'
-import { CHANGE_CONSTRAINT_VIEW } from 'src/eventConstants'
-import { sendToBus } from 'src/machineBus'
+import { CHANGE_CONSTRAINT_VIEW, REMOVE_LIST_CONSTRAINT, REMOVE_LIST_TAG } from 'src/eventConstants'
+import { sendToBus, useMachineBus } from 'src/machineBus'
 
-import { DATA_VIZ_COLORS } from './dataVizColors'
-import { OverviewConstraint } from './Overview/OverviewConstraint'
-import { QueryController } from './QueryController/QueryController'
-import { TemplateQuery } from './Templates/TemplateQuery'
+import { DATA_VIZ_COLORS } from '../dataVizColors'
+import { OverviewConstraint } from '../Overview/OverviewConstraint'
+import { QueryController } from '../QueryController/QueryController'
+import { TemplateQuery } from '../Templates/TemplateQuery'
+import { constraintSectionMachine } from './constraintSectionMachine'
 
 const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, showAllLabel }) => {
 	const [showCategories, setShowCategories] = useState(false)
@@ -23,7 +24,7 @@ const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, show
 				large={true}
 				onClick={() => setShowCategories(!showCategories)}
 			/>
-			<Collapse isOpen={showCategories} css={{ marginTop: 10 }}>
+			<Collapse isOpen={showCategories} css={{ marginTop: 0 }}>
 				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
 					{classCategoryTags.map(({ tagName, isVisible, count }) => {
 						if (count === 0 && tagName !== showAllLabel) {
@@ -56,6 +57,52 @@ const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, show
 	)
 }
 
+const ShowLists = ({ listNames }) => {
+	const [showLists, setShowLists] = useState(false)
+
+	const selectedLists = listNames.map((listName) => {
+		return (
+			<Tag
+				key={listName}
+				intent="primary"
+				interactive={true}
+				onRemove={() => {
+					// @ts-ignore
+					sendToBus({ type: REMOVE_LIST_CONSTRAINT, listName })
+					// @ts-ignore
+					sendToBus({ type: REMOVE_LIST_TAG, listName })
+				}}
+				css={{ margin: 4 }}
+			>
+				{listName}
+			</Tag>
+		)
+	})
+
+	return (
+		<>
+			<Button
+				icon={showLists ? IconNames.CARET_DOWN : IconNames.CARET_RIGHT}
+				fill={true}
+				alignText="left"
+				text="List Filters"
+				minimal={true}
+				large={true}
+				onClick={() => setShowLists(!showLists)}
+			/>
+			<Collapse isOpen={showLists} css={{ marginTop: 0 }}>
+				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
+					{listNames.length > 0 ? (
+						selectedLists
+					) : (
+						<Text css={{ marginLeft: 20 }}>No Lists Selected</Text>
+					)}
+				</div>
+			</Collapse>
+		</>
+	)
+}
+
 const TemplatesList = ({
 	isLoading,
 	queries,
@@ -65,6 +112,7 @@ const TemplatesList = ({
 	handleCategoryToggle,
 	classView,
 	rootUrl,
+	listNames,
 }) => {
 	if (isLoading) {
 		return null
@@ -72,7 +120,9 @@ const TemplatesList = ({
 
 	return (
 		<div>
-			<Divider css={{ margin: '10px 0' }} />
+			<Divider css={{ margin: 0 }} />
+			<ShowLists listNames={listNames} />
+			<Divider css={{ margin: 0 }} />
 			<ShowCategories
 				handleCategoryToggle={handleCategoryToggle}
 				classCategoryTags={classCategoryTags}
@@ -127,7 +177,10 @@ export const ConstraintSection = ({
 	rootUrl,
 	showAll,
 }) => {
+	const [state] = useMachineBus(constraintSectionMachine)
+
 	const isTemplateView = view === 'templateView'
+	const { listNames } = state.context
 
 	return (
 		<section
@@ -160,6 +213,7 @@ export const ConstraintSection = ({
 					handleCategoryToggle={toggleCategory}
 					classView={classView}
 					rootUrl={rootUrl}
+					listNames={listNames}
 				/>
 			) : (
 				<>

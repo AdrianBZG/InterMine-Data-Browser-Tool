@@ -1,13 +1,17 @@
 import {
+	ADD_LIST_CONSTRAINT,
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 	DELETE_QUERY_CONSTRAINT,
 	FETCH_INITIAL_SUMMARY,
+	REMOVE_LIST_CONSTRAINT,
 	SET_AVAILABLE_COLUMNS,
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/machineBus'
 import { assign, Machine } from 'xstate'
+
+import { listConstraintQuery } from '../common'
 
 const initializeMachine = assign({
 	currentConstraints: () => [],
@@ -58,6 +62,28 @@ const setSelectedPaths = assign({
 	selectedPaths: (_, { selectedPaths }) => selectedPaths,
 })
 
+const addListConstraint = assign({
+	// @ts-ignore
+	listConstraint: (ctx, { listName }) => {
+		return {
+			...ctx.listConstraint,
+			path: ctx.classView,
+			values: [...ctx.listConstraint.values, listName],
+		}
+	},
+})
+
+const removeListConstraint = assign({
+	// @ts-ignore
+	listConstraint: (ctx, { listName }) => {
+		return {
+			...ctx.listConstraint,
+			path: ctx.classView,
+			values: ctx.listConstraint.values.filter((list) => list !== listName),
+		}
+	},
+})
+
 /**
  *
  */
@@ -67,6 +93,9 @@ export const queryControllerMachine = Machine(
 		initial: 'idle',
 		context: {
 			currentConstraints: [],
+			listConstraint: {
+				...listConstraintQuery,
+			},
 			classView: '',
 			selectedPaths: [],
 			rootUrl: '',
@@ -74,6 +103,7 @@ export const queryControllerMachine = Machine(
 		on: {
 			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths' },
 			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
+			[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
 			[FETCH_INITIAL_SUMMARY]: {
 				target: 'idle',
 				actions: 'initializeMachine',
@@ -82,12 +112,26 @@ export const queryControllerMachine = Machine(
 		states: {
 			idle: {
 				on: {
+					[ADD_LIST_CONSTRAINT]: [
+						{
+							target: 'constraintLimitReached',
+							cond: {
+								type: 'listOccupiesLastSlot',
+								// One less than the max since this list will occupy that slot
+								maxConstraints: 25,
+							},
+							actions: 'addListConstraint',
+						},
+						{
+							actions: 'addListConstraint',
+						},
+					],
 					[DELETE_QUERY_CONSTRAINT]: { actions: 'removeConstraint' },
 					[APPLY_OVERVIEW_CONSTRAINT_TO_QUERY]: [
 						{
 							target: 'constraintLimitReached',
 							cond: {
-								type: 'canAddConstraint',
+								type: 'isLastConstraint',
 								maxConstraints: 26,
 							},
 							actions: 'addConstraint',
@@ -113,9 +157,18 @@ export const queryControllerMachine = Machine(
 			addConstraint,
 			removeConstraint,
 			setSelectedPaths,
+			addListConstraint,
+			removeListConstraint,
 		},
 		guards: {
-			canAddConstraint: (context, _, { cond }) => {
+			isLastConstraint: (context, _, { cond }) => {
+				const maxConstraints =
+					// @ts-ignore
+					context.listConstraint.values.length === 0 ? cond.maxConstraints : cond.maxConstraints - 1 // subtract the list constraint
+
+				return context.currentConstraints.length + 1 === maxConstraints
+			},
+			listOccupiesLastSlot: (context, _, { cond }) => {
 				// @ts-ignore
 				return context.currentConstraints.length + 1 === cond.maxConstraints
 			},
