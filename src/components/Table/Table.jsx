@@ -24,6 +24,9 @@ import { humanize, titleize } from 'underscore.string'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { TableChartMachine } from './tableMachine'
 
+/**
+ *
+ */
 const TableActionButtons = () => {
 	const [selectedLanguage, setLanguage] = useState('Python')
 	return (
@@ -67,6 +70,10 @@ const TableActionButtons = () => {
 		</div>
 	)
 }
+
+/**
+ *
+ */
 const TablePagingButtons = () => {
 	const [state, send] = useServiceContext('table')
 	const [pageNumber, setPageNumber] = useState(1)
@@ -115,14 +122,14 @@ const TablePagingButtons = () => {
 			<span css={{ alignSelf: 'center', paddingRight: 12, fontSize: 'var(--fs-desktopM1)' }}>
 				Page
 			</span>
-			<Tooltip content="Go to 1st Page" position={Position.TOP}>
+			<Tooltip content="Go to 1st Page" position={Position.TOP} disabled={isFirstPage}>
 				<Button
 					icon={IconNames.CHEVRON_BACKWARD}
 					disabled={isFirstPage}
 					onClick={() => setPageNumber(1)}
 				/>
 			</Tooltip>
-			<Tooltip content="Previous Page" position={Position.TOP}>
+			<Tooltip content="Previous Page" position={Position.TOP} disabled={isFirstPage}>
 				<Button
 					icon={IconNames.CHEVRON_LEFT}
 					disabled={isFirstPage}
@@ -135,14 +142,14 @@ const TablePagingButtons = () => {
 				value={`${pageNumber}`}
 				round={false}
 			/>
-			<Tooltip content="Next Page" position={Position.TOP}>
+			<Tooltip content="Next Page" position={Position.TOP} disabled={isLastPage}>
 				<Button
 					icon={IconNames.CHEVRON_RIGHT}
 					disabled={isLastPage}
 					onClick={() => setPageNumber(pageNumber + 1)}
 				/>
 			</Tooltip>
-			<Tooltip content="Go to last Page" position={Position.TOP}>
+			<Tooltip content="Go to last Page" position={Position.TOP} disabled={isLastPage}>
 				<Button
 					icon={IconNames.CHEVRON_FORWARD}
 					disabled={isLastPage}
@@ -156,6 +163,9 @@ const TablePagingButtons = () => {
 	)
 }
 
+/**
+ *
+ */
 const ColumnHeader = ({ columnName, isLoading }) => {
 	const name = titleize(humanize(columnName.replace(/\./g, ' ')))
 	const words = name.split(' ')
@@ -172,6 +182,9 @@ const ColumnHeader = ({ columnName, isLoading }) => {
 	)
 }
 
+/**
+ *
+ */
 const Cell = ({ cell, mineUrl, isLoading }) => {
 	const cellValue = cell.value
 	const skeletonClass = isLoading ? Classes.SKELETON : ''
@@ -201,6 +214,9 @@ const Cell = ({ cell, mineUrl, isLoading }) => {
 	)
 }
 
+/**
+ *
+ */
 export const Table = () => {
 	const isFirstRender = useFirstMountState()
 	const [state, send] = useMachineBus(TableChartMachine)
