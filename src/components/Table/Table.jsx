@@ -17,7 +17,7 @@ import { useDebounce } from 'react-use'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import { CHANGE_PAGE } from 'src/eventConstants'
-import { TableServiceContext, useMachineBus, useServiceContext } from 'src/machineBus'
+import { TableServiceContext, useMachineBus, useServiceContext } from 'src/useMachineBus'
 import { tableLoadingData } from 'src/utils/loadingData/tableResults'
 import { humanize, titleize } from 'underscore.string'
 

@@ -12,8 +12,8 @@ import {
 	Text,
 	Tooltip,
 } from 'recharts'
-import { useMachineBus } from 'src/machineBus'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
+import { useMachineBus } from 'src/useMachineBus'
 import { pieChartLoadingData } from 'src/utils/loadingData/pieChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'

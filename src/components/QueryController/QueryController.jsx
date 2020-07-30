@@ -7,7 +7,7 @@ import {
 	FETCH_UPDATED_SUMMARY,
 	REMOVE_LIST_CONSTRAINT,
 } from 'src/eventConstants'
-import { QueryServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
+import { QueryServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import { CODES } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'

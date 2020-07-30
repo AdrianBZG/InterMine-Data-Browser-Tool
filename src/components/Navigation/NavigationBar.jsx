@@ -1,7 +1,7 @@
 import { Navbar } from '@blueprintjs/core'
 import React from 'react'
 import { CHANGE_CLASS } from 'src/eventConstants'
-import { useServiceContext } from 'src/machineBus'
+import { useServiceContext } from 'src/useMachineBus'
 
 import { ClassSelector } from './ClassSelector'
 import { ListSelector } from './ListSelector'

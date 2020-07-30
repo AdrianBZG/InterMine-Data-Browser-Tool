@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
-import { ConstraintServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
+import { ConstraintServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import { CODES, listConstraintQuery } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'

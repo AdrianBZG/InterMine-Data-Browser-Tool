@@ -5,7 +5,7 @@ import { Card } from '@blueprintjs/core'
 import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
 import { FETCH_INITIAL_SUMMARY, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
-import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/machineBus'
+import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import logo from '../../images/logo.png'
 import { BarChart } from '../BarChart/BarChart'

@@ -13,8 +13,8 @@ import {
 	Tooltip,
 	XAxis,
 } from 'recharts'
-import { useMachineBus } from 'src/machineBus'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
+import { useMachineBus } from 'src/useMachineBus'
 import { barChartLoadingData } from 'src/utils/loadingData/barChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'

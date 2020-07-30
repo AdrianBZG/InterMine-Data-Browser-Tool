@@ -2,7 +2,7 @@ import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag, Text } from '@bluep
 import { IconNames } from '@blueprintjs/icons'
 import React, { useState } from 'react'
 import { CHANGE_CONSTRAINT_VIEW, REMOVE_LIST_CONSTRAINT, REMOVE_LIST_TAG } from 'src/eventConstants'
-import { sendToBus, useMachineBus } from 'src/machineBus'
+import { sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { OverviewConstraint } from '../Overview/OverviewConstraint'

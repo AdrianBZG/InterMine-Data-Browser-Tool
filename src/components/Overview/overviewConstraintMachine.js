@@ -11,7 +11,7 @@ import {
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
 import { fetchSummary } from 'src/fetchSummary'
-import { sendToBus } from 'src/machineBus'
+import { sendToBus } from 'src/useMachineBus'
 import { formatConstraintPath } from 'src/utils'
 import { assign, Machine } from 'xstate'
 

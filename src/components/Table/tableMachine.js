@@ -5,7 +5,7 @@ import {
 	SET_AVAILABLE_COLUMNS,
 } from 'src/eventConstants'
 import { fetchTable } from 'src/fetchSummary'
-import { sendToBus } from 'src/machineBus'
+import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 
 const bustCache = assign({

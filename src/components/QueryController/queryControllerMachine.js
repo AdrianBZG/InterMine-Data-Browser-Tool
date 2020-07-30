@@ -8,7 +8,7 @@ import {
 	SET_AVAILABLE_COLUMNS,
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/machineBus'
+import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 
 import { listConstraintQuery } from '../common'

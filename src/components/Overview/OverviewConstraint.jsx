@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
-import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/machineBus'
+import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/useMachineBus'
 
 import { PopupCard } from '../Shared/PopupCard'
 import { CheckboxWidget } from '../Widgets/CheckboxWidget'

@@ -5,7 +5,7 @@ import {
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { fetchPathValues } from 'src/fetchSummary'
-import { sendToBus } from 'src/machineBus'
+import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'

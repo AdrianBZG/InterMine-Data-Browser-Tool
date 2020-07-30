@@ -4,7 +4,7 @@ import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { ADD_LIST_CONSTRAINT, ADD_LIST_TAG } from 'src/eventConstants'
-import { sendToBus } from 'src/machineBus'
+import { sendToBus } from 'src/useMachineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { InfoIconPopover } from '../Shared/InfoIconPopover'

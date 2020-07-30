@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/eventConstants'
 import { generateId } from 'src/generateId'
-import { useServiceContext } from 'src/machineBus'
+import { useServiceContext } from 'src/useMachineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { NoValuesProvided } from '../Shared/NoValuesProvided'

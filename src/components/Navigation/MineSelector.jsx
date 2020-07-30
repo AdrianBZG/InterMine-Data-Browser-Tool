@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useState } from 'react'
 import { CHANGE_MINE } from 'src/eventConstants'
-import { useServiceContext } from 'src/machineBus'
+import { useServiceContext } from 'src/useMachineBus'
 
 import { NumberedSelectMenuItems } from '../Shared/Selects'
 
