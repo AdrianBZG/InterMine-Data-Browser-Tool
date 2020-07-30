@@ -107,6 +107,7 @@ export const queryControllerMachine = Machine(
 			[FETCH_INITIAL_SUMMARY]: {
 				target: 'idle',
 				actions: 'initializeMachine',
+				cond: 'isInitialFetch',
 			},
 		},
 		states: {
@@ -171,6 +172,10 @@ export const queryControllerMachine = Machine(
 			listOccupiesLastSlot: (context, _, { cond }) => {
 				// @ts-ignore
 				return context.currentConstraints.length + 1 === cond.maxConstraints
+			},
+			// @ts-ignore
+			isInitialFetch: (ctx, { globalConfig }) => {
+				return ctx.classView !== globalConfig.classView || ctx.rootUrl !== globalConfig.rootUrl
 			},
 		},
 	}

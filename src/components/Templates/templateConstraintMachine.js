@@ -35,78 +35,79 @@ const updateTemplateQuery = (ctx) => {
 	})
 }
 
-export const templateConstraintMachine = Machine(
-	{
-		id: 'Template constraint',
-		initial: 'loading',
-		context: {
-			rootUrl: '',
-			path: '',
-			op: '',
-			selectedValues: [],
-			availableValues: [],
-		},
-		states: {
-			loading: {
-				invoke: {
-					id: 'fetchTemplateConstraintValues',
-					src: 'fetchConstraintValues',
-					onDone: {
-						target: 'idle',
-						actions: 'setAvailableValues',
+export const templateConstraintMachine = (id = 'Template constraint widget') =>
+	Machine(
+		{
+			id,
+			initial: 'loading',
+			context: {
+				rootUrl: '',
+				path: '',
+				op: '',
+				selectedValues: [],
+				availableValues: [],
+			},
+			states: {
+				loading: {
+					invoke: {
+						id: 'fetchTemplateConstraintValues',
+						src: 'fetchConstraintValues',
+						onDone: {
+							target: 'idle',
+							actions: 'setAvailableValues',
+						},
+						onError: {
+							target: 'noValuesForConstraint',
+							actions: 'logErrorToConsole',
+						},
 					},
-					onError: {
-						target: 'noValuesForConstraint',
-						actions: 'logErrorToConsole',
+				},
+				noValuesForConstraint: {},
+				idle: {
+					on: {
+						[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addConstraint' },
+						[REMOVE_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'removeConstraint' },
+					},
+				},
+				updateTemplateQuery: {
+					entry: 'updateTemplateQuery',
+					on: {
+						[TEMPLATE_CONSTRAINT_UPDATED]: { target: 'idle', cond: 'constraintUpdated' },
+					},
+				},
+				// delay the finished transition to avoid quick flashes of animations
+				pending: {
+					after: {
+						500: [{ target: 'idle', cond: 'hasValues' }, { target: 'noValuesForConstraint' }],
 					},
 				},
 			},
-			noValuesForConstraint: {},
-			idle: {
-				on: {
-					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addConstraint' },
-					[REMOVE_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'removeConstraint' },
+		},
+		{
+			actions: {
+				logErrorToConsole,
+				addConstraint,
+				removeConstraint,
+				setAvailableValues,
+				updateTemplateQuery,
+			},
+			guards: {
+				// @ts-ignore
+				constraintUpdated: (ctx, { path }) => {
+					return ctx.path === path
+				},
+				hasValues: (ctx) => {
+					return ctx.availableValues.length > 0
 				},
 			},
-			updateTemplateQuery: {
-				entry: 'updateTemplateQuery',
-				on: {
-					[TEMPLATE_CONSTRAINT_UPDATED]: { target: 'idle', cond: 'constraintUpdated' },
-				},
-			},
-			// delay the finished transition to avoid quick flashes of animations
-			pending: {
-				after: {
-					500: [{ target: 'idle', cond: 'hasValues' }, { target: 'noValuesForConstraint' }],
-				},
-			},
-		},
-	},
-	{
-		actions: {
-			logErrorToConsole,
-			addConstraint,
-			removeConstraint,
-			setAvailableValues,
-			updateTemplateQuery,
-		},
-		guards: {
-			// @ts-ignore
-			constraintUpdated: (ctx, { path }) => {
-				return ctx.path === path
-			},
-			hasValues: (ctx) => {
-				return ctx.availableValues.length > 0
-			},
-		},
-		services: {
-			fetchConstraintValues: async (ctx) => {
-				const values = await fetchPathValues({ rootUrl: ctx.rootUrl, path: ctx.path })
+			services: {
+				fetchConstraintValues: async (ctx) => {
+					const values = await fetchPathValues({ rootUrl: ctx.rootUrl, path: ctx.path })
 
-				return {
-					values,
-				}
+					return {
+						values,
+					}
+				},
 			},
-		},
-	}
-)
+		}
+	)

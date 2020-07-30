@@ -11,6 +11,8 @@ const setLengthSummary = assign({
 	lengthSummary: (_, { data }) => data.lengthSummary,
 	// @ts-ignore
 	classView: (_, { data }) => data.classView,
+	// @ts-ignore
+	rootUrl: (_, { data }) => data.rootUrl,
 })
 
 export const BarChartMachine = Machine(
@@ -28,10 +30,11 @@ export const BarChartMachine = Machine(
 			},
 			lengthSummary: [],
 			classView: '',
+			rootUrl: '',
 		},
 		on: {
 			// Making it global ensures that we retry when the mine or class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isInitialFetch' },
 			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
@@ -67,6 +70,13 @@ export const BarChartMachine = Machine(
 			hasSummary: (ctx) => {
 				return ctx.lengthSummary.length > 0
 			},
+			isInitialFetch: (ctx, { globalConfig }) => {
+				return (
+					ctx.lengthSummary.length === 0 ||
+					ctx.classView !== globalConfig.classView ||
+					ctx.rootUrl !== globalConfig.rootUrl
+				)
+			},
 		},
 		services: {
 			fetchGeneLength: async (_ctx, { globalConfig: { classView, rootUrl }, query: nextQuery }) => {
@@ -89,6 +99,7 @@ export const BarChartMachine = Machine(
 
 				return {
 					classView,
+					rootUrl,
 					lengthStats: summary.stats,
 					lengthSummary: summary.results.slice(0, summary.results.length - 1),
 				}

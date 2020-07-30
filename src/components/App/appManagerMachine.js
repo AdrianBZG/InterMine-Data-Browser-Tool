@@ -79,9 +79,18 @@ const toggleViewIsLoading = assign({
 
 const updateTemplateQueries = assign({
 	// @ts-ignore
-	possibleQueries: (_, { queries }) => queries,
+	possibleQueries: (_, { templatesForSelectedCategories }) => templatesForSelectedCategories,
 	// @ts-ignore
 	categories: (_, { categories }) => categories,
+	// @ts-ignore
+	templates: (_, { templates }) => templates,
+	// @ts-ignore
+	templatesForClassView: (_, { templatesForClassView }) => templatesForClassView,
+	// @ts-ignore
+	templatesByCategory: (_, { templatesByCategory }) => templatesByCategory,
+	// @ts-ignore
+	templatesForSelectedCategories: (_, { templatesForSelectedCategories }) =>
+		templatesForSelectedCategories,
 })
 
 const setTemplateView = assign({
@@ -148,7 +157,7 @@ const filterListsForClass = assign({
 
 export const appManagerMachine = Machine(
 	{
-		id: 'AppManager',
+		id: 'App Manager',
 		initial: 'loading',
 		context: {
 			appView: 'defaultView',
@@ -164,7 +173,6 @@ export const appManagerMachine = Machine(
 			},
 			showAllLabel: 'Show All',
 			possibleQueries: defaultQueries,
-			categories: {},
 			viewIsLoading: false,
 			selectedMine: {
 				name: isProduction ? 'HumanMine' : 'biotestmine',
@@ -172,6 +180,14 @@ export const appManagerMachine = Machine(
 					? 'https://www.humanmine.org/humanmine'
 					: 'http://localhost:9999/biotestmine',
 			},
+			// We have to keep the template context here because it is an invoked machine and clears its
+			// context when the state in which it was invoked is exited. Therefore we have to pass the previous
+			// context to the template machine to rehydrate it.
+			templates: Object.create(null),
+			templatesForClassView: [],
+			templatesByCategory: [],
+			templatesForSelectedCategories: [],
+			categories: Object.create(null),
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'loading', actions: 'changeMine' },
@@ -219,8 +235,11 @@ export const appManagerMachine = Machine(
 					id: 'templateView',
 					src: templateViewMachine,
 					data: {
-						// Hack until xstate v5 introduces shallow merging
-						...templateViewMachine.context,
+						templates: (ctx) => ctx.templates,
+						templatesForClassView: (ctx) => ctx.templatesForClassView,
+						templatesByCategory: (ctx) => ctx.templatesByCategory,
+						templatesForSelectedCategories: (ctx) => ctx.templatesForSelectedCategories,
+						categories: (ctx) => ctx.categories,
 						classView: (ctx) => ctx.classView,
 						showAllLabel: (ctx) => ctx.showAllLabel,
 						rootUrl: (ctx) => ctx.selectedMine.rootUrl,

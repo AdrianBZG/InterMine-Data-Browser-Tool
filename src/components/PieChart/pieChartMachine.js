@@ -7,6 +7,8 @@ const setSummaryResults = assign({
 	allClassOrganisms: (_, { data }) => data.summary,
 	// @ts-ignore
 	classView: (_, { data }) => data.classView,
+	// @ts-ignore
+	rootUrl: (_, { data }) => data.rootUrl,
 })
 
 export const PieChartMachine = Machine(
@@ -16,10 +18,11 @@ export const PieChartMachine = Machine(
 		context: {
 			allClassOrganisms: [],
 			classView: '',
+			rootUrl: '',
 		},
 		on: {
 			// Making it global ensure we update the table when the mine/class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isInitialFetch' },
 			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
@@ -53,6 +56,11 @@ export const PieChartMachine = Machine(
 		},
 		guards: {
 			hasSummary: (ctx) => ctx.allClassOrganisms.length > 0,
+			// @ts-ignore
+			isInitialFetch: (ctx, { globalConfig }) =>
+				ctx.allClassOrganisms.length === 0 ||
+				ctx.classView !== globalConfig.classView ||
+				ctx.rootUrl !== globalConfig.rootUrl,
 		},
 		services: {
 			fetchItems: async (_ctx, event) => {
@@ -74,6 +82,7 @@ export const PieChartMachine = Machine(
 
 				return {
 					classView,
+					rootUrl,
 					summary: summary.results,
 				}
 			},

@@ -16,6 +16,10 @@ const updateParent = sendParent((ctx) => ({
 	type: UPDATE_TEMPLATE_QUERIES,
 	queries: ctx.templatesForSelectedCategories,
 	categories: ctx.categories,
+	templates: ctx.templates,
+	templatesForClassView: ctx.templatesForClassView,
+	templatesByCategory: ctx.templatesByCategory,
+	templatesForSelectedCategories: ctx.templatesForSelectedCategories,
 }))
 
 /**
@@ -167,8 +171,18 @@ export const templateViewMachine = Machine(
 			showAllLabel: '',
 			rootUrl: '',
 		},
-		initial: 'loadTemplates',
+		initial: 'init',
 		states: {
+			init: {
+				always: [
+					{
+						target: 'allCategories',
+						cond: 'hasTemplates',
+						actions: ['updateParent'],
+					},
+					{ target: 'loadTemplates' },
+				],
+			},
 			allCategories: {
 				on: {
 					[CHANGE_CLASS]: {
@@ -198,7 +212,7 @@ export const templateViewMachine = Machine(
 					],
 				},
 			},
-			noTemplates: {},
+			errorFetchingTemplates: {},
 			loadTemplates: {
 				entry: 'sendIsLoading',
 				invoke: {
@@ -217,7 +231,7 @@ export const templateViewMachine = Machine(
 						],
 					},
 					onError: {
-						target: 'noTemplates',
+						target: 'errorFetchingTemplates',
 						actions: (ctx, event) =>
 							console.error('FETCH: could not fetch templates', { ctx, event }),
 					},
@@ -244,6 +258,10 @@ export const templateViewMachine = Machine(
 			// @ts-ignore
 			showAllClicked: (ctx, { tagName }) => {
 				return tagName === ctx.showAllLabel
+			},
+			// @ts-ignore
+			hasTemplates: (ctx) => {
+				return Object.keys(ctx.templates).length > 0
 			},
 		},
 		services: {

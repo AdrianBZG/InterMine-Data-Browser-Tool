@@ -15,8 +15,10 @@ import { templateConstraintMachine } from './templateConstraintMachine'
 import { templateQueryMachine } from './templateQueryMachine'
 
 const ConstraintWidget = ({ constraint, rootUrl }) => {
+	const name = constraint.path.split('.').join(' > ')
+
 	const [state, send] = useMachineBus(
-		templateConstraintMachine.withContext({
+		templateConstraintMachine(`Template-${name} constraint widget`).withContext({
 			rootUrl,
 			path: constraint.path,
 			op: constraint.op,
@@ -27,8 +29,6 @@ const ConstraintWidget = ({ constraint, rootUrl }) => {
 
 	const searchIndex = useRef(null)
 	const { availableValues } = state.context
-
-	const name = constraint.path.split('.').join(' > ')
 
 	useEffect(() => {
 		const buildIndex = async () => {
@@ -81,8 +81,8 @@ export const TemplateQuery = ({ classView, rootUrl, template }) => {
 	}
 
 	const [state] = useMachineBus(
-		templateQueryMachine.withContext({
-			...templateQueryMachine.context,
+		templateQueryMachine(`Template-${template.name} Query`).withContext({
+			...templateQueryMachine().context,
 			template: templateQuery,
 			isActiveQuery: false,
 		})

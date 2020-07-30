@@ -4,20 +4,7 @@ import {
 	SET_INITIAL_ORGANISMS,
 	TOGGLE_CATEGORY_VISIBILITY,
 } from 'src/eventConstants'
-import {
-	EventData,
-	EventObject,
-	Interpreter,
-	InterpreterOptions,
-	MachineConfig,
-	MachineOptions,
-	State,
-	StateConfig,
-	StateMachine,
-	StateNode,
-	StateSchema,
-	Typestate,
-} from 'xstate'
+import { EventObject, MachineConfig, StateMachine, StateNode, StateSchema, Typestate } from 'xstate'
 
 import {
 	ADD_CONSTRAINT,
@@ -155,39 +142,3 @@ export type QueryMachineConfig = MachineConfig<
 	QueryMachineSchema,
 	QueryMachineEvents
 >
-
-/**
- * Machine bus
- */
-interface UseMachineOptions<TContext, TEvent extends EventObject> {
-	/**
-	 * If provided, will be merged with machine's `context`.
-	 */
-	context?: Partial<TContext>
-	/**
-	 * If `true`, service will start immediately (before mount).
-	 */
-	immediate: boolean
-	/**
-	 * The state to rehydrate the machine to. The machine will
-	 * start at this state instead of its `initialState`.
-	 */
-	state?: StateConfig<TContext, TEvent>
-}
-
-export type UseMachineBus = <TContext, TEvent extends EventObject>(
-	machine: StateMachine<TContext, any, TEvent>,
-	options?: Partial<InterpreterOptions> &
-		Partial<UseMachineOptions<TContext, TEvent>> &
-		Partial<MachineOptions<TContext, TEvent>>
-) => [State<TContext, TEvent>, SendToBusWrapper, Interpreter<TContext, any, TEvent>]
-
-export type SendToBusWrapper = (
-	event: ConstraintEvents,
-	payload?: EventData | undefined
-) => State<
-	ConstraintMachineContext,
-	ConstraintEvents,
-	ConstraintMachineSchema,
-	ConstraintTypeState
-> | void

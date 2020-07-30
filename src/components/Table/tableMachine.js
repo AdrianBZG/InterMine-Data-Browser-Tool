@@ -14,7 +14,9 @@ const bustCache = assign({
 
 const setInitialRows = assign({
 	// @ts-ignore
-	mineUrl: (_, { data }) => data.rootUrl,
+	rootUrl: (_, { data }) => data.rootUrl,
+	// @ts-ignore
+	classView: (_, { data }) => data.classView,
 	// @ts-ignore
 	totalRows: (_, { data }) => data.totalRows,
 	// @ts-ignore
@@ -72,11 +74,16 @@ export const TableChartMachine = Machine(
 			pageNumber: 1,
 			pages: new Map(),
 			lastQuery: {},
-			mineUrl: '',
+			rootUrl: '',
+			classView: '',
 		},
 		on: {
 			// Making it global ensure we update the table when the mine/class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCache' },
+			[FETCH_INITIAL_SUMMARY]: {
+				target: 'fetchInitialRows',
+				actions: 'bustCache',
+				cond: 'isInitialFetch',
+			},
 			[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCache' },
 		},
 		states: {
@@ -135,6 +142,14 @@ export const TableChartMachine = Machine(
 		guards: {
 			hasSummary: (ctx) => {
 				return ctx.totalRows > 0
+			},
+			// @ts-ignore
+			isInitialFetch: (ctx, { globalConfig }) => {
+				return (
+					ctx.totalRows === 0 ||
+					ctx.classView !== globalConfig.classView ||
+					ctx.rootUrl !== globalConfig.rootUrl
+				)
 			},
 			// @ts-ignore
 			hasPageInCache: (ctx, { pageNumber }) => {
@@ -198,7 +213,7 @@ export const TableChartMachine = Machine(
 					size,
 				}
 
-				const { summary } = await fetchTable({ rootUrl: ctx.mineUrl, query: ctx.lastQuery, page })
+				const { summary } = await fetchTable({ rootUrl: ctx.rootUrl, query: ctx.lastQuery, page })
 
 				return {
 					pageNumber,
