@@ -7,6 +7,7 @@ import { ADD_LIST_CONSTRAINT, ADD_LIST_TAG } from 'src/eventConstants'
 import { sendToBus } from 'src/useMachineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
+import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { InfoIconPopover } from '../Shared/InfoIconPopover'
 
 export const ListMenuItems = (item, props) => {
@@ -93,7 +94,7 @@ export const ListSelector = ({ listsForCurrentClass }) => {
 	}
 
 	return (
-		<div css={{ display: 'flex', marginLeft: 40, marginRight: 20 }}>
+		<div css={{ display: 'flex', alignItems: 'center', marginLeft: 40, marginRight: 20 }}>
 			<span
 				// @ts-ignore
 				css={{
@@ -124,6 +125,9 @@ export const ListSelector = ({ listsForCurrentClass }) => {
 					rightIcon={IconNames.CARET_DOWN}
 				/>
 			</Select>
+			<div css={{ marginLeft: 10 }}>
+				<ConstraintSetTag constraintApplied={selectedValues.length > 0} text="List Set" />
+			</div>
 		</div>
 	)
 }

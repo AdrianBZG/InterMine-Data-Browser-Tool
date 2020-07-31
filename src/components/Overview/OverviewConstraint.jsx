@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Icon, Tag } from '@blueprintjs/core'
+import { Button, ButtonGroup, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
@@ -7,6 +7,7 @@ import { buildSearchIndex } from 'src/buildSearchIndex'
 import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
 import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/useMachineBus'
 
+import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { PopupCard } from '../Shared/PopupCard'
 import { CheckboxWidget } from '../Widgets/CheckboxWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
@@ -23,31 +24,10 @@ const ConstraintCard = ({ children }) => {
 	const enableAdd = state.matches('constraintsUpdated')
 	const constraintApplied = !disableAllButtons && !enableAdd
 
-	const borderColor = constraintApplied ? 'var(--blue4)' : 'var(--grey4)'
-	const iconColor = constraintApplied ? 'var(--green5)' : 'var(--grey4)'
-	const textColor = constraintApplied ? 'var(--blue9)' : 'var(--grey4)'
-
 	return (
 		<>
 			<div css={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-				<Tag
-					css={{
-						backgroundColor: 'unset',
-						border: `1px solid ${borderColor}`,
-						color: iconColor,
-					}}
-					// @ts-ignore
-					intent="" // HACK - decreases blueprintjs css specificity
-					icon={constraintApplied ? IconNames.TICK_CIRCLE : IconNames.DISABLE}
-					minimal={true}
-				>
-					<span
-						// @ts-ignore
-						css={{ color: textColor, fontWeight: 'var(--fw-medium)' }}
-					>
-						Constraint Set
-					</span>
-				</Tag>
+				<ConstraintSetTag constraintApplied={constraintApplied} text="Constraint Set" />
 			</div>
 			{children}
 			<ButtonGroup fill={true} css={{ marginTop: 48 }}>
