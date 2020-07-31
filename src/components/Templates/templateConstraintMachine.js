@@ -1,10 +1,10 @@
+import { fetchPathValues } from 'src/apiRequests'
 import {
 	ADD_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
 	REMOVE_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
-import { fetchPathValues } from 'src/fetchSummary'
 import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 

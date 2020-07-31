@@ -1,10 +1,10 @@
+import { fetchTemplates } from 'src/apiRequests'
 import {
 	CHANGE_CLASS,
 	TOGGLE_CATEGORY_VISIBILITY,
 	TOGGLE_VIEW_IS_LOADING,
 	UPDATE_TEMPLATE_QUERIES,
 } from 'src/eventConstants'
-import { fetchTemplates } from 'src/fetchSummary'
 import { getTagCategories } from 'src/utils'
 import { assign, Machine, sendParent } from 'xstate'
 

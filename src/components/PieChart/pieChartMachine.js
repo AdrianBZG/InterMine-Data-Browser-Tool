@@ -1,5 +1,5 @@
+import { fetchSummary } from 'src/apiRequests'
 import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
-import { fetchSummary } from 'src/fetchSummary'
 import { assign, Machine } from 'xstate'
 
 const setSummaryResults = assign({

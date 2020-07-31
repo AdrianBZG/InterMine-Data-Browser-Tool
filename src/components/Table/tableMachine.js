@@ -1,10 +1,10 @@
+import { fetchTable } from 'src/apiRequests'
 import {
 	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
 	FETCH_UPDATED_SUMMARY,
 	SET_AVAILABLE_COLUMNS,
 } from 'src/eventConstants'
-import { fetchTable } from 'src/fetchSummary'
 import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 

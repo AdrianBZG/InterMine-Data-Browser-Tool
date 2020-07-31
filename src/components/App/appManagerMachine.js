@@ -1,3 +1,4 @@
+import { fetchClasses, fetchInstances, fetchLists } from 'src/apiRequests'
 import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
@@ -7,7 +8,6 @@ import {
 	TOGGLE_VIEW_IS_LOADING,
 	UPDATE_TEMPLATE_QUERIES,
 } from 'src/eventConstants'
-import { fetchClasses, fetchInstances, fetchLists } from 'src/fetchSummary'
 import { assign, forwardTo, Machine } from 'xstate'
 
 import { templateViewMachine } from './templateViewMachine'

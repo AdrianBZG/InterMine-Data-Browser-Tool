@@ -1,3 +1,4 @@
+import { fetchSummary } from 'src/apiRequests'
 import {
 	ADD_CONSTRAINT,
 	APPLY_DATA_BROWSER_CONSTRAINT,
@@ -10,7 +11,6 @@ import {
 	RESET_LOCAL_CONSTRAINT,
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
-import { fetchSummary } from 'src/fetchSummary'
 import { sendToBus } from 'src/useMachineBus'
 import { formatConstraintPath } from 'src/utils'
 import { assign, Machine } from 'xstate'
