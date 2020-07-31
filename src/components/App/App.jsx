@@ -73,6 +73,7 @@ export const App = () => {
 					classView={classView}
 					rootUrl={rootUrl}
 					showAll={categories[showAllLabel]?.isVisible ?? true}
+					mineName={selectedMine.name}
 				/>
 				<section
 					id="data-viz"

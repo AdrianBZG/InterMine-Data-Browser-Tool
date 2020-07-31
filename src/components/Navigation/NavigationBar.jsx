@@ -12,7 +12,7 @@ import { MineSelector } from './MineSelector'
  */
 export const NavigationBar = () => {
 	const [state, send] = useServiceContext('appManager')
-	const { classView, modelClasses, listsForCurrentClass } = state.context
+	const { classView, modelClasses, listsForCurrentClass, selectedMine } = state.context
 
 	const handleClassSelect = ({ name }) => {
 		send({ type: CHANGE_CLASS, newClass: name })
@@ -26,8 +26,9 @@ export const NavigationBar = () => {
 					handleClassSelect={handleClassSelect}
 					modelClasses={modelClasses}
 					classView={classView}
+					mineName={selectedMine.name}
 				/>
-				<ListSelector listsForCurrentClass={listsForCurrentClass} />
+				<ListSelector listsForCurrentClass={listsForCurrentClass} mineName={selectedMine.name} />
 			</Navbar.Group>
 		</Navbar>
 	)

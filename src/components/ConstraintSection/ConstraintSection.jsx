@@ -120,6 +120,7 @@ const TemplatesList = ({
 	classView,
 	rootUrl,
 	listNames,
+	mineName,
 }) => {
 	return (
 		<div>
@@ -138,7 +139,12 @@ const TemplatesList = ({
 				{!isLoading &&
 					queries.map((template) => (
 						<li key={template.name} css={{ margin: '0.875em 0' }}>
-							<TemplateQuery classView={classView} rootUrl={rootUrl} template={template} />
+							<TemplateQuery
+								classView={classView}
+								rootUrl={rootUrl}
+								template={template}
+								mineName={mineName}
+							/>
 						</li>
 					))}
 			</ul>
@@ -146,7 +152,7 @@ const TemplatesList = ({
 	)
 }
 
-const OverviewConstraintList = ({ queries, isLoading }) => {
+const OverviewConstraintList = ({ queries, isLoading, mineName }) => {
 	if (isLoading) {
 		return null
 	}
@@ -164,6 +170,7 @@ const OverviewConstraintList = ({ queries, isLoading }) => {
 					<OverviewConstraint
 						constraintConfig={config}
 						color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
+						mineName={mineName}
 					/>
 				</li>
 			))}
@@ -181,6 +188,7 @@ export const ConstraintSection = ({
 	classView,
 	rootUrl,
 	showAll,
+	mineName,
 }) => {
 	const [state] = useMachineBus(constraintSectionMachine)
 
@@ -219,11 +227,12 @@ export const ConstraintSection = ({
 					classView={classView}
 					rootUrl={rootUrl}
 					listNames={listNames}
+					mineName={mineName}
 				/>
 			) : (
 				<>
 					<QueryController />
-					<OverviewConstraintList queries={queries} isLoading={isLoading} />
+					<OverviewConstraintList queries={queries} isLoading={isLoading} mineName={mineName} />
 				</>
 			)}
 		</section>

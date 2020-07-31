@@ -42,7 +42,7 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	)
 }
 
-export const ListSelector = ({ listsForCurrentClass }) => {
+export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 	const listSearchIndex = useRef(null)
 	const [selectedValues, setSelectedValues] = useState([])
 
@@ -53,12 +53,13 @@ export const ListSelector = ({ listsForCurrentClass }) => {
 					docId: 'listName',
 					docField: 'displayName',
 					values: listsForCurrentClass,
+					cacheKey: `${mineName}-listSelector`,
 				})
 			}
 		}
 
 		indexClasses()
-	}, [listsForCurrentClass])
+	}, [listsForCurrentClass, mineName])
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !listSearchIndex?.current) {

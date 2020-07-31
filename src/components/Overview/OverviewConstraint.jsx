@@ -94,7 +94,7 @@ const S_ConstraintIcon = styled.div`
 	justify-content: center;
 `
 
-export const OverviewConstraint = ({ constraintConfig, color }) => {
+export const OverviewConstraint = ({ constraintConfig, color, mineName }) => {
 	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
 
 	const [state, send] = useMachineBus(
@@ -119,12 +119,13 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 					docField,
 					docId: 'item',
 					values: availableValues,
+					cacheKey: `${mineName}-overview-${path}-values`,
 				})
 			}
 		}
 
 		buildIndex()
-	}, [availableValues, type])
+	}, [availableValues, mineName, path, type])
 
 	let ConstraintWidget
 

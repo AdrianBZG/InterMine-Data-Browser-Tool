@@ -21,7 +21,7 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	)
 }
 
-export const ClassSelector = ({ handleClassSelect, modelClasses, classView }) => {
+export const ClassSelector = ({ handleClassSelect, modelClasses, classView, mineName }) => {
 	const classSearchIndex = useRef(null)
 
 	const classDisplayName =
@@ -34,12 +34,13 @@ export const ClassSelector = ({ handleClassSelect, modelClasses, classView }) =>
 					docId: 'name',
 					docField: 'displayName',
 					values: modelClasses,
+					cacheKey: `${mineName}-classSelector`,
 				})
 			}
 		}
 
 		indexClasses()
-	}, [modelClasses])
+	}, [modelClasses, mineName])
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !classSearchIndex?.current) {

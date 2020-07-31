@@ -1,8 +1,13 @@
 import FlexSearch from 'flexsearch'
+import localForage from 'localforage'
 
 import { indexWorker } from './searchIndex'
 
-export const buildSearchIndex = async ({ docId, docField, values }) => {
+const searchStore = localForage.createInstance({
+	name: 'search Indexes',
+})
+
+export const buildSearchIndex = async ({ docId, docField, values, cacheKey }) => {
 	// The configuration *must* be the same for import and export
 	const indexConfig = {
 		encode: 'advanced',
@@ -23,18 +28,28 @@ export const buildSearchIndex = async ({ docId, docField, values }) => {
 	// @ts-ignore
 	const index = new FlexSearch(indexConfig)
 
-	if (typeof window !== 'undefined' && window.Worker) {
-		const serializedIndex = await indexWorker.index({
-			values,
-			indexConfig,
-			exportConfig,
-		})
+	try {
+		const cachedIndex = await searchStore.getItem(cacheKey)
 
-		// @ts-ignore
-		index.import(serializedIndex, exportConfig)
-	} else {
-		// @ts-ignore
-		index.add(values)
+		if (cachedIndex) {
+			// @ts-ignore
+			index.import(cachedIndex, exportConfig)
+		} else if (typeof window !== 'undefined' && window.Worker) {
+			const serializedIndex = await indexWorker.index({
+				values,
+				indexConfig,
+				exportConfig,
+			})
+
+			searchStore.setItem(cacheKey, serializedIndex)
+			// @ts-ignore
+			index.import(serializedIndex, exportConfig)
+		} else {
+			// @ts-ignore
+			index.add(values)
+		}
+	} catch (e) {
+		console.error(`Error building search indexes: ${e}`)
 	}
 
 	return index

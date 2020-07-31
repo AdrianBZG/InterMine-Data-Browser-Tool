@@ -14,7 +14,7 @@ import { SuggestWidget } from '../Widgets/SuggestWidget'
 import { templateConstraintMachine } from './templateConstraintMachine'
 import { templateQueryMachine } from './templateQueryMachine'
 
-const ConstraintWidget = ({ constraint, rootUrl }) => {
+const ConstraintWidget = ({ constraint, rootUrl, mineName }) => {
 	const name = constraint.path.split('.').join(' > ')
 
 	const [state, send] = useMachineBus(
@@ -29,21 +29,22 @@ const ConstraintWidget = ({ constraint, rootUrl }) => {
 
 	const searchIndex = useRef(null)
 	const { availableValues } = state.context
-	const docField = 'item'
+	const docField = 'value'
 
 	useEffect(() => {
 		const buildIndex = async () => {
 			if (searchIndex.current === null && availableValues.length > 0) {
 				searchIndex.current = await buildSearchIndex({
 					docField,
-					docId: 'item',
+					docId: 'value',
 					values: availableValues,
+					cacheKey: `${mineName}-template-${constraint.path}-values`,
 				})
 			}
 		}
 
 		buildIndex()
-	}, [availableValues])
+	}, [availableValues, constraint.path, mineName])
 
 	const Widget =
 		availableValues.length <= 10 && constraint.op === 'ONE OF' ? CheckboxWidget : SuggestWidget
@@ -64,7 +65,7 @@ const ConstraintWidget = ({ constraint, rootUrl }) => {
 	)
 }
 
-export const TemplateQuery = ({ classView, rootUrl, template }) => {
+export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 	// We don't provide default values for the templates
 	const withNoDefaults = [...template.where].map((con) => {
 		if ('value' in con) {
@@ -130,7 +131,7 @@ export const TemplateQuery = ({ classView, rootUrl, template }) => {
 			{editableConstraints.map((con, idx) => {
 				return (
 					<div key={con.path}>
-						<ConstraintWidget constraint={con} rootUrl={rootUrl} />
+						<ConstraintWidget constraint={con} rootUrl={rootUrl} mineName={mineName} />
 						{showDivider(idx) && <Divider />}
 					</div>
 				)
