@@ -5290,16 +5290,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xstate/immer@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@xstate/immer@npm:0.1.0"
-  peerDependencies:
-    immer: ^6.0.3
-    xstate: ^4.9.1
-  checksum: 1e31dc459afabed2b7d787a00990b832fdc8fbdfd2fe293767483eed5504552911bc07c4b45423e3348e3496f9a08238b7c0d9f448c50a848471953a6b5f9f16
-  languageName: node
-  linkType: hard
-
 "@xstate/react@npm:^0.8.1":
   version: 0.8.1
   resolution: "@xstate/react@npm:0.8.1"
@@ -12849,7 +12839,6 @@ fsevents@^1.2.7:
     "@types/react-window": ^1.8.2
     "@typescript-eslint/eslint-plugin": 2.x
     "@typescript-eslint/parser": 2.x
-    "@xstate/immer": ^0.1.0
     "@xstate/react": ^0.8.1
     "@xstate/test": ^0.4.0
     axios: ^0.19.2

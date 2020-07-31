@@ -4,13 +4,13 @@
 	"description": "A web-based data browser for InterMine",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool"
+		"url": "https://github.com/JM-Mendez/InterMine-Data-Browser-Tool"
 	},
-	"author": "Adrian Rodriguez-Bazaga",
+	"author": "John Mendez",
 	"homepage": ".",
 	"bugs": {
-		"url": "https://github.com/InterMine/InterMine-Data-Browser-Tool/issues",
-		"email": "adrianrodriguezbazaga@gmail.com"
+		"url": "https://github.com/JM-Mendez/InterMine-Data-Browser-Tool/issues",
+		"email": "john.manuel.mendez@gmail.com"
 	},
 	"engines": {
 		"node": ">=10"
@@ -38,7 +38,6 @@
 		"@emotion/babel-preset-css-prop": "^10.0.27",
 		"@emotion/core": "^10.0.28",
 		"@emotion/styled": "^10.0.27",
-		"@xstate/immer": "^0.1.0",
 		"@xstate/react": "^0.8.1",
 		"axios": "^0.19.2",
 		"babel-plugin-emotion": "^10.0.33",
@@ -123,16 +122,7 @@
 		]
 	},
 	"contributors": [
-		"Yo Yehudi",
-		"Rachel Lyne",
-		"LarkhSingla",
-		"Divyanshu Mahajan",
-		"Ankit Kumar",
-		"Nikhil Vats",
-		"Himanshu Singh",
-		"Varun Bhandia",
-		"holloh",
-		"himanshuc3"
+		"John Mendez"
 	],
 	"eslintConfig": {
 		"extends": "react-app"
