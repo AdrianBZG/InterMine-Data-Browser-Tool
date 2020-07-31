@@ -4,7 +4,7 @@ exports.usedIcons = [
 	IconNames.DISABLE,
 	IconNames.PLAY,
 	IconNames.TICK_CIRCLE,
-	IconNames.UNLOCK,
+	IconNames.KEY,
 	IconNames.LOCK,
 	IconNames.CARET_DOWN,
 	IconNames.CARET_RIGHT,

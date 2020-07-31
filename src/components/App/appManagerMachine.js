@@ -2,6 +2,7 @@ import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
 	CHANGE_MINE,
+	SET_API_TOKEN,
 	TOGGLE_CATEGORY_VISIBILITY,
 	TOGGLE_VIEW_IS_LOADING,
 	UPDATE_TEMPLATE_QUERIES,
@@ -70,13 +71,22 @@ const defaultQueries = [
 	},
 ]
 
+/**
+ *
+ */
 const forwardToTemplateView = forwardTo('templateView')
 
+/**
+ *
+ */
 const toggleViewIsLoading = assign({
 	// @ts-ignore
 	viewIsLoading: (_, { isLoading }) => isLoading,
 })
 
+/**
+ *
+ */
 const updateTemplateQueries = assign({
 	// @ts-ignore
 	possibleQueries: (_, { templatesForSelectedCategories }) => templatesForSelectedCategories,
@@ -93,22 +103,37 @@ const updateTemplateQueries = assign({
 		templatesForSelectedCategories,
 })
 
+/**
+ *
+ */
 const setTemplateView = assign({
 	appView: () => 'templateView',
 })
 
+/**
+ *
+ */
 const clearPossibleQueries = assign({
 	possibleQueries: () => [],
 })
 
+/**
+ *
+ */
 const setPossibleOverviewQueries = assign({
 	possibleQueries: () => defaultQueries,
 })
 
+/**
+ *
+ */
 const setDefaultView = assign({
 	appView: () => 'defaultView',
 })
 
+/**
+ *
+ */
 const changeMine = assign({
 	// @ts-ignore
 	selectedMine: (ctx, { newMine }) => ctx.intermines.find((mine) => mine.name === newMine),
@@ -116,11 +141,17 @@ const changeMine = assign({
 	classView: () => 'Gene',
 })
 
+/**
+ *
+ */
 const changeClass = assign({
 	// @ts-ignore
 	classView: (_, { newClass }) => newClass,
 })
 
+/**
+ *
+ */
 const setMineConfiguration = assign({
 	// @ts-ignore
 	intermines: (_, { data }) => data.intermines,
@@ -131,6 +162,9 @@ const setMineConfiguration = assign({
 	lists: (_, { data }) => data.lists,
 })
 
+/**
+ *
+ */
 const filterListsForClass = assign({
 	listsForCurrentClass: (ctx) => {
 		/**
@@ -155,10 +189,39 @@ const filterListsForClass = assign({
 	},
 })
 
+/**
+ *
+ */
+const setApiToken = assign({
+	// @ts-ignore
+	selectedMine: (ctx, { apiToken }) => {
+		localStorage.setItem(`apiToken-${ctx.selectedMine.rootUrl}`, apiToken)
+
+		return {
+			...ctx.selectedMine,
+			apiToken,
+		}
+	},
+})
+
+/**
+ *
+ */
+const getApiTokenFromStorage = assign({
+	selectedMine: (ctx) => {
+		const apiToken = localStorage.getItem(`apiToken-${ctx.selectedMine.rootUrl}`) ?? ''
+
+		return {
+			...ctx.selectedMine,
+			apiToken,
+		}
+	},
+})
+
 export const appManagerMachine = Machine(
 	{
 		id: 'App Manager',
-		initial: 'loading',
+		initial: 'rehydrateApp',
 		context: {
 			appView: 'defaultView',
 			classView: 'Gene',
@@ -175,6 +238,7 @@ export const appManagerMachine = Machine(
 			possibleQueries: defaultQueries,
 			viewIsLoading: false,
 			selectedMine: {
+				apiToken: '',
 				name: isProduction ? 'HumanMine' : 'biotestmine',
 				rootUrl: isProduction
 					? 'https://www.humanmine.org/humanmine'
@@ -190,11 +254,12 @@ export const appManagerMachine = Machine(
 			categories: Object.create(null),
 		},
 		on: {
-			[CHANGE_MINE]: { target: 'loading', actions: 'changeMine' },
+			[CHANGE_MINE]: { target: 'loading', actions: ['changeMine', 'getApiTokenFromStorage'] },
 			[CHANGE_CLASS]: { actions: ['changeClass'] },
 			[UPDATE_TEMPLATE_QUERIES]: { actions: 'updateTemplateQueries' },
 			[TOGGLE_VIEW_IS_LOADING]: { actions: 'toggleViewIsLoading' },
 			[TOGGLE_CATEGORY_VISIBILITY]: { actions: 'forwardToTemplateView' },
+			[SET_API_TOKEN]: { actions: 'setApiToken' },
 			[CHANGE_CONSTRAINT_VIEW]: [
 				{ target: 'defaultView', cond: 'isDefaultView' },
 				{ target: 'templateView', cond: 'isTemplateView' },
@@ -202,6 +267,9 @@ export const appManagerMachine = Machine(
 			],
 		},
 		states: {
+			rehydrateApp: {
+				always: [{ target: 'loading', actions: 'getApiTokenFromStorage' }],
+			},
 			loading: {
 				on: {
 					[CHANGE_CLASS]: { actions: 'changeClass' },
@@ -262,6 +330,8 @@ export const appManagerMachine = Machine(
 			changeClass,
 			setMineConfiguration,
 			filterListsForClass,
+			setApiToken,
+			getApiTokenFromStorage,
 		},
 		guards: {
 			// @ts-ignore
