@@ -10,7 +10,13 @@ import { QueryController } from '../QueryController/QueryController'
 import { TemplateQuery } from '../Templates/TemplateQuery'
 import { constraintSectionMachine } from './constraintSectionMachine'
 
-const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, showAllLabel }) => {
+const ShowCategories = ({
+	classCategoryTags,
+	handleCategoryToggle,
+	showAll,
+	showAllLabel,
+	isLoading,
+}) => {
 	const [showCategories, setShowCategories] = useState(false)
 
 	return (
@@ -26,31 +32,32 @@ const ShowCategories = ({ classCategoryTags, handleCategoryToggle, showAll, show
 			/>
 			<Collapse isOpen={showCategories} css={{ marginTop: 0 }}>
 				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
-					{classCategoryTags.map(({ tagName, isVisible, count }) => {
-						if (count === 0 && tagName !== showAllLabel) {
-							return null
-						}
+					{!isLoading &&
+						classCategoryTags.map(({ tagName, isVisible, count }) => {
+							if (count === 0 && tagName !== showAllLabel) {
+								return null
+							}
 
-						let isEnabled = false
-						if (showAll) {
-							isEnabled = tagName === showAllLabel
-						} else {
-							isEnabled = isVisible
-						}
+							let isEnabled = false
+							if (showAll) {
+								isEnabled = tagName === showAllLabel
+							} else {
+								isEnabled = isVisible
+							}
 
-						return (
-							<Tag
-								key={tagName}
-								intent="primary"
-								interactive={true}
-								onClick={() => handleCategoryToggle({ isVisible: !isVisible, tagName })}
-								minimal={!isEnabled || count === 0}
-								css={{ margin: 4 }}
-							>
-								{`${tagName} ${count ?? 0}`}
-							</Tag>
-						)
-					})}
+							return (
+								<Tag
+									key={tagName}
+									intent="primary"
+									interactive={true}
+									onClick={() => handleCategoryToggle({ isVisible: !isVisible, tagName })}
+									minimal={!isEnabled || count === 0}
+									css={{ margin: 4 }}
+								>
+									{`${tagName} ${count ?? 0}`}
+								</Tag>
+							)
+						})}
 				</div>
 			</Collapse>
 		</>
@@ -114,10 +121,6 @@ const TemplatesList = ({
 	rootUrl,
 	listNames,
 }) => {
-	if (isLoading) {
-		return null
-	}
-
 	return (
 		<div>
 			<Divider css={{ margin: 0 }} />
@@ -128,14 +131,16 @@ const TemplatesList = ({
 				classCategoryTags={classCategoryTags}
 				showAllLabel={showAllLabel}
 				showAll={showAll}
+				isLoading={isLoading}
 			/>
 			<Divider css={{ margin: 0 }} />
 			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0, height: '77vh' }}>
-				{queries.map((template) => (
-					<li key={template.name} css={{ margin: '0.875em 0' }}>
-						<TemplateQuery classView={classView} rootUrl={rootUrl} template={template} />
-					</li>
-				))}
+				{!isLoading &&
+					queries.map((template) => (
+						<li key={template.name} css={{ margin: '0.875em 0' }}>
+							<TemplateQuery classView={classView} rootUrl={rootUrl} template={template} />
+						</li>
+					))}
 			</ul>
 		</div>
 	)
