@@ -60,7 +60,7 @@ const renderLoadingLabel = (props) => {
 	)
 }
 
-export const PieChart = () => {
+export const PieChart = React.memo(function PieChart() {
 	const isFirstRender = useFirstMountState()
 	const [state] = useMachineBus(PieChartMachine)
 	const { allClassOrganisms, classView } = state.context
@@ -140,4 +140,4 @@ export const PieChart = () => {
 			{isLoading && <ProgressBar css={{ margin: '20px auto', width: '50%' }} intent="primary" />}
 		</>
 	)
-}
+})

@@ -217,7 +217,7 @@ const Cell = ({ cell, mineUrl, isLoading }) => {
 /**
  *
  */
-export const Table = () => {
+export const Table = React.memo(function Table() {
 	const isFirstRender = useFirstMountState()
 	const [state, send] = useMachineBus(TableChartMachine)
 
@@ -289,4 +289,4 @@ export const Table = () => {
 			</HTMLTable>
 		</TableServiceContext.Provider>
 	)
-}
+})

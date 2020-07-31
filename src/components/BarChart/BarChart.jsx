@@ -54,7 +54,7 @@ const colorizeBars = (data, isLoading) =>
 		/>
 	))
 
-export const BarChart = () => {
+export const BarChart = React.memo(function BarChart() {
 	const isFirstRender = useFirstMountState()
 	const [state] = useMachineBus(BarChartMachine)
 
@@ -153,4 +153,4 @@ export const BarChart = () => {
 			)}
 		</>
 	)
-}
+})
