@@ -114,7 +114,6 @@ const OverviewConstraintList = ({ queries, isLoading, mineName }) => {
 				overflow: 'auto',
 				listStyle: 'none',
 				padding: 0,
-				height: '77vh',
 			}}
 		>
 			{queries.map((config, idx) => (
