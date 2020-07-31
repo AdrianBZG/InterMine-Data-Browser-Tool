@@ -164,6 +164,7 @@ export const SuggestWidget = ({
 					className={isLoading ? Classes.SKELETON : ''}
 					resetOnSelect={true}
 					itemListRenderer={renderMenu(handleItemSelect)}
+					onItemSelect={({ item }) => handleItemSelect({ name: item })}
 					itemListPredicate={filterQuery}
 					popoverProps={{ captureDismiss: true }}
 				/>
