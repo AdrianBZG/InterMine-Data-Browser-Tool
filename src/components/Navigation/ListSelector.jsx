@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
-import { ADD_LIST_CONSTRAINT, ADD_LIST_TAG } from 'src/eventConstants'
+import { ADD_LIST_CONSTRAINT, REMOVE_LIST_CONSTRAINT } from 'src/eventConstants'
 import { sendToBus } from 'src/useMachineBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
@@ -22,20 +22,34 @@ export const ListMenuItems = (item, props) => {
 					title={item.displayName}
 					description={item.description}
 					position="left-top"
+					intent={item?.isSelected ? 'success' : null}
 				/>
 			}
 		/>
 	)
 }
+
 /**
  *
  */
-const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
+const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	const renderedItems = filteredItems.map(renderItem)
 	const infoText = pluralizeFilteredCount(filteredItems, query)
 
+	const renderSelected = (
+		<>
+			<MenuItem disabled={true} text="Selected list (click to remove)" />
+			{renderItem({
+				listName: selectedValue,
+				displayName: selectedValue,
+				isSelected: true,
+			})}
+		</>
+	)
+
 	return (
 		<Menu ulRef={itemsParentRef}>
+			{selectedValue !== '' && renderSelected}
 			<MenuItem disabled={true} text={infoText} />
 			{renderedItems}
 		</Menu>
@@ -44,7 +58,7 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 
 export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 	const listSearchIndex = useRef(null)
-	const [selectedValues, setSelectedValues] = useState([])
+	const [selectedValue, setSelectedValue] = useState('')
 
 	useEffect(() => {
 		const indexClasses = async () => {
@@ -63,14 +77,8 @@ export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !listSearchIndex?.current) {
-			return items.filter((item) => !selectedValues.includes(item.displayName))
+			return items.filter((item) => item.displayName !== selectedValue)
 		}
-
-		const negateSelected = selectedValues.map((val) => ({
-			field: 'displayName',
-			query: val,
-			bool: 'not',
-		}))
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
 		return listSearchIndex.current.search(
@@ -80,18 +88,25 @@ export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 					field: 'displayName',
 					bool: 'and',
 				},
-				...negateSelected,
+				{
+					field: 'displayName',
+					query: selectedValue,
+					bool: 'not',
+				},
 			],
 			listsForCurrentClass.length
 		)
 	}
 
 	const handleListSelect = ({ displayName, listName }) => {
-		setSelectedValues([...selectedValues, displayName])
-		// @ts-ignore
-		sendToBus({ type: ADD_LIST_CONSTRAINT, listName })
-		// @ts-ignore
-		sendToBus({ type: ADD_LIST_TAG, listName })
+		if (displayName === selectedValue) {
+			sendToBus({ type: REMOVE_LIST_CONSTRAINT })
+			setSelectedValue('')
+		} else {
+			// @ts-ignore
+			sendToBus({ type: ADD_LIST_CONSTRAINT, listName })
+			setSelectedValue(displayName)
+		}
 	}
 
 	return (
@@ -112,7 +127,7 @@ export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 				filterable={true}
 				itemRenderer={ListMenuItems}
 				onItemSelect={handleListSelect}
-				itemListRenderer={renderMenu}
+				itemListRenderer={renderMenu(selectedValue)}
 				itemListPredicate={filterQuery}
 				resetOnClose={true}
 				popoverProps={{ boundary: 'window', usePortal: true, lazy: true }}
@@ -127,7 +142,11 @@ export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 				/>
 			</Select>
 			<div css={{ marginLeft: 10 }}>
-				<ConstraintSetTag constraintApplied={selectedValues.length > 0} text="List Set" />
+				<ConstraintSetTag
+					constraintApplied={selectedValue !== ''}
+					text={selectedValue === '' ? 'No list set' : selectedValue}
+					ellipsize={true}
+				/>
 			</div>
 		</div>
 	)

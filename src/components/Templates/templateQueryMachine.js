@@ -8,6 +8,8 @@ import {
 import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 
+import { listConstraintQuery } from '../common'
+
 /**
  *
  */
@@ -37,20 +39,26 @@ const setActiveQuery = assign({
 	isActiveQuery: (ctx, { query }) => query.name === ctx.template.name,
 })
 
-/**
- *
- */
 const addListConstraint = assign({
 	// @ts-ignore
-	listNames: (ctx, { listName }) => [...ctx.listNames, listName],
+	listConstraint: (ctx, { listName }) => {
+		return {
+			...ctx.listConstraint,
+			path: ctx.classView,
+			value: [listName],
+		}
+	},
 })
 
-/**
- *
- */
 const removeListConstraint = assign({
 	// @ts-ignore
-	listNames: (ctx, { listName }) => ctx.listNames.filter((list) => list !== listName),
+	listConstraint: (ctx) => {
+		return {
+			...ctx.listConstraint,
+			path: ctx.classView,
+			value: [],
+		}
+	},
 })
 
 /**
@@ -71,7 +79,7 @@ export const templateQueryMachine = (id = 'Template Query') =>
 			context: {
 				template: null,
 				isActiveQuery: false,
-				listNames: [],
+				listConstraint: listConstraintQuery,
 			},
 			states: {
 				idle: {

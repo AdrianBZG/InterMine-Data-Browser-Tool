@@ -5,7 +5,7 @@ import { buildSearchIndex } from 'src/buildSearchIndex'
 import { FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { ConstraintServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
-import { CODES, listConstraintQuery } from '../common'
+import { CODES } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'
 import { InfoIconPopover } from '../Shared/InfoIconPopover'
 import { PopupCard } from '../Shared/PopupCard'
@@ -91,24 +91,27 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 		})
 	)
 
-	const { isActiveQuery, listNames, template: updatedTemplate } = state.context
+	const { isActiveQuery, listConstraint, template: updatedTemplate } = state.context
 
 	const showDivider = (idx) =>
 		editableConstraints.length > 1 && idx < editableConstraints.length - 1
 
-	const nextCode = CODES[updatedTemplate.where.length]
 	const query = {
 		...updatedTemplate,
-		constraintLogic: `${updatedTemplate.constraintLogic} and ${nextCode}`,
-		where: [
-			...updatedTemplate.where,
+		constraintLogic: updatedTemplate.constraintLogic,
+		where: updatedTemplate.where,
+	}
+
+	if (listConstraint.value.length > 0) {
+		const nextCode = CODES[updatedTemplate.where.length]
+		query.where = [
+			...query.where,
 			{
-				...listConstraintQuery,
+				...listConstraint,
 				path: classView,
-				values: listNames,
 				code: nextCode,
 			},
-		],
+		]
 	}
 
 	return (

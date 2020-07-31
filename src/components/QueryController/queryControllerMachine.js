@@ -68,18 +68,18 @@ const addListConstraint = assign({
 		return {
 			...ctx.listConstraint,
 			path: ctx.classView,
-			values: [...ctx.listConstraint.values, listName],
+			value: [listName],
 		}
 	},
 })
 
 const removeListConstraint = assign({
 	// @ts-ignore
-	listConstraint: (ctx, { listName }) => {
+	listConstraint: (ctx) => {
 		return {
 			...ctx.listConstraint,
 			path: ctx.classView,
-			values: ctx.listConstraint.values.filter((list) => list !== listName),
+			value: [],
 		}
 	},
 })
@@ -93,9 +93,7 @@ export const queryControllerMachine = Machine(
 		initial: 'idle',
 		context: {
 			currentConstraints: [],
-			listConstraint: {
-				...listConstraintQuery,
-			},
+			listConstraint: listConstraintQuery,
 			classView: '',
 			selectedPaths: [],
 			rootUrl: '',
@@ -165,7 +163,7 @@ export const queryControllerMachine = Machine(
 			isLastConstraint: (context, _, { cond }) => {
 				const maxConstraints =
 					// @ts-ignore
-					context.listConstraint.values.length === 0 ? cond.maxConstraints : cond.maxConstraints - 1 // subtract the list constraint
+					context.listConstraint.value.length === 0 ? cond.maxConstraints : cond.maxConstraints - 1 // subtract the list constraint
 
 				return context.currentConstraints.length + 1 === maxConstraints
 			},

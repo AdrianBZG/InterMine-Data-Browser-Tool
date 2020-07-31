@@ -2,11 +2,7 @@ import { Button, Divider, H4, H5, NonIdealState } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {
-	DELETE_QUERY_CONSTRAINT,
-	FETCH_UPDATED_SUMMARY,
-	REMOVE_LIST_CONSTRAINT,
-} from 'src/eventConstants'
+import { DELETE_QUERY_CONSTRAINT, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { QueryServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import { CODES } from '../common'
@@ -78,33 +74,6 @@ CurrentConstraints.defaultProps = {
 	currentConstraints: [],
 }
 
-const ListContraintValues = ({ values, handleDeleteListConstraint }) => {
-	return (
-		<ul css={{ padding: '0 16px', listStyle: 'none' }}>
-			{values.map((value) => {
-				return (
-					<li key={value} css={{ padding: '6px 0' }}>
-						<div css={{ display: 'flex' }}>
-							<Button
-								intent="danger"
-								icon={IconNames.REMOVE}
-								small={true}
-								minimal={true}
-								onClick={() => handleDeleteListConstraint(value)}
-								aria-label={`delete ${value} from the list constraint`}
-								css={{ marginRight: 4 }}
-							/>
-							<span css={{ fontSize: 'var(--fs-desktopM1)', display: 'inline-block' }}>
-								{value}
-							</span>
-						</div>
-					</li>
-				)
-			})}
-		</ul>
-	)
-}
-
 export const QueryController = () => {
 	const [state, send] = useMachineBus(queryControllerMachine)
 
@@ -121,7 +90,10 @@ export const QueryController = () => {
 	const runQuery = () => {
 		let constraintLogic = ''
 
-		const codedConstraints = currentConstraints.map((con, idx) => {
+		const constraints =
+			listConstraint.value.length > 0 ? [...currentConstraints, listConstraint] : currentConstraints
+
+		const codedConstraints = constraints.map((con, idx) => {
 			const code = CODES[idx]
 			constraintLogic = constraintLogic === '' ? `(${code})` : `${constraintLogic} AND (${code})`
 
@@ -145,17 +117,12 @@ export const QueryController = () => {
 		send({ type: DELETE_QUERY_CONSTRAINT, path })
 	}
 
-	const handleDeleteListConstraint = (listName) => {
-		// @ts-ignore
-		sendToBus({ type: REMOVE_LIST_CONSTRAINT, listName })
-	}
-
-	const constraintCount = currentConstraints.length + listConstraint.values.length
-
 	return (
 		<div css={{ paddingTop: 10, margin: '0 20px' }}>
 			<H5>
-				<span css={{ color, display: 'inline-block', marginRight: 4 }}>{`${constraintCount}`}</span>
+				<span
+					css={{ color, display: 'inline-block', marginRight: 4 }}
+				>{`${currentConstraints.length}`}</span>
 				<span css={{ color: 'var(--blue9)' }}>Constraints applied</span>
 			</H5>
 			<PopupCard>
@@ -165,12 +132,6 @@ export const QueryController = () => {
 					<CurrentConstraints
 						constraints={currentConstraints}
 						handleDeleteConstraint={handleDeleteConstraint}
-					/>
-					<Divider css={{ width: '75%', marginBottom: 16 }} />
-					<H4>Lists</H4>
-					<ListContraintValues
-						values={listConstraint.values}
-						handleDeleteListConstraint={handleDeleteListConstraint}
 					/>
 					<Divider css={{ width: '75%', marginBottom: 16 }} />
 					<H4>History</H4>

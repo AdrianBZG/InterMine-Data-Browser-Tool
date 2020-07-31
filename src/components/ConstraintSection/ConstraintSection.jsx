@@ -1,7 +1,7 @@
-import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag, Text } from '@blueprintjs/core'
+import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React, { useState } from 'react'
-import { CHANGE_CONSTRAINT_VIEW, REMOVE_LIST_CONSTRAINT, REMOVE_LIST_TAG } from 'src/eventConstants'
+import { CHANGE_CONSTRAINT_VIEW } from 'src/eventConstants'
 import { sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -64,52 +64,6 @@ const ShowCategories = ({
 	)
 }
 
-const ShowLists = ({ listNames }) => {
-	const [showLists, setShowLists] = useState(false)
-
-	const selectedLists = listNames.map((listName) => {
-		return (
-			<Tag
-				key={listName}
-				intent="primary"
-				interactive={true}
-				onRemove={() => {
-					// @ts-ignore
-					sendToBus({ type: REMOVE_LIST_CONSTRAINT, listName })
-					// @ts-ignore
-					sendToBus({ type: REMOVE_LIST_TAG, listName })
-				}}
-				css={{ margin: 4 }}
-			>
-				{listName}
-			</Tag>
-		)
-	})
-
-	return (
-		<>
-			<Button
-				icon={showLists ? IconNames.CARET_DOWN : IconNames.CARET_RIGHT}
-				fill={true}
-				alignText="left"
-				text="List Filters"
-				minimal={true}
-				large={true}
-				onClick={() => setShowLists(!showLists)}
-			/>
-			<Collapse isOpen={showLists} css={{ marginTop: 0 }}>
-				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
-					{listNames.length > 0 ? (
-						selectedLists
-					) : (
-						<Text css={{ marginLeft: 20 }}>No Lists Selected</Text>
-					)}
-				</div>
-			</Collapse>
-		</>
-	)
-}
-
 const TemplatesList = ({
 	isLoading,
 	queries,
@@ -124,8 +78,6 @@ const TemplatesList = ({
 }) => {
 	return (
 		<div>
-			<Divider css={{ margin: 0 }} />
-			<ShowLists listNames={listNames} />
 			<Divider css={{ margin: 0 }} />
 			<ShowCategories
 				handleCategoryToggle={handleCategoryToggle}

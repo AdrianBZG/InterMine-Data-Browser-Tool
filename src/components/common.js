@@ -1,7 +1,8 @@
 export const listConstraintQuery = {
 	path: '',
 	op: 'IN',
-	values: [],
+	value: [],
+	code: '',
 }
 
 export const CODES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
