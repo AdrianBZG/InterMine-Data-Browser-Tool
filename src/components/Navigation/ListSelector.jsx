@@ -1,7 +1,7 @@
 import { Button, Menu, MenuItem } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { ADD_LIST_CONSTRAINT, ADD_LIST_TAG } from 'src/eventConstants'
 import { sendToBus } from 'src/useMachineBus'
@@ -43,6 +43,7 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 
 export const ListSelector = ({ listsForCurrentClass }) => {
 	const listSearchIndex = useRef(null)
+	const [selectedValues, setSelectedValues] = useState([])
 
 	useEffect(() => {
 		const indexClasses = async () => {
@@ -60,14 +61,31 @@ export const ListSelector = ({ listsForCurrentClass }) => {
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !listSearchIndex?.current) {
-			return items
+			return items.filter((item) => !selectedValues.includes(item.displayName))
 		}
 
+		const negateSelected = selectedValues.map((val) => ({
+			field: 'displayName',
+			query: val,
+			bool: 'not',
+		}))
+
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		return listSearchIndex.current.search(query, listsForCurrentClass.length)
+		return listSearchIndex.current.search(
+			[
+				{
+					query,
+					field: 'displayName',
+					bool: 'and',
+				},
+				...negateSelected,
+			],
+			listsForCurrentClass.length
+		)
 	}
 
-	const handleListSelect = ({ listName }) => {
+	const handleListSelect = ({ displayName, listName }) => {
+		setSelectedValues([...selectedValues, displayName])
 		// @ts-ignore
 		sendToBus({ type: ADD_LIST_CONSTRAINT, listName })
 		// @ts-ignore

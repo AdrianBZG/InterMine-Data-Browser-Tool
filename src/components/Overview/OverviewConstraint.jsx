@@ -130,13 +130,14 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 	const constraintCount = state.context.selectedValues.length
 	const searchIndex = useRef(null)
 	const { availableValues } = state.context
+	const docField = 'item'
 
 	useEffect(() => {
 		const buildIndex = async () => {
 			if (type === 'select' && searchIndex.current === null && availableValues.length > 0) {
 				searchIndex.current = await buildSearchIndex({
+					docField,
 					docId: 'item',
-					docField: 'item',
 					values: availableValues,
 				})
 			}
@@ -197,6 +198,7 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 							nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 							// @ts-ignore
 							searchIndex={searchIndex}
+							docField={docField}
 						/>
 					</ConstraintCard>
 				</div>

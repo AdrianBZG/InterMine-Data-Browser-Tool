@@ -29,13 +29,14 @@ const ConstraintWidget = ({ constraint, rootUrl }) => {
 
 	const searchIndex = useRef(null)
 	const { availableValues } = state.context
+	const docField = 'item'
 
 	useEffect(() => {
 		const buildIndex = async () => {
 			if (searchIndex.current === null && availableValues.length > 0) {
 				searchIndex.current = await buildSearchIndex({
+					docField,
 					docId: 'item',
-					docField: 'item',
 					values: availableValues,
 				})
 			}
@@ -56,6 +57,7 @@ const ConstraintWidget = ({ constraint, rootUrl }) => {
 					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 					// @ts-ignore
 					searchIndex={searchIndex}
+					docField={docField}
 				/>
 			</div>
 		</ConstraintServiceContext.Provider>

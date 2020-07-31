@@ -101,6 +101,7 @@ export const SuggestWidget = ({
 	nonIdealDescription = undefined,
 	label = '',
 	searchIndex,
+	docField = '',
 }) => {
 	const [uniqueId] = useState(() => `selectPopup-${generateId()}`)
 	const [state, send] = useServiceContext('constraints')
@@ -116,11 +117,27 @@ export const SuggestWidget = ({
 	const renderInputValue = () => ''
 	const filterQuery = (query, items) => {
 		if (query === '' || searchIndex.current === null) {
-			return items.filter((i) => !selectedValues.includes(i.name))
+			return items.filter((i) => !selectedValues.includes(i.item))
 		}
 
+		const negateSelected = selectedValues.map((val) => ({
+			field: docField,
+			query: val,
+			bool: 'not',
+		}))
+
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
-		const results = searchIndex.current.search(query, availableValues.length)
+		const results = searchIndex.current.search(
+			[
+				{
+					field: docField,
+					query,
+					bool: 'and',
+				},
+				...negateSelected,
+			],
+			availableValues.length
+		)
 
 		return results
 	}
