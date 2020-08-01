@@ -87,7 +87,7 @@ const TemplatesList = ({
 				isLoading={isLoading}
 			/>
 			<Divider css={{ margin: 0 }} />
-			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0, height: '77vh' }}>
+			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0 }}>
 				{!isLoading &&
 					queries.map((template) => (
 						<li key={template.name} css={{ margin: '0.875em 0' }}>

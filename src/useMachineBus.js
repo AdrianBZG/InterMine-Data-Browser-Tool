@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { interpret, State } from 'xstate'
+import { useMachine } from '@xstate/react'
+import { createContext, useContext, useMemo } from 'react'
 
 const enableMocks =
 	// istanbul ignore
@@ -15,44 +15,8 @@ export const TableServiceContext = createContext(null)
 
 const serviceStations = new Map()
 
-const ReactEffectType = {
-	Effect: 1,
-	LayoutEffect: 2,
-}
-
-const partition = (items, predicate) => {
-	const [truthy, falsy] = [[], []]
-	for (const item of items) {
-		if (predicate(item)) {
-			truthy.push(item)
-		} else {
-			falsy.push(item)
-		}
-	}
-
-	return [truthy, falsy]
-}
-
-const executeEffect = (action, state) => {
-	const { exec } = action
-	const originalExec = exec(state.context, state._event.data, {
-		action,
-		state,
-		_event: state._event,
-	})
-
-	originalExec()
-}
-
-/**
- * This is a slightly modified version of `xstate`s `useMachine` that allows components to
- * reuse an already interpreted machine. It does so by caching the service in the service station bus.
- *
- * N.B: Since the machines are **never** stopped, components are responsible for stopping them if
- * and where necessary
- */
+/** @type {import('./types').UseMachineBus} */
 export const useMachineBus = (machine, opts = {}) => {
-	// Allows mocking tests
 	const mockMachine = useContext(MockMachineContext)
 	let activeMachine = machine
 
@@ -63,110 +27,35 @@ export const useMachineBus = (machine, opts = {}) => {
 		}
 	}
 
-	const {
-		context,
-		guards,
-		actions,
-		activities,
-		services,
-		delays,
-		state: rehydratedState,
-		...interpreterOptions
-	} = opts
+	const [machineState, , service] = useMachine(activeMachine, opts)
 
-	const machineConfig = {
-		context,
-		guards,
-		actions,
-		activities,
-		services,
-		delays,
-	}
+	const sendToBusWrapper = useMemo(() => {
+		return (event, payload) => {
+			const receiver = serviceStations.get(service.sessionId)
 
-	let service = serviceStations.get(activeMachine.id)
-	let serviceState = service?.state
-
-	if (!service) {
-		const resolvedMachine = machine.withConfig(machineConfig, {
-			...activeMachine.context,
-			...context,
-		})
-
-		serviceState = rehydratedState ? State.create(rehydratedState) : resolvedMachine.initialState
-		service = interpret(resolvedMachine, { deferEvents: true, ...interpreterOptions })
-
-		serviceStations.set(activeMachine.id, service)
-	}
-
-	const [state, setState] = useState(serviceState)
-
-	const effectActionsRef = useRef([])
-	const layoutEffectActionsRef = useRef([])
-
-	useEffect(() => {
-		const handleStateChange = (currentState) => {
-			const initialStateChanged =
-				currentState.changed === undefined && Object.keys(currentState.children).length
-
-			if (currentState.changed || initialStateChanged) {
-				setState(currentState)
-			}
-
-			if (currentState.actions.length) {
-				const reactEffectActions = currentState.actions.filter((action) => {
-					return typeof action.exec === 'function' && '__effect' in action.exec
-				})
-
-				const [effectActions, layoutEffectActions] = partition(reactEffectActions, (action) => {
-					return action.exec.__effect === ReactEffectType.Effect
-				})
-
-				effectActionsRef.current.push(
-					...effectActions.map((effectAction) => [effectAction, currentState])
-				)
-
-				layoutEffectActionsRef.current.push(
-					...layoutEffectActions.map((layoutEffectAction) => [layoutEffectAction, currentState])
-				)
+			if (receiver) {
+				receiver.send(event, payload)
+			} else {
+				const e = new Error()
+				e.name = 'MessageBus'
+				e.message = 'Could not locate a service in the bus stations'
+				throw e
 			}
 		}
+	}, [service.sessionId])
 
-		service
-			.onTransition(handleStateChange)
-			.start(rehydratedState ? State.create(rehydratedState) : undefined)
+	const existing = serviceStations.get(service.sessionId)
 
-		return () => service.off(handleStateChange)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	if (!existing) {
+		serviceStations.set(service.sessionId, service)
+	}
 
-	// Make sure actions and services are kept updated when they change.
-	// This mutation assignment is safe because the service instance is only used
-	// in one place -- this hook's caller.
-	useEffect(() => {
-		Object.assign(service.machine.options.actions, actions)
-	}, [actions, service.machine.options.actions])
+	// Remove the service from the station when components unmount
+	service.onStop(() => {
+		serviceStations.delete(service.sessionId)
+	})
 
-	useEffect(() => {
-		Object.assign(service.machine.options.services, services)
-	}, [service.machine.options.services, services])
-
-	useEffect(() => {
-		while (layoutEffectActionsRef.current.length) {
-			const [layoutEffectAction, effectState] = layoutEffectActionsRef.current.shift()
-
-			executeEffect(layoutEffectAction, effectState)
-		}
-	}, [state])
-
-	useEffect(() => {
-		while (effectActionsRef.current.length) {
-			const [effectAction, effectState] = effectActionsRef.current.shift()
-
-			executeEffect(effectAction, effectState)
-		}
-	}, [state])
-
-	return [state, service.send, service]
+	return [machineState, sendToBusWrapper, service]
 }
 
 /**

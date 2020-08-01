@@ -18,7 +18,7 @@ const ConstraintWidget = ({ constraint, rootUrl, mineName }) => {
 	const name = constraint.path.split('.').join(' > ')
 
 	const [state, send] = useMachineBus(
-		templateConstraintMachine(`Template-${name} constraint widget`).withContext({
+		templateConstraintMachine.withContext({
 			rootUrl,
 			path: constraint.path,
 			op: constraint.op,
@@ -84,8 +84,8 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 	}
 
 	const [state] = useMachineBus(
-		templateQueryMachine(`Template-${template.name} Query`).withContext({
-			...templateQueryMachine().context,
+		templateQueryMachine.withContext({
+			...templateQueryMachine.context,
 			template: templateQuery,
 			isActiveQuery: false,
 		})

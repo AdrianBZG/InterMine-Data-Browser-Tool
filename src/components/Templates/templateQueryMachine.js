@@ -71,37 +71,36 @@ const templateHasQuery = (ctx, { path }) => {
 /**
  *
  */
-export const templateQueryMachine = (id = 'Template Query') =>
-	Machine(
-		{
-			id,
-			initial: 'idle',
-			context: {
-				template: null,
-				isActiveQuery: false,
-				listConstraint: listConstraintQuery,
-			},
-			states: {
-				idle: {
-					on: {
-						[ADD_TEMPLATE_CONSTRAINT]: { actions: 'setQueries', cond: 'templateHasQuery' },
-						[FETCH_UPDATED_SUMMARY]: { actions: 'setActiveQuery' },
-						[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
-						[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
-					},
+export const templateQueryMachine = Machine(
+	{
+		id: 'Template Query',
+		initial: 'idle',
+		context: {
+			template: null,
+			isActiveQuery: false,
+			listConstraint: listConstraintQuery,
+		},
+		states: {
+			idle: {
+				on: {
+					[ADD_TEMPLATE_CONSTRAINT]: { actions: 'setQueries', cond: 'templateHasQuery' },
+					[FETCH_UPDATED_SUMMARY]: { actions: 'setActiveQuery' },
+					[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
+					[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
 				},
 			},
 		},
-		{
-			actions: {
-				setQueries,
-				setActiveQuery,
-				addListConstraint,
-				removeListConstraint,
-			},
-			guards: {
-				// @ts-ignore
-				templateHasQuery,
-			},
-		}
-	)
+	},
+	{
+		actions: {
+			setQueries,
+			setActiveQuery,
+			addListConstraint,
+			removeListConstraint,
+		},
+		guards: {
+			// @ts-ignore
+			templateHasQuery,
+		},
+	}
+)
