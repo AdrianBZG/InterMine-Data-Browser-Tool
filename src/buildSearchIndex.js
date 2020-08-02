@@ -19,7 +19,7 @@ export const buildSearchIndex = async ({ docId, docField, values, query }) => {
 
 	const exportConfig = {
 		index: true,
-		doc: true,
+		doc: false,
 		serialize: false,
 	}
 
@@ -27,15 +27,23 @@ export const buildSearchIndex = async ({ docId, docField, values, query }) => {
 	const index = new FlexSearch(indexConfig)
 
 	const cacheKey = hash(query)
+	const cachedIndex = await searchIndexCache.getItem(cacheKey)
+
+	if (cachedIndex) {
+		const exportedDocs = {}
+
+		for (const val of values) {
+			exportedDocs[val[indexConfig.doc.id]] = val
+		}
+		// @ts-ignore
+		index.import(cachedIndex.index, { ...exportConfig, doc: exportedDocs })
+
+		return index
+	}
 
 	try {
-		const cachedIndex = await searchIndexCache.getItem(cacheKey)
-
-		if (cachedIndex) {
-			// @ts-ignore
-			index.import(cachedIndex.index, exportConfig)
-		} else if (typeof window !== 'undefined' && window.Worker) {
-			await indexWorker.index({
+		if (typeof window !== 'undefined' && window.Worker) {
+			const exportedDocs = await indexWorker.index({
 				values,
 				indexConfig,
 				exportConfig,
@@ -45,7 +53,7 @@ export const buildSearchIndex = async ({ docId, docField, values, query }) => {
 
 			const cachedIndex = await searchIndexCache.getItem(cacheKey)
 			// @ts-ignore
-			index.import(cachedIndex.index, exportConfig)
+			index.import(cachedIndex.index, { ...exportConfig, doc: exportedDocs })
 		} else {
 			// @ts-ignore
 			index.add(values)

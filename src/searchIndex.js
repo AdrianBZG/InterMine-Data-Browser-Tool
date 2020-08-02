@@ -9,12 +9,12 @@ class SearchIndex {
 
 		this._worker.onerror = (event) => {
 			const { callbackId, error } = event.data
-			this._updateCallbacks({ callbackId, error, hasBeenCached: false })
+			this._updateCallbacks({ callbackId, error, exportedDocs: {} })
 		}
 
 		this._worker.onmessage = (event) => {
-			const { callbackId, hasBeenCached } = event.data
-			this._updateCallbacks({ callbackId, hasBeenCached, error: null })
+			const { callbackId, exportedDocs } = event.data
+			this._updateCallbacks({ callbackId, exportedDocs, error: null })
 		}
 	}
 
@@ -25,7 +25,7 @@ class SearchIndex {
 				callbackId,
 				resolve,
 				reject,
-				hasBeenCached: false,
+				exportedDocs: {},
 				error: null,
 				complete: false,
 			}
@@ -43,10 +43,10 @@ class SearchIndex {
 		})
 	}
 
-	_updateCallbacks({ callbackId, hasBeenCached, error }) {
+	_updateCallbacks({ callbackId, exportedDocs, error }) {
 		const target = this._callbacks.get(callbackId)
 		target.complete = true
-		target.hasBeenCached = hasBeenCached
+		target.exportedDocs = exportedDocs
 		target.error = error
 
 		this._callbacks.forEach((data, key) => {
@@ -59,7 +59,7 @@ class SearchIndex {
 			if (data.error) {
 				data.reject(data.error)
 			} else {
-				data.resolve(data.hasBeenCached)
+				data.resolve(data.exportedDocs)
 			}
 		})
 	}
