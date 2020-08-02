@@ -194,10 +194,10 @@ export const overviewConstraintMachine = Machine(
 				if (cachedResult) {
 					summary = cachedResult.summary
 				} else {
-					const summary = await fetchSummary(summaryConfig)
+					summary = (await fetchSummary(summaryConfig)).results
 
 					await constraintValuesCache.setItem(configHash, {
-						summaryConfig,
+						...summaryConfig,
 						summary,
 						date: Date.now(),
 					})
@@ -206,7 +206,7 @@ export const overviewConstraintMachine = Machine(
 				return {
 					rootUrl,
 					classView,
-					items: summary.results,
+					items: summary,
 				}
 			},
 		},

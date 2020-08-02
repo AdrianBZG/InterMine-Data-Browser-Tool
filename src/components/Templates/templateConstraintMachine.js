@@ -115,7 +115,7 @@ export const templateConstraintMachine = Machine(
 					values = await fetchPathValues(valuesConfig)
 
 					await constraintValuesCache.setItem(configHash, {
-						valuesConfig,
+						...valuesConfig,
 						values,
 						date: Date.now(),
 					})

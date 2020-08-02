@@ -101,7 +101,11 @@ export const BarChartMachine = Machine(
 				} else {
 					summary = await fetchSummary(summaryConfig)
 
-					await barChartCache.setItem(configHash, { summaryConfig, summary, date: Date.now() })
+					await barChartCache.setItem(configHash, {
+						...summaryConfig,
+						summary,
+						date: Date.now(),
+					})
 				}
 
 				return {

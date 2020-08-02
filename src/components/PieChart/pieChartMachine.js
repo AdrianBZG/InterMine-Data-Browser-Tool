@@ -86,7 +86,11 @@ export const PieChartMachine = Machine(
 				} else {
 					summary = await fetchSummary(summaryConfig)
 
-					await pieChartCache.setItem(configHash, { summaryConfig, summary, date: Date.now() })
+					await pieChartCache.setItem(configHash, {
+						...summaryConfig,
+						summary,
+						date: Date.now(),
+					})
 				}
 
 				return {

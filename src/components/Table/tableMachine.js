@@ -166,23 +166,23 @@ export const TableChartMachine = Machine(
 
 				const tableRowsConfig = { rootUrl, query, page }
 				const configHash = hash(tableRowsConfig)
-				let tableRowsResult
+				let tableRows
 
 				const cachedResult = await tableCache.getItem(configHash)
 
 				if (cachedResult) {
-					tableRowsResult = cachedResult.tableRowsResult
+					tableRows = cachedResult
 				} else {
-					tableRowsResult = await fetchTable(tableRowsConfig)
+					tableRows = await fetchTable(tableRowsConfig)
 
 					await tableCache.setItem(configHash, {
-						tableRowsConfig,
-						tableRowsResult,
+						...tableRowsConfig,
+						...tableRows,
 						date: Date.now(),
 					})
 				}
 
-				const { totalRows, summary } = tableRowsResult
+				const { totalRows, summary } = tableRows
 				const hasSummary = summary.length > 0
 				const headers = hasSummary ? summary[0].map((item) => item.column) : []
 
@@ -225,23 +225,23 @@ export const TableChartMachine = Machine(
 
 				const tableRowsConfig = { rootUrl: ctx.rootUrl, query: ctx.lastQuery, page }
 				const configHash = hash(tableRowsConfig)
-				let tableRowsResult
+				let tableRows
 
 				const cachedResult = await tableCache.getItem(configHash)
 
 				if (cachedResult) {
-					tableRowsResult = cachedResult.tableRowsResult
+					tableRows = cachedResult.tableRows
 				} else {
-					tableRowsResult = await fetchTable(tableRowsConfig)
+					tableRows = await fetchTable(tableRowsConfig)
 
 					await tableCache.setItem(configHash, {
-						tableRowsConfig,
-						tableRowsResult,
+						...tableRowsConfig,
+						tableRows: tableRows.summary,
 						date: Date.now(),
 					})
 				}
 
-				const { summary } = tableRowsResult
+				const { summary } = tableRows
 
 				return {
 					pageNumber,
