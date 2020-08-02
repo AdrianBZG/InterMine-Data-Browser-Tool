@@ -27,7 +27,7 @@ export const useMachineBus = (machine, opts = {}) => {
 		}
 	}
 
-	const [machineState, , service] = useMachine(activeMachine, opts)
+	const [machineState, , service] = useMachine(activeMachine, { ...opts, devTools: true })
 
 	const sendToBusWrapper = useMemo(() => {
 		return (event, payload) => {

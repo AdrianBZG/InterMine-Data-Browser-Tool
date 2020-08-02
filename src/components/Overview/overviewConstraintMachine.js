@@ -73,142 +73,143 @@ const resetConstraint = ({ classView, constraintPath }) => {
 	})
 }
 
-export const overviewConstraintMachine = Machine(
-	{
-		id: 'ConstraintMachine',
-		initial: 'noConstraintsSet',
-		context: {
-			type: '',
-			op: '',
-			constraintPath: '',
-			selectedValues: [],
-			availableValues: [],
-			classView: '',
-			rootUrl: '',
-			constraintItemsQuery: {},
-		},
-		on: {
-			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
-			[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
-			[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
-			[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-		},
-		states: {
-			loading: {
-				invoke: {
-					id: 'fetchInitialValues',
-					src: 'fetchInitialValues',
-					onDone: {
-						target: 'noConstraintsSet',
-						actions: 'setAvailableValues',
+export const overviewConstraintMachine = (id) =>
+	Machine(
+		{
+			id: `${id} constraint machine`,
+			initial: 'noConstraintsSet',
+			context: {
+				type: '',
+				op: '',
+				constraintPath: '',
+				selectedValues: [],
+				availableValues: [],
+				classView: '',
+				rootUrl: '',
+				constraintItemsQuery: {},
+			},
+			on: {
+				[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
+				[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
+				[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
+				[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
+				[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+			},
+			states: {
+				loading: {
+					invoke: {
+						id: 'fetchInitialValues',
+						src: 'fetchInitialValues',
+						onDone: {
+							target: 'noConstraintsSet',
+							actions: 'setAvailableValues',
+						},
+						onError: {
+							target: 'noConstraintItems',
+							actions: 'logErrorToConsole',
+						},
 					},
-					onError: {
-						target: 'noConstraintItems',
-						actions: 'logErrorToConsole',
+				},
+				noConstraintItems: {},
+				noConstraintsSet: {
+					always: [{ target: 'noConstraintItems', cond: 'hasNoConstraintItems' }],
+					entry: 'resetConstraint',
+					on: {
+						[ADD_CONSTRAINT]: {
+							target: 'constraintsUpdated',
+							actions: 'addConstraint',
+						},
+					},
+				},
+				constraintsUpdated: {
+					always: [{ target: 'noConstraintsSet', cond: 'selectedListIsEmpty' }],
+					on: {
+						[ADD_CONSTRAINT]: { actions: 'addConstraint' },
+						[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
+						[APPLY_DATA_BROWSER_CONSTRAINT]: {
+							target: 'constraintsApplied',
+							actions: 'applyOverviewConstraint',
+						},
+					},
+				},
+				constraintsApplied: {
+					on: {
+						[ADD_CONSTRAINT]: {
+							target: 'constraintsUpdated',
+							actions: 'addConstraint',
+						},
+						[REMOVE_CONSTRAINT]: {
+							target: 'constraintsUpdated',
+							actions: 'removeConstraint',
+						},
+					},
+				},
+				constraintLimitReached: {
+					on: {
+						[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
 					},
 				},
 			},
-			noConstraintItems: {},
-			noConstraintsSet: {
-				always: [{ target: 'noConstraintItems', cond: 'hasNoConstraintItems' }],
-				entry: 'resetConstraint',
-				on: {
-					[ADD_CONSTRAINT]: {
-						target: 'constraintsUpdated',
-						actions: 'addConstraint',
-					},
+		},
+		{
+			actions: {
+				logErrorToConsole,
+				addConstraint,
+				removeConstraint,
+				removeAll,
+				setAvailableValues,
+				applyOverviewConstraint,
+				resetConstraint,
+			},
+			guards: {
+				selectedListIsEmpty: (ctx) => {
+					return ctx.selectedValues.length === 0
+				},
+				hasNoConstraintItems: (ctx) => {
+					return ctx.availableValues.length === 0
+				},
+				// @ts-ignore
+				pathMatches: (ctx, { path }) => {
+					return ctx.constraintPath === path
 				},
 			},
-			constraintsUpdated: {
-				always: [{ target: 'noConstraintsSet', cond: 'selectedListIsEmpty' }],
-				on: {
-					[ADD_CONSTRAINT]: { actions: 'addConstraint' },
-					[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
-					[APPLY_DATA_BROWSER_CONSTRAINT]: {
-						target: 'constraintsApplied',
-						actions: 'applyOverviewConstraint',
-					},
+			services: {
+				fetchInitialValues: async (ctx, event) => {
+					const { constraintItemsQuery, constraintPath } = ctx
+
+					const {
+						globalConfig: { rootUrl, classView },
+					} = event
+
+					const query = {
+						...constraintItemsQuery,
+						from: classView,
+					}
+
+					const summaryConfig = { rootUrl, query, path: constraintPath }
+					const configHash = hash(summaryConfig)
+					let summary
+
+					const cachedResult = await constraintValuesCache.getItem(configHash)
+
+					if (cachedResult) {
+						summary = cachedResult.summary
+					} else {
+						summary = (await fetchSummary(summaryConfig)).results
+
+						await constraintValuesCache.setItem(configHash, {
+							...summaryConfig,
+							summary,
+							date: Date.now(),
+						})
+					}
+
+					return {
+						rootUrl,
+						classView,
+						items: summary,
+					}
 				},
 			},
-			constraintsApplied: {
-				on: {
-					[ADD_CONSTRAINT]: {
-						target: 'constraintsUpdated',
-						actions: 'addConstraint',
-					},
-					[REMOVE_CONSTRAINT]: {
-						target: 'constraintsUpdated',
-						actions: 'removeConstraint',
-					},
-				},
-			},
-			constraintLimitReached: {
-				on: {
-					[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
-				},
-			},
-		},
-	},
-	{
-		actions: {
-			logErrorToConsole,
-			addConstraint,
-			removeConstraint,
-			removeAll,
-			setAvailableValues,
-			applyOverviewConstraint,
-			resetConstraint,
-		},
-		guards: {
-			selectedListIsEmpty: (ctx) => {
-				return ctx.selectedValues.length === 0
-			},
-			hasNoConstraintItems: (ctx) => {
-				return ctx.availableValues.length === 0
-			},
-			// @ts-ignore
-			pathMatches: (ctx, { path }) => {
-				return ctx.constraintPath === path
-			},
-		},
-		services: {
-			fetchInitialValues: async (ctx, event) => {
-				const { constraintItemsQuery, constraintPath } = ctx
-
-				const {
-					globalConfig: { rootUrl, classView },
-				} = event
-
-				const query = {
-					...constraintItemsQuery,
-					from: classView,
-				}
-
-				const summaryConfig = { rootUrl, query, path: constraintPath }
-				const configHash = hash(summaryConfig)
-				let summary
-
-				const cachedResult = await constraintValuesCache.getItem(configHash)
-
-				if (cachedResult) {
-					summary = cachedResult.summary
-				} else {
-					summary = (await fetchSummary(summaryConfig)).results
-
-					await constraintValuesCache.setItem(configHash, {
-						...summaryConfig,
-						summary,
-						date: Date.now(),
-					})
-				}
-
-				return {
-					rootUrl,
-					classView,
-					items: summary,
-				}
-			},
-		},
-	}
-)
+		}
+	)

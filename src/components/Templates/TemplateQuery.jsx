@@ -18,7 +18,7 @@ const ConstraintWidget = ({ constraint, rootUrl, mineName }) => {
 	const name = constraint.path.split('.').join(' > ')
 
 	const [state, send] = useMachineBus(
-		templateConstraintMachine.withContext({
+		templateConstraintMachine(name).withContext({
 			rootUrl,
 			path: constraint.path,
 			op: constraint.op,

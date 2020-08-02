@@ -98,8 +98,8 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
 
 	const [state, send] = useMachineBus(
-		overviewConstraintMachine.withContext({
-			...overviewConstraintMachine.context,
+		overviewConstraintMachine(name).withContext({
+			...overviewConstraintMachine().context,
 			op,
 			type,
 			constraintPath: path,
