@@ -1,4 +1,5 @@
 import { fetchClasses, fetchInstances, fetchLists } from 'src/apiRequests'
+import { appCache } from 'src/caches'
 import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
@@ -6,7 +7,6 @@ import {
 	SET_API_TOKEN,
 	TOGGLE_CATEGORY_VISIBILITY,
 	TOGGLE_VIEW_IS_LOADING,
-	UPDATE_TEMPLATE_QUERIES,
 } from 'src/eventConstants'
 import { assign, forwardTo, Machine } from 'xstate'
 
@@ -87,25 +87,6 @@ const toggleViewIsLoading = assign({
 /**
  *
  */
-const updateTemplateQueries = assign({
-	// @ts-ignore
-	possibleQueries: (_, { templatesForSelectedCategories }) => templatesForSelectedCategories,
-	// @ts-ignore
-	categories: (_, { categories }) => categories,
-	// @ts-ignore
-	templates: (_, { templates }) => templates,
-	// @ts-ignore
-	templatesForClassView: (_, { templatesForClassView }) => templatesForClassView,
-	// @ts-ignore
-	templatesByCategory: (_, { templatesByCategory }) => templatesByCategory,
-	// @ts-ignore
-	templatesForSelectedCategories: (_, { templatesForSelectedCategories }) =>
-		templatesForSelectedCategories,
-})
-
-/**
- *
- */
 const setTemplateView = assign({
 	appView: () => 'templateView',
 })
@@ -154,12 +135,24 @@ const changeClass = assign({
  */
 const setMineConfiguration = assign({
 	// @ts-ignore
-	intermines: (_, { data }) => data.intermines,
+	intermines: (_, { data }) =>
+		data.intermines.map((mine) => ({
+			name: mine.name,
+			rootUrl: mine.url,
+		})),
 	// @ts-ignore
-	modelClasses: (_, { data }) =>
-		data.modelClasses.sort().map((cl) => ({ displayName: cl.displayName, name: cl.name })),
+	modelClasses: (_, { data }) => {
+		return Object.entries(data.modelClasses.classes)
+			.map(([_key, value]) => ({
+				displayName: value.displayName,
+				name: value.name,
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name))
+	},
 	// @ts-ignore
-	lists: (_, { data }) => data.lists,
+	lists: (_, { data }) => {
+		return data.lists.map(({ name, title, type }) => ({ name, title, type }))
+	},
 })
 
 /**
@@ -218,10 +211,50 @@ const getApiTokenFromStorage = assign({
 	},
 })
 
+// @ts-ignore
+const loadAppContext = assign((ctx, { data }) => {
+	return {
+		...data.appContext,
+	}
+})
+
+/**
+ *
+ */
+const rehydrateContext = async () => {
+	const appContext = await appCache.getItem('appContext')
+
+	return {
+		appContext,
+	}
+}
+
+/**
+ * Services
+ */
+
+/**
+ *
+ */
+const dehydrateContext = async (ctx) => {
+	try {
+		await appCache.setItem('appContext', { ...ctx, date: Date.now() })
+	} catch (e) {
+		throw Error(e)
+	}
+}
+
+/**
+ *
+ */
+const logErrorToConsole = (ctx, event) => {
+	console.error('FETCH: could not retrieve intermines', { ctx, event })
+}
+
 export const appManagerMachine = Machine(
 	{
 		id: 'App Manager',
-		initial: 'rehydrateApp',
+		initial: 'rehydrateContext',
 		context: {
 			appView: 'defaultView',
 			classView: 'Gene',
@@ -244,19 +277,11 @@ export const appManagerMachine = Machine(
 					? 'https://www.humanmine.org/humanmine'
 					: 'http://localhost:9999/biotestmine',
 			},
-			// We have to keep the template context here because it is an invoked machine and when it exits,
-			// the state it was called in, it clears its context. Therefore we have to pass the previous
-			// context to the template machine to rehydrate it.
-			templates: Object.create(null),
-			templatesForClassView: [],
-			templatesByCategory: [],
-			templatesForSelectedCategories: [],
 			categories: Object.create(null),
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'loading', actions: ['changeMine', 'getApiTokenFromStorage'] },
 			[CHANGE_CLASS]: { actions: ['changeClass'] },
-			[UPDATE_TEMPLATE_QUERIES]: { actions: 'updateTemplateQueries' },
 			[TOGGLE_VIEW_IS_LOADING]: { actions: 'toggleViewIsLoading' },
 			[TOGGLE_CATEGORY_VISIBILITY]: { actions: 'forwardToTemplateView' },
 			[SET_API_TOKEN]: { actions: 'setApiToken' },
@@ -267,8 +292,19 @@ export const appManagerMachine = Machine(
 			],
 		},
 		states: {
-			rehydrateApp: {
-				always: [{ target: 'loading', actions: 'getApiTokenFromStorage' }],
+			rehydrateContext: {
+				invoke: {
+					id: 'rehydrateAppContext',
+					src: 'rehydrateContext',
+					onDone: {
+						target: 'defaultView',
+						actions: 'loadAppContext',
+					},
+					onError: {
+						target: 'invalidAppView',
+						actions: 'logErrorToConsole',
+					},
+				},
 			},
 			loading: {
 				on: {
@@ -279,23 +315,23 @@ export const appManagerMachine = Machine(
 					src: 'fetchMineConfiguration',
 					onDone: {
 						target: 'defaultView',
-						actions: ['setMineConfiguration', 'filterListsForClass'],
+						actions: ['setMineConfiguration', 'filterListsForClass', 'dehydrateContext'],
 					},
 					onError: {
 						target: 'defaultView',
-						actions: (ctx, event) =>
-							console.error('FETCH: could not retrieve intermines', { ctx, event }),
+						actions: 'logErrorToConsole',
 					},
 				},
 			},
 			defaultView: {
+				always: [{ target: 'loading', cond: 'hasNoMineConfig' }],
 				entry: ['setDefaultView', 'setPossibleOverviewQueries'],
 				on: {
 					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
 			},
 			templateView: {
-				entry: ['setTemplateView', 'clearPossibleQueries'],
+				entry: ['setTemplateView', 'clearPossibleQueries', 'dehydrateContext'],
 				on: {
 					[CHANGE_CLASS]: { actions: ['changeClass', 'forwardToTemplateView'] },
 				},
@@ -303,14 +339,9 @@ export const appManagerMachine = Machine(
 					id: 'templateView',
 					src: templateViewMachine,
 					data: {
-						templates: (ctx) => ctx.templates,
-						templatesForClassView: (ctx) => ctx.templatesForClassView,
-						templatesByCategory: (ctx) => ctx.templatesByCategory,
-						templatesForSelectedCategories: (ctx) => ctx.templatesForSelectedCategories,
-						categories: (ctx) => ctx.categories,
+						rootUrl: (ctx) => ctx.selectedMine.rootUrl,
 						classView: (ctx) => ctx.classView,
 						showAllLabel: (ctx) => ctx.showAllLabel,
-						rootUrl: (ctx) => ctx.selectedMine.rootUrl,
 					},
 				},
 			},
@@ -321,7 +352,6 @@ export const appManagerMachine = Machine(
 		actions: {
 			forwardToTemplateView,
 			toggleViewIsLoading,
-			updateTemplateQueries,
 			setTemplateView,
 			clearPossibleQueries,
 			setPossibleOverviewQueries,
@@ -332,6 +362,9 @@ export const appManagerMachine = Machine(
 			filterListsForClass,
 			setApiToken,
 			getApiTokenFromStorage,
+			logErrorToConsole,
+			loadAppContext,
+			dehydrateContext,
 		},
 		guards: {
 			// @ts-ignore
@@ -346,43 +379,23 @@ export const appManagerMachine = Machine(
 			showAllCategories: (ctx, { tagName }) => {
 				return tagName === ctx.showAllLabel
 			},
+			hasNoMineConfig: (ctx) => {
+				return ctx.intermines.length === 0
+			},
 		},
 		services: {
+			rehydrateContext,
 			fetchMineConfiguration: async (ctx) => {
-				let instances
-				let modelClasses
-				let lists
-
-				if (ctx.intermines.length === 0) {
-					const [instancesResult, classesResult, listsResult] = await Promise.all([
-						fetchInstances(),
-						fetchClasses(ctx.selectedMine.rootUrl),
-						fetchLists(ctx.selectedMine.rootUrl),
-					])
-
-					instances = instancesResult
-					modelClasses = classesResult
-					lists = listsResult
-				} else {
-					const [classesResult, listsResult] = await Promise.all([
-						fetchClasses(ctx.selectedMine.rootUrl),
-						fetchLists(ctx.selectedMine.rootUrl),
-					])
-
-					modelClasses = classesResult
-					lists = listsResult
-				}
+				const [interminesConfig, modelClasses, lists] = await Promise.all([
+					fetchInstances(),
+					fetchClasses(ctx.selectedMine.rootUrl),
+					fetchLists(ctx.selectedMine.rootUrl),
+				])
 
 				return {
-					modelClasses: Object.entries(modelClasses.classes).map(([_key, value]) => value),
+					modelClasses,
 					lists,
-					intermines:
-						ctx.intermines.length > 0
-							? ctx.intermines
-							: instances.data.instances.map((mine) => ({
-									name: mine.name,
-									rootUrl: mine.url,
-							  })),
+					intermines: interminesConfig.data.instances,
 				}
 			},
 		},

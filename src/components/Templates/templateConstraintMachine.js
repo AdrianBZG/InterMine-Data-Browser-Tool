@@ -1,4 +1,6 @@
+import hash from 'object-hash'
 import { fetchPathValues } from 'src/apiRequests'
+import { constraintValuesCache } from 'src/caches'
 import {
 	ADD_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
@@ -101,7 +103,23 @@ export const templateConstraintMachine = Machine(
 		},
 		services: {
 			fetchConstraintValues: async (ctx) => {
-				const values = await fetchPathValues({ rootUrl: ctx.rootUrl, path: ctx.path })
+				const valuesConfig = { rootUrl: ctx.rootUrl, path: ctx.path }
+				const configHash = hash(valuesConfig)
+				let values
+
+				const cachedResult = await constraintValuesCache.getItem(configHash)
+
+				if (cachedResult) {
+					values = cachedResult.values
+				} else {
+					values = await fetchPathValues(valuesConfig)
+
+					await constraintValuesCache.setItem(configHash, {
+						valuesConfig,
+						values,
+						date: Date.now(),
+					})
+				}
 
 				return {
 					values,

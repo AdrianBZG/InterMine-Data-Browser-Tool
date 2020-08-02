@@ -104,7 +104,7 @@ const TemplatesList = ({
 	)
 }
 
-const OverviewConstraintList = ({ queries, isLoading, mineName }) => {
+const OverviewConstraintList = ({ queries, isLoading }) => {
 	if (isLoading) {
 		return null
 	}
@@ -121,7 +121,6 @@ const OverviewConstraintList = ({ queries, isLoading, mineName }) => {
 					<OverviewConstraint
 						constraintConfig={config}
 						color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
-						mineName={mineName}
 					/>
 				</li>
 			))}
@@ -183,7 +182,7 @@ export const ConstraintSection = ({
 			) : (
 				<>
 					<QueryController />
-					<OverviewConstraintList queries={queries} isLoading={isLoading} mineName={mineName} />
+					<OverviewConstraintList queries={queries} isLoading={isLoading} />
 				</>
 			)}
 		</section>

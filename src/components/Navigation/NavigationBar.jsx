@@ -28,7 +28,11 @@ export const NavigationBar = () => {
 					classView={classView}
 					mineName={selectedMine.name}
 				/>
-				<ListSelector listsForCurrentClass={listsForCurrentClass} mineName={selectedMine.name} />
+				<ListSelector
+					listsForCurrentClass={listsForCurrentClass}
+					mineName={selectedMine.name}
+					classView={classView}
+				/>
 			</Navbar.Group>
 		</Navbar>
 	)

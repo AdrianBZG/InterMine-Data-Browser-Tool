@@ -56,7 +56,7 @@ const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, r
 	)
 }
 
-export const ListSelector = ({ listsForCurrentClass, mineName }) => {
+export const ListSelector = ({ listsForCurrentClass, mineName, classView }) => {
 	const listSearchIndex = useRef(null)
 	const [selectedValue, setSelectedValue] = useState('')
 
@@ -67,13 +67,13 @@ export const ListSelector = ({ listsForCurrentClass, mineName }) => {
 					docId: 'listName',
 					docField: 'displayName',
 					values: listsForCurrentClass,
-					cacheKey: `${mineName}-listSelector`,
+					query: { listsForCurrentClass, mineName, name: `${mineName}-${classView}-lists` },
 				})
 			}
 		}
 
 		indexClasses()
-	}, [listsForCurrentClass, mineName])
+	}, [classView, listsForCurrentClass, mineName])
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !listSearchIndex?.current) {

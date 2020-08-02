@@ -47,6 +47,7 @@
 		"localforage": "^1.8.1",
 		"nanoid": "^3.1.10",
 		"nanoid-dictionary": "^3.0.0",
+		"object-hash": "^2.0.3",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
 		"react-use": "^15.3.2",

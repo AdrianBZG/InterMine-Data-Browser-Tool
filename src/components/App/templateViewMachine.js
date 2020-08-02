@@ -1,4 +1,6 @@
+import hash from 'object-hash'
 import { fetchTemplates } from 'src/apiRequests'
+import { templatesCache } from 'src/caches'
 import {
 	CHANGE_CLASS,
 	TOGGLE_CATEGORY_VISIBILITY,
@@ -171,14 +173,8 @@ export const templateViewMachine = Machine(
 			showAllLabel: '',
 			rootUrl: '',
 		},
-		initial: 'init',
+		initial: 'loadTemplates',
 		states: {
-			init: {
-				always: [
-					{ target: 'allCategories', cond: 'hasTemplates', actions: ['updateParent'] },
-					{ target: 'loadTemplates' },
-				],
-			},
 			allCategories: {
 				on: {
 					[CHANGE_CLASS]: {
@@ -262,7 +258,23 @@ export const templateViewMachine = Machine(
 		},
 		services: {
 			fetchTemplates: async (ctx) => {
-				const templates = await fetchTemplates({ rootUrl: ctx.rootUrl })
+				const templatesConfig = { rootUrl: ctx.rootUrl }
+				const configHash = hash(templatesConfig)
+				let templates
+
+				const cachedResult = await templatesCache.getItem(configHash)
+
+				if (cachedResult) {
+					templates = cachedResult.templates
+				} else {
+					templates = await fetchTemplates(templatesConfig)
+
+					await templatesCache.setItem(configHash, {
+						templatesConfig,
+						templates,
+						date: Date.now(),
+					})
+				}
 
 				const categories = {
 					[ctx.showAllLabel]: {

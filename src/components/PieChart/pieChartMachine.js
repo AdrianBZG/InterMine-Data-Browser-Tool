@@ -1,4 +1,6 @@
+import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
+import { pieChartCache } from 'src/caches'
 import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
@@ -22,7 +24,7 @@ export const PieChartMachine = Machine(
 		},
 		on: {
 			// Making it global ensure we update the table when the mine/class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isInitialFetch' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
@@ -36,7 +38,7 @@ export const PieChartMachine = Machine(
 						actions: 'setSummaryResults',
 					},
 					onError: {
-						target: 'idle',
+						target: 'hasNoSummary',
 						actions: (ctx, event) => console.error('FETCH: Pie Chart', { ctx, event }),
 					},
 				},
@@ -56,11 +58,6 @@ export const PieChartMachine = Machine(
 		},
 		guards: {
 			hasSummary: (ctx) => ctx.allClassOrganisms.length > 0,
-			// @ts-ignore
-			isInitialFetch: (ctx, { globalConfig }) =>
-				ctx.allClassOrganisms.length === 0 ||
-				ctx.classView !== globalConfig.classView ||
-				ctx.rootUrl !== globalConfig.rootUrl,
 		},
 		services: {
 			fetchItems: async (_ctx, event) => {
@@ -78,7 +75,19 @@ export const PieChartMachine = Machine(
 					},
 				}
 
-				const summary = await fetchSummary({ rootUrl, query, path: 'organism.shortName' })
+				const summaryConfig = { rootUrl, query, path: 'organism.shortName' }
+				const configHash = hash(summaryConfig)
+				let summary
+
+				const cachedResult = await pieChartCache.getItem(configHash)
+
+				if (cachedResult) {
+					summary = cachedResult.summary
+				} else {
+					summary = await fetchSummary(summaryConfig)
+
+					await pieChartCache.setItem(configHash, { summaryConfig, summary, date: Date.now() })
+				}
 
 				return {
 					classView,

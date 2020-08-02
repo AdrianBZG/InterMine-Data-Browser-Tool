@@ -1,4 +1,6 @@
+import hash from 'object-hash'
 import { fetchTable } from 'src/apiRequests'
+import { tableCache } from 'src/caches'
 import {
 	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
@@ -8,7 +10,7 @@ import {
 import { sendToBus } from 'src/useMachineBus'
 import { assign, Machine } from 'xstate'
 
-const bustCache = assign({
+const bustCachedPages = assign({
 	pages: () => new Map(),
 })
 
@@ -81,10 +83,9 @@ export const TableChartMachine = Machine(
 			// Making it global ensure we update the table when the mine/class changes
 			[FETCH_INITIAL_SUMMARY]: {
 				target: 'fetchInitialRows',
-				actions: 'bustCache',
-				cond: 'isInitialFetch',
+				actions: 'bustCachedPages',
 			},
-			[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCache' },
+			[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
 		},
 		states: {
 			idle: {
@@ -133,7 +134,7 @@ export const TableChartMachine = Machine(
 	},
 	{
 		actions: {
-			bustCache,
+			bustCachedPages,
 			setInitialRows,
 			setLastQuery,
 			refreshCache,
@@ -142,14 +143,6 @@ export const TableChartMachine = Machine(
 		guards: {
 			hasSummary: (ctx) => {
 				return ctx.totalRows > 0
-			},
-			// @ts-ignore
-			isInitialFetch: (ctx, { globalConfig }) => {
-				return (
-					ctx.totalRows === 0 ||
-					ctx.classView !== globalConfig.classView ||
-					ctx.rootUrl !== globalConfig.rootUrl
-				)
 			},
 			// @ts-ignore
 			hasPageInCache: (ctx, { pageNumber }) => {
@@ -171,8 +164,25 @@ export const TableChartMachine = Machine(
 					size: ctx.visibleRows * ctx.cacheFactor,
 				}
 
-				const { totalRows, summary } = await fetchTable({ rootUrl, query, page })
+				const tableRowsConfig = { rootUrl, query, page }
+				const configHash = hash(tableRowsConfig)
+				let tableRowsResult
 
+				const cachedResult = await tableCache.getItem(configHash)
+
+				if (cachedResult) {
+					tableRowsResult = cachedResult.tableRowsResult
+				} else {
+					tableRowsResult = await fetchTable(tableRowsConfig)
+
+					await tableCache.setItem(configHash, {
+						tableRowsConfig,
+						tableRowsResult,
+						date: Date.now(),
+					})
+				}
+
+				const { totalRows, summary } = tableRowsResult
 				const hasSummary = summary.length > 0
 				const headers = hasSummary ? summary[0].map((item) => item.column) : []
 
@@ -213,7 +223,25 @@ export const TableChartMachine = Machine(
 					size,
 				}
 
-				const { summary } = await fetchTable({ rootUrl: ctx.rootUrl, query: ctx.lastQuery, page })
+				const tableRowsConfig = { rootUrl: ctx.rootUrl, query: ctx.lastQuery, page }
+				const configHash = hash(tableRowsConfig)
+				let tableRowsResult
+
+				const cachedResult = await tableCache.getItem(configHash)
+
+				if (cachedResult) {
+					tableRowsResult = cachedResult.tableRowsResult
+				} else {
+					tableRowsResult = await fetchTable(tableRowsConfig)
+
+					await tableCache.setItem(configHash, {
+						tableRowsConfig,
+						tableRowsResult,
+						date: Date.now(),
+					})
+				}
+
+				const { summary } = tableRowsResult
 
 				return {
 					pageNumber,

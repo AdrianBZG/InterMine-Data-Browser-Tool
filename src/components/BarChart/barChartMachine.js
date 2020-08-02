@@ -1,4 +1,6 @@
+import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
+import { barChartCache } from 'src/caches'
 import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
@@ -34,7 +36,7 @@ export const BarChartMachine = Machine(
 		},
 		on: {
 			// Making it global ensures that we retry when the mine or class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isInitialFetch' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
@@ -70,13 +72,6 @@ export const BarChartMachine = Machine(
 			hasSummary: (ctx) => {
 				return ctx.lengthSummary.length > 0
 			},
-			isInitialFetch: (ctx, { globalConfig }) => {
-				return (
-					ctx.lengthSummary.length === 0 ||
-					ctx.classView !== globalConfig.classView ||
-					ctx.rootUrl !== globalConfig.rootUrl
-				)
-			},
 		},
 		services: {
 			fetchGeneLength: async (_ctx, { globalConfig: { classView, rootUrl }, query: nextQuery }) => {
@@ -95,7 +90,19 @@ export const BarChartMachine = Machine(
 					],
 				}
 
-				const summary = await fetchSummary({ rootUrl, query, path: 'length' })
+				const summaryConfig = { rootUrl, query, path: 'length' }
+				const configHash = hash(summaryConfig)
+				let summary
+
+				const cachedResult = await barChartCache.getItem(configHash)
+
+				if (cachedResult) {
+					summary = cachedResult.summary
+				} else {
+					summary = await fetchSummary(summaryConfig)
+
+					await barChartCache.setItem(configHash, { summaryConfig, summary, date: Date.now() })
+				}
 
 				return {
 					classView,

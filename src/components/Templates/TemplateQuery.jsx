@@ -38,13 +38,13 @@ const ConstraintWidget = ({ constraint, rootUrl, mineName }) => {
 					docField,
 					docId: 'value',
 					values: availableValues,
-					cacheKey: `${mineName}-template-${constraint.path}-values`,
+					query: { rootUrl, mineName, constraint, name: `${name}-constraint` },
 				})
 			}
 		}
 
 		buildIndex()
-	}, [availableValues, constraint.path, mineName])
+	}, [availableValues, constraint, mineName, name, rootUrl])
 
 	const Widget =
 		availableValues.length <= 10 && constraint.op === 'ONE OF' ? CheckboxWidget : SuggestWidget

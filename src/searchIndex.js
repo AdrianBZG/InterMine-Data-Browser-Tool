@@ -9,37 +9,44 @@ class SearchIndex {
 
 		this._worker.onerror = (event) => {
 			const { callbackId, error } = event.data
-			this._updateCallbacks({ callbackId, error, results: null })
+			this._updateCallbacks({ callbackId, error, hasBeenCached: false })
 		}
 
 		this._worker.onmessage = (event) => {
-			const { callbackId, results } = event.data
-			this._updateCallbacks({ callbackId, results, error: null })
+			const { callbackId, hasBeenCached } = event.data
+			this._updateCallbacks({ callbackId, hasBeenCached, error: null })
 		}
 	}
 
-	index({ indexConfig, exportConfig, values }) {
+	index({ indexConfig, exportConfig, values, cacheKey, indexName }) {
 		return new Promise((resolve, reject) => {
 			const callbackId = nanoid()
 			const data = {
 				callbackId,
 				resolve,
 				reject,
-				results: null,
+				hasBeenCached: false,
 				error: null,
 				complete: false,
 			}
 
 			this._callbacks.set(callbackId, data)
 
-			this._worker.postMessage({ values, indexConfig, exportConfig, callbackId })
+			this._worker.postMessage({
+				values,
+				indexConfig,
+				exportConfig,
+				callbackId,
+				cacheKey,
+				indexName,
+			})
 		})
 	}
 
-	_updateCallbacks({ callbackId, results, error }) {
+	_updateCallbacks({ callbackId, hasBeenCached, error }) {
 		const target = this._callbacks.get(callbackId)
 		target.complete = true
-		target.results = results
+		target.hasBeenCached = hasBeenCached
 		target.error = error
 
 		this._callbacks.forEach((data, key) => {
@@ -52,7 +59,7 @@ class SearchIndex {
 			if (data.error) {
 				data.reject(data.error)
 			} else {
-				data.resolve(data.results)
+				data.resolve(data.hasBeenCached)
 			}
 		})
 	}

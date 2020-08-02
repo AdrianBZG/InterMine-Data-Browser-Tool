@@ -34,13 +34,13 @@ export const ClassSelector = ({ handleClassSelect, modelClasses, classView, mine
 					docId: 'name',
 					docField: 'displayName',
 					values: modelClasses,
-					cacheKey: `${mineName}-classSelector`,
+					query: { mineName, classView, modelClasses, name: `${mineName}-${classView}-classes` },
 				})
 			}
 		}
 
 		indexClasses()
-	}, [modelClasses, mineName])
+	}, [modelClasses, mineName, classView])
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !classSearchIndex?.current) {

@@ -1,4 +1,6 @@
+import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
+import { constraintValuesCache } from 'src/caches'
 import {
 	ADD_CONSTRAINT,
 	APPLY_DATA_BROWSER_CONSTRAINT,
@@ -90,7 +92,7 @@ export const overviewConstraintMachine = Machine(
 			[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
 			[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
 			[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading', cond: 'isInitialFetch' },
+			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 		},
 		states: {
 			loading: {
@@ -169,10 +171,6 @@ export const overviewConstraintMachine = Machine(
 			pathMatches: (ctx, { path }) => {
 				return ctx.constraintPath === path
 			},
-			// @ts-ignore
-			isInitialFetch: (ctx, { globalConfig }) => {
-				return ctx.rootUrl !== globalConfig.rootUrl || ctx.classView !== globalConfig.classView
-			},
 		},
 		services: {
 			fetchInitialValues: async (ctx, event) => {
@@ -187,7 +185,23 @@ export const overviewConstraintMachine = Machine(
 					from: classView,
 				}
 
-				const summary = await fetchSummary({ rootUrl, query, path: constraintPath })
+				const summaryConfig = { rootUrl, query, path: constraintPath }
+				const configHash = hash(summaryConfig)
+				let summary
+
+				const cachedResult = await constraintValuesCache.getItem(configHash)
+
+				if (cachedResult) {
+					summary = cachedResult.summary
+				} else {
+					const summary = await fetchSummary(summaryConfig)
+
+					await constraintValuesCache.setItem(configHash, {
+						summaryConfig,
+						summary,
+						date: Date.now(),
+					})
+				}
 
 				return {
 					rootUrl,
