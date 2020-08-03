@@ -6,9 +6,10 @@ import {
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useMachineBus'
-import { assign, Machine } from 'xstate'
+import { assign, Machine, spawn } from 'xstate'
 
 import { listConstraintQuery } from '../common'
+import { templateConstraintMachine } from './templateConstraintMachine'
 
 /**
  *
@@ -71,6 +72,25 @@ const templateHasQuery = (ctx, { path }) => {
 /**
  *
  */
+const spawnConstraintActors = assign({
+	constraintActors: (ctx) => {
+		return ctx.constraints.map((constraint) => {
+			const name = constraint.path.split('.').join(' > ')
+			const constraintActor = templateConstraintMachine.withContext({
+				...templateConstraintMachine.context,
+				rootUrl: ctx.rootUrl,
+				name,
+				constraint,
+			})
+
+			return spawn(constraintActor, `${name}-Template constraint widget`)
+		})
+	},
+})
+
+/**
+ *
+ */
 export const templateQueryMachine = Machine(
 	{
 		id: 'Template Query',
@@ -79,9 +99,13 @@ export const templateQueryMachine = Machine(
 			template: null,
 			isActiveQuery: false,
 			listConstraint: listConstraintQuery,
+			rootUrl: '',
+			constraints: [],
+			constraintActors: [],
 		},
 		states: {
 			idle: {
+				entry: 'spawnConstraintActors',
 				on: {
 					[ADD_TEMPLATE_CONSTRAINT]: { actions: 'setQueries', cond: 'templateHasQuery' },
 					[FETCH_UPDATED_SUMMARY]: { actions: 'setActiveQuery' },
@@ -97,6 +121,7 @@ export const templateQueryMachine = Machine(
 			setActiveQuery,
 			addListConstraint,
 			removeListConstraint,
+			spawnConstraintActors,
 		},
 		guards: {
 			// @ts-ignore

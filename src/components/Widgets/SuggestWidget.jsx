@@ -1,4 +1,4 @@
-import { Classes, FormGroup, H6, Menu, MenuItem, NonIdealState, Tag, Text } from '@blueprintjs/core'
+import { Classes, FormGroup, H6, Menu, MenuItem, ProgressBar, Tag, Text } from '@blueprintjs/core'
 import { Suggest } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
@@ -10,10 +10,10 @@ import { pluralizeFilteredCount } from 'src/utils'
 import { NoValuesProvided } from '../Shared/NoValuesProvided'
 
 const ConstraintItem = ({ index, style, data }) => {
-	const { filteredItems, activeItem, handleItemSelect, infoText } = data
+	const { filteredItems, activeItem, handleItemSelect, infoText, isLoading } = data
 
 	if (index === 0) {
-		return <MenuItem disabled={true} text={infoText} />
+		return <MenuItem disabled={true} text={isLoading ? 'Retrieving values' : infoText} />
 	}
 
 	const valueProp = 'item' in activeItem ? 'item' : 'value'
@@ -37,6 +37,7 @@ const VirtualizedMenu = ({
 	query,
 	activeItem,
 	handleItemSelect,
+	isLoading,
 }) => {
 	const listRef = useRef(null)
 	const infoText = pluralizeFilteredCount(filteredItems, query)
@@ -60,25 +61,29 @@ const VirtualizedMenu = ({
 	}
 
 	return (
-		<List
-			ref={listRef}
-			height={Math.min(200, (filteredItems.length + 1) * 30)}
-			itemSize={30}
-			width={300}
-			// add 1 because we're adding an informative menu item before all items
-			itemCount={filteredItems.length + 1}
-			innerElementType={ulWrapper}
-			className={Classes.MENU}
-			style={{ listStyle: 'none' }}
-			itemData={{
-				filteredItems,
-				activeItem,
-				handleItemSelect,
-				infoText,
-			}}
-		>
-			{ConstraintItem}
-		</List>
+		<>
+			<List
+				ref={listRef}
+				height={Math.min(200, (filteredItems.length + 1) * 30)}
+				itemSize={30}
+				width={300}
+				// add 1 because we're adding an informative menu item before all items
+				itemCount={filteredItems.length + 1}
+				innerElementType={ulWrapper}
+				className={Classes.MENU}
+				style={{ listStyle: 'none' }}
+				itemData={{
+					filteredItems,
+					activeItem,
+					handleItemSelect,
+					infoText,
+					isLoading,
+				}}
+			>
+				{ConstraintItem}
+			</List>
+			{isLoading && <ProgressBar intent="primary" />}
+		</>
 	)
 }
 
@@ -86,13 +91,19 @@ const VirtualizedMenu = ({
  * This bit of indirection is needed since Blueprintjs requires a regular function to render a filtered list,
  * but the rules of react require that hooks be at the top level of either another hook or a react component.
  */
-const renderMenu = (handleItemSelect) => ({ filteredItems, itemsParentRef, query, activeItem }) => (
+const renderMenu = (handleItemSelect, isLoading) => ({
+	filteredItems,
+	itemsParentRef,
+	query,
+	activeItem,
+}) => (
 	<VirtualizedMenu
 		filteredItems={filteredItems}
 		itemsParentRef={itemsParentRef}
 		query={query}
 		activeItem={activeItem}
 		handleItemSelect={handleItemSelect}
+		isLoading={isLoading}
 	/>
 )
 
@@ -107,7 +118,8 @@ export const SuggestWidget = ({
 	const [state, send] = useServiceContext('constraints')
 	const { availableValues, selectedValues } = state.context
 
-	const isLoading = state.matches('loading') || state.matches('pending')
+	const isLoading = state.matches('loading')
+
 	if (state.matches('noConstraintItems') || state.matches('noValuesForConstraint')) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
 	}
@@ -165,12 +177,6 @@ export const SuggestWidget = ({
 					</div>
 				</div>
 			)}
-			{isLoading && (
-				<NonIdealState
-					title="Fetching constraint items from the mine."
-					description="Please be patient, this may take some time."
-				/>
-			)}
 			<FormGroup labelFor={uniqueId} label={label} css={{ paddingTop: 14 }}>
 				<Suggest
 					// @ts-ignore
@@ -178,9 +184,8 @@ export const SuggestWidget = ({
 					items={availableValues}
 					inputValueRenderer={renderInputValue}
 					fill={true}
-					className={isLoading ? Classes.SKELETON : ''}
 					resetOnSelect={true}
-					itemListRenderer={renderMenu(handleItemSelect)}
+					itemListRenderer={renderMenu(handleItemSelect, isLoading)}
 					onItemSelect={({ item }) => handleItemSelect({ name: item })}
 					itemListPredicate={filterQuery}
 					popoverProps={{ captureDismiss: true }}

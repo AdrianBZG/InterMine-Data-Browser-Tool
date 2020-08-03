@@ -74,7 +74,7 @@ export const BarChartMachine = Machine(
 			},
 		},
 		services: {
-			fetchGeneLength: async (_ctx, { globalConfig: { classView, rootUrl }, query: nextQuery }) => {
+			fetchGeneLength: async (_ctx, { classView, rootUrl, query: nextQuery }) => {
 				let query = {
 					...nextQuery,
 					from: classView,

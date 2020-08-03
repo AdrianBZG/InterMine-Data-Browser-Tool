@@ -6,7 +6,6 @@ import {
 	APPLY_DATA_BROWSER_CONSTRAINT,
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
-	FETCH_INITIAL_SUMMARY,
 	LOCK_ALL_CONSTRAINTS,
 	REMOVE_CONSTRAINT,
 	RESET_ALL_CONSTRAINTS,
@@ -77,7 +76,7 @@ export const overviewConstraintMachine = (id) =>
 	Machine(
 		{
 			id: `${id} constraint machine`,
-			initial: 'noConstraintsSet',
+			initial: 'loading',
 			context: {
 				type: '',
 				op: '',
@@ -93,7 +92,6 @@ export const overviewConstraintMachine = (id) =>
 				[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
 				[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
 				[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
-				[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 			},
 			states: {
 				loading: {
@@ -177,9 +175,8 @@ export const overviewConstraintMachine = (id) =>
 				fetchInitialValues: async (ctx, event) => {
 					const { constraintItemsQuery, constraintPath } = ctx
 
-					const {
-						globalConfig: { rootUrl, classView },
-					} = event
+					const rootUrl = event?.rootUrl ?? ctx.rootUrl
+					const classView = event?.classView ?? ctx.classView
 
 					const query = {
 						...constraintItemsQuery,

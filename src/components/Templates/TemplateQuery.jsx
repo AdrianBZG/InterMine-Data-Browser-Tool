@@ -1,5 +1,6 @@
 import { Button, Classes, Divider, H5, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
+import { useService } from '@xstate/react'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
@@ -9,26 +10,14 @@ import { CODES } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'
 import { InfoIconPopover } from '../Shared/InfoIconPopover'
 import { PopupCard } from '../Shared/PopupCard'
-import { CheckboxWidget } from '../Widgets/CheckboxWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
-import { templateConstraintMachine } from './templateConstraintMachine'
 import { templateQueryMachine } from './templateQueryMachine'
 
-const ConstraintWidget = ({ constraint, rootUrl, mineName }) => {
-	const name = constraint.path.split('.').join(' > ')
-
-	const [state, send] = useMachineBus(
-		templateConstraintMachine(name).withContext({
-			rootUrl,
-			path: constraint.path,
-			op: constraint.op,
-			selectedValues: [],
-			availableValues: [],
-		})
-	)
+const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
+	const [state, send] = useService(templateConstraintActor)
 
 	const searchIndex = useRef(null)
-	const { availableValues } = state.context
+	const { availableValues, name, rootUrl, constraint } = state.context
 	const docField = 'value'
 
 	useEffect(() => {
@@ -44,16 +33,13 @@ const ConstraintWidget = ({ constraint, rootUrl, mineName }) => {
 		}
 
 		buildIndex()
-	}, [availableValues, constraint, mineName, name, rootUrl])
-
-	const Widget =
-		availableValues.length <= 10 && constraint.op === 'ONE OF' ? CheckboxWidget : SuggestWidget
+	}, [availableValues, mineName, name, constraint, rootUrl])
 
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<div css={{ margin: '20px 0' }}>
 				<H5>{name}</H5>
-				<Widget
+				<SuggestWidget
 					nonIdealTitle="No items found"
 					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 					// @ts-ignore
@@ -86,12 +72,19 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 	const [state] = useMachineBus(
 		templateQueryMachine.withContext({
 			...templateQueryMachine.context,
+			rootUrl,
 			template: templateQuery,
 			isActiveQuery: false,
+			constraints: editableConstraints,
 		})
 	)
 
-	const { isActiveQuery, listConstraint, template: updatedTemplate } = state.context
+	const {
+		isActiveQuery,
+		listConstraint,
+		template: updatedTemplate,
+		constraintActors,
+	} = state.context
 
 	const showDivider = (idx) =>
 		editableConstraints.length > 1 && idx < editableConstraints.length - 1
@@ -131,10 +124,10 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 					}
 				/>
 			</div>
-			{editableConstraints.map((con, idx) => {
+			{constraintActors.map((actor, idx) => {
 				return (
-					<div key={con.path}>
-						<ConstraintWidget constraint={con} rootUrl={rootUrl} mineName={mineName} />
+					<div key={actor.id}>
+						<ConstraintWidget templateConstraintActor={actor} mineName={mineName} />
 						{showDivider(idx) && <Divider />}
 					</div>
 				)
@@ -144,8 +137,9 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 					handleOnClick={() => {
 						sendToBus({
 							query,
+							classView,
+							rootUrl,
 							type: FETCH_UPDATED_SUMMARY,
-							globalConfig: { classView, rootUrl },
 						})
 					}}
 				/>

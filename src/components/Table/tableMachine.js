@@ -150,8 +150,7 @@ export const TableChartMachine = Machine(
 			},
 		},
 		services: {
-			fetchInitialRows: async (ctx, { globalConfig, query: maybeQuery }) => {
-				const { classView, rootUrl } = globalConfig
+			fetchInitialRows: async (ctx, { classView, rootUrl, query: maybeQuery }) => {
 				const query = maybeQuery
 					? maybeQuery
 					: {

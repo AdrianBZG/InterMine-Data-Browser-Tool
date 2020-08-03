@@ -8,20 +8,21 @@ import {
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useMachineBus'
-import { assign, Machine } from 'xstate'
+import { assign, Machine, sendUpdate } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
 
-const addConstraint = assign({
+const addValueToConstraint = assign({
 	// @ts-ignore
-	selectedValues: (ctx, { constraint }) => {
-		return ctx.op === 'ONE OF' ? [...ctx.selectedValues, constraint] : [constraint]
+	selectedValues: (ctx, { constraint: value }) => {
+		return ctx.constraint.op === 'ONE OF' ? [...ctx.selectedValues, value] : [value]
 	},
 })
 
-const removeConstraint = assign({
+const removeValueFromConstraint = assign({
 	// @ts-ignore
-	selectedValues: (ctx, { constraint }) => ctx.selectedValues.filter((name) => name !== constraint),
+	selectedValues: (ctx, { constraint: value }) =>
+		ctx.selectedValues.filter((selectedValue) => selectedValue !== value),
 })
 
 const setAvailableValues = assign({
@@ -32,100 +33,96 @@ const setAvailableValues = assign({
 const updateTemplateQuery = (ctx) => {
 	sendToBus({
 		type: ADD_TEMPLATE_CONSTRAINT,
-		path: ctx.path,
+		path: ctx.constraint.path,
 		selectedValues: ctx.selectedValues,
 	})
 }
 
-export const templateConstraintMachine = (id) =>
-	Machine(
-		{
-			id: `${id} Template constraint widget`,
-			initial: 'loading',
-			context: {
-				rootUrl: '',
-				path: '',
-				op: '',
-				selectedValues: [],
-				availableValues: [],
+export const templateConstraintMachine = Machine(
+	{
+		id: 'Template constraint widget',
+		initial: 'idle',
+		context: {
+			rootUrl: '',
+			constraint: {},
+			selectedValues: [],
+			availableValues: [],
+		},
+		states: {
+			loading: {
+				invoke: {
+					id: 'fetchTemplateConstraintValues',
+					src: 'fetchConstraintValues',
+					onDone: {
+						target: 'idle',
+						actions: ['setAvailableValues', 'sendUpdate'],
+					},
+					onError: {
+						target: 'noValuesForConstraint',
+						actions: 'logErrorToConsole',
+					},
+				},
 			},
-			states: {
-				loading: {
-					invoke: {
-						id: 'fetchTemplateConstraintValues',
-						src: 'fetchConstraintValues',
-						onDone: {
-							target: 'idle',
-							actions: 'setAvailableValues',
-						},
-						onError: {
-							target: 'noValuesForConstraint',
-							actions: 'logErrorToConsole',
-						},
+			noValuesForConstraint: {},
+			idle: {
+				on: {
+					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
+					[REMOVE_CONSTRAINT]: {
+						target: 'updateTemplateQuery',
+						actions: 'removeValueFromConstraint',
 					},
 				},
-				noValuesForConstraint: {},
-				idle: {
-					on: {
-						[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addConstraint' },
-						[REMOVE_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'removeConstraint' },
-					},
-				},
-				updateTemplateQuery: {
-					entry: 'updateTemplateQuery',
-					on: {
-						[TEMPLATE_CONSTRAINT_UPDATED]: { target: 'idle', cond: 'constraintUpdated' },
-					},
-				},
-				// delay the finished transition to avoid quick flashes of animations
-				pending: {
-					after: {
-						500: [{ target: 'idle', cond: 'hasValues' }, { target: 'noValuesForConstraint' }],
-					},
+			},
+			updateTemplateQuery: {
+				entry: 'updateTemplateQuery',
+				on: {
+					[TEMPLATE_CONSTRAINT_UPDATED]: { target: 'idle', cond: 'constraintUpdated' },
 				},
 			},
 		},
-		{
-			actions: {
-				logErrorToConsole,
-				addConstraint,
-				removeConstraint,
-				setAvailableValues,
-				updateTemplateQuery,
+	},
+	{
+		actions: {
+			logErrorToConsole,
+			addValueToConstraint,
+			removeValueFromConstraint,
+			setAvailableValues,
+			updateTemplateQuery,
+			sendUpdate,
+		},
+		guards: {
+			// @ts-ignore
+			constraintUpdated: (ctx, { path }) => {
+				return ctx.constraint.path === path
 			},
-			guards: {
-				// @ts-ignore
-				constraintUpdated: (ctx, { path }) => {
-					return ctx.path === path
-				},
-				hasValues: (ctx) => {
-					return ctx.availableValues.length > 0
-				},
+			hasValues: (ctx) => {
+				return ctx.availableValues.length > 0
 			},
-			services: {
-				fetchConstraintValues: async (ctx) => {
-					const valuesConfig = { rootUrl: ctx.rootUrl, path: ctx.path }
-					const configHash = hash(valuesConfig)
-					let values
+		},
+		services: {
+			fetchConstraintValues: async (ctx) => {
+				const valuesConfig = { rootUrl: ctx.rootUrl, path: ctx.constraint.path }
+				const configHash = hash(valuesConfig)
+				let values
 
-					const cachedResult = await constraintValuesCache.getItem(configHash)
+				const cachedResult = await constraintValuesCache.getItem(configHash)
 
-					if (cachedResult) {
-						values = cachedResult.values
-					} else {
-						values = await fetchPathValues(valuesConfig)
+				if (cachedResult) {
+					values = cachedResult.values
+				} else {
+					values = await fetchPathValues(valuesConfig)
 
-						await constraintValuesCache.setItem(configHash, {
-							...valuesConfig,
-							values,
-							date: Date.now(),
-						})
-					}
-
-					return {
+					await constraintValuesCache.setItem(configHash, {
+						...valuesConfig,
 						values,
-					}
-				},
+						date: Date.now(),
+					})
+				}
+
+				return {
+					values,
+				}
 			},
-		}
-	)
+		},
+	}
+)

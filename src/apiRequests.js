@@ -15,6 +15,8 @@ const getService = (rootUrl) => {
 	return service
 }
 
+export const INTERMINE_REGISTRY = 'https://registry.intermine.org/service/instances'
+
 export const fetchSummary = async ({ rootUrl, query, path }) => {
 	const service = getService(rootUrl)
 	const q = new imjs.Query(query, service)
@@ -52,8 +54,8 @@ export const fetchTemplates = async ({ rootUrl }) => {
 	return await service.fetchTemplates()
 }
 
-export const fetchInstances = async () => {
-	return axios.get('https://registry.intermine.org/service/instances', {
+export const fetchInstances = async (registry) => {
+	return axios.get(registry, {
 		params: {
 			mine: 'prod',
 		},

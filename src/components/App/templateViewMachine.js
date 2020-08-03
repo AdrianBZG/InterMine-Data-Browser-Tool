@@ -1,95 +1,100 @@
 import hash from 'object-hash'
 import { fetchTemplates } from 'src/apiRequests'
 import { templatesCache } from 'src/caches'
-import {
-	CHANGE_CLASS,
-	TOGGLE_CATEGORY_VISIBILITY,
-	TOGGLE_VIEW_IS_LOADING,
-	UPDATE_TEMPLATE_QUERIES,
-} from 'src/eventConstants'
+import { CHANGE_CLASS, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
 import { getTagCategories } from 'src/utils'
-import { assign, Machine, sendParent } from 'xstate'
-
-/**
- * Sends the updated available template queries and category
- * config to the parent machine
- */
-const updateParent = sendParent((ctx) => ({
-	type: UPDATE_TEMPLATE_QUERIES,
-	queries: ctx.templatesForSelectedCategories,
-	categories: ctx.categories,
-	templates: ctx.templates,
-	templatesForClassView: ctx.templatesForClassView,
-	templatesByCategory: ctx.templatesByCategory,
-	templatesForSelectedCategories: ctx.templatesForSelectedCategories,
-}))
+import { assign, Machine, sendUpdate } from 'xstate'
 
 /**
  *
  */
-// @ts-ignore
-const updateClassView = assign((ctx, { newClass }) => {
-	ctx.classView = newClass
+const updateClassView = assign({
+	// @ts-ignore
+	classView: (_, { newClass }) => newClass,
 })
 
 /**
  *
  */
-const resetCategories = assign((ctx) => {
-	// Reset to only the show all tag
-	ctx.categories = {
-		[ctx.showAllLabel]: {
-			...ctx.categories[ctx.showAllLabel],
-			count: 0,
-		},
-	}
+const resetCategories = assign({
+	categories: (ctx) => {
+		// Reset to only the show all tag
+		const showAllTag = ctx.categories[ctx.showAllLabel]
+		showAllTag.isVisible = true
+		showAllTag.count = 0
+
+		return {
+			...ctx.categories,
+			[ctx.showAllLabel]: showAllTag,
+		}
+	},
 })
 
 /**
  *
  */
-const enableShowAllTag = assign((ctx) => {
-	ctx.categories[ctx.showAllLabel].isVisible = true
+const enableShowAllTag = assign({
+	categories: (ctx) => {
+		const showAllTag = ctx.categories[ctx.showAllLabel]
+		showAllTag.isVisible = true
+
+		return {
+			...ctx.categories,
+			[ctx.showAllLabel]: showAllTag,
+		}
+	},
 })
 
 /**
  *
  */
-const disableShowAllTag = assign((ctx) => {
-	ctx.categories[ctx.showAllLabel].isVisible = false
+const disableShowAllTag = assign({
+	categories: (ctx) => {
+		const showAllTag = ctx.categories[ctx.showAllLabel]
+		showAllTag.isVisible = false
+
+		return {
+			...ctx.categories,
+			[ctx.showAllLabel]: showAllTag,
+		}
+	},
 })
 
 /**
  * Generates the configuration dictionary for the category class
  * that apply to this particular view.
  */
-const setCategoriesForClass = assign((ctx) => {
-	const templates = ctx.templates
-	const categories = ctx.categories
+const setCategoriesForClass = assign({
+	categoryTagsForClass: (ctx) => {
+		const templates = ctx.templates
+		const categories = ctx.categories
 
-	for (const key in templates) {
-		const template = templates[key]
-		const templateClass = template.select[0].split('.')[0]
+		for (const key in templates) {
+			const template = templates[key]
+			const templateClass = template.select[0].split('.')[0]
 
-		if (templateClass !== ctx.classView) {
-			continue
-		}
-
-		const tagCategories = getTagCategories(template.tags)
-
-		for (const category of tagCategories) {
-			if (!(category in categories)) {
-				categories[category] = {
-					tagName: category,
-					isVisible: false,
-					count: 0,
-					classForCategory: templateClass,
-				}
+			if (templateClass !== ctx.classView) {
+				continue
 			}
 
-			categories[category].count += 1
+			const tagCategories = getTagCategories(template.tags)
+
+			for (const category of tagCategories) {
+				if (!(category in categories)) {
+					categories[category] = {
+						tagName: category,
+						isVisible: false,
+						count: 0,
+						classForCategory: templateClass,
+					}
+				}
+
+				categories[category].count += 1
+			}
 		}
-	}
+
+		return Object.keys(categories).map((category) => categories[category])
+	},
 })
 
 /**
@@ -125,39 +130,50 @@ const filterTemplatesForClassView = assign((ctx) => {
  * Takes the templates available for a particular class view, and further filters
  * them by any selected category tags.
  */
-const filterBySelectedCategory = assign((ctx) => {
-	const categories = ctx.categories
-	const classTemplates = ctx.templatesForClassView
+const filterBySelectedCategory = assign({
+	templatesForSelectedCategories: (ctx) => {
+		const categories = ctx.categories
+		const classTemplates = ctx.templatesForClassView
 
-	let filteredCategories
+		let filteredCategories
 
-	if (categories[ctx.showAllLabel].isVisible) {
-		filteredCategories = classTemplates
-	} else {
-		filteredCategories = classTemplates.filter((template) => {
-			const tagCategories = getTagCategories(template.tags)
-			return tagCategories.some((cat) => categories[cat].isVisible)
-		})
-	}
+		if (categories[ctx.showAllLabel].isVisible) {
+			filteredCategories = classTemplates
+		} else {
+			filteredCategories = classTemplates.filter((template) => {
+				const tagCategories = getTagCategories(template.tags)
+				return tagCategories.some((cat) => categories[cat].isVisible)
+			})
+		}
 
-	ctx.templatesForSelectedCategories = filteredCategories
+		return filteredCategories
+	},
 })
 
 /**
  *
  */
-// @ts-ignore
-const toggleCategory = assign((ctx, { isVisible, tagName }) => {
-	ctx.categories[tagName].isVisible = isVisible
+const toggleCategory = assign({
+	// @ts-ignore
+	categories: (ctx, { isVisible, tagName }) => {
+		const updatedTag = ctx.categories[tagName]
+		updatedTag.isVisible = isVisible
+
+		return {
+			...ctx.categories,
+			[tagName]: updatedTag,
+		}
+	},
 })
 
 /**
  *
  */
-// @ts-ignore
-const setTemplates = assign((ctx, { data }) => {
-	ctx.templates = data.templates
-	ctx.categories = data.categories
+const setTemplates = assign({
+	// @ts-ignore
+	templates: (_, { data }) => data.templates,
+	// @ts-ignore
+	categories: (_, { data }) => data.categories,
 })
 
 export const templateViewMachine = Machine(
@@ -166,12 +182,13 @@ export const templateViewMachine = Machine(
 		context: {
 			templates: Object.create(null),
 			templatesForClassView: [],
-			templatesByCategory: [],
 			templatesForSelectedCategories: [],
 			categories: Object.create(null),
+			categoryTagsForClass: Object.create(null),
 			classView: '',
 			showAllLabel: '',
 			rootUrl: '',
+			mineName: '',
 		},
 		initial: 'loadTemplates',
 		states: {
@@ -185,20 +202,20 @@ export const templateViewMachine = Machine(
 							'setCategoriesForClass',
 							'filterTemplatesForClassView',
 							'filterBySelectedCategory',
-							'updateParent',
+							'sendUpdate',
 						],
 					},
 					[TOGGLE_CATEGORY_VISIBILITY]: [
 						{
 							cond: 'showAllClicked',
-							actions: ['toggleCategory', 'filterBySelectedCategory', 'updateParent'],
+							actions: ['toggleCategory', 'filterBySelectedCategory', 'sendUpdate'],
 						},
 						{
 							actions: [
 								'disableShowAllTag',
 								'toggleCategory',
 								'filterBySelectedCategory',
-								'updateParent',
+								'sendUpdate',
 							],
 						},
 					],
@@ -206,7 +223,6 @@ export const templateViewMachine = Machine(
 			},
 			errorFetchingTemplates: {},
 			loadTemplates: {
-				entry: 'sendIsLoading',
 				invoke: {
 					id: 'fetchTemplates',
 					src: 'fetchTemplates',
@@ -218,8 +234,7 @@ export const templateViewMachine = Machine(
 							'setCategoriesForClass',
 							'filterTemplatesForClassView',
 							'filterBySelectedCategory',
-							'updateParent',
-							'sendIsDoneLoading',
+							'sendUpdate',
 						],
 					},
 					onError: {
@@ -238,13 +253,11 @@ export const templateViewMachine = Machine(
 			filterBySelectedCategory,
 			filterTemplatesForClassView,
 			resetCategories,
-			sendIsDoneLoading: sendParent({ type: TOGGLE_VIEW_IS_LOADING, isLoading: false }),
-			sendIsLoading: sendParent({ type: TOGGLE_VIEW_IS_LOADING, isLoading: true }),
 			setCategoriesForClass,
 			setTemplates,
 			toggleCategory,
 			updateClassView,
-			updateParent,
+			sendUpdate,
 		},
 		guards: {
 			// @ts-ignore
@@ -270,7 +283,7 @@ export const templateViewMachine = Machine(
 					templates = await fetchTemplates(templatesConfig)
 
 					await templatesCache.setItem(configHash, {
-						templatesConfig,
+						...templatesConfig,
 						templates,
 						date: Date.now(),
 					})

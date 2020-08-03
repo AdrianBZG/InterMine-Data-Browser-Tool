@@ -27,3 +27,7 @@ export const templatesCache = localForage.createInstance({
 export const searchIndexCache = localForage.createInstance({
 	name: 'search indexes',
 })
+
+export const interminesConfigCache = localForage.createInstance({
+	name: 'intermines',
+})

@@ -94,7 +94,7 @@ const S_ConstraintIcon = styled.div`
 	justify-content: center;
 `
 
-export const OverviewConstraint = ({ constraintConfig, color }) => {
+export const OverviewConstraint = ({ constraintConfig, color, classView, rootUrl }) => {
 	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
 
 	const [state, send] = useMachineBus(
@@ -104,6 +104,8 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 			type,
 			constraintPath: path,
 			constraintItemsQuery,
+			classView,
+			rootUrl,
 		})
 	)
 
@@ -139,10 +141,6 @@ export const OverviewConstraint = ({ constraintConfig, color }) => {
 		default:
 			ConstraintWidget = SuggestWidget
 			break
-	}
-
-	if (state.matches('noConstraintItems') || state.matches('loading')) {
-		return null
 	}
 
 	/**

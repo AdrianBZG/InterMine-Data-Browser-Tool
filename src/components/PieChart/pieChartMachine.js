@@ -61,10 +61,7 @@ export const PieChartMachine = Machine(
 		},
 		services: {
 			fetchItems: async (_ctx, event) => {
-				const {
-					globalConfig: { classView, rootUrl },
-					query: nextQuery,
-				} = event
+				const { classView, rootUrl, query: nextQuery } = event
 
 				let query = {
 					...nextQuery,

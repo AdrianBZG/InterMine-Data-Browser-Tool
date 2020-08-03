@@ -110,7 +110,7 @@ export const QueryController = () => {
 			where: codedConstraints,
 		}
 
-		sendToBus({ type: FETCH_UPDATED_SUMMARY, query, globalConfig: { classView, rootUrl } })
+		sendToBus({ type: FETCH_UPDATED_SUMMARY, query, classView, rootUrl })
 	}
 
 	const handleDeleteConstraint = (path) => {

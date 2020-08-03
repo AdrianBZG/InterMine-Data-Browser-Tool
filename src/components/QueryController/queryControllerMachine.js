@@ -17,9 +17,9 @@ const initializeMachine = assign({
 	currentConstraints: () => [],
 	selectedPaths: () => [],
 	// @ts-ignore
-	classView: (_, { globalConfig }) => globalConfig.classView,
+	classView: (_, { classView }) => classView,
 	// @ts-ignore
-	rootUrl: (_, { globalConfig }) => globalConfig.rootUrl,
+	rootUrl: (_, { rootUrl }) => rootUrl,
 })
 
 const addConstraint = assign({
@@ -105,7 +105,6 @@ export const queryControllerMachine = Machine(
 			[FETCH_INITIAL_SUMMARY]: {
 				target: 'idle',
 				actions: 'initializeMachine',
-				cond: 'isInitialFetch',
 			},
 		},
 		states: {

@@ -4,7 +4,7 @@ import '@emotion/core'
 import { Card } from '@blueprintjs/core'
 import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
-import { FETCH_INITIAL_SUMMARY, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
+import { FETCH_INITIAL_SUMMARY, FETCH_TEMPLATES } from 'src/eventConstants'
 import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import logo from '../../images/logo.png'
@@ -20,27 +20,14 @@ enableMapSet()
 export const App = () => {
 	const [state, send] = useMachineBus(appManagerMachine)
 
-	const {
-		appView,
-		classView,
-		possibleQueries,
-		categories,
-		selectedMine,
-		showAllLabel,
-		viewIsLoading,
-	} = state.context
+	const { appView, classView, overviewQueries, selectedMine, viewActors } = state.context
 
 	const rootUrl = selectedMine.rootUrl
 
 	useEffect(() => {
-		if (state.matches('defaultView')) {
-			sendToBus({ type: FETCH_INITIAL_SUMMARY, globalConfig: { rootUrl, classView } })
-		}
-	}, [rootUrl, classView, state])
-
-	const toggleCategory = ({ isVisible, tagName }) => {
-		send({ type: TOGGLE_CATEGORY_VISIBILITY, isVisible, tagName })
-	}
+		send({ type: FETCH_TEMPLATES })
+		sendToBus({ type: FETCH_INITIAL_SUMMARY, classView, rootUrl })
+	}, [classView, rootUrl, selectedMine, send])
 
 	return (
 		<div className="light-theme">
@@ -64,16 +51,11 @@ export const App = () => {
 			</AppManagerServiceContext.Provider>
 			<main css={{ display: 'grid', gridTemplateColumns: '230px 1fr' }}>
 				<ConstraintSection
-					queries={possibleQueries}
+					templateViewActor={viewActors.templateView}
 					view={appView}
-					classCategoryTags={Object.values(categories)}
-					isLoading={viewIsLoading}
-					toggleCategory={toggleCategory}
-					showAllLabel={showAllLabel}
 					classView={classView}
 					rootUrl={rootUrl}
-					showAll={categories[showAllLabel]?.isVisible ?? true}
-					mineName={selectedMine.name}
+					overviewQueries={overviewQueries}
 				/>
 				<section
 					id="data-viz"

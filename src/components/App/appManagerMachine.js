@@ -1,15 +1,23 @@
-import { fetchClasses, fetchInstances, fetchLists } from 'src/apiRequests'
-import { appCache } from 'src/caches'
+import hash from 'object-hash'
+import { INTERMINE_REGISTRY } from 'src/apiRequests'
+import { appCache, interminesConfigCache } from 'src/caches'
 import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
 	CHANGE_MINE,
+	FETCH_TEMPLATES,
 	SET_API_TOKEN,
-	TOGGLE_CATEGORY_VISIBILITY,
-	TOGGLE_VIEW_IS_LOADING,
 } from 'src/eventConstants'
-import { assign, forwardTo, Machine } from 'xstate'
+import { assign, forwardTo, Machine, spawn } from 'xstate'
 
+import {
+	interminesConfig,
+	interminesPromise,
+	listsConfig,
+	listsPromise,
+	modelClassesConfig,
+	modelClassesPromise,
+} from './fetchMineConfigUtils'
 import { templateViewMachine } from './templateViewMachine'
 
 // Todo: Change this after fixing biotestmine dev environment
@@ -135,24 +143,11 @@ const changeClass = assign({
  */
 const setMineConfiguration = assign({
 	// @ts-ignore
-	intermines: (_, { data }) =>
-		data.intermines.map((mine) => ({
-			name: mine.name,
-			rootUrl: mine.url,
-		})),
+	intermines: (_, { data }) => data.intermines,
 	// @ts-ignore
-	modelClasses: (_, { data }) => {
-		return Object.entries(data.modelClasses.classes)
-			.map(([_key, value]) => ({
-				displayName: value.displayName,
-				name: value.name,
-			}))
-			.sort((a, b) => a.name.localeCompare(b.name))
-	},
+	modelClasses: (_, { data }) => data.modelClasses,
 	// @ts-ignore
-	lists: (_, { data }) => {
-		return data.lists.map(({ name, title, type }) => ({ name, title, type }))
-	},
+	lists: (_, { data }) => data.lists,
 })
 
 /**
@@ -230,19 +225,36 @@ const rehydrateContext = async () => {
 }
 
 /**
- * Services
+ *
  */
+const setAppView = assign({
+	// @ts-ignore
+	appView: (_, { newTabId }) => newTabId,
+})
 
 /**
  *
  */
-const dehydrateContext = async (ctx) => {
-	try {
-		await appCache.setItem('appContext', { ...ctx, date: Date.now() })
-	} catch (e) {
-		throw Error(e)
-	}
-}
+const spawnTemplateViewMachine = assign({
+	viewActors: (ctx) => {
+		const actor = templateViewMachine.withContext({
+			...templateViewMachine.context,
+			classView: ctx.classView,
+			rootUrl: ctx.selectedMine.rootUrl,
+			showAllLabel: ctx.showAllLabel,
+			mineName: ctx.selectedMine.name,
+		})
+
+		return {
+			...ctx.viewActors,
+			templateView: spawn(actor, 'Template view'),
+		}
+	},
+})
+
+/**
+ * Services
+ */
 
 /**
  *
@@ -257,6 +269,9 @@ export const appManagerMachine = Machine(
 		initial: 'rehydrateContext',
 		context: {
 			appView: 'defaultView',
+			viewActors: {
+				templateView: null,
+			},
 			classView: 'Gene',
 			intermines: [],
 			modelClasses: [],
@@ -268,7 +283,7 @@ export const appManagerMachine = Machine(
 				values: [],
 			},
 			showAllLabel: 'Show All',
-			possibleQueries: defaultQueries,
+			overviewQueries: defaultQueries,
 			viewIsLoading: false,
 			selectedMine: {
 				apiToken: '',
@@ -282,14 +297,9 @@ export const appManagerMachine = Machine(
 		on: {
 			[CHANGE_MINE]: { target: 'loading', actions: ['changeMine', 'getApiTokenFromStorage'] },
 			[CHANGE_CLASS]: { actions: ['changeClass'] },
-			[TOGGLE_VIEW_IS_LOADING]: { actions: 'toggleViewIsLoading' },
-			[TOGGLE_CATEGORY_VISIBILITY]: { actions: 'forwardToTemplateView' },
 			[SET_API_TOKEN]: { actions: 'setApiToken' },
-			[CHANGE_CONSTRAINT_VIEW]: [
-				{ target: 'defaultView', cond: 'isDefaultView' },
-				{ target: 'templateView', cond: 'isTemplateView' },
-				{ target: 'invalidAppView' },
-			],
+			[FETCH_TEMPLATES]: { actions: 'spawnTemplateViewMachine' },
+			[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
 		},
 		states: {
 			rehydrateContext: {
@@ -297,7 +307,7 @@ export const appManagerMachine = Machine(
 					id: 'rehydrateAppContext',
 					src: 'rehydrateContext',
 					onDone: {
-						target: 'defaultView',
+						target: 'idle',
 						actions: 'loadAppContext',
 					},
 					onError: {
@@ -305,6 +315,9 @@ export const appManagerMachine = Machine(
 						actions: 'logErrorToConsole',
 					},
 				},
+			},
+			idle: {
+				always: [{ target: 'loading', cond: 'hasNoMineConfig' }],
 			},
 			loading: {
 				on: {
@@ -314,24 +327,23 @@ export const appManagerMachine = Machine(
 					id: 'fetchMineConfig',
 					src: 'fetchMineConfiguration',
 					onDone: {
-						target: 'defaultView',
-						actions: ['setMineConfiguration', 'filterListsForClass', 'dehydrateContext'],
+						target: 'idle',
+						actions: ['setMineConfiguration', 'filterListsForClass'],
 					},
 					onError: {
-						target: 'defaultView',
+						target: 'invalidAppView',
 						actions: 'logErrorToConsole',
 					},
 				},
 			},
 			defaultView: {
-				always: [{ target: 'loading', cond: 'hasNoMineConfig' }],
 				entry: ['setDefaultView', 'setPossibleOverviewQueries'],
 				on: {
 					[CHANGE_CLASS]: { actions: 'changeClass' },
 				},
 			},
 			templateView: {
-				entry: ['setTemplateView', 'clearPossibleQueries', 'dehydrateContext'],
+				entry: ['setTemplateView', 'clearPossibleQueries'],
 				on: {
 					[CHANGE_CLASS]: { actions: ['changeClass', 'forwardToTemplateView'] },
 				},
@@ -364,7 +376,8 @@ export const appManagerMachine = Machine(
 			getApiTokenFromStorage,
 			logErrorToConsole,
 			loadAppContext,
-			dehydrateContext,
+			spawnTemplateViewMachine,
+			setAppView,
 		},
 		guards: {
 			// @ts-ignore
@@ -386,16 +399,66 @@ export const appManagerMachine = Machine(
 		services: {
 			rehydrateContext,
 			fetchMineConfiguration: async (ctx) => {
-				const [interminesConfig, modelClasses, lists] = await Promise.all([
-					fetchInstances(),
-					fetchClasses(ctx.selectedMine.rootUrl),
-					fetchLists(ctx.selectedMine.rootUrl),
+				const rootUrl = ctx.selectedMine.rootUrl
+				const registry = INTERMINE_REGISTRY
+
+				const registryStorageConfig = { name: 'instances', registry }
+				const registryHash = hash(registryStorageConfig)
+
+				const modelsStorageConfig = { name: 'mine classes', rootUrl }
+				const modelsHash = hash(modelsStorageConfig)
+
+				const listsStorageConfig = { name: 'mine lists', rootUrl }
+				const listsHash = hash(listsStorageConfig)
+
+				const cachedIntermines = await interminesConfigCache.getItem(registryHash)
+				const cachedModelClasses = await interminesConfigCache.getItem(modelsHash)
+				const cachedLists = await interminesConfigCache.getItem(listsHash)
+
+				const [resolvedIntermines, resolvedClasses, resolvedLists] = await Promise.all([
+					interminesPromise(cachedIntermines, registry),
+					modelClassesPromise(cachedModelClasses, rootUrl),
+					listsPromise(cachedLists, rootUrl),
 				])
+
+				const dateSaved = Date.now()
+
+				let intermines = resolvedIntermines
+				if (!cachedIntermines) {
+					intermines = interminesConfig(intermines)
+
+					await interminesConfigCache.setItem(registryHash, {
+						...registryStorageConfig,
+						intermines,
+						date: dateSaved,
+					})
+				}
+
+				let modelClasses = resolvedClasses
+				if (!cachedModelClasses) {
+					modelClasses = modelClassesConfig(modelClasses)
+
+					await interminesConfigCache.setItem(modelsHash, {
+						...modelsStorageConfig,
+						modelClasses,
+						date: dateSaved,
+					})
+				}
+
+				let lists = resolvedLists
+				if (!cachedLists) {
+					lists = listsConfig(lists)
+					await interminesConfigCache.setItem(listsHash, {
+						...listsStorageConfig,
+						lists,
+						date: dateSaved,
+					})
+				}
 
 				return {
 					modelClasses,
 					lists,
-					intermines: interminesConfig.data.instances,
+					intermines,
 				}
 			},
 		},

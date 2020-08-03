@@ -1,17 +1,17 @@
 import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
+import { useService } from '@xstate/react'
 import React, { useState } from 'react'
-import { CHANGE_CONSTRAINT_VIEW } from 'src/eventConstants'
-import { sendToBus, useMachineBus } from 'src/useMachineBus'
+import { CHANGE_CONSTRAINT_VIEW, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
+import { sendToBus } from 'src/useMachineBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { OverviewConstraint } from '../Overview/OverviewConstraint'
 import { QueryController } from '../QueryController/QueryController'
 import { TemplateQuery } from '../Templates/TemplateQuery'
-import { constraintSectionMachine } from './constraintSectionMachine'
 
 const ShowCategories = ({
-	classCategoryTags,
+	categoryTagsForClass,
 	handleCategoryToggle,
 	showAll,
 	showAllLabel,
@@ -33,7 +33,7 @@ const ShowCategories = ({
 			<Collapse isOpen={showCategories} css={{ marginTop: 0 }}>
 				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
 					{!isLoading &&
-						classCategoryTags.map(({ tagName, isVisible, count }) => {
+						categoryTagsForClass.map(({ tagName, isVisible, count }) => {
 							if (count === 0 && tagName !== showAllLabel) {
 								return null
 							}
@@ -64,24 +64,32 @@ const ShowCategories = ({
 	)
 }
 
-const TemplatesList = ({
-	isLoading,
-	queries,
-	showAll,
-	classCategoryTags,
-	showAllLabel,
-	handleCategoryToggle,
-	classView,
-	rootUrl,
-	listNames,
-	mineName,
-}) => {
+const TemplatesList = ({ templateViewActor }) => {
+	const [state, send] = useService(templateViewActor)
+	const {
+		classView,
+		rootUrl,
+		showAllLabel,
+		categories,
+		mineName,
+		templatesForSelectedCategories,
+		categoryTagsForClass,
+	} = state.context
+
+	const showAll = categories[showAllLabel].isVisible ?? true
+	const isLoading = state.matches('loadTemplates')
+
+	const handleCategoryToggle = ({ isVisible, tagName }) => {
+		// @ts-ignore
+		send({ type: TOGGLE_CATEGORY_VISIBILITY, isVisible, tagName })
+	}
+
 	return (
 		<div>
 			<Divider css={{ margin: 0 }} />
 			<ShowCategories
 				handleCategoryToggle={handleCategoryToggle}
-				classCategoryTags={classCategoryTags}
+				categoryTagsForClass={categoryTagsForClass}
 				showAllLabel={showAllLabel}
 				showAll={showAll}
 				isLoading={isLoading}
@@ -89,7 +97,7 @@ const TemplatesList = ({
 			<Divider css={{ margin: 0 }} />
 			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0 }}>
 				{!isLoading &&
-					queries.map((template) => (
+					templatesForSelectedCategories.map((template) => (
 						<li key={template.name} css={{ margin: '0.875em 0' }}>
 							<TemplateQuery
 								classView={classView}
@@ -104,10 +112,7 @@ const TemplatesList = ({
 	)
 }
 
-const OverviewConstraintList = ({ queries, isLoading }) => {
-	if (isLoading) {
-		return null
-	}
+const OverviewConstraintList = ({ queries, classView, rootUrl }) => {
 	return (
 		<ul
 			css={{
@@ -121,6 +126,8 @@ const OverviewConstraintList = ({ queries, isLoading }) => {
 					<OverviewConstraint
 						constraintConfig={config}
 						color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
+						classView={classView}
+						rootUrl={rootUrl}
 					/>
 				</li>
 			))}
@@ -129,21 +136,13 @@ const OverviewConstraintList = ({ queries, isLoading }) => {
 }
 
 export const ConstraintSection = ({
-	queries,
-	isLoading,
 	view,
-	showAllLabel,
-	classCategoryTags,
-	toggleCategory,
 	classView,
 	rootUrl,
-	showAll,
-	mineName,
+	templateViewActor,
+	overviewQueries,
 }) => {
-	const [state] = useMachineBus(constraintSectionMachine)
-
 	const isTemplateView = view === 'templateView'
-	const { listNames } = state.context
 
 	return (
 		<section
@@ -167,22 +166,15 @@ export const ConstraintSection = ({
 				<Tab id="templateView" title="Templates" />
 			</Tabs>
 			{isTemplateView ? (
-				<TemplatesList
-					isLoading={isLoading}
-					queries={queries}
-					showAll={showAll}
-					classCategoryTags={classCategoryTags}
-					showAllLabel={showAllLabel}
-					handleCategoryToggle={toggleCategory}
-					classView={classView}
-					rootUrl={rootUrl}
-					listNames={listNames}
-					mineName={mineName}
-				/>
+				<TemplatesList templateViewActor={templateViewActor} />
 			) : (
 				<>
 					<QueryController />
-					<OverviewConstraintList queries={queries} isLoading={isLoading} />
+					<OverviewConstraintList
+						queries={overviewQueries}
+						classView={classView}
+						rootUrl={rootUrl}
+					/>
 				</>
 			)}
 		</section>

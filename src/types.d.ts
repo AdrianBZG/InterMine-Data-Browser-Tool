@@ -56,7 +56,8 @@ export type ConstraintEvents = EventObject &
 		| {
 				to?: string
 				type: typeof SET_INITIAL_ORGANISMS
-				globalConfig: { rootUrl: string; classView: string }
+				rootUrl: string
+				classView: string
 		  }
 	)
 
