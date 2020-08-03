@@ -1,10 +1,11 @@
 import hash from 'object-hash'
 import { INTERMINE_REGISTRY } from 'src/apiRequests'
-import { appCache, interminesConfigCache } from 'src/caches'
+import { interminesConfigCache } from 'src/caches'
 import {
 	CHANGE_CLASS,
 	CHANGE_CONSTRAINT_VIEW,
 	CHANGE_MINE,
+	FETCH_OVERVIEW_CONSTRAINTS,
 	FETCH_TEMPLATES,
 	SET_API_TOKEN,
 } from 'src/eventConstants'
@@ -18,66 +19,11 @@ import {
 	modelClassesConfig,
 	modelClassesPromise,
 } from './fetchMineConfigUtils'
+import { overviewMachine } from './overviewMachine'
 import { templateViewMachine } from './templateViewMachine'
 
 // Todo: Change this after fixing biotestmine dev environment
 const isProduction = true
-
-/** @type {import('../../types').ConstraintConfig[]} */
-const defaultQueries = [
-	{
-		type: 'checkbox',
-		name: 'Organism',
-		label: 'Or',
-		path: 'organism.shortName',
-		op: 'ONE OF',
-		valuesQuery: {
-			select: ['primaryIdentifier'],
-			model: {
-				name: 'genomic',
-			},
-			where: [],
-		},
-	},
-	{
-		type: 'select',
-		name: 'Pathway Name',
-		label: 'Pn',
-		path: 'pathways.name',
-		op: 'ONE OF',
-		valuesQuery: {
-			select: ['pathways.name', 'primaryIdentifier'],
-			model: {
-				name: 'genomic',
-			},
-			orderBy: [
-				{
-					path: 'pathways.name',
-					direction: 'ASC',
-				},
-			],
-		},
-	},
-	{
-		type: 'select',
-		name: 'GO Annotation',
-		label: 'GA',
-		path: 'goAnnotation.ontologyTerm.name',
-		op: 'ONE OF',
-		valuesQuery: {
-			select: ['goAnnotation.ontologyTerm.name', 'primaryIdentifier'],
-			model: {
-				name: 'genomic',
-			},
-			orderBy: [
-				{
-					path: 'Gene.goAnnotation.ontologyTerm.name',
-					direction: 'ASC',
-				},
-			],
-		},
-	},
-]
 
 /**
  *
@@ -168,17 +114,6 @@ const getApiTokenFromStorage = assign({
 /**
  *
  */
-const rehydrateContext = async () => {
-	const appContext = await appCache.getItem('appContext')
-
-	return {
-		appContext,
-	}
-}
-
-/**
- *
- */
 const setAppView = assign({
 	// @ts-ignore
 	appView: (_, { newTabId }) => newTabId,
@@ -189,6 +124,10 @@ const setAppView = assign({
  */
 const spawnTemplateViewMachine = assign({
 	viewActors: (ctx) => {
+		if (ctx.viewActors.templateView) {
+			ctx.viewActors.templateView.stop()
+		}
+
 		const actor = templateViewMachine.withContext({
 			...templateViewMachine.context,
 			classView: ctx.classView,
@@ -200,6 +139,28 @@ const spawnTemplateViewMachine = assign({
 		return {
 			...ctx.viewActors,
 			templateView: spawn(actor, 'Template view'),
+		}
+	},
+})
+
+/**
+ *
+ */
+const spawnOverviewMachine = assign({
+	viewActors: (ctx) => {
+		if (ctx.viewActors.overview) {
+			ctx.viewActors.overview.stop()
+		}
+
+		const actor = overviewMachine.withContext({
+			...overviewMachine.context,
+			classView: ctx.classView,
+			rootUrl: ctx.selectedMine.rootUrl,
+		})
+
+		return {
+			...ctx.viewActors,
+			overview: spawn(actor, 'Overview'),
 		}
 	},
 })
@@ -223,6 +184,7 @@ export const appManagerMachine = Machine(
 			appView: 'defaultView',
 			viewActors: {
 				templateView: null,
+				overview: null,
 			},
 			classView: 'Gene',
 			intermines: [],
@@ -235,7 +197,6 @@ export const appManagerMachine = Machine(
 				values: [],
 			},
 			showAllLabel: 'Show All',
-			overviewQueries: defaultQueries,
 			selectedMine: {
 				apiToken: '',
 				name: isProduction ? 'HumanMine' : 'biotestmine',
@@ -249,6 +210,7 @@ export const appManagerMachine = Machine(
 			[CHANGE_CLASS]: { actions: ['changeClass'] },
 			[SET_API_TOKEN]: { actions: 'setApiToken' },
 			[FETCH_TEMPLATES]: { actions: 'spawnTemplateViewMachine' },
+			[FETCH_OVERVIEW_CONSTRAINTS]: { actions: 'spawnOverviewMachine' },
 			[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
 		},
 		states: {
@@ -280,10 +242,10 @@ export const appManagerMachine = Machine(
 			getApiTokenFromStorage,
 			logErrorToConsole,
 			spawnTemplateViewMachine,
+			spawnOverviewMachine,
 			setAppView,
 		},
 		services: {
-			rehydrateContext,
 			fetchMineConfiguration: async (ctx) => {
 				const rootUrl = ctx.selectedMine.rootUrl
 				const registry = INTERMINE_REGISTRY

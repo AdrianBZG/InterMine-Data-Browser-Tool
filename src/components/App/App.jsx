@@ -4,7 +4,11 @@ import '@emotion/core'
 import { Card } from '@blueprintjs/core'
 import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
-import { FETCH_INITIAL_SUMMARY, FETCH_TEMPLATES } from 'src/eventConstants'
+import {
+	FETCH_INITIAL_SUMMARY,
+	FETCH_OVERVIEW_CONSTRAINTS,
+	FETCH_TEMPLATES,
+} from 'src/eventConstants'
 import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
 
 import logo from '../../images/logo.png'
@@ -20,11 +24,12 @@ enableMapSet()
 export const App = () => {
 	const [state, send] = useMachineBus(appManagerMachine)
 
-	const { appView, classView, overviewQueries, selectedMine, viewActors } = state.context
+	const { appView, classView, selectedMine, viewActors } = state.context
 
 	const rootUrl = selectedMine.rootUrl
 
 	useEffect(() => {
+		send({ type: FETCH_OVERVIEW_CONSTRAINTS })
 		send({ type: FETCH_TEMPLATES })
 		sendToBus({ type: FETCH_INITIAL_SUMMARY, classView, rootUrl })
 	}, [classView, rootUrl, selectedMine, send])
@@ -52,10 +57,8 @@ export const App = () => {
 			<main css={{ display: 'grid', gridTemplateColumns: '230px 1fr' }}>
 				<ConstraintSection
 					templateViewActor={viewActors.templateView}
+					overviewActor={viewActors.overview}
 					view={appView}
-					classView={classView}
-					rootUrl={rootUrl}
-					overviewQueries={overviewQueries}
 				/>
 				<section
 					id="data-viz"

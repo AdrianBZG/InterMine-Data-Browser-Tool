@@ -112,7 +112,10 @@ const TemplatesList = ({ templateViewActor }) => {
 	)
 }
 
-const OverviewConstraintList = ({ queries, classView, rootUrl }) => {
+const OverviewConstraintList = ({ overviewActor }) => {
+	const [state] = useService(overviewActor)
+	const { constraintActors } = state.context
+
 	return (
 		<ul
 			css={{
@@ -121,27 +124,21 @@ const OverviewConstraintList = ({ queries, classView, rootUrl }) => {
 				padding: 0,
 			}}
 		>
-			{queries.map((config, idx) => (
-				<li css={{ margin: '0.875em 0' }} key={idx}>
-					<OverviewConstraint
-						constraintConfig={config}
-						color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
-						classView={classView}
-						rootUrl={rootUrl}
-					/>
-				</li>
-			))}
+			{constraintActors.map((actor, idx) => {
+				return (
+					<li css={{ margin: '0.875em 0' }} key={actor.id}>
+						<OverviewConstraint
+							overviewConstraintActor={actor}
+							color={DATA_VIZ_COLORS[idx % DATA_VIZ_COLORS.length]}
+						/>
+					</li>
+				)
+			})}
 		</ul>
 	)
 }
 
-export const ConstraintSection = ({
-	view,
-	classView,
-	rootUrl,
-	templateViewActor,
-	overviewQueries,
-}) => {
+export const ConstraintSection = ({ view, templateViewActor, overviewActor }) => {
 	const isTemplateView = view === 'templateView'
 
 	return (
@@ -165,16 +162,12 @@ export const ConstraintSection = ({
 				<Tab id="defaultView" title="Overview" />
 				<Tab id="templateView" title="Templates" />
 			</Tabs>
-			{isTemplateView ? (
+			{isTemplateView && templateViewActor ? (
 				<TemplatesList templateViewActor={templateViewActor} />
 			) : (
 				<>
 					<QueryController />
-					<OverviewConstraintList
-						queries={overviewQueries}
-						classView={classView}
-						rootUrl={rootUrl}
-					/>
+					{overviewActor && <OverviewConstraintList overviewActor={overviewActor} />}
 				</>
 			)}
 		</section>

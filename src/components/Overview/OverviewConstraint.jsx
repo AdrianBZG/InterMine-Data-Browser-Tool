@@ -1,28 +1,20 @@
 import { Button, ButtonGroup, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import styled from '@emotion/styled'
+import { useService } from '@xstate/react'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
-import { ConstraintServiceContext, useMachineBus, useServiceContext } from 'src/useMachineBus'
+import { ConstraintServiceContext } from 'src/useMachineBus'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { PopupCard } from '../Shared/PopupCard'
 import { CheckboxWidget } from '../Widgets/CheckboxWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
-import { overviewConstraintMachine } from './overviewConstraintMachine'
 
-const ConstraintCard = ({ children }) => {
-	const [state, send] = useServiceContext('constraints')
-
-	const disableAllButtons =
-		state.matches('noConstraintsSet') ||
-		state.matches('loading') ||
-		state.matches('noConstraintItems')
-
-	const enableAdd = state.matches('constraintsUpdated')
-	const constraintApplied = !disableAllButtons && !enableAdd
+const ConstraintCard = ({ children, disableAllButtons, enableApplyButton, handleOnClick }) => {
+	const constraintApplied = !disableAllButtons && !enableApplyButton
 
 	return (
 		<>
@@ -36,17 +28,42 @@ const ConstraintCard = ({ children }) => {
 					css={{ maxWidth: '50%' }}
 					intent={!disableAllButtons && constraintApplied ? 'danger' : 'none'}
 					disabled={disableAllButtons || !constraintApplied}
-					onClick={() => send(RESET_LOCAL_CONSTRAINT)}
+					onClick={() => handleOnClick(RESET_LOCAL_CONSTRAINT)}
 				/>
 				<Button
 					text="Apply Constraint"
 					css={{ maxWidth: '50%' }}
-					intent={!disableAllButtons && enableAdd ? 'success' : 'none'}
-					disabled={disableAllButtons || !enableAdd}
-					onClick={() => send(APPLY_DATA_BROWSER_CONSTRAINT)}
+					intent={!disableAllButtons && enableApplyButton ? 'success' : 'none'}
+					disabled={disableAllButtons || !enableApplyButton}
+					onClick={() => handleOnClick(APPLY_DATA_BROWSER_CONSTRAINT)}
 				/>
 			</ButtonGroup>
 		</>
+	)
+}
+
+const ConstraintButton = ({ label, color, name, constraintCount, isUpdated }) => {
+	return (
+		<Button minimal={true} large={true} fill={true} alignText="left" aria-label={name}>
+			<div css={{ display: 'flex', alignItems: 'center' }}>
+				{/**@ts-ignore **/}
+				<S_ConstraintIcon labelBorderColor={color}>
+					<span>{label}</span>
+				</S_ConstraintIcon>
+				{name}
+				{constraintCount > 0 && (
+					// @ts-ignore
+					<S_CountTag isUpdated={isUpdated}>
+						{constraintCount > 1 && <small>{constraintCount}</small>}
+						<Icon
+							css={{ margin: '-0.167em -0.167em !important', alignSelf: 'flex-start' }}
+							icon={IconNames.TICK_CIRCLE}
+							color={isUpdated ? 'var(--yellow5)' : 'var(--green5)'}
+						/>
+					</S_CountTag>
+				)}
+			</div>
+		</Button>
 	)
 }
 
@@ -94,24 +111,13 @@ const S_ConstraintIcon = styled.div`
 	justify-content: center;
 `
 
-export const OverviewConstraint = ({ constraintConfig, color, classView, rootUrl }) => {
-	const { type, name, label, path, op, valuesQuery: constraintItemsQuery } = constraintConfig
+export const OverviewConstraint = ({ color, overviewConstraintActor }) => {
+	const [state, send] = useService(overviewConstraintActor)
 
-	const [state, send] = useMachineBus(
-		overviewConstraintMachine(name).withContext({
-			...overviewConstraintMachine().context,
-			op,
-			type,
-			constraintPath: path,
-			constraintItemsQuery,
-			classView,
-			rootUrl,
-		})
-	)
+	const { availableValues, selectedValues, type, constraintItemsQuery, label, name } = state.context
+	const constraintCount = selectedValues.length
 
-	const constraintCount = state.context.selectedValues.length
 	const searchIndex = useRef(null)
-	const { availableValues } = state.context
 	const docField = 'item'
 
 	useEffect(() => {
@@ -143,6 +149,13 @@ export const OverviewConstraint = ({ constraintConfig, color, classView, rootUrl
 			break
 	}
 
+	const disableAllButtons =
+		state.matches('noConstraintsSet') ||
+		state.matches('loading') ||
+		state.matches('noConstraintItems')
+
+	const enableApplyButton = state.matches('constraintsUpdated')
+
 	/**
 	 * This is used to decide the color for the count tag. Since it will only
 	 * ever be displayed when a constraint is actually set, we only care to know if
@@ -150,31 +163,24 @@ export const OverviewConstraint = ({ constraintConfig, color, classView, rootUrl
 	 */
 	const isUpdated = state.matches('constraintsUpdated')
 
+	const handleOnClick = (type) => send({ type })
+
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<PopupCard boundary="viewport">
-				<Button minimal={true} large={true} fill={true} alignText="left" aria-label={name}>
-					<div css={{ display: 'flex', alignItems: 'center' }}>
-						{/**@ts-ignore **/}
-						<S_ConstraintIcon labelBorderColor={color}>
-							<span>{label}</span>
-						</S_ConstraintIcon>
-						{name}
-						{constraintCount > 0 && (
-							// @ts-ignore
-							<S_CountTag isUpdated={isUpdated}>
-								{constraintCount > 1 && <small>{constraintCount}</small>}
-								<Icon
-									css={{ margin: '-0.167em -0.167em !important', alignSelf: 'flex-start' }}
-									icon={IconNames.TICK_CIRCLE}
-									color={isUpdated ? 'var(--yellow5)' : 'var(--green5)'}
-								/>
-							</S_CountTag>
-						)}
-					</div>
-				</Button>
+				<ConstraintButton
+					label={label}
+					color={color}
+					name={name}
+					constraintCount={constraintCount}
+					isUpdated={isUpdated}
+				/>
 				<div>
-					<ConstraintCard>
+					<ConstraintCard
+						disableAllButtons={disableAllButtons}
+						enableApplyButton={enableApplyButton}
+						handleOnClick={handleOnClick}
+					>
 						<ConstraintWidget
 							nonIdealTitle="No items found"
 							nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
