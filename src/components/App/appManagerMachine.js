@@ -8,7 +8,7 @@ import {
 	FETCH_TEMPLATES,
 	SET_API_TOKEN,
 } from 'src/eventConstants'
-import { assign, forwardTo, Machine, spawn } from 'xstate'
+import { assign, Machine, spawn } from 'xstate'
 
 import {
 	interminesConfig,
@@ -78,47 +78,6 @@ const defaultQueries = [
 		},
 	},
 ]
-
-/**
- *
- */
-const forwardToTemplateView = forwardTo('templateView')
-
-/**
- *
- */
-const toggleViewIsLoading = assign({
-	// @ts-ignore
-	viewIsLoading: (_, { isLoading }) => isLoading,
-})
-
-/**
- *
- */
-const setTemplateView = assign({
-	appView: () => 'templateView',
-})
-
-/**
- *
- */
-const clearPossibleQueries = assign({
-	possibleQueries: () => [],
-})
-
-/**
- *
- */
-const setPossibleOverviewQueries = assign({
-	possibleQueries: () => defaultQueries,
-})
-
-/**
- *
- */
-const setDefaultView = assign({
-	appView: () => 'defaultView',
-})
 
 /**
  *
@@ -206,13 +165,6 @@ const getApiTokenFromStorage = assign({
 	},
 })
 
-// @ts-ignore
-const loadAppContext = assign((ctx, { data }) => {
-	return {
-		...data.appContext,
-	}
-})
-
 /**
  *
  */
@@ -266,7 +218,7 @@ const logErrorToConsole = (ctx, event) => {
 export const appManagerMachine = Machine(
 	{
 		id: 'App Manager',
-		initial: 'rehydrateContext',
+		initial: 'loading',
 		context: {
 			appView: 'defaultView',
 			viewActors: {
@@ -284,7 +236,6 @@ export const appManagerMachine = Machine(
 			},
 			showAllLabel: 'Show All',
 			overviewQueries: defaultQueries,
-			viewIsLoading: false,
 			selectedMine: {
 				apiToken: '',
 				name: isProduction ? 'HumanMine' : 'biotestmine',
@@ -292,7 +243,6 @@ export const appManagerMachine = Machine(
 					? 'https://www.humanmine.org/humanmine'
 					: 'http://localhost:9999/biotestmine',
 			},
-			categories: Object.create(null),
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'loading', actions: ['changeMine', 'getApiTokenFromStorage'] },
@@ -302,27 +252,9 @@ export const appManagerMachine = Machine(
 			[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
 		},
 		states: {
-			rehydrateContext: {
-				invoke: {
-					id: 'rehydrateAppContext',
-					src: 'rehydrateContext',
-					onDone: {
-						target: 'idle',
-						actions: 'loadAppContext',
-					},
-					onError: {
-						target: 'invalidAppView',
-						actions: 'logErrorToConsole',
-					},
-				},
-			},
-			idle: {
-				always: [{ target: 'loading', cond: 'hasNoMineConfig' }],
-			},
+			idle: {},
+			invalidAppView: {},
 			loading: {
-				on: {
-					[CHANGE_CLASS]: { actions: 'changeClass' },
-				},
 				invoke: {
 					id: 'fetchMineConfig',
 					src: 'fetchMineConfiguration',
@@ -336,38 +268,10 @@ export const appManagerMachine = Machine(
 					},
 				},
 			},
-			defaultView: {
-				entry: ['setDefaultView', 'setPossibleOverviewQueries'],
-				on: {
-					[CHANGE_CLASS]: { actions: 'changeClass' },
-				},
-			},
-			templateView: {
-				entry: ['setTemplateView', 'clearPossibleQueries'],
-				on: {
-					[CHANGE_CLASS]: { actions: ['changeClass', 'forwardToTemplateView'] },
-				},
-				invoke: {
-					id: 'templateView',
-					src: templateViewMachine,
-					data: {
-						rootUrl: (ctx) => ctx.selectedMine.rootUrl,
-						classView: (ctx) => ctx.classView,
-						showAllLabel: (ctx) => ctx.showAllLabel,
-					},
-				},
-			},
-			invalidAppView: {},
 		},
 	},
 	{
 		actions: {
-			forwardToTemplateView,
-			toggleViewIsLoading,
-			setTemplateView,
-			clearPossibleQueries,
-			setPossibleOverviewQueries,
-			setDefaultView,
 			changeMine,
 			changeClass,
 			setMineConfiguration,
@@ -375,26 +279,8 @@ export const appManagerMachine = Machine(
 			setApiToken,
 			getApiTokenFromStorage,
 			logErrorToConsole,
-			loadAppContext,
 			spawnTemplateViewMachine,
 			setAppView,
-		},
-		guards: {
-			// @ts-ignore
-			isDefaultView: (_, { newTabId }) => {
-				return newTabId === 'defaultView'
-			},
-			// @ts-ignore
-			isTemplateView: (_, { newTabId }) => {
-				return newTabId === 'templateView'
-			},
-			// @ts-ignore
-			showAllCategories: (ctx, { tagName }) => {
-				return tagName === ctx.showAllLabel
-			},
-			hasNoMineConfig: (ctx) => {
-				return ctx.intermines.length === 0
-			},
 		},
 		services: {
 			rehydrateContext,
