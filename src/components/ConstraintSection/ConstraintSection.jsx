@@ -2,6 +2,7 @@ import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs
 import { IconNames } from '@blueprintjs/icons'
 import { useService } from '@xstate/react'
 import React, { useState } from 'react'
+import { useWindowSize } from 'react-use'
 import { CHANGE_CONSTRAINT_VIEW, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
 import { sendToBus } from 'src/useMachineBus'
 
@@ -65,6 +66,8 @@ const ShowCategories = ({
 }
 
 const TemplatesList = ({ templateViewActor }) => {
+	const { height } = useWindowSize()
+
 	const [state, send] = useService(templateViewActor)
 	const {
 		classView,
@@ -95,7 +98,7 @@ const TemplatesList = ({ templateViewActor }) => {
 				isLoading={isLoading}
 			/>
 			<Divider css={{ margin: 0 }} />
-			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0 }}>
+			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0, maxHeight: height - 173 }}>
 				{!isLoading &&
 					templatesForSelectedCategories.map((template) => (
 						<li key={template.name} css={{ margin: '0.875em 0' }}>
@@ -113,6 +116,8 @@ const TemplatesList = ({ templateViewActor }) => {
 }
 
 const OverviewConstraintList = ({ overviewActor }) => {
+	const { height } = useWindowSize()
+
 	const [state] = useService(overviewActor)
 	const { constraintActors } = state.context
 
@@ -122,6 +127,7 @@ const OverviewConstraintList = ({ overviewActor }) => {
 				overflow: 'auto',
 				listStyle: 'none',
 				padding: 0,
+				maxHeight: height - 173,
 			}}
 		>
 			{constraintActors.map((actor, idx) => {
