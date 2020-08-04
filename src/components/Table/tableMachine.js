@@ -89,6 +89,7 @@ export const TableChartMachine = Machine(
 		},
 		states: {
 			idle: {
+				always: [{ target: 'noTableSummary', cond: 'hasNoTableSummary' }],
 				on: {
 					[CHANGE_PAGE]: [
 						{ actions: 'updatePageNumber', cond: 'hasPageInCache' },
@@ -101,7 +102,7 @@ export const TableChartMachine = Machine(
 					id: 'fetchInitialRows',
 					src: 'fetchInitialRows',
 					onDone: {
-						target: 'pending',
+						target: 'idle',
 						actions: ['setInitialRows', 'refreshCache', 'setLastQuery'],
 					},
 					onError: {
@@ -114,7 +115,7 @@ export const TableChartMachine = Machine(
 					id: 'fetchNewPages',
 					src: 'fetchNewPages',
 					onDone: {
-						target: 'pending',
+						target: 'idle',
 						actions: ['updatePageNumber', 'refreshCache'],
 					},
 					onError: {
@@ -124,12 +125,6 @@ export const TableChartMachine = Machine(
 				},
 			},
 			noTableSummary: {},
-			pending: {
-				after: {
-					// Delay the rendering in case the table is currently rendering
-					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'noTableSummary' }],
-				},
-			},
 		},
 	},
 	{
@@ -141,8 +136,8 @@ export const TableChartMachine = Machine(
 			updatePageNumber,
 		},
 		guards: {
-			hasSummary: (ctx) => {
-				return ctx.totalRows > 0
+			hasNoTableSummary: (ctx) => {
+				return ctx.totalRows === 0
 			},
 			// @ts-ignore
 			hasPageInCache: (ctx, { pageNumber }) => {

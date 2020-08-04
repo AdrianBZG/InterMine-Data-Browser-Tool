@@ -28,13 +28,15 @@ export const PieChartMachine = Machine(
 			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
-			idle: {},
+			idle: {
+				always: [{ target: 'hasNoSummary', cond: 'hasNoSummary' }],
+			},
 			loading: {
 				invoke: {
 					id: 'fetchPieChartValues',
 					src: 'fetchItems',
 					onDone: {
-						target: 'pending',
+						target: 'idle',
 						actions: 'setSummaryResults',
 					},
 					onError: {
@@ -44,12 +46,6 @@ export const PieChartMachine = Machine(
 				},
 			},
 			hasNoSummary: {},
-			// delay the finished transition to avoid quick flashes of animations
-			pending: {
-				after: {
-					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'hasNoSummary' }],
-				},
-			},
 		},
 	},
 	{
@@ -57,7 +53,7 @@ export const PieChartMachine = Machine(
 			setSummaryResults,
 		},
 		guards: {
-			hasSummary: (ctx) => ctx.allClassOrganisms.length > 0,
+			hasNoSummary: (ctx) => ctx.allClassOrganisms.length === 0,
 		},
 		services: {
 			fetchItems: async (_ctx, event) => {

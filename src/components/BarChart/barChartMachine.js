@@ -40,13 +40,15 @@ export const BarChartMachine = Machine(
 			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
 		},
 		states: {
-			idle: {},
+			idle: {
+				always: [{ target: 'noGeneLengths', cond: 'hasNoSummary' }],
+			},
 			loading: {
 				invoke: {
 					id: 'fetchGeneLength',
 					src: 'fetchGeneLength',
 					onDone: {
-						target: 'pending',
+						target: 'idle',
 						actions: 'setLengthSummary',
 					},
 					onError: {
@@ -56,11 +58,6 @@ export const BarChartMachine = Machine(
 				},
 			},
 			noGeneLengths: {},
-			pending: {
-				after: {
-					500: [{ target: 'idle', cond: 'hasSummary' }, { target: 'noGeneLengths' }],
-				},
-			},
 		},
 	},
 	{
@@ -69,8 +66,8 @@ export const BarChartMachine = Machine(
 			logErrorToConsole,
 		},
 		guards: {
-			hasSummary: (ctx) => {
-				return ctx.lengthSummary.length > 0
+			hasNoSummary: (ctx) => {
+				return ctx.lengthSummary.length === 0
 			},
 		},
 		services: {
