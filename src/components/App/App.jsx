@@ -5,6 +5,7 @@ import { Card } from '@blueprintjs/core'
 import { useMachine } from '@xstate/react'
 import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
+import { useWindowSize } from 'react-use'
 import {
 	FETCH_INITIAL_SUMMARY,
 	FETCH_OVERVIEW_CONSTRAINTS,
@@ -26,6 +27,7 @@ enableMapSet()
 export const App = () => {
 	const [state, send, service] = useMachine(appManagerMachine)
 	const [sendToBus] = useEventBus(service)
+	const { height } = useWindowSize()
 
 	const { classView, selectedMine, viewActors } = state.context
 
@@ -79,7 +81,14 @@ export const App = () => {
 						</Card>
 					</section>
 					<section id="table">
-						<Card css={{ marginBottom: 10, overflow: 'scroll', paddingBottom: 'unset' }}>
+						<Card
+							css={{
+								marginBottom: 10,
+								overflow: 'scroll',
+								paddingBottom: 'unset',
+								maxHeight: height - 467,
+							}}
+						>
 							<Table />
 						</Card>
 					</section>
