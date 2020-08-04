@@ -3,13 +3,14 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useState } from 'react'
 import { CHANGE_MINE, SET_API_TOKEN } from 'src/eventConstants'
-import { useServiceContext } from 'src/useEventBus'
+import { useEventBus, useServiceContext } from 'src/useEventBus'
 
 import { NumberedSelectMenuItems } from '../Shared/Selects'
 
 export const MineSelector = () => {
 	const [state, send] = useServiceContext('appManager')
 	const [showPopup, setShowPopup] = useState(false)
+	const [sendToBus] = useEventBus()
 
 	const { selectedMine, intermines } = state.context
 	const [apiToken, setApiToken] = useState(selectedMine.apiToken)
@@ -23,7 +24,8 @@ export const MineSelector = () => {
 	}, [currentMine, selectedMine.rootUrl, selectedMine.apiToken])
 
 	const handleMineChange = ({ name }) => {
-		send({ type: CHANGE_MINE, newMine: name })
+		// @ts-ignore
+		sendToBus({ type: CHANGE_MINE, newMine: name })
 	}
 
 	const isAuthenticated = selectedMine.apiToken.length > 0

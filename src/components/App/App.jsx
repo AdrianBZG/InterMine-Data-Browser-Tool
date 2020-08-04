@@ -4,14 +4,8 @@ import '@emotion/core'
 import { Card } from '@blueprintjs/core'
 import { useMachine } from '@xstate/react'
 import { enableMapSet } from 'immer'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useWindowSize } from 'react-use'
-import {
-	FETCH_INITIAL_SUMMARY,
-	FETCH_OVERVIEW_CONSTRAINTS,
-	FETCH_TEMPLATES,
-	RESET_QUERY_CONTROLLER,
-} from 'src/eventConstants'
 import { AppManagerServiceContext, useEventBus } from 'src/useEventBus'
 
 import logo from '../../images/logo.png'
@@ -26,19 +20,10 @@ enableMapSet()
 
 export const App = () => {
 	const [state, send, service] = useMachine(appManagerMachine)
-	const [sendToBus] = useEventBus(service)
+	useEventBus(service)
 	const { height } = useWindowSize()
 
-	const { classView, selectedMine, viewActors } = state.context
-
-	const rootUrl = selectedMine.rootUrl
-
-	useEffect(() => {
-		send({ type: FETCH_OVERVIEW_CONSTRAINTS })
-		send({ type: FETCH_TEMPLATES })
-		send({ type: RESET_QUERY_CONTROLLER })
-		sendToBus({ type: FETCH_INITIAL_SUMMARY, classView, rootUrl })
-	}, [classView, rootUrl, selectedMine, send, sendToBus])
+	const { viewActors } = state.context
 
 	return (
 		<div className="light-theme">

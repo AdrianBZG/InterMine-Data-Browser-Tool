@@ -1,15 +1,8 @@
 import hash from 'object-hash'
 import { INTERMINE_REGISTRY } from 'src/apiRequests'
 import { interminesConfigCache } from 'src/caches'
-import {
-	CHANGE_CLASS,
-	CHANGE_CONSTRAINT_VIEW,
-	CHANGE_MINE,
-	FETCH_OVERVIEW_CONSTRAINTS,
-	FETCH_TEMPLATES,
-	RESET_QUERY_CONTROLLER,
-	SET_API_TOKEN,
-} from 'src/eventConstants'
+import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, SET_API_TOKEN } from 'src/eventConstants'
+import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
 import { queryControllerMachine } from '../QueryController/queryControllerMachine'
@@ -189,9 +182,13 @@ const spawnQueryControllerMachine = assign({
 	},
 })
 
-/**
- * Services
- */
+const fetchInitialSummaryForMine = (ctx) => {
+	sendToBus({
+		type: FETCH_INITIAL_SUMMARY,
+		classView: ctx.classView,
+		rootUrl: ctx.selectedMine.rootUrl,
+	})
+}
 
 /**
  *
@@ -230,13 +227,20 @@ export const appManagerMachine = Machine(
 			},
 		},
 		on: {
-			[CHANGE_MINE]: { target: 'loading', actions: ['changeMine', 'getApiTokenFromStorage'] },
-			[CHANGE_CLASS]: { actions: ['changeClass'] },
+			[CHANGE_MINE]: {
+				target: 'loading',
+				actions: ['changeMine', 'getApiTokenFromStorage'],
+			},
+			[CHANGE_CLASS]: {
+				actions: [
+					'changeClass',
+					'spawnOverviewMachine',
+					'spawnTemplateViewMachine',
+					'spawnQueryControllerMachine',
+					'fetchInitialSummaryForMine',
+				],
+			},
 			[SET_API_TOKEN]: { actions: 'setApiToken' },
-			[FETCH_TEMPLATES]: { actions: 'spawnTemplateViewMachine' },
-			[FETCH_OVERVIEW_CONSTRAINTS]: { actions: 'spawnOverviewMachine' },
-			[RESET_QUERY_CONTROLLER]: { actions: 'spawnQueryControllerMachine' },
-			[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
 		},
 		states: {
 			idle: {},
@@ -247,7 +251,14 @@ export const appManagerMachine = Machine(
 					src: 'fetchMineConfiguration',
 					onDone: {
 						target: 'idle',
-						actions: ['setMineConfiguration', 'filterListsForClass'],
+						actions: [
+							'setMineConfiguration',
+							'filterListsForClass',
+							'spawnOverviewMachine',
+							'spawnTemplateViewMachine',
+							'spawnQueryControllerMachine',
+							'fetchInitialSummaryForMine',
+						],
 					},
 					onError: {
 						target: 'invalidAppView',
@@ -270,6 +281,7 @@ export const appManagerMachine = Machine(
 			spawnOverviewMachine,
 			spawnQueryControllerMachine,
 			setAppView,
+			fetchInitialSummaryForMine,
 		},
 		services: {
 			fetchMineConfiguration: async (ctx) => {

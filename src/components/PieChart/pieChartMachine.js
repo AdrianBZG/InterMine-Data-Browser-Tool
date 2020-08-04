@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { pieChartCache } from 'src/caches'
-import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
+import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
 const setSummaryResults = assign({
@@ -16,20 +16,26 @@ const setSummaryResults = assign({
 export const PieChartMachine = Machine(
 	{
 		id: 'PieChart',
-		initial: 'hasNoSummary',
+		initial: 'waitingOnMineToLoad',
 		context: {
 			allClassOrganisms: [],
 			classView: '',
 			rootUrl: '',
 		},
 		on: {
-			// Making it global ensure we update the table when the mine/class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 		},
 		states: {
 			idle: {
 				always: [{ target: 'hasNoSummary', cond: 'hasNoSummary' }],
+				on: {
+					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+				},
+			},
+			waitingOnMineToLoad: {
+				on: {
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+				},
 			},
 			loading: {
 				invoke: {

@@ -41,14 +41,11 @@ export const SET_INITIAL_ORGANISMS = 'pieChart/fetch/initial'
  */
 export const CHANGE_MINE = 'appManager/mine/change'
 export const CHANGE_CLASS = 'appManager/class/change'
-export const CHANGE_CONSTRAINT_VIEW = 'appManager/view/change'
 export const TOGGLE_CATEGORY_VISIBILITY = 'appManager/category/visibility'
 export const TOGGLE_VIEW_IS_LOADING = 'appManager/view/isLoading'
 export const ADD_LIST_CONSTRAINT = 'appManager/lists/add'
 export const REMOVE_LIST_CONSTRAINT = 'appManager/lists/remove'
 export const SET_API_TOKEN = 'appManager/api/token'
-export const FETCH_TEMPLATES = 'appManager/fetch/templates'
-export const FETCH_OVERVIEW_CONSTRAINTS = 'appManager/fetch/overviewConstraints'
 
 /**
  * Table

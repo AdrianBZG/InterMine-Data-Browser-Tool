@@ -2,6 +2,7 @@ import hash from 'object-hash'
 import { fetchTable } from 'src/apiRequests'
 import { tableCache } from 'src/caches'
 import {
+	CHANGE_MINE,
 	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
 	FETCH_UPDATED_SUMMARY,
@@ -68,7 +69,7 @@ const updatePageNumber = assign({
 export const TableChartMachine = Machine(
 	{
 		id: 'TableChart',
-		initial: 'noTableSummary',
+		initial: 'waitingOnMineToLoad',
 		context: {
 			totalRows: 0,
 			visibleRows: 25,
@@ -80,14 +81,17 @@ export const TableChartMachine = Machine(
 			classView: '',
 		},
 		on: {
-			// Making it global ensure we update the table when the mine/class changes
-			[FETCH_INITIAL_SUMMARY]: {
-				target: 'fetchInitialRows',
-				actions: 'bustCachedPages',
-			},
-			[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
+			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 		},
 		states: {
+			waitingOnMineToLoad: {
+				on: {
+					[FETCH_INITIAL_SUMMARY]: {
+						target: 'fetchInitialRows',
+						actions: 'bustCachedPages',
+					},
+				},
+			},
 			idle: {
 				always: [{ target: 'noTableSummary', cond: 'hasNoTableSummary' }],
 				on: {
@@ -95,6 +99,7 @@ export const TableChartMachine = Machine(
 						{ actions: 'updatePageNumber', cond: 'hasPageInCache' },
 						{ target: 'fetchNewPages' },
 					],
+					[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
 				},
 			},
 			fetchInitialRows: {

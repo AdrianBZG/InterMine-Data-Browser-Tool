@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { barChartCache } from 'src/caches'
-import { FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
+import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
@@ -20,7 +20,7 @@ const setLengthSummary = assign({
 export const BarChartMachine = Machine(
 	{
 		id: 'BarChart',
-		initial: 'noGeneLengths',
+		initial: 'waitingOnMineToLoad',
 		context: {
 			lengthStats: {
 				min: 0,
@@ -35,13 +35,19 @@ export const BarChartMachine = Machine(
 			rootUrl: '',
 		},
 		on: {
-			// Making it global ensures that we retry when the mine or class changes
-			[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
-			[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 		},
 		states: {
 			idle: {
 				always: [{ target: 'noGeneLengths', cond: 'hasNoSummary' }],
+				on: {
+					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+				},
+			},
+			waitingOnMineToLoad: {
+				on: {
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+				},
 			},
 			loading: {
 				invoke: {
