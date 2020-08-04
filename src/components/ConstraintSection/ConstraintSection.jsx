@@ -144,7 +144,7 @@ const OverviewConstraintList = ({ overviewActor }) => {
 }
 
 export const ConstraintSection = ({ templateViewActor, overviewActor, queryControllerActor }) => {
-	const [view, setView] = useState('defaultAppView')
+	const [view, setView] = useState('defaultView')
 	const isTemplateView = view === 'templateView'
 
 	return (
