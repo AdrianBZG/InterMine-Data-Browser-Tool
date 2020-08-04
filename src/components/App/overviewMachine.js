@@ -1,4 +1,4 @@
-import { assign, Machine, sendUpdate, spawn } from 'xstate'
+import { assign, Machine, spawn } from 'xstate'
 
 import { overviewConstraintMachine } from '../Overview/overviewConstraintMachine'
 
@@ -93,14 +93,13 @@ export const overviewMachine = Machine(
 		},
 		states: {
 			idle: {
-				entry: ['spawnConstraintActors', 'sendUpdate'],
+				entry: 'spawnConstraintActors',
 			},
 		},
 	},
 	{
 		actions: {
 			spawnConstraintActors,
-			sendUpdate,
 		},
 	}
 )

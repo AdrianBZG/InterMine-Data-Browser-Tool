@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useState } from 'react'
 import { CHANGE_MINE, SET_API_TOKEN } from 'src/eventConstants'
-import { useServiceContext } from 'src/useMachineBus'
+import { useServiceContext } from 'src/useEventBus'
 
 import { NumberedSelectMenuItems } from '../Shared/Selects'
 

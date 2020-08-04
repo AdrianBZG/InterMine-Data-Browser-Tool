@@ -5,7 +5,7 @@ import {
 	REMOVE_LIST_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
+import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
 import { listConstraintQuery } from '../common'

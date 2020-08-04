@@ -7,8 +7,8 @@ import {
 	REMOVE_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
-import { assign, Machine, sendUpdate } from 'xstate'
+import { sendToBus } from 'src/useEventBus'
+import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
 
@@ -55,7 +55,7 @@ export const templateConstraintMachine = Machine(
 					src: 'fetchConstraintValues',
 					onDone: {
 						target: 'idle',
-						actions: ['setAvailableValues', 'sendUpdate'],
+						actions: 'setAvailableValues',
 					},
 					onError: {
 						target: 'noValuesForConstraint',
@@ -88,7 +88,6 @@ export const templateConstraintMachine = Machine(
 			removeValueFromConstraint,
 			setAvailableValues,
 			updateTemplateQuery,
-			sendUpdate,
 		},
 		guards: {
 			// @ts-ignore

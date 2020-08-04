@@ -2,14 +2,16 @@
 import '@emotion/core'
 
 import { Card } from '@blueprintjs/core'
+import { useMachine } from '@xstate/react'
 import { enableMapSet } from 'immer'
 import React, { useEffect } from 'react'
 import {
 	FETCH_INITIAL_SUMMARY,
 	FETCH_OVERVIEW_CONSTRAINTS,
 	FETCH_TEMPLATES,
+	RESET_QUERY_CONTROLLER,
 } from 'src/eventConstants'
-import { AppManagerServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
+import { AppManagerServiceContext, useEventBus } from 'src/useEventBus'
 
 import logo from '../../images/logo.png'
 import { BarChart } from '../BarChart/BarChart'
@@ -22,17 +24,19 @@ import { appManagerMachine } from './appManagerMachine'
 enableMapSet()
 
 export const App = () => {
-	const [state, send] = useMachineBus(appManagerMachine)
+	const [state, send, service] = useMachine(appManagerMachine)
+	const [sendToBus] = useEventBus(service)
 
-	const { appView, classView, selectedMine, viewActors } = state.context
+	const { classView, selectedMine, viewActors } = state.context
 
 	const rootUrl = selectedMine.rootUrl
 
 	useEffect(() => {
 		send({ type: FETCH_OVERVIEW_CONSTRAINTS })
 		send({ type: FETCH_TEMPLATES })
+		send({ type: RESET_QUERY_CONTROLLER })
 		sendToBus({ type: FETCH_INITIAL_SUMMARY, classView, rootUrl })
-	}, [classView, rootUrl, selectedMine, send])
+	}, [classView, rootUrl, selectedMine, send, sendToBus])
 
 	return (
 		<div className="light-theme">
@@ -58,7 +62,7 @@ export const App = () => {
 				<ConstraintSection
 					templateViewActor={viewActors.templateView}
 					overviewActor={viewActors.overview}
-					view={appView}
+					queryControllerActor={viewActors.queryController}
 				/>
 				<section
 					id="data-viz"

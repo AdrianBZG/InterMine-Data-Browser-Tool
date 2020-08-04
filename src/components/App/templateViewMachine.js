@@ -3,7 +3,7 @@ import { fetchTemplates } from 'src/apiRequests'
 import { templatesCache } from 'src/caches'
 import { CHANGE_CLASS, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
 import { getTagCategories } from 'src/utils'
-import { assign, Machine, sendUpdate } from 'xstate'
+import { assign, Machine } from 'xstate'
 
 /**
  *
@@ -202,21 +202,15 @@ export const templateViewMachine = Machine(
 							'setCategoriesForClass',
 							'filterTemplatesForClassView',
 							'filterBySelectedCategory',
-							'sendUpdate',
 						],
 					},
 					[TOGGLE_CATEGORY_VISIBILITY]: [
 						{
 							cond: 'showAllClicked',
-							actions: ['toggleCategory', 'filterBySelectedCategory', 'sendUpdate'],
+							actions: ['toggleCategory', 'filterBySelectedCategory'],
 						},
 						{
-							actions: [
-								'disableShowAllTag',
-								'toggleCategory',
-								'filterBySelectedCategory',
-								'sendUpdate',
-							],
+							actions: ['disableShowAllTag', 'toggleCategory', 'filterBySelectedCategory'],
 						},
 					],
 				},
@@ -234,7 +228,6 @@ export const templateViewMachine = Machine(
 							'setCategoriesForClass',
 							'filterTemplatesForClassView',
 							'filterBySelectedCategory',
-							'sendUpdate',
 						],
 					},
 					onError: {
@@ -257,7 +250,6 @@ export const templateViewMachine = Machine(
 			setTemplates,
 			toggleCategory,
 			updateClassView,
-			sendUpdate,
 		},
 		guards: {
 			// @ts-ignore

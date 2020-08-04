@@ -1,10 +1,10 @@
 import { Button, Classes, Divider, H5, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { useService } from '@xstate/react'
+import { useMachine, useService } from '@xstate/react'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
-import { ConstraintServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
+import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
 import { CODES } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'
@@ -69,7 +69,7 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 		where: withNoDefaults,
 	}
 
-	const [state] = useMachineBus(
+	const [state, , service] = useMachine(
 		templateQueryMachine.withContext({
 			...templateQueryMachine.context,
 			rootUrl,
@@ -78,6 +78,8 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 			constraints: editableConstraints,
 		})
 	)
+
+	const [sendToBus] = useEventBus(service)
 
 	const {
 		isActiveQuery,

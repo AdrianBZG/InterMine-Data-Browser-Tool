@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
-import { ConstraintServiceContext } from 'src/useMachineBus'
+import { ConstraintServiceContext } from 'src/useEventBus'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { PopupCard } from '../Shared/PopupCard'

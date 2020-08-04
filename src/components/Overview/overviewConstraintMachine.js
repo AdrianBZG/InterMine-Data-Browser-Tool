@@ -12,9 +12,9 @@ import {
 	RESET_LOCAL_CONSTRAINT,
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
+import { sendToBus } from 'src/useEventBus'
 import { formatConstraintPath } from 'src/utils'
-import { assign, Machine, sendUpdate } from 'xstate'
+import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
 
@@ -101,7 +101,7 @@ export const overviewConstraintMachine = Machine(
 					src: 'fetchInitialValues',
 					onDone: {
 						target: 'noConstraintsSet',
-						actions: ['setAvailableValues', 'sendUpdate'],
+						actions: 'setAvailableValues',
 					},
 					onError: {
 						target: 'noConstraintItems',
@@ -159,7 +159,6 @@ export const overviewConstraintMachine = Machine(
 			setAvailableValues,
 			applyOverviewConstraint,
 			resetConstraint,
-			sendUpdate,
 		},
 		guards: {
 			selectedListIsEmpty: (ctx) => {

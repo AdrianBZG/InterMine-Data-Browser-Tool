@@ -1,4 +1,5 @@
 import { ProgressBar } from '@blueprintjs/core'
+import { useMachine } from '@xstate/react'
 import React from 'react'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
@@ -14,7 +15,7 @@ import {
 	XAxis,
 } from 'recharts'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
-import { useMachineBus } from 'src/useMachineBus'
+import { useEventBus } from 'src/useEventBus'
 import { barChartLoadingData } from 'src/utils/loadingData/barChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -56,7 +57,8 @@ const colorizeBars = (data, isLoading) =>
 
 export const BarChart = React.memo(function BarChart() {
 	const isFirstRender = useFirstMountState()
-	const [state] = useMachineBus(BarChartMachine)
+	const [state, , service] = useMachine(BarChartMachine)
+	useEventBus(service)
 
 	const { lengthSummary, lengthStats } = state.context
 

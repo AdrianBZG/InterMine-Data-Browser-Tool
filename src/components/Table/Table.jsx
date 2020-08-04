@@ -12,12 +12,13 @@ import {
 } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
+import { useMachine } from '@xstate/react'
 import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import { CHANGE_PAGE } from 'src/eventConstants'
-import { TableServiceContext, useMachineBus, useServiceContext } from 'src/useMachineBus'
+import { TableServiceContext, useEventBus, useServiceContext } from 'src/useEventBus'
 import { tableLoadingData } from 'src/utils/loadingData/tableResults'
 import { humanize, titleize } from 'underscore.string'
 
@@ -219,7 +220,8 @@ const Cell = ({ cell, mineUrl, isLoading }) => {
  */
 export const Table = React.memo(function Table() {
 	const isFirstRender = useFirstMountState()
-	const [state, send] = useMachineBus(TableChartMachine)
+	const [state, send, service] = useMachine(TableChartMachine)
+	useEventBus(service)
 
 	const { pages, mineUrl, totalRows, pageNumber, visibleRows } = state.context
 	const isLoading = !state.matches('idle')

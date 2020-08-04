@@ -3,8 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { useService } from '@xstate/react'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { CHANGE_CONSTRAINT_VIEW, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
+import { TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { OverviewConstraint } from '../Overview/OverviewConstraint'
@@ -144,7 +143,8 @@ const OverviewConstraintList = ({ overviewActor }) => {
 	)
 }
 
-export const ConstraintSection = ({ view, templateViewActor, overviewActor }) => {
+export const ConstraintSection = ({ templateViewActor, overviewActor, queryControllerActor }) => {
+	const [view, setView] = useState('defaultAppView')
 	const isTemplateView = view === 'templateView'
 
 	return (
@@ -159,7 +159,8 @@ export const ConstraintSection = ({ view, templateViewActor, overviewActor }) =>
 				id="constraint-tabs"
 				selectedTabId={view}
 				large={true}
-				onChange={(newTabId) => sendToBus({ type: CHANGE_CONSTRAINT_VIEW, newTabId })}
+				// @ts-ignore
+				onChange={setView}
 				css={{
 					marginBottom: 10,
 					[`&& .${Classes.TAB_LIST}`]: { margin: '10px 20px 0' },
@@ -172,7 +173,7 @@ export const ConstraintSection = ({ view, templateViewActor, overviewActor }) =>
 				<TemplatesList templateViewActor={templateViewActor} />
 			) : (
 				<>
-					<QueryController />
+					{queryControllerActor && <QueryController queryControllerActor={queryControllerActor} />}
 					{overviewActor && <OverviewConstraintList overviewActor={overviewActor} />}
 				</>
 			)}

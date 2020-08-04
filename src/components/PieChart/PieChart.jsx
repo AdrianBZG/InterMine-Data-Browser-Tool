@@ -1,4 +1,5 @@
 import { ProgressBar } from '@blueprintjs/core'
+import { useMachine } from '@xstate/react'
 import React from 'react'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
@@ -13,7 +14,7 @@ import {
 	Tooltip,
 } from 'recharts'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
-import { useMachineBus } from 'src/useMachineBus'
+import { useEventBus } from 'src/useEventBus'
 import { pieChartLoadingData } from 'src/utils/loadingData/pieChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -62,7 +63,9 @@ const renderLoadingLabel = (props) => {
 
 export const PieChart = React.memo(function PieChart() {
 	const isFirstRender = useFirstMountState()
-	const [state] = useMachineBus(PieChartMachine)
+	const [state, , service] = useMachine(PieChartMachine)
+	useEventBus(service)
+
 	const { allClassOrganisms, classView } = state.context
 
 	const isLoading = !state.matches('idle')

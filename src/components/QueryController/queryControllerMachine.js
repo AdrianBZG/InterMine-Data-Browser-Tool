@@ -3,12 +3,11 @@ import {
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 	DELETE_QUERY_CONSTRAINT,
-	FETCH_INITIAL_SUMMARY,
 	REMOVE_LIST_CONSTRAINT,
 	SET_AVAILABLE_COLUMNS,
 	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
+import { sendToBus } from 'src/useEventBus'
 import { assign, Machine } from 'xstate'
 
 import { listConstraintQuery } from '../common'
@@ -102,10 +101,6 @@ export const queryControllerMachine = Machine(
 			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths' },
 			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
 			[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
-			[FETCH_INITIAL_SUMMARY]: {
-				target: 'idle',
-				actions: 'initializeMachine',
-			},
 		},
 		states: {
 			idle: {

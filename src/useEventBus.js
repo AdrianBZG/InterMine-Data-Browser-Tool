@@ -1,11 +1,4 @@
-import { useMachine } from '@xstate/react'
-import { createContext, useContext, useMemo } from 'react'
-
-const enableMocks =
-	// istanbul ignore
-	process.env.NODE_ENV?.toLowerCase() === 'development' ||
-	process.env.NODE_ENV?.toLowerCase() === 'test' ||
-	process.env.STORYBOOK_USEMOCK?.toLowerCase() === 'true'
+import { createContext, useContext } from 'react'
 
 export const MockMachineContext = createContext(null)
 export const ConstraintServiceContext = createContext(null)
@@ -13,50 +6,7 @@ export const QueryServiceContext = createContext(null)
 export const AppManagerServiceContext = createContext(null)
 export const TableServiceContext = createContext(null)
 
-const serviceStations = new Map()
-
-/** @type {import('./types').UseMachineBus} */
-export const useMachineBus = (machine, opts = {}) => {
-	const mockMachine = useContext(MockMachineContext)
-	let activeMachine = machine
-
-	if (enableMocks && mockMachine) {
-		// istanbul ignore
-		if (mockMachine?.id === machine.id) {
-			activeMachine = mockMachine
-		}
-	}
-
-	const [machineState, , service] = useMachine(activeMachine, { ...opts, devTools: true })
-
-	const sendToBusWrapper = useMemo(() => {
-		return (event, payload) => {
-			const receiver = serviceStations.get(service.sessionId)
-
-			if (receiver) {
-				receiver.send(event, payload)
-			} else {
-				const e = new Error()
-				e.name = 'MessageBus'
-				e.message = 'Could not locate a service in the bus stations'
-				throw e
-			}
-		}
-	}, [service.sessionId])
-
-	const existing = serviceStations.get(service.sessionId)
-
-	if (!existing) {
-		serviceStations.set(service.sessionId, service)
-	}
-
-	// Remove the service from the station when components unmount
-	service.onStop(() => {
-		serviceStations.delete(service.sessionId)
-	})
-
-	return [machineState, sendToBusWrapper, service]
-}
+const serviceStations = new Set()
 
 /**
  * Sends a message to all services on the bus. Only the active services
@@ -72,6 +22,21 @@ export const sendToBus = (event, payload) => {
 			s.send(event, payload)
 		}
 	})
+}
+
+/**
+ *
+ */
+export const useEventBus = (service) => {
+	if (service) {
+		serviceStations.add(service)
+
+		service.onStop(() => {
+			serviceStations.delete(service)
+		})
+	}
+
+	return [sendToBus]
 }
 
 export const useServiceContext = (serviceRequested = null) => {

@@ -7,10 +7,12 @@ import {
 	CHANGE_MINE,
 	FETCH_OVERVIEW_CONSTRAINTS,
 	FETCH_TEMPLATES,
+	RESET_QUERY_CONTROLLER,
 	SET_API_TOKEN,
 } from 'src/eventConstants'
 import { assign, Machine, spawn } from 'xstate'
 
+import { queryControllerMachine } from '../QueryController/queryControllerMachine'
 import {
 	interminesConfig,
 	interminesPromise,
@@ -166,6 +168,28 @@ const spawnOverviewMachine = assign({
 })
 
 /**
+ *
+ */
+const spawnQueryControllerMachine = assign({
+	viewActors: (ctx) => {
+		if (ctx.viewActors.queryController) {
+			ctx.viewActors.queryController.stop()
+		}
+
+		const actor = queryControllerMachine.withContext({
+			...queryControllerMachine.context,
+			classView: ctx.classView,
+			rootUrl: ctx.selectedMine.rootUrl,
+		})
+
+		return {
+			...ctx.viewActors,
+			queryController: spawn(actor, 'Query controller'),
+		}
+	},
+})
+
+/**
  * Services
  */
 
@@ -181,10 +205,10 @@ export const appManagerMachine = Machine(
 		id: 'App Manager',
 		initial: 'loading',
 		context: {
-			appView: 'defaultView',
 			viewActors: {
 				templateView: null,
 				overview: null,
+				queryController: null,
 			},
 			classView: 'Gene',
 			intermines: [],
@@ -211,6 +235,7 @@ export const appManagerMachine = Machine(
 			[SET_API_TOKEN]: { actions: 'setApiToken' },
 			[FETCH_TEMPLATES]: { actions: 'spawnTemplateViewMachine' },
 			[FETCH_OVERVIEW_CONSTRAINTS]: { actions: 'spawnOverviewMachine' },
+			[RESET_QUERY_CONTROLLER]: { actions: 'spawnQueryControllerMachine' },
 			[CHANGE_CONSTRAINT_VIEW]: { actions: 'setAppView' },
 		},
 		states: {
@@ -243,6 +268,7 @@ export const appManagerMachine = Machine(
 			logErrorToConsole,
 			spawnTemplateViewMachine,
 			spawnOverviewMachine,
+			spawnQueryControllerMachine,
 			setAppView,
 		},
 		services: {

@@ -1,7 +1,7 @@
 import { Checkbox, Label } from '@blueprintjs/core'
 import React from 'react'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/eventConstants'
-import { useServiceContext } from 'src/useMachineBus'
+import { useServiceContext } from 'src/useEventBus'
 
 import { NoValuesProvided } from '../Shared/NoValuesProvided'
 

@@ -18,6 +18,7 @@ export const SET_AVAILABLE_COLUMNS = 'global/table/set_columns'
  */
 export const DELETE_QUERY_CONSTRAINT = 'queryController/constraint/delete'
 export const ADD_QUERY_CONSTRAINT = 'queryController/constraint/add'
+export const RESET_QUERY_CONTROLLER = 'queryController/constraint/reset'
 
 /**
  * constraints

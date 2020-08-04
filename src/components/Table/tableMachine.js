@@ -7,7 +7,7 @@ import {
 	FETCH_UPDATED_SUMMARY,
 	SET_AVAILABLE_COLUMNS,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
+import { sendToBus } from 'src/useEventBus'
 import { assign, Machine } from 'xstate'
 
 const bustCachedPages = assign({

@@ -1,15 +1,15 @@
 import { Button, Divider, H4, H5, NonIdealState } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
+import { useService } from '@xstate/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { DELETE_QUERY_CONSTRAINT, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
-import { QueryServiceContext, sendToBus, useMachineBus } from 'src/useMachineBus'
+import { QueryServiceContext, useEventBus } from 'src/useEventBus'
 
 import { CODES } from '../common'
 import { RunQueryButton } from '../Shared/Buttons'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { PopupCard } from '../Shared/PopupCard'
-import { queryControllerMachine } from './queryControllerMachine'
 
 const getOperantSymbol = (operant) => {
 	switch (operant) {
@@ -74,8 +74,9 @@ CurrentConstraints.defaultProps = {
 	currentConstraints: [],
 }
 
-export const QueryController = () => {
-	const [state, send] = useMachineBus(queryControllerMachine)
+export const QueryController = ({ queryControllerActor }) => {
+	const [state, send, service] = useService(queryControllerActor)
+	const [sendToBus] = useEventBus(service)
 
 	const { currentConstraints, classView, selectedPaths, rootUrl, listConstraint } = state.context
 
@@ -114,6 +115,7 @@ export const QueryController = () => {
 	}
 
 	const handleDeleteConstraint = (path) => {
+		// @ts-ignore
 		send({ type: DELETE_QUERY_CONSTRAINT, path })
 	}
 

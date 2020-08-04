@@ -4,7 +4,7 @@ import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { ADD_LIST_CONSTRAINT, REMOVE_LIST_CONSTRAINT } from 'src/eventConstants'
-import { sendToBus } from 'src/useMachineBus'
+import { useEventBus } from 'src/useEventBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
@@ -59,6 +59,7 @@ const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, r
 export const ListSelector = ({ listsForCurrentClass, mineName, classView }) => {
 	const listSearchIndex = useRef(null)
 	const [selectedValue, setSelectedValue] = useState('')
+	const [sendToBus] = useEventBus()
 
 	useEffect(() => {
 		const indexClasses = async () => {
