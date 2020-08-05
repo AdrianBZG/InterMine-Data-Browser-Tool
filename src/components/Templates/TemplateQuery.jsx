@@ -137,7 +137,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 					alignText="left"
 					minimal={true}
 					// @ts-ignore
-					icon={<InfoIconPopover description={template?.description} />}
+					icon={<InfoIconPopover title={template.title} description={template?.description} />}
 					rightIcon={
 						isActiveQuery ? (
 							<Icon icon={IconNames.TICK_CIRCLE} intent="success" iconSize={20} />
