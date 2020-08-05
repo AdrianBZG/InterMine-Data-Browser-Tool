@@ -110,11 +110,11 @@ const renderMenu = (handleItemSelect, isLoading) => ({
 export const SuggestWidget = ({
 	nonIdealTitle = undefined,
 	nonIdealDescription = undefined,
-	label = '',
+	operationLabel = null,
 	searchIndex,
 	docField = '',
 }) => {
-	const [uniqueId] = useState(() => `selectPopup-${generateId()}`)
+	const [uniqueId] = useState(() => `suggestWidget-${generateId()}`)
 	const [state, send] = useServiceContext('constraints')
 	const { availableValues, selectedValues } = state.context
 
@@ -163,7 +163,7 @@ export const SuggestWidget = ({
 			{selectedValues.length > 0 && (
 				<div css={{ display: 'flex', alignItems: 'center' }}>
 					{state.context.op && <H6 css={{ margin: '0 10px 0 0' }}>{state.context.op}</H6>}
-					<div css={{ maxWidth: '50%' }}>
+					<div>
 						{selectedValues.map((val) => (
 							<Tag
 								key={val}
@@ -177,10 +177,30 @@ export const SuggestWidget = ({
 					</div>
 				</div>
 			)}
-			<FormGroup labelFor={uniqueId} label={label} css={{ paddingTop: 14 }}>
+			<FormGroup
+				labelFor={uniqueId}
+				inline={true}
+				css={{ paddingTop: 14, [`& .${Classes.FORM_CONTENT}`]: { display: 'flex', width: '100%' } }}
+			>
+				{operationLabel && (
+					<div
+						css={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							marginRight: 5,
+							border: '1px solid var(--grey3)',
+							borderRadius: 3,
+							width: 100,
+							height: 30,
+						}}
+					>
+						{operationLabel}
+					</div>
+				)}
 				<Suggest
 					// @ts-ignore
-					id={`selectPopup-${uniqueId}`}
+					id={uniqueId}
 					items={availableValues}
 					inputValueRenderer={renderInputValue}
 					fill={true}

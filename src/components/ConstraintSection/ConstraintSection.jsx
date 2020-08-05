@@ -78,7 +78,7 @@ const TemplatesList = ({ templateViewActor }) => {
 		categoryTagsForClass,
 	} = state.context
 
-	const showAll = categories[showAllLabel].isVisible ?? true
+	const showAll = categories[showAllLabel]?.isVisible ?? true
 	const isLoading = state.matches('loadTemplates')
 
 	const handleCategoryToggle = ({ isVisible, tagName }) => {

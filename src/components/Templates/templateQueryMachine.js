@@ -76,11 +76,15 @@ const spawnConstraintActors = assign({
 	constraintActors: (ctx) => {
 		return ctx.constraints.map((constraint) => {
 			const name = constraint.path.split('.').join(' > ')
+			const selectedValues = constraint.values ? constraint.values : [constraint.value]
+
 			const constraintActor = templateConstraintMachine.withContext({
 				...templateConstraintMachine.context,
 				rootUrl: ctx.rootUrl,
 				name,
 				constraint,
+				selectedValues,
+				defaultSelections: selectedValues,
 			})
 
 			return spawn(constraintActor, `${name}-Template constraint widget`)

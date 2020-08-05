@@ -1,10 +1,13 @@
 import hash from 'object-hash'
 import { fetchPathValues } from 'src/apiRequests'
 import { constraintValuesCache } from 'src/caches'
+import { fetchableConstraintOps } from 'src/constraintOperations'
 import {
 	ADD_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
+	FETCH_CONSTRAINT_ITEMS,
 	REMOVE_CONSTRAINT,
+	RESET_LOCAL_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
@@ -15,7 +18,9 @@ import { logErrorToConsole } from '../../utils'
 const addValueToConstraint = assign({
 	// @ts-ignore
 	selectedValues: (ctx, { constraint: value }) => {
-		return ctx.constraint.op === 'ONE OF' ? [...ctx.selectedValues, value] : [value]
+		return ctx.constraint.op === 'ONE OF'
+			? [...ctx.selectedValues.filter((val) => val !== value), value]
+			: [value]
 	},
 })
 
@@ -28,6 +33,10 @@ const removeValueFromConstraint = assign({
 const setAvailableValues = assign({
 	// @ts-ignore
 	availableValues: (_, { data }) => data.values,
+})
+
+const resetConstraint = assign({
+	selectedValues: (ctx) => ctx.defaultSelections,
 })
 
 const updateTemplateQuery = (ctx) => {
@@ -46,10 +55,15 @@ export const templateConstraintMachine = Machine(
 			rootUrl: '',
 			constraint: {},
 			selectedValues: [],
+			defaultSelections: [],
 			availableValues: [],
 		},
 		states: {
 			loading: {
+				always: [
+					{ target: 'idle', cond: 'isNotFetchableConstraint' },
+					{ target: 'idle', cond: 'hasValues' },
+				],
 				invoke: {
 					id: 'fetchTemplateConstraintValues',
 					src: 'fetchConstraintValues',
@@ -65,12 +79,21 @@ export const templateConstraintMachine = Machine(
 			},
 			noValuesForConstraint: {},
 			idle: {
+				always: [{ target: 'noValuesSelected', cond: 'noValuesSelected' }],
 				on: {
+					[FETCH_CONSTRAINT_ITEMS]: { target: 'loading' },
 					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
 					[REMOVE_CONSTRAINT]: {
 						target: 'updateTemplateQuery',
 						actions: 'removeValueFromConstraint',
 					},
+					[RESET_LOCAL_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'resetConstraint' },
+				},
+			},
+			noValuesSelected: {
+				on: {
+					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
+					[RESET_LOCAL_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'resetConstraint' },
 				},
 			},
 			updateTemplateQuery: {
@@ -88,6 +111,7 @@ export const templateConstraintMachine = Machine(
 			removeValueFromConstraint,
 			setAvailableValues,
 			updateTemplateQuery,
+			resetConstraint,
 		},
 		guards: {
 			// @ts-ignore
@@ -96,6 +120,12 @@ export const templateConstraintMachine = Machine(
 			},
 			hasValues: (ctx) => {
 				return ctx.availableValues.length > 0
+			},
+			isNotFetchableConstraint: (ctx) => {
+				return !fetchableConstraintOps.includes(ctx.constraint.op)
+			},
+			noValuesSelected: (ctx) => {
+				return ctx.selectedValues.length === 0 || ctx.selectedValues[0] === '' // could be an empty string from an Input Widget
 			},
 		},
 		services: {

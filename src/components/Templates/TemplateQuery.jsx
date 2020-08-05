@@ -1,24 +1,35 @@
-import { Button, Classes, Divider, H5, Icon } from '@blueprintjs/core'
+import { Button, ButtonGroup, Classes, Divider, H5, Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { useMachine, useService } from '@xstate/react'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
-import { FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
+import { isMultiSelection, isSingleSelection } from 'src/constraintOperations'
+import {
+	FETCH_CONSTRAINT_ITEMS,
+	FETCH_UPDATED_SUMMARY,
+	RESET_LOCAL_CONSTRAINT,
+} from 'src/eventConstants'
 import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
 import { CODES } from '../common'
-import { RunQueryButton } from '../Shared/Buttons'
 import { InfoIconPopover } from '../Shared/InfoIconPopover'
 import { PopupCard } from '../Shared/PopupCard'
+import { InputWidget } from '../Widgets/InputWidget'
+import { SelectWidget } from '../Widgets/SelectWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
 import { templateQueryMachine } from './templateQueryMachine'
 
 const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
-	const [state, send] = useService(templateConstraintActor)
+	const [state, send, service] = useService(templateConstraintActor)
+	useEventBus(service)
 
 	const searchIndex = useRef(null)
 	const { availableValues, name, rootUrl, constraint } = state.context
 	const docField = 'value'
+
+	useEffect(() => {
+		send({ type: FETCH_CONSTRAINT_ITEMS })
+	}, [send])
 
 	useEffect(() => {
 		const buildIndex = async () => {
@@ -35,45 +46,49 @@ const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
 		buildIndex()
 	}, [availableValues, mineName, name, constraint, rootUrl])
 
+	let ConstraintWidget = InputWidget
+
+	if (isSingleSelection.includes(constraint.op)) {
+		ConstraintWidget = SelectWidget
+	}
+
+	if (isMultiSelection.includes(constraint.op)) {
+		// @ts-ignore
+		ConstraintWidget = SuggestWidget
+	}
+
+	// Todo: This path return over 77,000 values. For now we display it as an input to match blue genes.
+	// After virtualizing the Select widget, we can display the actual values, and allow searching for values.
+	if (availableValues.length > 1000) {
+		ConstraintWidget = InputWidget
+	}
+
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<div css={{ margin: '20px 0' }}>
 				<H5>{name}</H5>
-				<SuggestWidget
+				<ConstraintWidget
+					// @ts-ignore
 					nonIdealTitle="No items found"
 					nonIdealDescription="If you feel this is a mistake, try refreshing the browser. If that doesn't work, let us know"
 					// @ts-ignore
 					searchIndex={searchIndex}
 					docField={docField}
+					operationLabel={constraint.op}
 				/>
 			</div>
 		</ConstraintServiceContext.Provider>
 	)
 }
 
-export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
-	// We don't provide default values for the templates
-	const withNoDefaults = [...template.where].map((con) => {
-		if ('value' in con) {
-			return {
-				...con,
-				value: '',
-			}
-		}
-		return { ...con, values: [] }
-	})
-	const editableConstraints = withNoDefaults.filter((con) => con.editable)
-
-	const templateQuery = {
-		...template,
-		where: withNoDefaults,
-	}
+export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
+	const editableConstraints = template.where.filter((con) => con.editable)
 
 	const [state, , service] = useMachine(
 		templateQueryMachine.withContext({
 			...templateQueryMachine.context,
 			rootUrl,
-			template: templateQuery,
+			template,
 			isActiveQuery: false,
 			constraints: editableConstraints,
 		})
@@ -109,6 +124,10 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 		]
 	}
 
+	const disableRunQuery = constraintActors.some((actor) => {
+		return actor.state.matches('noValuesSelected')
+	})
+
 	return (
 		<PopupCard boundary="viewport">
 			<div css={{ display: 'flex', alignItems: 'center' }}>
@@ -134,9 +153,14 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 					</div>
 				)
 			})}
-			<div className={Classes.POPOVER_DISMISS}>
-				<RunQueryButton
-					handleOnClick={() => {
+			<ButtonGroup fill={true} css={{ justifyContent: 'center' }}>
+				<Button
+					text="Run Query"
+					intent={disableRunQuery ? 'none' : 'success'}
+					css={{ maxWidth: '50%' }}
+					className={Classes.POPOVER_DISMISS}
+					disabled={disableRunQuery}
+					onClick={() => {
 						sendToBus({
 							query,
 							classView,
@@ -145,7 +169,17 @@ export const TemplateQuery = ({ classView, rootUrl, template, mineName }) => {
 						})
 					}}
 				/>
-			</div>
+				<Button
+					text="Reset All"
+					intent="danger"
+					css={{ maxWidth: '50%' }}
+					onClick={() => {
+						constraintActors.forEach((actor) => {
+							actor.send({ type: RESET_LOCAL_CONSTRAINT })
+						})
+					}}
+				/>
+			</ButtonGroup>
 		</PopupCard>
 	)
 }
