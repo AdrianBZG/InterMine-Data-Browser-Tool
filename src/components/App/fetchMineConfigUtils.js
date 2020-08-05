@@ -1,13 +1,6 @@
-import { fetchClasses, fetchInstances, fetchLists } from 'src/apiRequests'
-
-export const interminesPromise = (cachedIntermines, registry) =>
-	cachedIntermines ? Promise.resolve(cachedIntermines.intermines) : fetchInstances(registry)
-
-export const modelClassesPromise = (cachedModelClasses, rootUrl) =>
-	cachedModelClasses ? Promise.resolve(cachedModelClasses.modelClasses) : fetchClasses(rootUrl)
-
-export const listsPromise = (cachedLists, rootUrl) =>
-	cachedLists ? Promise.resolve(cachedLists.lists) : fetchLists(rootUrl)
+export const maybeFetchPromise = (cachedValue, fetchFn) => {
+	return cachedValue ? Promise.resolve(cachedValue) : fetchFn()
+}
 
 export const interminesConfig = (interminesResp) =>
 	interminesResp.data.instances.map((mine) => ({

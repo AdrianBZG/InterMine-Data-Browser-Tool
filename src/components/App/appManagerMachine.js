@@ -1,5 +1,5 @@
 import hash from 'object-hash'
-import { INTERMINE_REGISTRY } from 'src/apiRequests'
+import { fetchClasses, fetchInstances, fetchLists, INTERMINE_REGISTRY } from 'src/apiRequests'
 import { interminesConfigCache } from 'src/caches'
 import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, SET_API_TOKEN } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
@@ -8,11 +8,9 @@ import { assign, Machine, spawn } from 'xstate'
 import { queryControllerMachine } from '../QueryController/queryControllerMachine'
 import {
 	interminesConfig,
-	interminesPromise,
 	listsConfig,
-	listsPromise,
+	maybeFetchPromise,
 	modelClassesConfig,
-	modelClassesPromise,
 } from './fetchMineConfigUtils'
 import { overviewMachine } from './overviewMachine'
 import { templateViewMachine } from './templateViewMachine'
@@ -197,6 +195,71 @@ const logErrorToConsole = (ctx, event) => {
 	console.error('FETCH: could not retrieve intermines', { ctx, event })
 }
 
+/**
+ * Services
+ */
+const fetchMineConfiguration = async (ctx) => {
+	const rootUrl = ctx.selectedMine.rootUrl
+	const registry = INTERMINE_REGISTRY
+
+	const registryStorageConfig = { name: 'instances', registry }
+	const registryHash = hash(registryStorageConfig)
+
+	const modelsStorageConfig = { name: 'mine classes', rootUrl }
+	const modelsHash = hash(modelsStorageConfig)
+
+	const listsStorageConfig = { name: 'mine lists', rootUrl }
+	const listsHash = hash(listsStorageConfig)
+
+	const cachedIntermines = await interminesConfigCache.getItem(registryHash)
+	const cachedModelClasses = await interminesConfigCache.getItem(modelsHash)
+	const cachedLists = await interminesConfigCache.getItem(listsHash)
+
+	let [resolvedIntermines, resolvedClasses, resolvedLists] = await Promise.all([
+		maybeFetchPromise(cachedIntermines?.intermines, () => fetchInstances(registry)),
+		maybeFetchPromise(cachedModelClasses?.modelClasses, () => fetchClasses(rootUrl)),
+		maybeFetchPromise(cachedLists?.lists, () => fetchLists(rootUrl)),
+	])
+
+	const dateSaved = Date.now()
+
+	if (!cachedIntermines) {
+		resolvedIntermines = interminesConfig(resolvedIntermines)
+
+		await interminesConfigCache.setItem(registryHash, {
+			...registryStorageConfig,
+			intermines: resolvedIntermines,
+			date: dateSaved,
+		})
+	}
+
+	if (!cachedModelClasses) {
+		resolvedClasses = modelClassesConfig(resolvedClasses)
+
+		await interminesConfigCache.setItem(modelsHash, {
+			...modelsStorageConfig,
+			modelClasses: resolvedClasses,
+			date: dateSaved,
+		})
+	}
+
+	if (!cachedLists) {
+		resolvedLists = listsConfig(resolvedLists)
+
+		await interminesConfigCache.setItem(listsHash, {
+			...listsStorageConfig,
+			lists: resolvedLists,
+			date: dateSaved,
+		})
+	}
+
+	return {
+		modelClasses: resolvedClasses,
+		lists: resolvedLists,
+		intermines: resolvedIntermines,
+	}
+}
+
 export const appManagerMachine = Machine(
 	{
 		id: 'App Manager',
@@ -284,69 +347,7 @@ export const appManagerMachine = Machine(
 			fetchInitialSummaryForMine,
 		},
 		services: {
-			fetchMineConfiguration: async (ctx) => {
-				const rootUrl = ctx.selectedMine.rootUrl
-				const registry = INTERMINE_REGISTRY
-
-				const registryStorageConfig = { name: 'instances', registry }
-				const registryHash = hash(registryStorageConfig)
-
-				const modelsStorageConfig = { name: 'mine classes', rootUrl }
-				const modelsHash = hash(modelsStorageConfig)
-
-				const listsStorageConfig = { name: 'mine lists', rootUrl }
-				const listsHash = hash(listsStorageConfig)
-
-				const cachedIntermines = await interminesConfigCache.getItem(registryHash)
-				const cachedModelClasses = await interminesConfigCache.getItem(modelsHash)
-				const cachedLists = await interminesConfigCache.getItem(listsHash)
-
-				const [resolvedIntermines, resolvedClasses, resolvedLists] = await Promise.all([
-					interminesPromise(cachedIntermines, registry),
-					modelClassesPromise(cachedModelClasses, rootUrl),
-					listsPromise(cachedLists, rootUrl),
-				])
-
-				const dateSaved = Date.now()
-
-				let intermines = resolvedIntermines
-				if (!cachedIntermines) {
-					intermines = interminesConfig(intermines)
-
-					await interminesConfigCache.setItem(registryHash, {
-						...registryStorageConfig,
-						intermines,
-						date: dateSaved,
-					})
-				}
-
-				let modelClasses = resolvedClasses
-				if (!cachedModelClasses) {
-					modelClasses = modelClassesConfig(modelClasses)
-
-					await interminesConfigCache.setItem(modelsHash, {
-						...modelsStorageConfig,
-						modelClasses,
-						date: dateSaved,
-					})
-				}
-
-				let lists = resolvedLists
-				if (!cachedLists) {
-					lists = listsConfig(lists)
-					await interminesConfigCache.setItem(listsHash, {
-						...listsStorageConfig,
-						lists,
-						date: dateSaved,
-					})
-				}
-
-				return {
-					modelClasses,
-					lists,
-					intermines,
-				}
-			},
+			fetchMineConfiguration,
 		},
 	}
 )

@@ -98,7 +98,6 @@ export const BarChartMachine = Machine(
 					],
 				}
 
-				console.log('here')
 				const summaryConfig = { rootUrl, query, path: 'length' }
 				const configHash = hash(summaryConfig)
 				let summary
