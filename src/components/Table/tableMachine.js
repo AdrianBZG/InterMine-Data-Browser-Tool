@@ -129,7 +129,15 @@ export const TableChartMachine = Machine(
 					},
 				},
 			},
-			noTableSummary: {},
+			noTableSummary: {
+				on: {
+					[FETCH_INITIAL_SUMMARY]: {
+						target: 'fetchInitialRows',
+						actions: 'bustCachedPages',
+					},
+					[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
+				},
+			},
 		},
 	},
 	{

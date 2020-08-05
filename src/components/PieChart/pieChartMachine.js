@@ -51,7 +51,12 @@ export const PieChartMachine = Machine(
 					},
 				},
 			},
-			hasNoSummary: {},
+			hasNoSummary: {
+				on: {
+					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+				},
+			},
 		},
 	},
 	{

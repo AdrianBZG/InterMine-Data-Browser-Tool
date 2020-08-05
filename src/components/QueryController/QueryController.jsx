@@ -89,6 +89,11 @@ export const QueryController = ({ queryControllerActor }) => {
 	}
 
 	const runQuery = () => {
+		if (currentConstraints.length === 0) {
+			sendToBus({ type: FETCH_UPDATED_SUMMARY, classView, rootUrl })
+			return
+		}
+
 		let constraintLogic = ''
 
 		const constraints =
@@ -144,11 +149,7 @@ export const QueryController = ({ queryControllerActor }) => {
 					/>
 				</QueryServiceContext.Provider>
 			</PopupCard>
-			<RunQueryButton
-				intent={currentConstraints.length === 0 ? 'none' : 'success'}
-				isDisabled={currentConstraints.length === 0}
-				handleOnClick={runQuery}
-			/>
+			<RunQueryButton intent="success" handleOnClick={runQuery} />
 		</div>
 	)
 }

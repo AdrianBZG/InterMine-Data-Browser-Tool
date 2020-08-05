@@ -63,7 +63,12 @@ export const BarChartMachine = Machine(
 					},
 				},
 			},
-			noGeneLengths: {},
+			noGeneLengths: {
+				on: {
+					[FETCH_UPDATED_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+				},
+			},
 		},
 	},
 	{
@@ -93,6 +98,7 @@ export const BarChartMachine = Machine(
 					],
 				}
 
+				console.log('here')
 				const summaryConfig = { rootUrl, query, path: 'length' }
 				const configHash = hash(summaryConfig)
 				let summary
