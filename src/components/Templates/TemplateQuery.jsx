@@ -106,14 +106,15 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 	const showDivider = (idx) =>
 		editableConstraints.length > 1 && idx < editableConstraints.length - 1
 
-	const query = {
+	let query = {
 		...updatedTemplate,
-		constraintLogic: updatedTemplate.constraintLogic,
+		constraintLogic: template.where.map((_, idx) => CODES[idx]).join(' AND '),
 		where: updatedTemplate.where,
 	}
 
 	if (listConstraint.value.length > 0) {
 		const nextCode = CODES[updatedTemplate.where.length]
+		query.constraintLogic = `${query.constraintLogic} AND ${nextCode}`
 		query.where = [
 			...query.where,
 			{
