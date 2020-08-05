@@ -23,4 +23,5 @@ exports.usedIcons = [
 	IconNames.REMOVE,
 	IconNames.DELETE,
 	IconNames.INFO_SIGN,
+	IconNames.SMALL_CROSS,
 ]
