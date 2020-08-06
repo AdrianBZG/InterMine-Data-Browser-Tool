@@ -128,6 +128,9 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 	const [, setErrorDownloading] = useState(false)
 	const [lastQuery, setLastQuery] = useState('')
 
+	const fileExtension = codeNameToExtension(lang)
+	const previousFileExtension = codeNameToExtension(lang)
+
 	const fetchCodePreview = async () => {
 		const nextQuery = hash(query)
 		let codeCache = { ...code }
@@ -142,15 +145,19 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 				query,
 				rootUrl,
 				codeCache,
-				lang: codeNameToExtension(lang),
+				fileExtension,
+				isSameQuery: nextQuery === lastQuery,
 			})
-			setCode({
-				...codeCache,
-				[lang]: {
-					highlighted: hljs.highlightAuto(file).value,
-					plain: file,
-				},
-			})
+
+			if (file) {
+				setCode({
+					...codeCache,
+					[fileExtension]: {
+						highlighted: hljs.highlightAuto(file).value,
+						plain: file,
+					},
+				})
+			}
 		} catch (e) {
 			// Todo: show error message
 			setErrorDownloading(true)
@@ -168,7 +175,8 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 		saveAs(blob, `${fileName}.${codeNameToExtension(lang)}`)
 	}
 
-	const renderCode = code[lang] || code[prevLang]
+	const renderCode = code[fileExtension] || code[previousFileExtension]
+
 	return (
 		<Dialog
 			title="Generate code snippet"
@@ -204,7 +212,8 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 					{renderCode ? (
 						<Code
 							dangerouslySetInnerHTML={{
-								__html: code[lang]?.highlighted ?? code[prevLang]?.highlighted,
+								__html:
+									code[fileExtension]?.highlighted ?? code[previousFileExtension]?.highlighted,
 							}}
 						/>
 					) : (

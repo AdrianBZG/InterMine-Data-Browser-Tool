@@ -98,15 +98,13 @@ export const fetchCode1 = async ({ query, lang, rootUrl, fileName }) => {
 	return await q.fetchCode(lang)
 }
 
-export const fetchCode = async ({ query, lang, rootUrl, codeCache }) => {
-	if (!query || Object.keys(query).length === 0) {
+export const fetchCode = async ({ query, fileExtension, rootUrl, codeCache, isSameQuery }) => {
+	if (!query || Object.keys(query).length === 0 || (isSameQuery && fileExtension in codeCache)) {
 		return
 	}
 
-	if (!(lang in codeCache)) {
-		const service = getService(rootUrl)
-		const q = await service.query(query)
+	const service = getService(rootUrl)
+	const q = await service.query(query)
 
-		return await q.fetchCode(lang)
-	}
+	return await q.fetchCode(fileExtension)
 }
