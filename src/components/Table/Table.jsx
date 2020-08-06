@@ -3,6 +3,8 @@ import {
 	ButtonGroup,
 	Classes,
 	ControlGroup,
+	Dialog,
+	FormGroup,
 	HTMLTable,
 	Icon,
 	InputGroup,
@@ -17,6 +19,7 @@ import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
+import { exportTable } from 'src/apiRequests'
 import { CHANGE_PAGE } from 'src/eventConstants'
 import { TableServiceContext, useEventBus, useServiceContext } from 'src/useEventBus'
 import { tableLoadingData } from 'src/utils/loadingData/tableResults'
@@ -28,8 +31,82 @@ import { TableChartMachine } from './tableMachine'
 /**
  *
  */
-const TableActionButtons = () => {
+const ExportTableButton = ({ query, rootUrl }) => {
+	const [isOpen, setIsOpen] = useState(false)
+	const [format, setFormat] = useState('tsv')
+	const [fileName, setFileName] = useState('table data result')
+	const [, setErrorDownloading] = useState(false)
+
+	const handleOnClose = () => setIsOpen(false)
+
+	const handleExport = async () => {
+		try {
+			await exportTable({ query, rootUrl, format, fileName })
+		} catch (e) {
+			// Todo: display an error message
+			setErrorDownloading(true)
+			console.error(`Error downloading file: ${e}`)
+		}
+	}
+
+	return (
+		<>
+			<Button
+				intent="primary"
+				outlined={true}
+				icon={IconNames.ARCHIVE}
+				text="Export"
+				onClick={() => setIsOpen(true)}
+			/>
+			<Dialog
+				title="Export Table Data"
+				isOpen={isOpen}
+				canEscapeKeyClose={true}
+				onClose={handleOnClose}
+			>
+				<div css={{ padding: 40 }}>
+					<ControlGroup css={{ display: 'flex' }}>
+						<FormGroup label="Filename" labelFor="table-download-filename" labelInfo="(optional)">
+							<InputGroup
+								id="table-download-filename"
+								value={fileName}
+								fill={false}
+								css={{ width: 160 }}
+								onChange={(e) => setFileName(e.target.value)}
+							/>
+						</FormGroup>
+						<Select
+							filterable={false}
+							items={['tsv', 'csv']}
+							itemRenderer={(format, { handleClick }) => {
+								// @ts-ignore
+								return <MenuItem key={format} text={format} onClick={handleClick} />
+							}}
+							onItemSelect={setFormat}
+							css={{ alignSelf: 'center', marginTop: 8 }}
+						>
+							<Button intent="none" rightIcon={IconNames.CARET_DOWN} text={format} />
+						</Select>
+					</ControlGroup>
+					<Button
+						intent="primary"
+						icon={IconNames.ARCHIVE}
+						text="Download results"
+						onClick={handleExport}
+						css={{ marginTop: 10 }}
+					/>
+				</div>
+			</Dialog>
+		</>
+	)
+}
+
+/**
+ *
+ */
+const TableActionButtons = ({ query, rootUrl }) => {
 	const [selectedLanguage, setLanguage] = useState('Python')
+
 	return (
 		<div
 			css={{
@@ -67,7 +144,7 @@ const TableActionButtons = () => {
 			{/* 
 			Export button 
 			*/}
-			<Button intent="primary" outlined={true} icon={IconNames.ARCHIVE} text="Export" />
+			<ExportTableButton query={query} rootUrl={rootUrl} />
 		</div>
 	)
 }
@@ -186,7 +263,7 @@ const ColumnHeader = ({ columnName, isLoading }) => {
 /**
  *
  */
-const Cell = ({ cell, mineUrl, isLoading }) => {
+const Cell = ({ cell, rootUrl, isLoading }) => {
 	const cellValue = cell.value
 	const skeletonClass = isLoading ? Classes.SKELETON : ''
 
@@ -203,7 +280,7 @@ const Cell = ({ cell, mineUrl, isLoading }) => {
 		>
 			{cellValue ? (
 				<div title={cellValue} className={skeletonClass}>
-					<a href={`${mineUrl}${cell.url}`} target="_blank" rel="noopener noreferrer">
+					<a href={`${rootUrl}${cell.url}`} target="_blank" rel="noopener noreferrer">
 						<Icon icon={IconNames.GLOBE_NETWORK} />
 						{cellValue}
 					</a>
@@ -223,7 +300,7 @@ export const Table = React.memo(function Table() {
 	const [state, send, service] = useMachine(TableChartMachine)
 	useEventBus(service)
 
-	const { pages, mineUrl, totalRows, pageNumber, visibleRows } = state.context
+	const { pages, rootUrl, totalRows, pageNumber, visibleRows, lastQuery } = state.context
 	const isLoading = !state.matches('idle')
 	const rows = isLoading
 		? tableLoadingData
@@ -248,7 +325,7 @@ export const Table = React.memo(function Table() {
 
 	return (
 		<TableServiceContext.Provider value={{ state, send }}>
-			<TableActionButtons />
+			<TableActionButtons query={lastQuery} rootUrl={rootUrl} />
 			<div css={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
 				<span
 					// @ts-ignore
@@ -280,7 +357,7 @@ export const Table = React.memo(function Table() {
 									<Cell
 										key={`${colIdx}-${rowIdx}`}
 										cell={cell}
-										mineUrl={mineUrl}
+										rootUrl={rootUrl}
 										isLoading={isLoading}
 									/>
 								))}

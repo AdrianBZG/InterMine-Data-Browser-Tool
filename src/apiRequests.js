@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { saveAs } from 'file-saver'
 import imjs from 'imjs'
 
 import { formatConstraintPath } from './utils'
@@ -78,4 +79,14 @@ export const fetchLists = async (rootUrl) => {
 	const service = getService(rootUrl)
 
 	return await service.fetchLists()
+}
+
+export const exportTable = async ({ query, rootUrl, format, fileName }) => {
+	const service = getService(rootUrl)
+	const q = await service.query(query)
+
+	const file = await service.post('query/results', { format, query: q.toXML() })
+	const blob = new Blob([file])
+
+	saveAs(blob, `${fileName}.${format}`)
 }

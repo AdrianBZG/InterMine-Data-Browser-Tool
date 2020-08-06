@@ -10958,6 +10958,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-saver@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "file-saver@npm:2.0.2"
+  checksum: 3b4e66bf4ec88740b4076792b74db91e534e27400babe43a5a0b533238551842e5e1bd108c350b3e2129de14be0d11759a3098ba0d4d19f7eaaf88976f6fd415
+  languageName: node
+  linkType: hard
+
 "file-system-cache@npm:^1.0.5":
   version: 1.0.5
   resolution: "file-system-cache@npm:1.0.5"
@@ -12864,6 +12871,7 @@ fsevents@^1.2.7:
     eslint-plugin-react: 7.x
     eslint-plugin-react-hooks: 2.x
     eslint-plugin-simple-import-sort: ^5.0.3
+    file-saver: ^2.0.2
     flexsearch: ^0.6.32
     husky: ">=4"
     imjs: ^4.0.0
