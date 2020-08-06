@@ -1,153 +1,28 @@
 import {
 	Button,
-	ButtonGroup,
 	Classes,
 	ControlGroup,
-	Dialog,
-	FormGroup,
 	HTMLTable,
 	Icon,
 	InputGroup,
-	MenuItem,
 	Position,
 	Tooltip,
 } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { Select } from '@blueprintjs/select'
 import { useMachine } from '@xstate/react'
 import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
-import { exportTable } from 'src/apiRequests'
 import { CHANGE_PAGE } from 'src/eventConstants'
 import { TableServiceContext, useEventBus, useServiceContext } from 'src/useEventBus'
 import { tableLoadingData } from 'src/utils/loadingData/tableResults'
 import { humanize, titleize } from 'underscore.string'
 
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
+import { ExportTableButton } from './ExportTableButton'
+import { GenerateCodeButton } from './GenerateCodeButton'
 import { TableChartMachine } from './tableMachine'
-
-/**
- *
- */
-const ExportTableButton = ({ query, rootUrl }) => {
-	const [isOpen, setIsOpen] = useState(false)
-	const [format, setFormat] = useState('tsv')
-	const [fileName, setFileName] = useState('table data result')
-	const [, setErrorDownloading] = useState(false)
-
-	const handleOnClose = () => setIsOpen(false)
-
-	const handleExport = async () => {
-		try {
-			await exportTable({ query, rootUrl, format, fileName })
-		} catch (e) {
-			// Todo: display an error message
-			setErrorDownloading(true)
-			console.error(`Error downloading file: ${e}`)
-		}
-	}
-
-	return (
-		<>
-			<Button
-				intent="primary"
-				outlined={true}
-				icon={IconNames.ARCHIVE}
-				text="Export"
-				onClick={() => setIsOpen(true)}
-			/>
-			<Dialog
-				title="Export Table Data"
-				isOpen={isOpen}
-				canEscapeKeyClose={true}
-				onClose={handleOnClose}
-			>
-				<div css={{ padding: 40 }}>
-					<ControlGroup css={{ display: 'flex' }}>
-						<FormGroup label="Filename" labelFor="table-download-filename" labelInfo="(optional)">
-							<InputGroup
-								id="table-download-filename"
-								value={fileName}
-								fill={false}
-								css={{ width: 160 }}
-								onChange={(e) => setFileName(e.target.value)}
-							/>
-						</FormGroup>
-						<Select
-							filterable={false}
-							items={['tsv', 'csv']}
-							itemRenderer={(format, { handleClick }) => {
-								// @ts-ignore
-								return <MenuItem key={format} text={format} onClick={handleClick} />
-							}}
-							onItemSelect={setFormat}
-							css={{ alignSelf: 'center', marginTop: 8 }}
-						>
-							<Button intent="none" rightIcon={IconNames.CARET_DOWN} text={format} />
-						</Select>
-					</ControlGroup>
-					<Button
-						intent="primary"
-						icon={IconNames.ARCHIVE}
-						text="Download results"
-						onClick={handleExport}
-						css={{ marginTop: 10 }}
-					/>
-				</div>
-			</Dialog>
-		</>
-	)
-}
-
-/**
- *
- */
-const TableActionButtons = ({ query, rootUrl }) => {
-	const [selectedLanguage, setLanguage] = useState('Python')
-
-	return (
-		<div
-			css={{
-				display: 'flex',
-				justifyContent: 'flex-end',
-				marginBottom: '40px',
-			}}
-		>
-			{/* 
-			Save as list button 
-			*/}
-			<Button outlined={true} intent="primary" icon={IconNames.CLOUD_UPLOAD} text="Save As List" />
-			{/* 
-			Code snippet button
-			*/}
-			<ButtonGroup css={{ margin: '0px 16px' }}>
-				<Button
-					outlined={true}
-					intent="primary"
-					icon={IconNames.CODE}
-					text={`Generate ${selectedLanguage} code`}
-				/>
-				<Select
-					filterable={false}
-					items={['Python', 'Perl', 'Java', 'Ruby', 'Javascript', 'XML']}
-					itemRenderer={(lang, { handleClick }) => {
-						// @ts-ignore
-						return <MenuItem key={lang} text={lang} onClick={handleClick} />
-					}}
-					onItemSelect={setLanguage}
-				>
-					<Button outlined={true} intent="primary" icon={IconNames.CARET_DOWN} />
-				</Select>
-			</ButtonGroup>
-			{/* 
-			Export button 
-			*/}
-			<ExportTableButton query={query} rootUrl={rootUrl} />
-		</div>
-	)
-}
 
 /**
  *
@@ -325,7 +200,22 @@ export const Table = React.memo(function Table() {
 
 	return (
 		<TableServiceContext.Provider value={{ state, send }}>
-			<TableActionButtons query={lastQuery} rootUrl={rootUrl} />
+			<div
+				css={{
+					display: 'flex',
+					justifyContent: 'flex-end',
+					marginBottom: '40px',
+				}}
+			>
+				<Button
+					outlined={true}
+					intent="primary"
+					icon={IconNames.CLOUD_UPLOAD}
+					text="Save As List"
+				/>
+				<GenerateCodeButton query={lastQuery} rootUrl={rootUrl} />
+				<ExportTableButton query={lastQuery} rootUrl={rootUrl} />
+			</div>
 			<div css={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
 				<span
 					// @ts-ignore

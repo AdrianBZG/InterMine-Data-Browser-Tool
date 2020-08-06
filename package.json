@@ -43,6 +43,7 @@
 		"babel-plugin-emotion": "^10.0.33",
 		"file-saver": "^2.0.2",
 		"flexsearch": "^0.6.32",
+		"highlight.js": "^10.1.2",
 		"imjs": "^4.0.0",
 		"immer": "^7.0.5",
 		"localforage": "^1.8.1",

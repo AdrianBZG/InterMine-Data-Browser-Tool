@@ -12182,6 +12182,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"highlight.js@npm:^10.1.2":
+  version: 10.1.2
+  resolution: "highlight.js@npm:10.1.2"
+  checksum: 12ad98d6f2b89ff7f46e2f9404bb3f3783c81cc5a98362e89e7f56d9d0315952149561e5f1661073e0bf8528412ce9262a331f27da4e263d122d34daa5473d08
+  languageName: node
+  linkType: hard
+
 "highlight.js@npm:~9.13.0":
   version: 9.13.1
   resolution: "highlight.js@npm:9.13.1"
@@ -12873,6 +12880,7 @@ fsevents@^1.2.7:
     eslint-plugin-simple-import-sort: ^5.0.3
     file-saver: ^2.0.2
     flexsearch: ^0.6.32
+    highlight.js: ^10.1.2
     husky: ">=4"
     imjs: ^4.0.0
     immer: ^7.0.5
