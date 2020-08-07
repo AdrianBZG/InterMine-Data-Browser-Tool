@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import { useService } from '@xstate/react'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { DELETE_QUERY_CONSTRAINT, FETCH_UPDATED_SUMMARY } from 'src/eventConstants'
+import { DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY, FETCH_SUMMARY } from 'src/eventConstants'
 import { QueryServiceContext, useEventBus } from 'src/useEventBus'
 
 import { CODES } from '../common'
@@ -111,12 +111,12 @@ export const QueryController = ({ queryControllerActor }) => {
 			where: codedConstraints,
 		}
 
-		sendToBus({ type: FETCH_UPDATED_SUMMARY, query, classView, rootUrl })
+		sendToBus({ type: FETCH_SUMMARY, query, classView, rootUrl })
 	}
 
 	const handleDeleteConstraint = (path) => {
 		// @ts-ignore
-		send({ type: DELETE_QUERY_CONSTRAINT, path })
+		send({ type: DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY, path })
 	}
 
 	return (

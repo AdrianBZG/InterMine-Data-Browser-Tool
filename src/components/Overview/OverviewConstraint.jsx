@@ -5,7 +5,7 @@ import { useService } from '@xstate/react'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
-import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
+import { APPLY_OVERVIEW_CONSTRAINT, RESET_OVERVIEW_CONSTRAINT } from 'src/eventConstants'
 import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
@@ -28,14 +28,14 @@ const ConstraintCard = ({ children, disableAllButtons, enableApplyButton, handle
 					css={{ maxWidth: '50%' }}
 					intent={!disableAllButtons && constraintApplied ? 'danger' : 'none'}
 					disabled={disableAllButtons || !constraintApplied}
-					onClick={() => handleOnClick(RESET_LOCAL_CONSTRAINT)}
+					onClick={() => handleOnClick(RESET_OVERVIEW_CONSTRAINT)}
 				/>
 				<Button
 					text="Apply Constraint"
 					css={{ maxWidth: '50%' }}
 					intent={!disableAllButtons && enableApplyButton ? 'success' : 'none'}
 					disabled={disableAllButtons || !enableApplyButton}
-					onClick={() => handleOnClick(APPLY_DATA_BROWSER_CONSTRAINT)}
+					onClick={() => handleOnClick(APPLY_OVERVIEW_CONSTRAINT)}
 				/>
 			</ButtonGroup>
 		</>

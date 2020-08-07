@@ -5,9 +5,9 @@ import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { isMultiSelection, isSingleSelection } from 'src/constraintOperations'
 import {
-	FETCH_CONSTRAINT_ITEMS,
-	FETCH_UPDATED_SUMMARY,
-	RESET_LOCAL_CONSTRAINT,
+	FETCH_SUMMARY,
+	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
+	RESET_OVERVIEW_CONSTRAINT,
 } from 'src/eventConstants'
 import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
@@ -28,7 +28,7 @@ const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
 	const docField = 'value'
 
 	useEffect(() => {
-		send({ type: FETCH_CONSTRAINT_ITEMS })
+		send({ type: FETCH_TEMPLATE_CONSTRAINT_ITEMS })
 	}, [send])
 
 	useEffect(() => {
@@ -166,7 +166,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 							query,
 							classView,
 							rootUrl,
-							type: FETCH_UPDATED_SUMMARY,
+							type: FETCH_SUMMARY,
 						})
 					}}
 				/>
@@ -176,7 +176,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 					css={{ maxWidth: '50%' }}
 					onClick={() => {
 						constraintActors.forEach((actor) => {
-							actor.send({ type: RESET_LOCAL_CONSTRAINT })
+							actor.send({ type: RESET_OVERVIEW_CONSTRAINT })
 						})
 					}}
 				/>

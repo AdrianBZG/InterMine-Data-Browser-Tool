@@ -1,7 +1,7 @@
 import {
 	ADD_LIST_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
-	FETCH_UPDATED_SUMMARY,
+	FETCH_SUMMARY,
 	REMOVE_LIST_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
@@ -112,7 +112,7 @@ export const templateQueryMachine = Machine(
 				entry: 'spawnConstraintActors',
 				on: {
 					[ADD_TEMPLATE_CONSTRAINT]: { actions: 'setQueries', cond: 'templateHasQuery' },
-					[FETCH_UPDATED_SUMMARY]: { actions: 'setActiveQuery' },
+					[FETCH_SUMMARY]: { actions: 'setActiveQuery' },
 					[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
 					[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
 				},

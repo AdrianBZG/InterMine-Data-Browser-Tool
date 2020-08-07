@@ -1,13 +1,7 @@
 import hash from 'object-hash'
 import { fetchTable } from 'src/apiRequests'
 import { tableCache } from 'src/caches'
-import {
-	CHANGE_MINE,
-	CHANGE_PAGE,
-	FETCH_INITIAL_SUMMARY,
-	FETCH_UPDATED_SUMMARY,
-	SET_AVAILABLE_COLUMNS,
-} from 'src/eventConstants'
+import { CHANGE_MINE, CHANGE_PAGE, FETCH_SUMMARY, SET_AVAILABLE_COLUMNS } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine } from 'xstate'
 
@@ -86,7 +80,7 @@ export const TableChartMachine = Machine(
 		states: {
 			waitingOnMineToLoad: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: {
+					[FETCH_SUMMARY]: {
 						target: 'fetchInitialRows',
 						actions: 'bustCachedPages',
 					},
@@ -99,7 +93,7 @@ export const TableChartMachine = Machine(
 						{ actions: 'updatePageNumber', cond: 'hasPageInCache' },
 						{ target: 'fetchNewPages' },
 					],
-					[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
+					[FETCH_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
 				},
 			},
 			fetchInitialRows: {
@@ -133,11 +127,10 @@ export const TableChartMachine = Machine(
 			},
 			noTableSummary: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: {
+					[FETCH_SUMMARY]: {
 						target: 'fetchInitialRows',
 						actions: 'bustCachedPages',
 					},
-					[FETCH_UPDATED_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
 				},
 			},
 		},

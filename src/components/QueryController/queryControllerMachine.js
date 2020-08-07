@@ -3,11 +3,10 @@ import {
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
 	CHANGE_CLASS,
 	CHANGE_MINE,
+	CONSTRAINT_UPDATED,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
-	DELETE_QUERY_CONSTRAINT,
 	REMOVE_LIST_CONSTRAINT,
 	SET_AVAILABLE_COLUMNS,
-	UNSET_CONSTRAINT,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine } from 'xstate'
@@ -51,7 +50,7 @@ const removeConstraint = assign({
 		if (type !== DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
 			const constraintPath = path.slice(path.indexOf('.') + 1)
 
-			sendToBus({ type: UNSET_CONSTRAINT, path: constraintPath })
+			sendToBus({ type: CONSTRAINT_UPDATED, path: constraintPath })
 		}
 
 		return withoutQuery
@@ -123,7 +122,7 @@ export const queryControllerMachine = Machine(
 							actions: 'addListConstraint',
 						},
 					],
-					[DELETE_QUERY_CONSTRAINT]: { actions: 'removeConstraint' },
+					[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { actions: 'removeConstraint' },
 					[APPLY_OVERVIEW_CONSTRAINT_TO_QUERY]: [
 						{
 							target: 'constraintLimitReached',
@@ -141,7 +140,7 @@ export const queryControllerMachine = Machine(
 			},
 			constraintLimitReached: {
 				on: {
-					[DELETE_QUERY_CONSTRAINT]: {
+					[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: {
 						actions: 'removeConstraint',
 					},
 				},

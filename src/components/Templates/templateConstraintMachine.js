@@ -5,9 +5,9 @@ import { fetchableConstraintOps } from 'src/constraintOperations'
 import {
 	ADD_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
-	FETCH_CONSTRAINT_ITEMS,
+	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
 	REMOVE_CONSTRAINT,
-	RESET_LOCAL_CONSTRAINT,
+	RESET_OVERVIEW_CONSTRAINT,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
@@ -81,19 +81,25 @@ export const templateConstraintMachine = Machine(
 			idle: {
 				always: [{ target: 'noValuesSelected', cond: 'noValuesSelected' }],
 				on: {
-					[FETCH_CONSTRAINT_ITEMS]: { target: 'loading' },
+					[FETCH_TEMPLATE_CONSTRAINT_ITEMS]: { target: 'loading' },
 					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
 					[REMOVE_CONSTRAINT]: {
 						target: 'updateTemplateQuery',
 						actions: 'removeValueFromConstraint',
 					},
-					[RESET_LOCAL_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'resetConstraint' },
+					[RESET_OVERVIEW_CONSTRAINT]: {
+						target: 'updateTemplateQuery',
+						actions: 'resetConstraint',
+					},
 				},
 			},
 			noValuesSelected: {
 				on: {
 					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
-					[RESET_LOCAL_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'resetConstraint' },
+					[RESET_OVERVIEW_CONSTRAINT]: {
+						target: 'updateTemplateQuery',
+						actions: 'resetConstraint',
+					},
 				},
 			},
 			updateTemplateQuery: {

@@ -3,14 +3,14 @@ import { fetchSummary } from 'src/apiRequests'
 import { constraintValuesCache } from 'src/caches'
 import {
 	ADD_CONSTRAINT,
-	APPLY_DATA_BROWSER_CONSTRAINT,
+	APPLY_OVERVIEW_CONSTRAINT,
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
+	CONSTRAINT_UPDATED,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 	LOCK_ALL_CONSTRAINTS,
 	REMOVE_CONSTRAINT,
 	RESET_ALL_CONSTRAINTS,
-	RESET_LOCAL_CONSTRAINT,
-	UNSET_CONSTRAINT,
+	RESET_OVERVIEW_CONSTRAINT,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { formatConstraintPath } from 'src/utils'
@@ -91,8 +91,8 @@ export const overviewConstraintMachine = Machine(
 		on: {
 			[LOCK_ALL_CONSTRAINTS]: 'constraintLimitReached',
 			[RESET_ALL_CONSTRAINTS]: { target: 'noConstraintsSet', actions: 'removeAll' },
-			[RESET_LOCAL_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
-			[UNSET_CONSTRAINT]: { target: 'constraintsUpdated', cond: 'pathMatches' },
+			[RESET_OVERVIEW_CONSTRAINT]: { target: 'noConstraintsSet', actions: 'removeAll' },
+			[CONSTRAINT_UPDATED]: { target: 'constraintsUpdated', cond: 'pathMatches' },
 		},
 		states: {
 			loading: {
@@ -125,7 +125,7 @@ export const overviewConstraintMachine = Machine(
 				on: {
 					[ADD_CONSTRAINT]: { actions: 'addConstraint' },
 					[REMOVE_CONSTRAINT]: { actions: 'removeConstraint' },
-					[APPLY_DATA_BROWSER_CONSTRAINT]: {
+					[APPLY_OVERVIEW_CONSTRAINT]: {
 						target: 'constraintsApplied',
 						actions: 'applyOverviewConstraint',
 					},
