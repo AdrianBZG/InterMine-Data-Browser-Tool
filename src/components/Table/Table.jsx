@@ -11,7 +11,6 @@ import { humanize, titleize } from 'underscore.string'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { ExportTableButton } from './ExportTableButton'
 import { GenerateCodeButton } from './GenerateCodeButton'
-import { SaveAsListButton } from './SaveAsListButton'
 import { TableChartMachine } from './tableMachine'
 import { TablePagingButtons } from './TablePagingButtons'
 
@@ -98,7 +97,6 @@ export const Table = React.memo(function Table() {
 					marginBottom: '40px',
 				}}
 			>
-				<SaveAsListButton />
 				<GenerateCodeButton query={lastQuery} rootUrl={rootUrl} />
 				<ExportTableButton query={lastQuery} rootUrl={rootUrl} />
 			</div>
