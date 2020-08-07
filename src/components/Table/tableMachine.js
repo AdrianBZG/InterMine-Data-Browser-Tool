@@ -160,12 +160,13 @@ export const TableChartMachine = Machine(
 		},
 		services: {
 			fetchInitialRows: async (ctx, { classView, rootUrl, query: maybeQuery }) => {
-				const query = maybeQuery
-					? maybeQuery
-					: {
-							from: classView,
-							select: ['*'],
-					  }
+				const query =
+					maybeQuery && Object.keys(maybeQuery).length > 0
+						? maybeQuery
+						: {
+								from: classView,
+								select: ['*'],
+						  }
 
 				const page = {
 					start: 0,
