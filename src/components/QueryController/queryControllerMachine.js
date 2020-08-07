@@ -47,7 +47,7 @@ const removeConstraint = assign({
 
 		// The constraint is being deleted internally, and needs to be synced
 		// with the constraint machines
-		if (type !== DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY && nextCount !== prevCount) {
+		if (nextCount !== prevCount) {
 			const constraintPath = path.slice(path.indexOf('.') + 1)
 
 			sendToBus({ type: CONSTRAINT_UPDATED, path: constraintPath })
