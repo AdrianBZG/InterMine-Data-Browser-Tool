@@ -2,6 +2,7 @@ import { Button, Menu, MenuItem } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef, useState } from 'react'
+import { usePrevious } from 'react-use'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { ADD_LIST_CONSTRAINT, REMOVE_LIST_CONSTRAINT } from 'src/eventConstants'
 import { useEventBus } from 'src/useEventBus'
@@ -60,6 +61,14 @@ export const ListSelector = ({ listsForCurrentClass, mineName, classView }) => {
 	const listSearchIndex = useRef(null)
 	const [selectedValue, setSelectedValue] = useState('')
 	const [sendToBus] = useEventBus()
+	const prevMineName = usePrevious(mineName)
+	const prevClassView = usePrevious(classView)
+
+	useEffect(() => {
+		if (mineName !== prevMineName || classView !== prevClassView) {
+			setSelectedValue('')
+		}
+	}, [classView, mineName, prevClassView, prevMineName])
 
 	useEffect(() => {
 		const indexClasses = async () => {

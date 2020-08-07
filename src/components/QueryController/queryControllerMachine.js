@@ -1,6 +1,8 @@
 import {
 	ADD_LIST_CONSTRAINT,
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
+	CHANGE_CLASS,
+	CHANGE_MINE,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
 	DELETE_QUERY_CONSTRAINT,
 	REMOVE_LIST_CONSTRAINT,
@@ -101,6 +103,8 @@ export const queryControllerMachine = Machine(
 			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths' },
 			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
 			[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
+			[CHANGE_MINE]: { actions: 'removeListConstraint' },
+			[CHANGE_CLASS]: { actions: 'removeListConstraint' },
 		},
 		states: {
 			idle: {
