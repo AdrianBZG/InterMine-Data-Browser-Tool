@@ -122,7 +122,8 @@ const filterTemplatesForClassView = assign((ctx) => {
 		}
 	})
 
-	ctx.templatesForClassView = templatesForClassView
+	ctx.templatesForClassView = templatesForClassView.sort((a, b) => a.rank - b.rank)
+
 	ctx.categories[ctx.showAllLabel].count = templatesForClassView.length
 })
 
@@ -184,7 +185,7 @@ export const templateViewMachine = Machine(
 			templatesForClassView: [],
 			templatesForSelectedCategories: [],
 			categories: Object.create(null),
-			categoryTagsForClass: Object.create(null),
+			categoryTagsForClass: [],
 			classView: '',
 			showAllLabel: '',
 			rootUrl: '',

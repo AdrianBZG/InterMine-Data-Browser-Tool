@@ -57,12 +57,6 @@ const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
 		ConstraintWidget = SuggestWidget
 	}
 
-	// Todo: This path return over 77,000 values. For now we display it as an input to match blue genes.
-	// After virtualizing the Select widget, we can display the actual values, and allow searching for values.
-	if (availableValues.length > 1000) {
-		ConstraintWidget = InputWidget
-	}
-
 	return (
 		<ConstraintServiceContext.Provider value={{ state, send }}>
 			<div css={{ margin: '20px 0' }}>
@@ -82,6 +76,11 @@ const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
 }
 
 export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
+	// Some tempalates do not have a `where` constraints array
+	if (!template.where) {
+		template.where = []
+	}
+
 	const editableConstraints = template.where.filter((con) => con.editable)
 
 	const [state, , service] = useMachine(

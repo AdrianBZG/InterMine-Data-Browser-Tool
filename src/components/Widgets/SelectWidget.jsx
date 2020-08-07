@@ -51,6 +51,7 @@ export const SelectWidget = () => {
 				onItemSelect={handleItemSelect}
 				itemPredicate={(q, item) => item}
 				popoverProps={{ captureDismiss: true }}
+				noResults="No items available"
 			>
 				<Button text={selectedValues[0]} rightIcon={IconNames.CARET_DOWN} />
 			</Select>

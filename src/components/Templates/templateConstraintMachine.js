@@ -147,6 +147,13 @@ export const templateConstraintMachine = Machine(
 				} else {
 					values = await fetchPathValues(valuesConfig)
 
+					// Todo: Some paths return huge lists, some over 300k values. Setting it to an empty array
+					// will default to an input widget After virtualizing the Select widget, we can display the
+					// actual values, and allow searching for values.
+					if (values.length > 1000) {
+						values = []
+					}
+
 					await constraintValuesCache.setItem(configHash, {
 						...valuesConfig,
 						values,

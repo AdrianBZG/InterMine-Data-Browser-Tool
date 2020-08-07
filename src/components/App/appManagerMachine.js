@@ -180,6 +180,9 @@ const spawnQueryControllerMachine = assign({
 	},
 })
 
+/**
+ *
+ */
 const fetchInitialSummaryForMine = (ctx) => {
 	sendToBus({
 		type: FETCH_SUMMARY,
@@ -187,6 +190,25 @@ const fetchInitialSummaryForMine = (ctx) => {
 		rootUrl: ctx.selectedMine.rootUrl,
 	})
 }
+
+/**
+ *
+ */
+const stopAllActors = assign({
+	viewActors: (ctx) => {
+		const { templateView, overview, queryController } = ctx.viewActors
+
+		templateView && templateView.stop()
+		overview && overview.stop()
+		queryController && queryController.stop()
+
+		return {
+			templateView: null,
+			overview: null,
+			queryController: null,
+		}
+	},
+})
 
 /**
  *
@@ -292,7 +314,7 @@ export const appManagerMachine = Machine(
 		on: {
 			[CHANGE_MINE]: {
 				target: 'loading',
-				actions: ['changeMine', 'getApiTokenFromStorage'],
+				actions: ['changeMine', 'stopAllActors', 'getApiTokenFromStorage'],
 			},
 			[CHANGE_CLASS]: {
 				actions: [
@@ -345,6 +367,7 @@ export const appManagerMachine = Machine(
 			spawnQueryControllerMachine,
 			setAppView,
 			fetchInitialSummaryForMine,
+			stopAllActors,
 		},
 		services: {
 			fetchMineConfiguration,

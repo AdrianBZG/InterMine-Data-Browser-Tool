@@ -1,22 +1,17 @@
 import { Button, Classes, Collapse, Divider, Tab, Tabs, Tag } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { useService } from '@xstate/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
+import { useEventBus } from 'src/useEventBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { OverviewConstraint } from '../Overview/OverviewConstraint'
 import { QueryController } from '../QueryController/QueryController'
 import { TemplateQuery } from '../Templates/TemplateQuery'
 
-const ShowCategories = ({
-	categoryTagsForClass,
-	handleCategoryToggle,
-	showAll,
-	showAllLabel,
-	isLoading,
-}) => {
+const ShowCategories = ({ categoryTagsForClass, handleCategoryToggle, showAll, showAllLabel }) => {
 	const [showCategories, setShowCategories] = useState(false)
 
 	return (
@@ -32,42 +27,46 @@ const ShowCategories = ({
 			/>
 			<Collapse isOpen={showCategories} css={{ marginTop: 0 }}>
 				<div css={{ backgroundColor: 'var(--blue0)', padding: 10 }}>
-					{!isLoading &&
-						categoryTagsForClass.map(({ tagName, isVisible, count }) => {
-							if (count === 0 && tagName !== showAllLabel) {
-								return null
-							}
+					{categoryTagsForClass.map(({ tagName, isVisible, count }) => {
+						if (count === 0 && tagName !== showAllLabel) {
+							return null
+						}
 
-							let isEnabled = false
-							if (showAll) {
-								isEnabled = tagName === showAllLabel
-							} else {
-								isEnabled = isVisible
-							}
+						let isEnabled = false
+						if (showAll) {
+							isEnabled = tagName === showAllLabel
+						} else {
+							isEnabled = isVisible
+						}
 
-							return (
-								<Tag
-									key={tagName}
-									intent="primary"
-									interactive={true}
-									onClick={() => handleCategoryToggle({ isVisible: !isVisible, tagName })}
-									minimal={!isEnabled || count === 0}
-									css={{ margin: 4 }}
-								>
-									{`${tagName} ${count ?? 0}`}
-								</Tag>
-							)
-						})}
+						return (
+							<Tag
+								key={tagName}
+								intent="primary"
+								interactive={true}
+								onClick={() => handleCategoryToggle({ isVisible: !isVisible, tagName })}
+								minimal={!isEnabled || count === 0}
+								css={{ margin: 4 }}
+							>
+								{`${tagName} ${count ?? 0}`}
+							</Tag>
+						)
+					})}
 				</div>
 			</Collapse>
 		</>
 	)
 }
 
-const TemplatesList = ({ templateViewActor }) => {
+const TemplatesList = ({
+	templateViewActor,
+	setShowAllLabel,
+	setCategories,
+	setCategoryTagsForClass,
+}) => {
 	const { height } = useWindowSize()
 
-	const [state, send] = useService(templateViewActor)
+	const [state, , service] = useService(templateViewActor)
 	const {
 		classView,
 		rootUrl,
@@ -78,12 +77,50 @@ const TemplatesList = ({ templateViewActor }) => {
 		categoryTagsForClass,
 	} = state.context
 
-	const showAll = categories[showAllLabel]?.isVisible ?? true
 	const isLoading = state.matches('loadTemplates')
+
+	useEventBus(service)
+
+	useEffect(() => {
+		setShowAllLabel(showAllLabel)
+	}, [setShowAllLabel, showAllLabel])
+
+	useEffect(() => {
+		setCategories(categories)
+	}, [categories, setCategories])
+
+	useEffect(() => {
+		setCategoryTagsForClass(categoryTagsForClass)
+	}, [categoryTagsForClass, setCategoryTagsForClass])
+
+	return (
+		<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0, maxHeight: height - 173 }}>
+			{!isLoading &&
+				templatesForSelectedCategories.map((template) => (
+					<li key={template.name} css={{ margin: '0.875em 0' }}>
+						<TemplateQuery
+							classView={classView}
+							rootUrl={rootUrl}
+							template={template}
+							mineName={mineName}
+						/>
+					</li>
+				))}
+		</ul>
+	)
+}
+
+const Templates = ({ templateViewActor }) => {
+	const [showAllLabel, setShowAllLabel] = useState('')
+	const [categories, setCategories] = useState({})
+	const [categoryTagsForClass, setCategoryTagsForClass] = useState([])
+	const [sendToBus] = useEventBus()
+
+	const showAll = categories[showAllLabel]?.isVisible ?? true
 
 	const handleCategoryToggle = ({ isVisible, tagName }) => {
 		// @ts-ignore
-		send({ type: TOGGLE_CATEGORY_VISIBILITY, isVisible, tagName })
+		sendToBus({ type: TOGGLE_CATEGORY_VISIBILITY, isVisible, tagName })
 	}
 
 	return (
@@ -94,22 +131,16 @@ const TemplatesList = ({ templateViewActor }) => {
 				categoryTagsForClass={categoryTagsForClass}
 				showAllLabel={showAllLabel}
 				showAll={showAll}
-				isLoading={isLoading}
 			/>
 			<Divider css={{ margin: 0 }} />
-			<ul css={{ overflow: 'auto', listStyle: 'none', padding: 0, maxHeight: height - 173 }}>
-				{!isLoading &&
-					templatesForSelectedCategories.map((template) => (
-						<li key={template.name} css={{ margin: '0.875em 0' }}>
-							<TemplateQuery
-								classView={classView}
-								rootUrl={rootUrl}
-								template={template}
-								mineName={mineName}
-							/>
-						</li>
-					))}
-			</ul>
+			{templateViewActor && (
+				<TemplatesList
+					templateViewActor={templateViewActor}
+					setShowAllLabel={setShowAllLabel}
+					setCategories={setCategories}
+					setCategoryTagsForClass={setCategoryTagsForClass}
+				/>
+			)}
 		</div>
 	)
 }
@@ -169,8 +200,8 @@ export const ConstraintSection = ({ templateViewActor, overviewActor, queryContr
 				<Tab id="defaultView" title="Overview" />
 				<Tab id="templateView" title="Templates" />
 			</Tabs>
-			{isTemplateView && templateViewActor ? (
-				<TemplatesList templateViewActor={templateViewActor} />
+			{isTemplateView ? (
+				<Templates templateViewActor={templateViewActor} />
 			) : (
 				<>
 					{queryControllerActor && <QueryController queryControllerActor={queryControllerActor} />}
