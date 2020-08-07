@@ -111,6 +111,7 @@ export const TableChartMachine = Machine(
 						actions: ['setInitialRows', 'refreshCache', 'setLastQuery'],
 					},
 					onError: {
+						target: 'noTableSummary',
 						actions: (ctx, event) => console.error('FETCH: Loading Table Rows', { ctx, event }),
 					},
 				},
@@ -124,6 +125,7 @@ export const TableChartMachine = Machine(
 						actions: ['updatePageNumber', 'refreshCache'],
 					},
 					onError: {
+						target: 'noTableSummary',
 						actions: (ctx, event) =>
 							console.error('FETCH: Could not fetch new Table Rows', { ctx, event }),
 					},
