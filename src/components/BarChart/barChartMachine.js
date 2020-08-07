@@ -42,6 +42,7 @@ export const BarChartMachine = Machine(
 				always: [{ target: 'noGeneLengths', cond: 'hasNoSummary' }],
 				on: {
 					[FETCH_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
 			},
 			waitingOnMineToLoad: {

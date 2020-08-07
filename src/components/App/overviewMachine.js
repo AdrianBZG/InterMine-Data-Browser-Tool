@@ -94,7 +94,6 @@ const spawnConstraintActors = assign({
 const assignLastOverviewQuery = assign({
 	// @ts-ignore
 	lastOverviewQuery: (_ctx, { query }) => {
-		console.log('asd')
 		return query
 	},
 })

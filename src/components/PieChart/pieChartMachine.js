@@ -30,6 +30,7 @@ export const PieChartMachine = Machine(
 				always: [{ target: 'hasNoSummary', cond: 'hasNoSummary' }],
 				on: {
 					[FETCH_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
 			},
 			waitingOnMineToLoad: {

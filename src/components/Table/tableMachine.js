@@ -100,6 +100,10 @@ export const TableChartMachine = Machine(
 						{ target: 'fetchNewPages' },
 					],
 					[FETCH_SUMMARY]: { target: 'fetchInitialRows', actions: 'bustCachedPages' },
+					[FETCH_INITIAL_SUMMARY]: {
+						target: 'fetchInitialRows',
+						actions: 'bustCachedPages',
+					},
 				},
 			},
 			fetchInitialRows: {
