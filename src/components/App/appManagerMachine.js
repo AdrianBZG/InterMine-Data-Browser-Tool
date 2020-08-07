@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchClasses, fetchInstances, fetchLists, INTERMINE_REGISTRY } from 'src/apiRequests'
 import { interminesConfigCache } from 'src/caches'
-import { CHANGE_CLASS, CHANGE_MINE, FETCH_SUMMARY, SET_API_TOKEN } from 'src/eventConstants'
+import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, SET_API_TOKEN } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
@@ -185,7 +185,7 @@ const spawnQueryControllerMachine = assign({
  */
 const fetchInitialSummaryForMine = (ctx) => {
 	sendToBus({
-		type: FETCH_SUMMARY,
+		type: FETCH_INITIAL_SUMMARY,
 		classView: ctx.classView,
 		rootUrl: ctx.selectedMine.rootUrl,
 	})

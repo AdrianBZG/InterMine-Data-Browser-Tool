@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { pieChartCache } from 'src/caches'
-import { CHANGE_MINE, FETCH_SUMMARY } from 'src/eventConstants'
+import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
 const setSummaryResults = assign({
@@ -34,7 +34,7 @@ export const PieChartMachine = Machine(
 			},
 			waitingOnMineToLoad: {
 				on: {
-					[FETCH_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
 			},
 			loading: {

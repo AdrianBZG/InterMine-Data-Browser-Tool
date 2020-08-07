@@ -3,8 +3,10 @@ import { IconNames } from '@blueprintjs/icons'
 import { useService } from '@xstate/react'
 import React, { useEffect, useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
-import { useEventBus } from 'src/useEventBus'
+// use direct import because babel is not properly changing it in webpack
+import { useFirstMountState } from 'react-use/lib/useFirstMountState'
+import { FETCH_SUMMARY, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
+import { sendToBus, useEventBus } from 'src/useEventBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { OverviewConstraint } from '../Overview/OverviewConstraint'
@@ -75,11 +77,19 @@ const TemplatesList = ({
 		mineName,
 		templatesForSelectedCategories,
 		categoryTagsForClass,
+		lastTemplateQuery,
 	} = state.context
 
 	const isLoading = state.matches('loadTemplates')
 
-	useEventBus(service)
+	const [sendToBus] = useEventBus(service)
+	const isFirstMount = useFirstMountState()
+
+	useEffect(() => {
+		if (isFirstMount) {
+			sendToBus({ type: FETCH_SUMMARY, query: lastTemplateQuery, classView, rootUrl })
+		}
+	})
 
 	useEffect(() => {
 		setShowAllLabel(showAllLabel)
@@ -148,8 +158,17 @@ const Templates = ({ templateViewActor }) => {
 const OverviewConstraintList = ({ overviewActor }) => {
 	const { height } = useWindowSize()
 
-	const [state] = useService(overviewActor)
-	const { constraintActors } = state.context
+	const [state, , service] = useService(overviewActor)
+	useEventBus(service)
+	const isFirstMount = useFirstMountState()
+
+	const { constraintActors, lastOverviewQuery, classView, rootUrl } = state.context
+
+	useEffect(() => {
+		if (isFirstMount) {
+			sendToBus({ type: FETCH_SUMMARY, query: lastOverviewQuery, classView, rootUrl })
+		}
+	})
 
 	return (
 		<ul

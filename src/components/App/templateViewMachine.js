@@ -1,7 +1,14 @@
 import hash from 'object-hash'
 import { fetchTemplates } from 'src/apiRequests'
 import { templatesCache } from 'src/caches'
-import { CHANGE_CLASS, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
+import {
+	CHANGE_CLASS,
+	FETCH_INITIAL_SUMMARY,
+	FETCH_SUMMARY,
+	FETCH_TEMPLATE_SUMMARY,
+	TOGGLE_CATEGORY_VISIBILITY,
+} from 'src/eventConstants'
+import { sendToBus } from 'src/useEventBus'
 import { getTagCategories } from 'src/utils'
 import { assign, Machine } from 'xstate'
 
@@ -177,6 +184,32 @@ const setTemplates = assign({
 	categories: (_, { data }) => data.categories,
 })
 
+/**
+ *
+ */
+const assignLastTemplateQuery = assign({
+	// @ts-ignore
+	lastTemplateQuery: (_ctx, { query }) => {
+		return query
+	},
+})
+
+/**
+ *
+ */
+const resetLastTemplateQuery = assign({
+	lastTemplateQuery: () => {
+		return null
+	},
+})
+
+/**
+ *
+ */
+const fetchTemplateSummary = (_ctx, { query, rootUrl, classView }) => {
+	sendToBus({ type: FETCH_SUMMARY, query, rootUrl, classView })
+}
+
 export const templateViewMachine = Machine(
 	{
 		id: 'template view',
@@ -190,6 +223,7 @@ export const templateViewMachine = Machine(
 			showAllLabel: '',
 			rootUrl: '',
 			mineName: '',
+			lastTemplateQuery: {},
 		},
 		initial: 'loadTemplates',
 		states: {
@@ -199,6 +233,7 @@ export const templateViewMachine = Machine(
 						actions: [
 							'updateClassView',
 							'resetCategories',
+							'resetLastTemplateQuery',
 							'enableShowAllTag',
 							'setCategoriesForClass',
 							'filterTemplatesForClassView',
@@ -214,6 +249,12 @@ export const templateViewMachine = Machine(
 							actions: ['disableShowAllTag', 'toggleCategory', 'filterBySelectedCategory'],
 						},
 					],
+					[FETCH_TEMPLATE_SUMMARY]: {
+						actions: ['assignLastTemplateQuery', 'fetchTemplateSummary'],
+					},
+					[FETCH_INITIAL_SUMMARY]: {
+						actions: 'assignLastTemplateQuery',
+					},
 				},
 			},
 			errorFetchingTemplates: {},
@@ -251,6 +292,10 @@ export const templateViewMachine = Machine(
 			setTemplates,
 			toggleCategory,
 			updateClassView,
+			assignLastTemplateQuery,
+			resetLastTemplateQuery,
+			// @ts-ignore
+			fetchTemplateSummary,
 		},
 		guards: {
 			// @ts-ignore

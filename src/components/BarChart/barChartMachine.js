@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { barChartCache } from 'src/caches'
-import { CHANGE_MINE, FETCH_SUMMARY } from 'src/eventConstants'
+import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
@@ -46,7 +46,7 @@ export const BarChartMachine = Machine(
 			},
 			waitingOnMineToLoad: {
 				on: {
-					[FETCH_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
 			},
 			loading: {

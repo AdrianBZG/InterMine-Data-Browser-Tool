@@ -1,7 +1,13 @@
 import hash from 'object-hash'
 import { fetchTable } from 'src/apiRequests'
 import { tableCache } from 'src/caches'
-import { CHANGE_MINE, CHANGE_PAGE, FETCH_SUMMARY, SET_AVAILABLE_COLUMNS } from 'src/eventConstants'
+import {
+	CHANGE_MINE,
+	CHANGE_PAGE,
+	FETCH_INITIAL_SUMMARY,
+	FETCH_SUMMARY,
+	SET_AVAILABLE_COLUMNS,
+} from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine } from 'xstate'
 
@@ -80,7 +86,7 @@ export const TableChartMachine = Machine(
 		states: {
 			waitingOnMineToLoad: {
 				on: {
-					[FETCH_SUMMARY]: {
+					[FETCH_INITIAL_SUMMARY]: {
 						target: 'fetchInitialRows',
 						actions: 'bustCachedPages',
 					},

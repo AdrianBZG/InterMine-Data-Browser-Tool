@@ -5,8 +5,8 @@ import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { isMultiSelection, isSingleSelection } from 'src/constraintOperations'
 import {
-	FETCH_SUMMARY,
 	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
+	FETCH_TEMPLATE_SUMMARY,
 	RESET_OVERVIEW_CONSTRAINT,
 } from 'src/eventConstants'
 import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
@@ -165,7 +165,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 							query,
 							classView,
 							rootUrl,
-							type: FETCH_SUMMARY,
+							type: FETCH_TEMPLATE_SUMMARY,
 						})
 					}}
 				/>

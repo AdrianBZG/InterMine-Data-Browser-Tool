@@ -1,3 +1,10 @@
+import {
+	CHANGE_CLASS,
+	FETCH_INITIAL_SUMMARY,
+	FETCH_OVERVIEW_SUMMARY,
+	FETCH_SUMMARY,
+} from 'src/eventConstants'
+import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
 import { overviewConstraintMachine } from '../Overview/overviewConstraintMachine'
@@ -81,6 +88,36 @@ const spawnConstraintActors = assign({
 	},
 })
 
+/**
+ *
+ */
+const assignLastOverviewQuery = assign({
+	// @ts-ignore
+	lastOverviewQuery: (_ctx, { query }) => {
+		console.log('asd')
+		return query
+	},
+})
+
+/**
+ *
+ */
+const resetLastOverviewQuery = assign({
+	lastOverviewQuery: () => {
+		return {}
+	},
+})
+
+/**
+ *
+ */
+const fetchOverviewSummary = (_ctx, { query, rootUrl, classView }) => {
+	sendToBus({ type: FETCH_SUMMARY, query, rootUrl, classView })
+}
+
+/**
+ *
+ */
 export const overviewMachine = Machine(
 	{
 		id: 'overview',
@@ -90,16 +127,28 @@ export const overviewMachine = Machine(
 			constraintActors: [],
 			classView: '',
 			rootUrl: '',
+			lastOverviewQuery: {},
 		},
 		states: {
 			idle: {
 				entry: 'spawnConstraintActors',
+				on: {
+					[FETCH_INITIAL_SUMMARY]: { actions: 'assignLastOverviewQuery' },
+					[FETCH_OVERVIEW_SUMMARY]: {
+						actions: ['assignLastOverviewQuery', 'fetchOverviewSummary'],
+					},
+					[CHANGE_CLASS]: { actions: 'resetLastOverviewQuery' },
+				},
 			},
 		},
 	},
 	{
 		actions: {
 			spawnConstraintActors,
+			assignLastOverviewQuery,
+			resetLastOverviewQuery,
+			// @ts-ignore
+			fetchOverviewSummary,
 		},
 	}
 )

@@ -37,7 +37,7 @@ const setQueries = assign({
  */
 const setActiveQuery = assign({
 	// @ts-ignore
-	isActiveQuery: (ctx, { query }) => query.name === ctx.template.name,
+	isActiveQuery: (ctx, { query }) => query?.name === ctx.template.name,
 })
 
 const addListConstraint = assign({

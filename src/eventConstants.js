@@ -21,7 +21,10 @@ export const TEMPLATE_CONSTRAINT_UPDATED = 'constraint/template/updated'
  * Fetch
  */
 export const FETCH_TEMPLATE_CONSTRAINT_ITEMS = 'fetch/template/init'
-export const FETCH_SUMMARY = 'fetch/initial_summary'
+export const FETCH_SUMMARY = 'fetch/summary'
+export const FETCH_INITIAL_SUMMARY = 'fetch/initial_summary'
+export const FETCH_TEMPLATE_SUMMARY = 'fetch/templateSummary'
+export const FETCH_OVERVIEW_SUMMARY = 'fetch/overviewSummary'
 
 /**
  * AppManager
