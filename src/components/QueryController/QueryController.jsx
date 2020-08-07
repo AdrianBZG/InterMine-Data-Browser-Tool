@@ -89,11 +89,6 @@ export const QueryController = ({ queryControllerActor }) => {
 	}
 
 	const runQuery = () => {
-		if (currentConstraints.length === 0) {
-			sendToBus({ type: FETCH_UPDATED_SUMMARY, classView, rootUrl })
-			return
-		}
-
 		let constraintLogic = ''
 
 		const constraints =
