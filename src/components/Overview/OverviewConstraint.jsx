@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { APPLY_DATA_BROWSER_CONSTRAINT, RESET_LOCAL_CONSTRAINT } from 'src/eventConstants'
-import { ConstraintServiceContext } from 'src/useEventBus'
+import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { PopupCard } from '../Shared/PopupCard'
@@ -112,7 +112,8 @@ const S_ConstraintIcon = styled.div`
 `
 
 export const OverviewConstraint = ({ color, overviewConstraintActor }) => {
-	const [state, send] = useService(overviewConstraintActor)
+	const [state, send, service] = useService(overviewConstraintActor)
+	useEventBus(service)
 
 	const { availableValues, selectedValues, type, constraintItemsQuery, label, name } = state.context
 	const constraintCount = selectedValues.length
