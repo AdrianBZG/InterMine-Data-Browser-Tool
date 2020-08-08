@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons'
 import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
 import { CHANGE_PAGE } from 'src/eventConstants'
-import { useServiceContext } from 'src/useEventBus'
+import { usePartialContext } from 'src/useEventBus'
 
 const RowCount = ({ pageNumber, visibleRows, totalRows, isLoading }) => {
 	const previousPage = pageNumber - 1
@@ -35,11 +35,16 @@ const RowCount = ({ pageNumber, visibleRows, totalRows, isLoading }) => {
  *
  */
 export const TablePagingButtons = () => {
-	const [state, send] = useServiceContext('table')
-	const [pageNumber, setPageNumber] = useState(1)
+	const [state, send, service] = usePartialContext('table', (ctx) => ({
+		pageInMachine: ctx.pageNumber,
+		visibleRows: ctx.visibleRows,
+		totalRows: ctx.totalRows,
+	}))
 
-	const { pageNumber: pageInMachine, visibleRows, totalRows } = state.context
-	const isLoading = !state.matches('idle')
+	const [pageNumber, setPageNumber] = useState(1)
+	const { pageInMachine, visibleRows, totalRows } = state
+
+	const { isLoading } = service.state.activities
 
 	useEffect(() => {
 		setPageNumber(pageInMachine)

@@ -9,9 +9,9 @@ import {
 	REMOVE_CONSTRAINT,
 	RESET_TEMPLATE_CONSTRAINT,
 } from 'src/eventConstants'
-import { assign, Machine, sendParent } from 'xstate'
+import { assign, Machine, sendParent, sendUpdate } from 'xstate'
 
-import { logErrorToConsole } from '../../utils'
+import { logErrorToConsole, startActivity } from '../../utils'
 
 /**
  *
@@ -63,12 +63,18 @@ const updateTemplateQuery = sendParent((ctx) => {
 /**
  *
  */
+const updateParent = sendUpdate()
+
+/**
+ *
+ */
 export const templateConstraintMachine = Machine(
 	{
 		id: 'Template constraint widget',
 		initial: 'idle',
 		context: {
 			rootUrl: '',
+			name: '',
 			constraint: {},
 			selectedValues: [],
 			defaultSelections: [],
@@ -93,9 +99,11 @@ export const templateConstraintMachine = Machine(
 					},
 				},
 			},
-			noValuesForConstraint: {},
+			noValuesForConstraint: {
+				activities: 'hasNoValues',
+			},
 			idle: {
-				always: [{ target: 'noValuesSelected', cond: 'noValuesSelected' }],
+				always: [{ target: 'noValuesSelected', cond: 'noValuesSelected', actions: 'updateParent' }],
 				on: {
 					[FETCH_TEMPLATE_CONSTRAINT_ITEMS]: { target: 'loading' },
 					[ADD_CONSTRAINT]: { actions: 'addValueToConstraint' },
@@ -103,11 +111,12 @@ export const templateConstraintMachine = Machine(
 						actions: 'removeValueFromConstraint',
 					},
 					[RESET_TEMPLATE_CONSTRAINT]: {
-						actions: 'resetConstraint',
+						actions: ['resetConstraint', 'updateParent'],
 					},
 				},
 			},
 			noValuesSelected: {
+				activities: ['waitingForSelection'],
 				on: {
 					[ADD_CONSTRAINT]: {
 						target: 'idle',
@@ -115,7 +124,7 @@ export const templateConstraintMachine = Machine(
 					},
 					[RESET_TEMPLATE_CONSTRAINT]: {
 						target: 'idle',
-						actions: 'resetConstraint',
+						actions: ['resetConstraint', 'updateParent'],
 					},
 				},
 			},
@@ -129,6 +138,12 @@ export const templateConstraintMachine = Machine(
 			setAvailableValues,
 			updateTemplateQuery,
 			resetConstraint,
+			updateParent,
+			isLoading: startActivity,
+			hasNoValues: startActivity,
+		},
+		activities: {
+			waitingForSelection: startActivity,
 		},
 		guards: {
 			// @ts-ignore

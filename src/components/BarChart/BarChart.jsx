@@ -62,7 +62,7 @@ export const BarChart = React.memo(function BarChart() {
 
 	const { lengthSummary, lengthStats } = state.context
 
-	const isLoading = !state.matches('idle')
+	const { isLoading } = state.activities
 	const summary = isLoading ? barChartLoadingData : lengthSummary
 
 	const { max, min, buckets, uniqueValues, average, stdev } = lengthStats
@@ -89,7 +89,7 @@ export const BarChart = React.memo(function BarChart() {
 		}
 	})
 
-	if (state.matches('noGeneLengths')) {
+	if (state.activities.hasNoValues) {
 		const title = isFirstRender ? 'No query has been executed' : 'No Gene lengths available'
 		const description = isFirstRender
 			? 'Define the constraints to the left, and execute a query to see visual data results'

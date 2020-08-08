@@ -1,5 +1,9 @@
 export const noop = () => {}
 
+export const startActivity = () => {
+	return noop
+}
+
 export const formatConstraintPath = ({ classView, path }) => `${classView}.${path}`
 
 export const pluralizeFilteredCount = (filteredItems, query) => {
@@ -13,7 +17,7 @@ export const pluralizeFilteredCount = (filteredItems, query) => {
 export const getTagCategories = (tags) => {
 	const categories = []
 
-	for (let i = 0; i < tags.length; i++) {
+	for (let i = 0; i < tags?.length; i++) {
 		if (tags[i].indexOf('im:aspect') > -1) {
 			categories.push(tags[i].replace('im:aspect:', ''))
 		}

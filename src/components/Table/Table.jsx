@@ -70,16 +70,23 @@ const Cell = ({ cell, rootUrl, isLoading }) => {
  */
 export const Table = React.memo(function Table() {
 	const isFirstRender = useFirstMountState()
-	const [state, send, service] = useMachine(TableChartMachine)
+	const [state, , service] = useMachine(TableChartMachine)
 	useEventBus(service)
 
+	// hack until https://github.com/davidkpiano/xstate/issues/938 is closed
+	// @ts-ignore
+	if (!state.initialized) {
+		service.start()
+	}
+
 	const { pages, rootUrl, pageNumber, lastQuery } = state.context
-	const isLoading = !state.matches('idle')
+	const { isLoading, hasNoValues } = service.state.activities
+
 	const rows = isLoading
 		? tableLoadingData
 		: pages.get(pageNumber) ?? [[]] /** ensure a 2D array on 1st render */
 
-	if (state.matches('noTableSummary')) {
+	if (hasNoValues) {
 		const title = isFirstRender ? 'No query has been executed' : 'No Table results available'
 		const description = isFirstRender
 			? 'Define the constraints to the left, and execute a query to see visual data results'
@@ -89,7 +96,7 @@ export const Table = React.memo(function Table() {
 	}
 
 	return (
-		<TableServiceContext.Provider value={{ state, send }}>
+		<TableServiceContext.Provider value={service}>
 			<div
 				css={{
 					display: 'flex',

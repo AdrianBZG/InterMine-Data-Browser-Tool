@@ -3,32 +3,38 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useState } from 'react'
 import { CHANGE_MINE, SET_API_TOKEN } from 'src/eventConstants'
-import { useEventBus, useServiceContext } from 'src/useEventBus'
+import { useEventBus, usePartialContext } from 'src/useEventBus'
 
 import { NumberedSelectMenuItems } from '../Shared/Selects'
 
 export const MineSelector = () => {
-	const [state, send] = useServiceContext('appManager')
+	const [state, sendToAppManager] = usePartialContext('appManager', (ctx) => ({
+		apiToken: ctx.selectedMine.apiToken,
+		rootUrl: ctx.selectedMine.rootUrl,
+		intermines: ctx.intermines,
+		mineName: ctx.selectedMine.name,
+	}))
+
 	const [showPopup, setShowPopup] = useState(false)
 	const [sendToBus] = useEventBus()
 
-	const { selectedMine, intermines } = state.context
-	const [apiToken, setApiToken] = useState(selectedMine.apiToken)
-	const [currentMine, setCurrentMine] = useState(selectedMine.rootUrl)
+	const { apiToken: token, rootUrl, intermines, mineName } = state
+	const [apiToken, setApiToken] = useState(token)
+	const [currentMine, setCurrentMine] = useState(rootUrl)
 
 	useEffect(() => {
-		if (currentMine !== selectedMine.rootUrl) {
-			setCurrentMine(selectedMine.rootUrl)
-			setApiToken(selectedMine.apiToken)
+		if (currentMine !== rootUrl) {
+			setCurrentMine(rootUrl)
+			setApiToken(apiToken)
 		}
-	}, [currentMine, selectedMine.rootUrl, selectedMine.apiToken])
+	}, [apiToken, currentMine, rootUrl])
 
 	const handleMineChange = ({ name }) => {
 		// @ts-ignore
 		sendToBus({ type: CHANGE_MINE, newMine: name })
 	}
 
-	const isAuthenticated = selectedMine.apiToken.length > 0
+	const isAuthenticated = apiToken.length > 0
 
 	return (
 		<>
@@ -59,7 +65,7 @@ export const MineSelector = () => {
 						// used to override `Blueprintjs` styles for a small button
 						style={{ minWidth: 166 }}
 						small={true}
-						text={selectedMine.name}
+						text={mineName}
 						alignText="left"
 						rightIcon={IconNames.CARET_DOWN}
 					/>
@@ -81,7 +87,7 @@ export const MineSelector = () => {
 					Key
 				</span>
 				<Popover
-					onClose={() => send({ type: SET_API_TOKEN, apiToken })}
+					onClose={() => sendToAppManager({ type: SET_API_TOKEN, apiToken })}
 					isOpen={showPopup}
 					onInteraction={(nextState) => setShowPopup(nextState)}
 				>

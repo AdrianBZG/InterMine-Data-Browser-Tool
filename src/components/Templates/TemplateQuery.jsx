@@ -58,7 +58,7 @@ const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
 	}
 
 	return (
-		<ConstraintServiceContext.Provider value={{ state, send }}>
+		<ConstraintServiceContext.Provider value={service}>
 			<div css={{ margin: '20px 0' }}>
 				<H5>{name}</H5>
 				<ConstraintWidget
@@ -127,7 +127,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 	}
 
 	const disableRunQuery = constraintActors.some((actor) => {
-		return actor.state.matches('noValuesSelected')
+		return actor.state.activities.waitingForSelection
 	})
 
 	return (

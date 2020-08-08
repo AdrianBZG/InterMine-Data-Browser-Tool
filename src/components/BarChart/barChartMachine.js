@@ -4,17 +4,13 @@ import { barChartCache } from 'src/caches'
 import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
-import { logErrorToConsole } from '../../utils'
+import { logErrorToConsole, startActivity } from '../../utils'
 
 const setLengthSummary = assign({
 	// @ts-ignore
 	lengthStats: (_, { data }) => data.lengthStats,
 	// @ts-ignore
 	lengthSummary: (_, { data }) => data.lengthSummary,
-	// @ts-ignore
-	classView: (_, { data }) => data.classView,
-	// @ts-ignore
-	rootUrl: (_, { data }) => data.rootUrl,
 })
 
 export const BarChartMachine = Machine(
@@ -31,8 +27,6 @@ export const BarChartMachine = Machine(
 				stdev: 0,
 			},
 			lengthSummary: [],
-			classView: '',
-			rootUrl: '',
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
@@ -49,6 +43,7 @@ export const BarChartMachine = Machine(
 				on: {
 					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
+				activities: ['isLoading'],
 			},
 			loading: {
 				invoke: {
@@ -68,6 +63,7 @@ export const BarChartMachine = Machine(
 				on: {
 					[FETCH_SUMMARY]: { target: 'loading' },
 				},
+				activities: ['hasNoValues'],
 			},
 		},
 	},
@@ -75,6 +71,10 @@ export const BarChartMachine = Machine(
 		actions: {
 			setLengthSummary,
 			logErrorToConsole,
+		},
+		activities: {
+			isLoading: startActivity,
+			hasNoValues: startActivity,
 		},
 		guards: {
 			hasNoSummary: (ctx) => {

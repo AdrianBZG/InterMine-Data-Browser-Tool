@@ -80,7 +80,7 @@ const TemplatesList = ({
 		lastTemplateQuery,
 	} = state.context
 
-	const isLoading = state.matches('loadTemplates')
+	const { isLoading } = state.activities
 
 	const [sendToBus] = useEventBus(service)
 	const isFirstMount = useFirstMountState()

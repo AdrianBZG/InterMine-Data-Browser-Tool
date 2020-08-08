@@ -3,6 +3,8 @@ import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
+import { CHANGE_CLASS } from 'src/eventConstants'
+import { usePartialContext } from 'src/useEventBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { NumberedSelectMenuItems } from '../Shared/Selects'
@@ -11,6 +13,7 @@ import { NumberedSelectMenuItems } from '../Shared/Selects'
  */
 const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	const renderedItems = filteredItems.map(renderItem)
+
 	const infoText = pluralizeFilteredCount(filteredItems, query)
 
 	return (
@@ -21,11 +24,23 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	)
 }
 
-export const ClassSelector = ({ handleClassSelect, modelClasses, classView, mineName }) => {
+export const ClassSelector = () => {
+	const [state, sendToAppManager] = usePartialContext('appManager', (ctx) => ({
+		modelClasses: ctx.modelClasses,
+		classView: ctx.classView,
+		mineName: ctx.selectedMine.name,
+	}))
+
+	const { modelClasses, classView, mineName } = state
+
 	const classSearchIndex = useRef(null)
 
 	const classDisplayName =
 		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
+
+	const handleClassSelect = ({ name }) => {
+		sendToAppManager({ type: CHANGE_CLASS, newClass: name })
+	}
 
 	useEffect(() => {
 		const indexClasses = async () => {

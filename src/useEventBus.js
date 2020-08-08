@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 export const MockMachineContext = createContext(null)
 export const ConstraintServiceContext = createContext(null)
@@ -39,9 +39,8 @@ export const useEventBus = (service) => {
 	return [sendToBus]
 }
 
-export const useServiceContext = (serviceRequested = null) => {
+export const usePartialContext = (serviceRequested = null, selector) => {
 	const constraintService = useContext(ConstraintServiceContext)
-	const queryService = useContext(QueryServiceContext)
 	const appManagerService = useContext(AppManagerServiceContext)
 	const tableService = useContext(TableServiceContext)
 
@@ -49,10 +48,6 @@ export const useServiceContext = (serviceRequested = null) => {
 
 	if (serviceRequested === 'constraints') {
 		service = constraintService
-	}
-
-	if (serviceRequested === 'queryController') {
-		service = queryService
 	}
 
 	if (serviceRequested === 'appManager') {
@@ -67,5 +62,18 @@ export const useServiceContext = (serviceRequested = null) => {
 		throw Error('You MUST have a ServiceContext up the tree from this component')
 	}
 
-	return [service.state, service.send]
+	const [partialContext, setPartialContext] = useState(selector(service.state.context))
+
+	useEffect(() => {
+		const { unsubscribe } = service.subscribe((state) => {
+			if (!state.changed) return
+
+			setPartialContext(selector(state.context))
+		})
+
+		return () => unsubscribe()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	return [partialContext, service.send, service]
 }

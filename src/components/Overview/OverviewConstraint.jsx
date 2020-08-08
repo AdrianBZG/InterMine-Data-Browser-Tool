@@ -150,36 +150,29 @@ export const OverviewConstraint = ({ color, overviewConstraintActor }) => {
 			break
 	}
 
-	const disableAllButtons =
-		state.matches('noConstraintsSet') ||
-		state.matches('loading') ||
-		state.matches('noConstraintItems')
-
-	const enableApplyButton = state.matches('constraintsUpdated')
-
-	/**
-	 * This is used to decide the color for the count tag. Since it will only
-	 * ever be displayed when a constraint is actually set, we only care to know if
-	 * it has been updated so we can change its color.
-	 */
-	const isUpdated = state.matches('constraintsUpdated')
+	const { disablingButtons, waitingToApplyContraint } = state.activities
 
 	const handleOnClick = (type) => send({ type })
 
 	return (
-		<ConstraintServiceContext.Provider value={{ state, send }}>
+		<ConstraintServiceContext.Provider value={service}>
 			<PopupCard boundary="viewport">
 				<ConstraintButton
 					label={label}
 					color={color}
 					name={name}
 					constraintCount={constraintCount}
-					isUpdated={isUpdated}
+					/**
+					 * This is used to decide the color for the count tag. Since it will only
+					 * ever be displayed when a constraint is actually set, we only care to know if
+					 * it has been updated so we can change its color.
+					 */
+					isUpdated={waitingToApplyContraint}
 				/>
 				<div>
 					<ConstraintCard
-						disableAllButtons={disableAllButtons}
-						enableApplyButton={enableApplyButton}
+						disableAllButtons={disablingButtons}
+						enableApplyButton={waitingToApplyContraint}
 						handleOnClick={handleOnClick}
 					>
 						<ConstraintWidget

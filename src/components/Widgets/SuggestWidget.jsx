@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/eventConstants'
 import { generateId } from 'src/generateId'
-import { useServiceContext } from 'src/useEventBus'
+import { usePartialContext } from 'src/useEventBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { NoValuesProvided } from '../Shared/NoValuesProvided'
@@ -115,12 +115,17 @@ export const SuggestWidget = ({
 	docField = '',
 }) => {
 	const [uniqueId] = useState(() => `suggestWidget-${generateId()}`)
-	const [state, send] = useServiceContext('constraints')
-	const { availableValues, selectedValues } = state.context
+	const [state, sendToConstraintMachine, service] = usePartialContext('constraints', (ctx) => ({
+		availableValues: ctx.availableValues,
+		selectedValues: ctx.selectedValues,
+		constraintOp: ctx.op,
+	}))
 
-	const isLoading = state.matches('loading')
+	const { availableValues, selectedValues, constraintOp } = state
 
-	if (state.matches('noConstraintItems') || state.matches('noValuesForConstraint')) {
+	const { isLoading, hasNoValues } = service.state.activities
+
+	if (hasNoValues) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
 	}
 
@@ -155,21 +160,23 @@ export const SuggestWidget = ({
 	}
 
 	const handleItemSelect = ({ name }) => {
-		send({ type: ADD_CONSTRAINT, constraint: name })
+		sendToConstraintMachine({ type: ADD_CONSTRAINT, constraint: name })
 	}
 
 	return (
 		<div>
 			{selectedValues.length > 0 && (
 				<div css={{ display: 'flex', alignItems: 'center' }}>
-					{state.context.op && <H6 css={{ margin: '0 10px 0 0' }}>{state.context.op}</H6>}
+					{constraintOp && <H6 css={{ margin: '0 10px 0 0' }}>{constraintOp}</H6>}
 					<div>
 						{selectedValues.map((val) => (
 							<Tag
 								key={val}
 								intent="primary"
 								css={{ margin: 4 }}
-								onRemove={() => send({ type: REMOVE_CONSTRAINT, constraint: val })}
+								onRemove={() =>
+									sendToConstraintMachine({ type: REMOVE_CONSTRAINT, constraint: val })
+								}
 							>
 								<Text ellipsize={true}>{val}</Text>
 							</Tag>

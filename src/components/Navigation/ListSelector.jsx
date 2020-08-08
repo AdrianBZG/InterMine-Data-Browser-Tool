@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { usePrevious } from 'react-use'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { ADD_LIST_CONSTRAINT, REMOVE_LIST_CONSTRAINT } from 'src/eventConstants'
-import { useEventBus } from 'src/useEventBus'
+import { useEventBus, usePartialContext } from 'src/useEventBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
@@ -57,10 +57,19 @@ const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, r
 	)
 }
 
-export const ListSelector = ({ listsForCurrentClass, mineName, classView }) => {
+export const ListSelector = () => {
+	const [state] = usePartialContext('appManager', (ctx) => ({
+		mineName: ctx.selectedMine.name,
+		classView: ctx.classView,
+		listsForCurrentClass: ctx.listsForCurrentClass,
+	}))
+
+	const { mineName, classView, listsForCurrentClass } = state
+	const [sendToBus] = useEventBus()
+
 	const listSearchIndex = useRef(null)
 	const [selectedValue, setSelectedValue] = useState('')
-	const [sendToBus] = useEventBus()
+
 	const prevMineName = usePrevious(mineName)
 	const prevClassView = usePrevious(classView)
 

@@ -14,7 +14,7 @@ import {
 	Tooltip,
 } from 'recharts'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
-import { useEventBus } from 'src/useEventBus'
+import { useEventBus, usePartialContext } from 'src/useEventBus'
 import { pieChartLoadingData } from 'src/utils/loadingData/pieChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -63,15 +63,21 @@ const renderLoadingLabel = (props) => {
 
 export const PieChart = React.memo(function PieChart() {
 	const isFirstRender = useFirstMountState()
+
 	const [state, , service] = useMachine(PieChartMachine)
+	const [appState] = usePartialContext('appManager', (ctx) => ({
+		classView: ctx.classView,
+	}))
+
 	useEventBus(service)
 
-	const { allClassOrganisms, classView } = state.context
+	const { allClassOrganisms } = state.context
+	const { classView } = appState
 
-	const isLoading = !state.matches('idle')
+	const { isLoading, hasNoValues } = state.activities
 	const data = isLoading ? pieChartLoadingData : allClassOrganisms
 
-	if (state.matches('hasNoSummary')) {
+	if (hasNoValues) {
 		const title = isFirstRender ? 'No query has been executed' : 'No Organism Summary available'
 		const description = isFirstRender
 			? 'Define the constraints to the left, and execute a query to see visual data results'

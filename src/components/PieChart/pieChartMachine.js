@@ -2,15 +2,12 @@ import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { pieChartCache } from 'src/caches'
 import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
+import { startActivity } from 'src/utils'
 import { assign, Machine } from 'xstate'
 
 const setSummaryResults = assign({
 	// @ts-ignore
 	allClassOrganisms: (_, { data }) => data.summary,
-	// @ts-ignore
-	classView: (_, { data }) => data.classView,
-	// @ts-ignore
-	rootUrl: (_, { data }) => data.rootUrl,
 })
 
 export const PieChartMachine = Machine(
@@ -19,8 +16,6 @@ export const PieChartMachine = Machine(
 		initial: 'waitingOnMineToLoad',
 		context: {
 			allClassOrganisms: [],
-			classView: '',
-			rootUrl: '',
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
@@ -37,8 +32,10 @@ export const PieChartMachine = Machine(
 				on: {
 					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
 				},
+				activities: ['isLoading'],
 			},
 			loading: {
+				activities: ['isLoading'],
 				invoke: {
 					id: 'fetchPieChartValues',
 					src: 'fetchItems',
@@ -56,12 +53,17 @@ export const PieChartMachine = Machine(
 				on: {
 					[FETCH_SUMMARY]: { target: 'loading' },
 				},
+				activities: ['hasNoValues'],
 			},
 		},
 	},
 	{
 		actions: {
 			setSummaryResults,
+		},
+		activities: {
+			isLoading: startActivity,
+			hasNoValues: startActivity,
 		},
 		guards: {
 			hasNoSummary: (ctx) => ctx.allClassOrganisms.length === 0,
@@ -98,8 +100,6 @@ export const PieChartMachine = Machine(
 				}
 
 				return {
-					classView,
-					rootUrl,
 					summary: summary.results,
 				}
 			},

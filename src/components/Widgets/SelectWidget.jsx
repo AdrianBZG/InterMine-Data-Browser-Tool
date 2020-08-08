@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 import { operationsDict } from 'src/constraintOperations'
 import { ADD_CONSTRAINT } from 'src/eventConstants'
 import { generateId } from 'src/generateId'
-import { useServiceContext } from 'src/useEventBus'
+import { usePartialContext } from 'src/useEventBus'
 
 const renderItems = (item, { handleClick, modifiers }) => {
 	if (!modifiers.matchesPredicate) {
@@ -19,11 +19,16 @@ const renderItems = (item, { handleClick, modifiers }) => {
 
 export const SelectWidget = () => {
 	const [uniqueId] = useState(() => `selectWidget-${generateId()}`)
-	const [state, send] = useServiceContext('constraints')
-	const { availableValues, constraint, selectedValues } = state.context
+	const [state, sendToConstraintMachine] = usePartialContext('constraints', (ctx) => ({
+		availableValues: ctx.availableValues,
+		constraint: ctx.constraint,
+		selectedValues: ctx.selectedValues,
+	}))
+
+	const { availableValues, constraint, selectedValues } = state
 
 	const handleItemSelect = ({ value }) => {
-		send({ type: ADD_CONSTRAINT, constraint: value })
+		sendToConstraintMachine({ type: ADD_CONSTRAINT, constraint: value })
 	}
 
 	return (

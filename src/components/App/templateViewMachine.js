@@ -9,7 +9,7 @@ import {
 	TOGGLE_CATEGORY_VISIBILITY,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
-import { getTagCategories } from 'src/utils'
+import { getTagCategories, startActivity } from 'src/utils'
 import { assign, Machine } from 'xstate'
 
 /**
@@ -259,6 +259,7 @@ export const templateViewMachine = Machine(
 			},
 			errorFetchingTemplates: {},
 			loadTemplates: {
+				activities: ['isLoading'],
 				invoke: {
 					id: 'fetchTemplates',
 					src: 'fetchTemplates',
@@ -296,6 +297,9 @@ export const templateViewMachine = Machine(
 			resetLastTemplateQuery,
 			// @ts-ignore
 			fetchTemplateSummary,
+		},
+		activities: {
+			isLoading: startActivity,
 		},
 		guards: {
 			// @ts-ignore

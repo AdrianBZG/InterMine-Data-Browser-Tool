@@ -13,7 +13,7 @@ import {
 	RESET_OVERVIEW_CONSTRAINT,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
-import { formatConstraintPath } from 'src/utils'
+import { formatConstraintPath, startActivity } from 'src/utils'
 import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
@@ -108,9 +108,13 @@ export const overviewConstraintMachine = Machine(
 						actions: 'logErrorToConsole',
 					},
 				},
+				activities: ['isLoading', 'disablingButtons'],
 			},
-			noConstraintItems: {},
+			noConstraintItems: {
+				activities: ['hasNoValues', 'disablingButtons'],
+			},
 			noConstraintsSet: {
+				activities: ['disablingButtons'],
 				always: [{ target: 'noConstraintItems', cond: 'hasNoConstraintItems' }],
 				entry: 'resetConstraint',
 				on: {
@@ -121,6 +125,7 @@ export const overviewConstraintMachine = Machine(
 				},
 			},
 			constraintsUpdated: {
+				activities: ['waitingToApplyContraint'],
 				always: [{ target: 'noConstraintsSet', cond: 'selectedListIsEmpty' }],
 				on: {
 					[ADD_CONSTRAINT]: { actions: 'addConstraint' },
@@ -159,6 +164,12 @@ export const overviewConstraintMachine = Machine(
 			setAvailableValues,
 			applyOverviewConstraint,
 			resetConstraint,
+		},
+		activities: {
+			isLoading: startActivity,
+			disablingButtons: startActivity,
+			waitingToApplyContraint: startActivity,
+			hasNoValues: startActivity,
 		},
 		guards: {
 			selectedListIsEmpty: (ctx) => {

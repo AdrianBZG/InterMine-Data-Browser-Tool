@@ -8,43 +8,36 @@ import React from 'react'
 import { useWindowSize } from 'react-use'
 import { AppManagerServiceContext, useEventBus } from 'src/useEventBus'
 
-import logo from '../../images/logo.png'
 import { BarChart } from '../BarChart/BarChart'
 import { ConstraintSection } from '../ConstraintSection/ConstraintSection'
 import { NavigationBar } from '../Navigation/NavigationBar'
 import { PieChart } from '../PieChart/PieChart'
 import { Table } from '../Table/Table'
 import { appManagerMachine } from './appManagerMachine'
+import { Header } from './Header'
 
 enableMapSet()
 
 export const App = () => {
-	const [state, send, service] = useMachine(appManagerMachine)
+	const [state, , service] = useMachine(appManagerMachine)
 	useEventBus(service)
 	const { height } = useWindowSize()
 
 	const { viewActors, appView } = state.context
 
+	// hack until https://github.com/davidkpiano/xstate/issues/938 is closed
+	// @ts-ignore
+	if (!state.initialized) {
+		service.start()
+	}
+
 	return (
 		<div className="light-theme">
-			<AppManagerServiceContext.Provider value={{ state, send }}>
-				<header css={{ display: 'inline-flex', width: '100%' }}>
-					<div
-						css={{
-							minWidth: '230px',
-							height: 43,
-							display: 'inline-flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							borderRight: '2px solid var(--blue5)',
-							borderBottom: '2px solid var(--blue5)',
-						}}
-					>
-						<img width="120px" src={logo} alt="Logo" />
-					</div>
+			<Header>
+				<AppManagerServiceContext.Provider value={service}>
 					<NavigationBar />
-				</header>
-			</AppManagerServiceContext.Provider>
+				</AppManagerServiceContext.Provider>
+			</Header>
 			<main css={{ display: 'grid', gridTemplateColumns: '230px 1fr' }}>
 				<ConstraintSection
 					templateViewActor={viewActors.templateView}
@@ -59,7 +52,9 @@ export const App = () => {
 					<section id="charts">
 						<Card css={{ height: '376px', marginBottom: '20px', display: 'flex' }}>
 							<div css={{ height: '100%', width: '45%' }}>
-								<PieChart />
+								<AppManagerServiceContext.Provider value={service}>
+									<PieChart />
+								</AppManagerServiceContext.Provider>
 							</div>
 							<div css={{ height: '100%', width: '45%' }}>
 								<BarChart />

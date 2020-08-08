@@ -9,6 +9,7 @@ import {
 	SET_AVAILABLE_COLUMNS,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
+import { startActivity } from 'src/utils'
 import { assign, Machine } from 'xstate'
 
 const bustCachedPages = assign({
@@ -18,8 +19,6 @@ const bustCachedPages = assign({
 const setInitialRows = assign({
 	// @ts-ignore
 	rootUrl: (_, { data }) => data.rootUrl,
-	// @ts-ignore
-	classView: (_, { data }) => data.classView,
 	// @ts-ignore
 	totalRows: (_, { data }) => data.totalRows,
 	// @ts-ignore
@@ -78,7 +77,6 @@ export const TableChartMachine = Machine(
 			pages: new Map(),
 			lastQuery: {},
 			rootUrl: '',
-			classView: '',
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
@@ -119,6 +117,7 @@ export const TableChartMachine = Machine(
 						actions: (ctx, event) => console.error('FETCH: Loading Table Rows', { ctx, event }),
 					},
 				},
+				activities: ['isLoading'],
 			},
 			fetchNewPages: {
 				invoke: {
@@ -134,6 +133,7 @@ export const TableChartMachine = Machine(
 							console.error('FETCH: Could not fetch new Table Rows', { ctx, event }),
 					},
 				},
+				activities: ['isLoading'],
 			},
 			noTableSummary: {
 				on: {
@@ -142,6 +142,7 @@ export const TableChartMachine = Machine(
 						actions: 'bustCachedPages',
 					},
 				},
+				activities: ['hasNoValues'],
 			},
 		},
 	},
@@ -152,6 +153,10 @@ export const TableChartMachine = Machine(
 			setLastQuery,
 			refreshCache,
 			updatePageNumber,
+		},
+		activities: {
+			isLoading: startActivity,
+			hasNoValues: startActivity,
 		},
 		guards: {
 			hasNoTableSummary: (ctx) => {
@@ -202,7 +207,6 @@ export const TableChartMachine = Machine(
 				sendToBus({ type: SET_AVAILABLE_COLUMNS, selectedPaths: headers })
 
 				return {
-					classView,
 					rootUrl,
 					totalRows,
 					query,

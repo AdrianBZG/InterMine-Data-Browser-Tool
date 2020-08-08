@@ -1,14 +1,17 @@
 import { Checkbox, Label } from '@blueprintjs/core'
 import React from 'react'
 import { ADD_CONSTRAINT, REMOVE_CONSTRAINT } from 'src/eventConstants'
-import { useServiceContext } from 'src/useEventBus'
+import { usePartialContext } from 'src/useEventBus'
 
 import { NoValuesProvided } from '../Shared/NoValuesProvided'
 
 export const CheckboxWidget = ({ nonIdealTitle = undefined, nonIdealDescription = undefined }) => {
-	const [state, send] = useServiceContext('constraints')
+	const [state, sendToConstraintMachine] = usePartialContext('constraints', (ctx) => ({
+		availableValues: ctx.availableValues,
+		selectedValues: ctx.selectedValues,
+	}))
 
-	const { availableValues, selectedValues } = state?.context
+	const { availableValues, selectedValues } = state
 
 	if (availableValues?.length === 0) {
 		return <NoValuesProvided title={nonIdealTitle} description={nonIdealDescription} />
@@ -16,9 +19,9 @@ export const CheckboxWidget = ({ nonIdealTitle = undefined, nonIdealDescription 
 
 	const onChangeHandler = (constraint) => (e) => {
 		if (e.target.checked) {
-			send({ type: ADD_CONSTRAINT, constraint })
+			sendToConstraintMachine({ type: ADD_CONSTRAINT, constraint })
 		} else {
-			send({ type: REMOVE_CONSTRAINT, constraint })
+			sendToConstraintMachine({ type: REMOVE_CONSTRAINT, constraint })
 		}
 	}
 
