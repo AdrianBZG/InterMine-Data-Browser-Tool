@@ -15,7 +15,6 @@ export const REMOVE_CONSTRAINT = 'constraint/overview/remove'
  * Template constraints
  */
 export const ADD_TEMPLATE_CONSTRAINT = 'constraint/template/add'
-export const TEMPLATE_CONSTRAINT_UPDATED = 'constraint/template/updated'
 
 /**
  * Fetch

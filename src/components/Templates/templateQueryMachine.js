@@ -5,7 +5,6 @@ import {
 	FETCH_TEMPLATE_SUMMARY,
 	REMOVE_LIST_CONSTRAINT,
 	RESET_VIEW,
-	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
@@ -27,8 +26,6 @@ const setQueries = assign({
 		} else {
 			query.values = selectedValues
 		}
-
-		sendToBus({ type: TEMPLATE_CONSTRAINT_UPDATED, path })
 
 		return updatedQuery
 	},

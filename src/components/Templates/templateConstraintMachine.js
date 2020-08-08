@@ -8,13 +8,14 @@ import {
 	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
 	REMOVE_CONSTRAINT,
 	RESET_OVERVIEW_CONSTRAINT,
-	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
-import { sendToBus } from 'src/useEventBus'
-import { assign, Machine } from 'xstate'
+import { assign, Machine, sendParent } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
 
+/**
+ *
+ */
 const addValueToConstraint = assign({
 	// @ts-ignore
 	selectedValues: (ctx, { constraint: value }) => {
@@ -24,29 +25,44 @@ const addValueToConstraint = assign({
 	},
 })
 
+/**
+ *
+ */
 const removeValueFromConstraint = assign({
 	// @ts-ignore
 	selectedValues: (ctx, { constraint: value }) =>
 		ctx.selectedValues.filter((selectedValue) => selectedValue !== value),
 })
 
+/**
+ *
+ */
 const setAvailableValues = assign({
 	// @ts-ignore
 	availableValues: (_, { data }) => data.values,
 })
 
+/**
+ *
+ */
 const resetConstraint = assign({
 	selectedValues: (ctx) => ctx.defaultSelections,
 })
 
-const updateTemplateQuery = (ctx) => {
-	sendToBus({
+/**
+ *
+ */
+const updateTemplateQuery = sendParent((ctx) => {
+	return {
 		type: ADD_TEMPLATE_CONSTRAINT,
 		path: ctx.constraint.path,
 		selectedValues: ctx.selectedValues,
-	})
-}
+	}
+})
 
+/**
+ *
+ */
 export const templateConstraintMachine = Machine(
 	{
 		id: 'Template constraint widget',
@@ -82,30 +98,25 @@ export const templateConstraintMachine = Machine(
 				always: [{ target: 'noValuesSelected', cond: 'noValuesSelected' }],
 				on: {
 					[FETCH_TEMPLATE_CONSTRAINT_ITEMS]: { target: 'loading' },
-					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
+					[ADD_CONSTRAINT]: { actions: 'addValueToConstraint' },
 					[REMOVE_CONSTRAINT]: {
-						target: 'updateTemplateQuery',
 						actions: 'removeValueFromConstraint',
 					},
 					[RESET_OVERVIEW_CONSTRAINT]: {
-						target: 'updateTemplateQuery',
 						actions: 'resetConstraint',
 					},
 				},
 			},
 			noValuesSelected: {
 				on: {
-					[ADD_CONSTRAINT]: { target: 'updateTemplateQuery', actions: 'addValueToConstraint' },
+					[ADD_CONSTRAINT]: {
+						target: 'idle',
+						actions: ['addValueToConstraint', 'updateTemplateQuery'],
+					},
 					[RESET_OVERVIEW_CONSTRAINT]: {
-						target: 'updateTemplateQuery',
+						target: 'idle',
 						actions: 'resetConstraint',
 					},
-				},
-			},
-			updateTemplateQuery: {
-				entry: 'updateTemplateQuery',
-				on: {
-					[TEMPLATE_CONSTRAINT_UPDATED]: { target: 'idle', cond: 'constraintUpdated' },
 				},
 			},
 		},
