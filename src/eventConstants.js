@@ -8,6 +8,7 @@ export const APPLY_OVERVIEW_CONSTRAINT_TO_QUERY = 'constraint/overview/addToQuer
 export const DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY = 'constraint/overview/deleteQuery'
 export const APPLY_OVERVIEW_CONSTRAINT = 'constraint/overview/apply'
 export const RESET_OVERVIEW_CONSTRAINT = 'constraint/overview/reset'
+export const RESET_TEMPLATE_CONSTRAINT = 'constraint/template/reset'
 export const ADD_CONSTRAINT = 'constraint/overview/add'
 export const REMOVE_CONSTRAINT = 'constraint/overview/remove'
 

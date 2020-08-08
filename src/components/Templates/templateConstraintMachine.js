@@ -7,7 +7,7 @@ import {
 	ADD_TEMPLATE_CONSTRAINT,
 	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
 	REMOVE_CONSTRAINT,
-	RESET_OVERVIEW_CONSTRAINT,
+	RESET_TEMPLATE_CONSTRAINT,
 } from 'src/eventConstants'
 import { assign, Machine, sendParent } from 'xstate'
 
@@ -102,7 +102,7 @@ export const templateConstraintMachine = Machine(
 					[REMOVE_CONSTRAINT]: {
 						actions: 'removeValueFromConstraint',
 					},
-					[RESET_OVERVIEW_CONSTRAINT]: {
+					[RESET_TEMPLATE_CONSTRAINT]: {
 						actions: 'resetConstraint',
 					},
 				},
@@ -113,7 +113,7 @@ export const templateConstraintMachine = Machine(
 						target: 'idle',
 						actions: ['addValueToConstraint', 'updateTemplateQuery'],
 					},
-					[RESET_OVERVIEW_CONSTRAINT]: {
+					[RESET_TEMPLATE_CONSTRAINT]: {
 						target: 'idle',
 						actions: 'resetConstraint',
 					},

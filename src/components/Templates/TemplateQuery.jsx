@@ -7,7 +7,7 @@ import { isMultiSelection, isSingleSelection } from 'src/constraintOperations'
 import {
 	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
 	FETCH_TEMPLATE_SUMMARY,
-	RESET_OVERVIEW_CONSTRAINT,
+	RESET_TEMPLATE_CONSTRAINT,
 } from 'src/eventConstants'
 import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
@@ -178,7 +178,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 					css={{ maxWidth: '50%' }}
 					onClick={() => {
 						constraintActors.forEach((actor) => {
-							actor.send({ type: RESET_OVERVIEW_CONSTRAINT })
+							actor.send({ type: RESET_TEMPLATE_CONSTRAINT })
 						})
 					}}
 				/>
