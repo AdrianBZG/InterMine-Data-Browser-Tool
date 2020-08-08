@@ -2,7 +2,9 @@ import {
 	ADD_LIST_CONSTRAINT,
 	ADD_TEMPLATE_CONSTRAINT,
 	FETCH_SUMMARY,
+	FETCH_TEMPLATE_SUMMARY,
 	REMOVE_LIST_CONSTRAINT,
+	RESET_VIEW,
 	TEMPLATE_CONSTRAINT_UPDATED,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
@@ -95,15 +97,38 @@ const spawnConstraintActors = assign({
 /**
  *
  */
+const resetTemplate = assign((ctx) => {
+	return {
+		template: ctx.baseTemplate,
+		isActiveQuery: false,
+	}
+})
+
+/**
+ *
+ */
+const resetTemplateSummary = ({ classView, rootUrl }) => {
+	sendToBus({
+		classView,
+		rootUrl,
+		type: FETCH_TEMPLATE_SUMMARY,
+	})
+}
+
+/**
+ *
+ */
 export const templateQueryMachine = Machine(
 	{
 		id: 'Template Query',
 		initial: 'idle',
 		context: {
-			template: null,
+			template: {},
+			baseTemplate: {},
 			isActiveQuery: false,
 			listConstraint: listConstraintQuery,
 			rootUrl: '',
+			classView: '',
 			constraints: [],
 			constraintActors: [],
 		},
@@ -115,6 +140,9 @@ export const templateQueryMachine = Machine(
 					[FETCH_SUMMARY]: { actions: 'setActiveQuery' },
 					[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
 					[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
+					[RESET_VIEW]: {
+						actions: ['resetTemplate', 'spawnConstraintActors', 'resetTemplateSummary'],
+					},
 				},
 			},
 		},
@@ -126,6 +154,8 @@ export const templateQueryMachine = Machine(
 			addListConstraint,
 			removeListConstraint,
 			spawnConstraintActors,
+			resetTemplateSummary,
+			resetTemplate,
 		},
 		guards: {
 			// @ts-ignore

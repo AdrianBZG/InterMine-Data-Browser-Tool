@@ -3,6 +3,7 @@ import {
 	FETCH_INITIAL_SUMMARY,
 	FETCH_OVERVIEW_SUMMARY,
 	FETCH_SUMMARY,
+	RESET_VIEW,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
@@ -101,6 +102,16 @@ const assignLastOverviewQuery = assign({
 /**
  *
  */
+const assignInitialOverviewQuery = assign({
+	// @ts-ignore
+	initialOverviewQuery: (_ctx, { query }) => {
+		return query
+	},
+})
+
+/**
+ *
+ */
 const resetLastOverviewQuery = assign({
 	lastOverviewQuery: () => {
 		return {}
@@ -117,6 +128,22 @@ const fetchOverviewSummary = (_ctx, { query, rootUrl, classView }) => {
 /**
  *
  */
+const fetchInitialOverviewSummary = ({ classView, rootUrl, initialOverviewQuery }) => {
+	sendToBus({ type: FETCH_SUMMARY, classView, rootUrl, query: initialOverviewQuery })
+}
+
+/**
+ *
+ */
+const resetToInitialQuery = assign({
+	lastOverviewQuery: (ctx) => {
+		return ctx.initialOverviewQuery
+	},
+})
+
+/**
+ *
+ */
 export const overviewMachine = Machine(
 	{
 		id: 'overview',
@@ -127,16 +154,26 @@ export const overviewMachine = Machine(
 			classView: '',
 			rootUrl: '',
 			lastOverviewQuery: {},
+			initialOverviewQuery: {},
 		},
 		states: {
 			idle: {
 				entry: 'spawnConstraintActors',
 				on: {
-					[FETCH_INITIAL_SUMMARY]: { actions: 'assignLastOverviewQuery' },
+					[FETCH_INITIAL_SUMMARY]: {
+						actions: ['assignLastOverviewQuery', 'assignInitialOverviewQuery'],
+					},
 					[FETCH_OVERVIEW_SUMMARY]: {
 						actions: ['assignLastOverviewQuery', 'fetchOverviewSummary'],
 					},
 					[CHANGE_CLASS]: { actions: 'resetLastOverviewQuery' },
+					[RESET_VIEW]: {
+						actions: [
+							'resetToInitialQuery',
+							'spawnConstraintActors',
+							'fetchInitialOverviewSummary',
+						],
+					},
 				},
 			},
 		},
@@ -145,9 +182,12 @@ export const overviewMachine = Machine(
 		actions: {
 			spawnConstraintActors,
 			assignLastOverviewQuery,
+			assignInitialOverviewQuery,
+			resetToInitialQuery,
 			resetLastOverviewQuery,
 			// @ts-ignore
 			fetchOverviewSummary,
+			fetchInitialOverviewSummary,
 		},
 	}
 )

@@ -35,6 +35,7 @@ export const TOGGLE_CATEGORY_VISIBILITY = 'appManager/category/visibility'
 export const ADD_LIST_CONSTRAINT = 'appManager/lists/add'
 export const REMOVE_LIST_CONSTRAINT = 'appManager/lists/remove'
 export const SET_API_TOKEN = 'appManager/api/token'
+export const RESET_VIEW = 'appManager/reset/overview'
 
 /**
  * Table

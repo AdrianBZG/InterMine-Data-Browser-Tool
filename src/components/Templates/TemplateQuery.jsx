@@ -86,8 +86,10 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 	const [state, , service] = useMachine(
 		templateQueryMachine.withContext({
 			...templateQueryMachine.context,
+			classView,
 			rootUrl,
 			template,
+			baseTemplate: template,
 			isActiveQuery: false,
 			constraints: editableConstraints,
 		})
