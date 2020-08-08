@@ -11,7 +11,7 @@ import { humanize, titleize } from 'underscore.string'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { ExportTableButton } from './ExportTableButton'
 import { GenerateCodeButton } from './GenerateCodeButton'
-import { TableChartMachine } from './tableMachine'
+import { TableChartMachine } from './tableChartMachine'
 import { TablePagingButtons } from './TablePagingButtons'
 
 /**
