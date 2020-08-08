@@ -3,7 +3,7 @@ import {
 	FETCH_INITIAL_SUMMARY,
 	FETCH_OVERVIEW_SUMMARY,
 	FETCH_SUMMARY,
-	RESET_VIEW,
+	RESET_OVERVIEW,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
@@ -167,7 +167,7 @@ export const overviewMachine = Machine(
 						actions: ['assignLastOverviewQuery', 'fetchOverviewSummary'],
 					},
 					[CHANGE_CLASS]: { actions: 'resetLastOverviewQuery' },
-					[RESET_VIEW]: {
+					[RESET_OVERVIEW]: {
 						actions: [
 							'resetToInitialQuery',
 							'spawnConstraintActors',

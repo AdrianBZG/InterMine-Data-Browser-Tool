@@ -95,7 +95,6 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 		})
 	)
 
-	console.log('here')
 	const [sendToBus] = useEventBus(service)
 
 	const {

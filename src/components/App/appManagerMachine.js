@@ -1,7 +1,13 @@
 import hash from 'object-hash'
 import { fetchClasses, fetchInstances, fetchLists, INTERMINE_REGISTRY } from 'src/apiRequests'
 import { interminesConfigCache } from 'src/caches'
-import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, SET_API_TOKEN } from 'src/eventConstants'
+import {
+	CHANGE_CLASS,
+	CHANGE_MINE,
+	FETCH_INITIAL_SUMMARY,
+	SET_API_TOKEN,
+	TOGGLE_VIEW,
+} from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
@@ -218,6 +224,14 @@ const logErrorToConsole = (ctx, event) => {
 }
 
 /**
+ *
+ */
+const assignAppView = assign({
+	// @ts-ignore
+	appView: (_, { newTabId }) => newTabId,
+})
+
+/**
  * Services
  */
 const fetchMineConfiguration = async (ctx) => {
@@ -292,6 +306,7 @@ export const appManagerMachine = Machine(
 				overview: null,
 				queryController: null,
 			},
+			appView: 'defaultView',
 			classView: 'Gene',
 			intermines: [],
 			modelClasses: [],
@@ -312,6 +327,7 @@ export const appManagerMachine = Machine(
 			},
 		},
 		on: {
+			[TOGGLE_VIEW]: { actions: 'assignAppView' },
 			[CHANGE_MINE]: {
 				target: 'loading',
 				actions: ['changeMine', 'stopAllActors', 'getApiTokenFromStorage'],
@@ -368,6 +384,7 @@ export const appManagerMachine = Machine(
 			setAppView,
 			fetchInitialSummaryForMine,
 			stopAllActors,
+			assignAppView,
 		},
 		services: {
 			fetchMineConfiguration,

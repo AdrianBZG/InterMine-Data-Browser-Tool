@@ -1,7 +1,7 @@
 import { Button, Navbar } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import React from 'react'
-import { CHANGE_CLASS, RESET_VIEW } from 'src/eventConstants'
+import { CHANGE_CLASS, RESET_OVERVIEW, RESET_TEMPLATE_VIEW } from 'src/eventConstants'
 import { useEventBus, useServiceContext } from 'src/useEventBus'
 
 import { ClassSelector } from './ClassSelector'
@@ -13,7 +13,7 @@ import { MineSelector } from './MineSelector'
  */
 export const NavigationBar = () => {
 	const [state, send] = useServiceContext('appManager')
-	const { classView, modelClasses, listsForCurrentClass, selectedMine } = state.context
+	const { classView, modelClasses, listsForCurrentClass, selectedMine, appView } = state.context
 	const [sendToBus] = useEventBus()
 
 	const handleClassSelect = ({ name }) => {
@@ -36,12 +36,12 @@ export const NavigationBar = () => {
 					classView={classView}
 				/>
 				<Button
-					text="Reset all"
+					text="Reset view"
 					intent="danger"
 					icon={IconNames.ERROR}
 					css={{ marginLeft: 'auto' }}
 					onClick={() => {
-						sendToBus({ type: RESET_VIEW })
+						sendToBus({ type: appView === 'defaultView' ? RESET_OVERVIEW : RESET_TEMPLATE_VIEW })
 					}}
 				/>
 			</Navbar.Group>

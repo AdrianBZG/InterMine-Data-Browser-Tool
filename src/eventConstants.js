@@ -36,6 +36,9 @@ export const ADD_LIST_CONSTRAINT = 'appManager/lists/add'
 export const REMOVE_LIST_CONSTRAINT = 'appManager/lists/remove'
 export const SET_API_TOKEN = 'appManager/api/token'
 export const RESET_VIEW = 'appManager/reset/overview'
+export const RESET_OVERVIEW = 'appManager/reset/overview'
+export const RESET_TEMPLATE_VIEW = 'appManager/reset/templateView'
+export const TOGGLE_VIEW = 'appManager/view/toggle'
 
 /**
  * Table

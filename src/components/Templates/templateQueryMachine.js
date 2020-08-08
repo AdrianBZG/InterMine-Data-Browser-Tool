@@ -4,7 +4,7 @@ import {
 	FETCH_SUMMARY,
 	FETCH_TEMPLATE_SUMMARY,
 	REMOVE_LIST_CONSTRAINT,
-	RESET_VIEW,
+	RESET_TEMPLATE_VIEW,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
@@ -137,7 +137,7 @@ export const templateQueryMachine = Machine(
 					[FETCH_SUMMARY]: { actions: 'setActiveQuery' },
 					[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
 					[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
-					[RESET_VIEW]: {
+					[RESET_TEMPLATE_VIEW]: {
 						actions: ['resetTemplate', 'spawnConstraintActors', 'resetTemplateSummary'],
 					},
 				},

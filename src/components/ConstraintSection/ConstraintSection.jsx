@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { useWindowSize } from 'react-use'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
-import { FETCH_SUMMARY, TOGGLE_CATEGORY_VISIBILITY } from 'src/eventConstants'
+import { FETCH_SUMMARY, TOGGLE_CATEGORY_VISIBILITY, TOGGLE_VIEW } from 'src/eventConstants'
 import { sendToBus, useEventBus } from 'src/useEventBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -193,9 +193,14 @@ const OverviewConstraintList = ({ overviewActor }) => {
 	)
 }
 
-export const ConstraintSection = ({ templateViewActor, overviewActor, queryControllerActor }) => {
-	const [view, setView] = useState('defaultView')
-	const isTemplateView = view === 'templateView'
+export const ConstraintSection = ({
+	templateViewActor,
+	overviewActor,
+	queryControllerActor,
+	appView,
+}) => {
+	const isTemplateView = appView === 'templateView'
+	const [sendToBus] = useEventBus()
 
 	return (
 		<section
@@ -207,10 +212,12 @@ export const ConstraintSection = ({ templateViewActor, overviewActor, queryContr
 		>
 			<Tabs
 				id="constraint-tabs"
-				selectedTabId={view}
+				selectedTabId={appView}
 				large={true}
 				// @ts-ignore
-				onChange={setView}
+				onChange={(newTabId) => {
+					sendToBus({ type: TOGGLE_VIEW, newTabId })
+				}}
 				css={{
 					marginBottom: 10,
 					[`&& .${Classes.TAB_LIST}`]: { margin: '10px 20px 0' },

@@ -23,7 +23,7 @@ export const App = () => {
 	useEventBus(service)
 	const { height } = useWindowSize()
 
-	const { viewActors } = state.context
+	const { viewActors, appView } = state.context
 
 	return (
 		<div className="light-theme">
@@ -50,6 +50,7 @@ export const App = () => {
 					templateViewActor={viewActors.templateView}
 					overviewActor={viewActors.overview}
 					queryControllerActor={viewActors.queryController}
+					appView={appView}
 				/>
 				<section
 					id="data-viz"
