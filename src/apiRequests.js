@@ -91,13 +91,6 @@ export const exportTable = async ({ query, rootUrl, format, fileName }) => {
 	saveAs(blob, `${fileName}.${format}`)
 }
 
-export const fetchCode1 = async ({ query, lang, rootUrl, fileName }) => {
-	const service = getService(rootUrl)
-	const q = await service.query(query)
-
-	return await q.fetchCode(lang)
-}
-
 export const fetchCode = async ({ query, fileExtension, rootUrl, codeCache, isSameQuery }) => {
 	if (!query || Object.keys(query).length === 0 || (isSameQuery && fileExtension in codeCache)) {
 		return
