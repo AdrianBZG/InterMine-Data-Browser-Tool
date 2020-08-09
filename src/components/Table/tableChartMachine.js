@@ -18,6 +18,8 @@ const bustCachedPages = assign({
 
 const setInitialRows = assign({
 	// @ts-ignore
+	headers: (_, { data }) => data.headers,
+	// @ts-ignore
 	rootUrl: (_, { data }) => data.rootUrl,
 	// @ts-ignore
 	totalRows: (_, { data }) => data.totalRows,
@@ -77,6 +79,7 @@ export const TableChartMachine = Machine(
 			pages: new Map(),
 			lastQuery: {},
 			rootUrl: '',
+			headers: [],
 		},
 		on: {
 			[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
@@ -207,6 +210,7 @@ export const TableChartMachine = Machine(
 				sendToBus({ type: SET_AVAILABLE_COLUMNS, selectedPaths: headers })
 
 				return {
+					headers,
 					rootUrl,
 					totalRows,
 					query,

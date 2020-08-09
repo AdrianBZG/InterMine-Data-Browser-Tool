@@ -79,7 +79,7 @@ export const Table = React.memo(function Table() {
 		service.start()
 	}
 
-	const { pages, rootUrl, pageNumber, lastQuery } = state.context
+	const { pages, rootUrl, pageNumber, lastQuery, headers } = state.context
 	const { isLoading, hasNoValues } = service.state.activities
 
 	const rows = isLoading
@@ -105,14 +105,14 @@ export const Table = React.memo(function Table() {
 				}}
 			>
 				<GenerateCodeButton query={lastQuery} rootUrl={rootUrl} />
-				<ExportTableButton query={lastQuery} rootUrl={rootUrl} />
+				<ExportTableButton query={lastQuery} rootUrl={rootUrl} headers={headers} />
 			</div>
 			<TablePagingButtons />
 			<HTMLTable css={{ width: '100%' }} interactive={true} striped={true}>
 				<thead>
 					<tr>
-						{rows[0].map((r) => {
-							return <ColumnHeader isLoading={isLoading} key={r.column} columnName={r.column} />
+						{headers.map((header) => {
+							return <ColumnHeader isLoading={isLoading} key={header} columnName={header} />
 						})}
 					</tr>
 				</thead>

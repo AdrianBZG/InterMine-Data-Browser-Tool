@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { saveAs } from 'file-saver'
 import imjs from 'imjs'
+import { humanize, titleize } from 'underscore.string'
 
 import { formatConstraintPath } from './utils'
 
@@ -81,16 +82,26 @@ export const fetchLists = async (rootUrl) => {
 	return await service.fetchLists()
 }
 
-export const exportTable = async ({ query, rootUrl, format, fileName }) => {
+export const exportTable = async ({ query, rootUrl, format, fileName, headers }) => {
 	const service = getService(rootUrl)
 	const q = await service.query(query)
 
 	const file = await service.post('query/results', { format, query: q.toXML() })
-	const blob = new Blob([file])
+
+	const tableRows = file.split(/\n/)
+
+	const tableHeaders = headers.map((name) => {
+		const title = titleize(humanize(name.replace(/\./g, ' ')))
+		const words = title.split(' ')
+
+		return words.splice(1).join(' ')
+	})
+
+	tableRows.unshift(tableHeaders.join(format === 'csv' ? ',' : '\t'))
+	const blob = new Blob([tableRows.join('\n')])
 
 	saveAs(blob, `${fileName}.${format}`)
 }
-
 export const fetchCode = async ({ query, fileExtension, rootUrl, codeCache, isSameQuery }) => {
 	if (!query || Object.keys(query).length === 0 || (isSameQuery && fileExtension in codeCache)) {
 		return

@@ -7,7 +7,7 @@ import { exportTable } from 'src/apiRequests'
 /**
  *
  */
-export const ExportTableButton = ({ query, rootUrl }) => {
+export const ExportTableButton = ({ query, rootUrl, headers }) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [format, setFormat] = useState('tsv')
 	const [fileName, setFileName] = useState('table data result')
@@ -17,7 +17,7 @@ export const ExportTableButton = ({ query, rootUrl }) => {
 
 	const handleExport = async () => {
 		try {
-			await exportTable({ query, rootUrl, format, fileName })
+			await exportTable({ query, rootUrl, format, fileName, headers })
 		} catch (e) {
 			// Todo: display an error message
 			setErrorDownloading(true)
