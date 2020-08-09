@@ -7,8 +7,8 @@ import { indexWorker } from './searchIndex'
 export const buildSearchIndex = async ({ docId, docField, values, query }) => {
 	// The configuration *must* be the same for import and export
 	const indexConfig = {
-		encode: 'advanced',
-		tokenize: 'reverse',
+		encode: 'extra',
+		tokenize: 'forward',
 		suggest: true,
 		cache: true,
 		doc: {
