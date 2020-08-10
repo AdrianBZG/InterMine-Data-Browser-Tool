@@ -19,8 +19,17 @@ export const NavigationBar = () => {
 	const [sendToBus] = useEventBus()
 
 	return (
-		<Navbar css={{ padding: '0 40px' }}>
-			<Navbar.Group css={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+		<Navbar css={{ padding: '0 40px', height: 'auto' }}>
+			<Navbar.Group
+				css={{
+					width: '100%',
+					display: 'flex',
+					flexWrap: 'wrap',
+					justifyContent: 'space-evenly',
+					height: 'auto',
+					minHeight: 42,
+				}}
+			>
 				<MineSelector />
 				<ClassSelector />
 				<ListSelector />
@@ -28,7 +37,7 @@ export const NavigationBar = () => {
 					text="Reset view"
 					intent="danger"
 					icon={IconNames.ERROR}
-					css={{ marginLeft: 'auto' }}
+					css={{ margin: '10px 0' }}
 					onClick={() => {
 						sendToBus({
 							type: state.appView === 'defaultView' ? RESET_OVERVIEW : RESET_TEMPLATE_VIEW,

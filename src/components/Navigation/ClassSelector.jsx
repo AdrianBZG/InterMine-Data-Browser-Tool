@@ -67,7 +67,7 @@ export const ClassSelector = () => {
 	}
 
 	return (
-		<div css={{ display: 'flex', marginLeft: 100, marginRight: 20 }}>
+		<div css={{ display: 'flex' }}>
 			<span
 				// @ts-ignore
 				css={{

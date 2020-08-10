@@ -37,11 +37,11 @@ export const MineSelector = () => {
 	const isAuthenticated = apiToken.length > 0
 
 	return (
-		<>
+		<div css={{ display: 'flex' }}>
 			{/* 
 					mine selection
 		  */}
-			<div css={{ display: 'flex', alignItems: 'center' }}>
+			<div css={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}>
 				<span
 					// @ts-ignore
 					css={{
@@ -54,7 +54,6 @@ export const MineSelector = () => {
 					Mine
 				</span>
 				<Select
-					css={{ marginRight: 30 }}
 					items={intermines}
 					filterable={false}
 					itemRenderer={NumberedSelectMenuItems}
@@ -74,7 +73,7 @@ export const MineSelector = () => {
 			{/* 
 			       Api Status
 			 */}
-			<div css={{ display: 'flex', alignItems: 'center' }}>
+			<div css={{ display: 'flex', alignItems: 'center', marginLeft: 20 }}>
 				<span
 					// @ts-ignore
 					css={{
@@ -114,6 +113,6 @@ export const MineSelector = () => {
 					/>
 				</Popover>
 			</div>
-		</>
+		</div>
 	)
 }

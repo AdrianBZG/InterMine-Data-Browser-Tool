@@ -129,7 +129,7 @@ export const ListSelector = () => {
 	}
 
 	return (
-		<div css={{ display: 'flex', alignItems: 'center', marginLeft: 40, marginRight: 20 }}>
+		<div css={{ display: 'flex', alignItems: 'center' }}>
 			<span
 				// @ts-ignore
 				css={{

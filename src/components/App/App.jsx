@@ -47,10 +47,17 @@ export const App = () => {
 				/>
 				<section
 					id="data-viz"
-					css={{ padding: '10px 30px 0', overflow: 'auto', height: 'calc(100vh - 3.643em)' }}
+					css={{
+						padding: '10px 30px 0',
+						overflow: 'auto',
+						height: 'calc(100vh - 100px)',
+						'@media (min-width: 1157px)': {
+							height: 'calc(100vh - 20px)',
+						},
+					}}
 				>
 					<section id="charts">
-						<Card css={{ height: '376px', marginBottom: '20px', display: 'flex' }}>
+						<Card css={{ height: '376px', marginBottom: '10px', display: 'flex' }}>
 							<div css={{ height: '100%', width: '45%' }}>
 								<AppManagerServiceContext.Provider value={service}>
 									<PieChart />

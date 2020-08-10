@@ -8,7 +8,6 @@ export const Header = ({ children }) => {
 			<div
 				css={{
 					minWidth: '230px',
-					height: 43,
 					display: 'inline-flex',
 					alignItems: 'center',
 					justifyContent: 'center',
