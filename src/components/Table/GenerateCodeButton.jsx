@@ -185,9 +185,9 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 			canEscapeKeyClose={true}
 			onClose={handleDialogClose}
 			onOpening={fetchCodePreview}
-			css={{ width: 'auto' }}
+			css={{ width: '60vw', maxWidth: 1000 }}
 		>
-			<div css={{ padding: 20, display: 'flex', maxHeight: '500px', width: '50vw' }}>
+			<div css={{ padding: 20, display: 'flex', maxHeight: '500px' }}>
 				<div css={{ marginTop: 20, marginRight: 20 }}>
 					<FileNameInput
 						fileName={fileName}
@@ -206,8 +206,8 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 				<Pre
 					css={{
 						overflow: 'scroll',
-						minWidth: code[lang] ? 'auto' : 500,
-						minHeight: code[lang] ? 'auto' : 400,
+						minWidth: code[fileExtension] ? 'auto' : 500,
+						minHeight: code[fileExtension] ? 'auto' : 400,
 					}}
 				>
 					{renderCode ? (
