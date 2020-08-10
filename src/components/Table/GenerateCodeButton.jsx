@@ -26,6 +26,7 @@ import hash from 'object-hash'
 import React, { useEffect, useState } from 'react'
 import { usePrevious } from 'react-use'
 import { fetchCode } from 'src/apiRequests'
+import { noop } from 'src/utils'
 
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('html', html)
@@ -60,6 +61,7 @@ const codeNameToExtension = (lang) => {
 const CodeButtonSelect = ({
 	setLang,
 	intent,
+	setDialogOpen = noop,
 	text = '',
 	icon = null,
 	rightIcon = null,
@@ -75,7 +77,10 @@ const CodeButtonSelect = ({
 				// @ts-ignore
 				return <MenuItem key={lang} text={lang} onClick={handleClick} />
 			}}
-			onItemSelect={setLang}
+			onItemSelect={(item) => {
+				setLang(item)
+				setDialogOpen()
+			}}
 			css={wrapperStyles}
 		>
 			<Button
@@ -259,6 +264,7 @@ export const GenerateCodeButton = ({ query, rootUrl }) => {
 				intent="primary"
 				icon={IconNames.CARET_DOWN}
 				outlined={true}
+				setDialogOpen={() => setIsOpen(true)}
 			/>
 		</ButtonGroup>
 	)
