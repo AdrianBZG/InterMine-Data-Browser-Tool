@@ -3,7 +3,6 @@ import '@emotion/core'
 
 import { Card } from '@blueprintjs/core'
 import { useMachine } from '@xstate/react'
-import { enableMapSet } from 'immer'
 import React from 'react'
 import { useWindowSize } from 'react-use'
 import { AppManagerServiceContext, useEventBus } from 'src/useEventBus'
@@ -15,8 +14,6 @@ import { PieChart } from '../PieChart/PieChart'
 import { Table } from '../Table/Table'
 import { appManagerMachine } from './appManagerMachine'
 import { Header } from './Header'
-
-enableMapSet()
 
 export const App = () => {
 	const [state, , service] = useMachine(appManagerMachine)

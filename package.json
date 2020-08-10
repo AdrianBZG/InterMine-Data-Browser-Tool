@@ -23,11 +23,8 @@
 		"lint": "concurrently \"yarn:lint:*\"",
 		"lint:css": "cross-env NODE_ENV=development stylelint src/**/*.js{x}",
 		"lint:js": "cross-env NODE_ENV=development eslint src/**/*.{js,jsx}",
-		"serve:app": "serve build",
-		"serve:orig": "serve orig_app",
+		"serve": "serve build",
 		"start": "yarn build:css && cross-env EXTEND_ESLINT=true craco start",
-		"storybook": "yarn build:css && cross-env EXTEND_ESLINT=true start-storybook -p 9000",
-		"storybook:build": "yarn build:css && cross-env STORYBOOK_USEMOCK=true EXTEND_ESLINT=true build-storybook --no-dll -c .storybook -o storybook-dist",
 		"test": "craco test",
 		"typecheck": "tsc",
 		"typecheck:watch": "tsc --watch"
@@ -40,12 +37,10 @@
 		"@emotion/styled": "^10.0.27",
 		"@xstate/react": "^0.8.1",
 		"axios": "^0.19.2",
-		"babel-plugin-emotion": "^10.0.33",
 		"file-saver": "^2.0.2",
 		"flexsearch": "^0.6.32",
 		"highlight.js": "^10.1.2",
 		"imjs": "^4.0.0",
-		"immer": "^7.0.5",
 		"localforage": "^1.8.1",
 		"nanoid": "^3.1.10",
 		"nanoid-dictionary": "^3.0.0",
@@ -61,22 +56,15 @@
 	"devDependencies": {
 		"@blueprintjs/eslint-plugin": "^0.2.0",
 		"@craco/craco": "^5.6.4",
-		"@storybook/addon-actions": "^5.3.19",
-		"@storybook/addon-docs": "next",
-		"@storybook/addon-knobs": "next",
-		"@storybook/addon-links": "next",
-		"@storybook/addons": "next",
-		"@storybook/preset-create-react-app": "^3.0.1",
-		"@storybook/react": "next",
 		"@testing-library/jest-dom": "^5.11.0",
 		"@testing-library/react": "^10.4.3",
 		"@testing-library/user-event": "^12.0.11",
-		"@types/dotenv": "^8.2.0",
 		"@types/react-window": "^1.8.2",
 		"@typescript-eslint/eslint-plugin": "2.x",
 		"@typescript-eslint/parser": "2.x",
 		"@xstate/test": "^0.4.0",
 		"babel-eslint": "10.x",
+		"babel-plugin-emotion": "^10.0.33",
 		"babel-plugin-import": "^1.13.0",
 		"babel-preset-react-app": "^9.1.2",
 		"concurrently": "^5.2.0",
@@ -126,7 +114,9 @@
 		]
 	},
 	"contributors": [
-		"John Mendez"
+		"John Mendez",
+		"Adrian Barzaga",
+		"Nikhil Vats"
 	],
 	"eslintConfig": {
 		"extends": "react-app"

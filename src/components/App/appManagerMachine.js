@@ -64,7 +64,6 @@ const filterListsForClass = assign({
 		 * in a service worker. So we have to extract the values we need, namely just the name
 		 * and description
 		 */
-		// return ctx.lists.filter((list) => list.type === ctx.classView)
 		return ctx.lists.flatMap((list) => {
 			if (list.type !== ctx.classView) {
 				return []
