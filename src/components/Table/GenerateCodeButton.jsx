@@ -170,9 +170,10 @@ const GenerateCodeDialog = ({ lang, handleDialogClose, isOpen, query, rootUrl, s
 			fetchCodePreview()
 		}
 	})
+
 	const handleFileSave = () => {
-		const blob = new Blob([code[lang].plain])
-		saveAs(blob, `${fileName}.${codeNameToExtension(lang)}`)
+		const blob = new Blob([code[fileExtension].plain])
+		saveAs(blob, `${fileName}.${fileExtension}`)
 	}
 
 	const renderCode = code[fileExtension] || code[previousFileExtension]
