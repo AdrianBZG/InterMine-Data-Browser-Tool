@@ -1,10 +1,12 @@
 import hash from 'object-hash'
-import { fetchSummary } from 'src/apiRequests'
+import { fetchSummary, verifyPath } from 'src/apiRequests'
 import { barChartCache } from 'src/caches'
 import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
-import { logErrorToConsole, startActivity } from '../../utils'
+import { startActivity } from '../../utils'
+
+const LENGTH_PATH = 'length'
 
 const setLengthSummary = assign({
 	// @ts-ignore
@@ -12,6 +14,11 @@ const setLengthSummary = assign({
 	// @ts-ignore
 	lengthSummary: (_, { data }) => data.lengthSummary,
 })
+
+/**
+ *
+ */
+const logErrorToConsole = (_, event) => console.warn(event.data)
 
 export const BarChartMachine = Machine(
 	{
@@ -35,15 +42,27 @@ export const BarChartMachine = Machine(
 			idle: {
 				always: [{ target: 'noGeneLengths', cond: 'hasNoSummary' }],
 				on: {
-					[FETCH_SUMMARY]: { target: 'loading' },
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+					[FETCH_SUMMARY]: { target: 'verifyPath' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'verifyPath' },
 				},
 			},
 			waitingOnMineToLoad: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'verifyPath' },
 				},
 				activities: ['isLoading'],
+			},
+			verifyPath: {
+				invoke: {
+					id: 'verifyPath',
+					src: 'verifyPath',
+					onDone: {
+						target: 'loading',
+					},
+					onError: {
+						target: 'pathNotAvailable',
+					},
+				},
 			},
 			loading: {
 				activities: ['isLoading'],
@@ -60,13 +79,21 @@ export const BarChartMachine = Machine(
 					},
 				},
 			},
-			noGeneLengths: {
+			pathNotAvailable: {
 				on: {
-					[FETCH_SUMMARY]: { target: 'loading' },
+					[FETCH_SUMMARY]: { target: 'verifyPath' },
 					[CHANGE_CLASS]: { target: 'idle' },
 					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 				},
-				activities: ['hasNoValues'],
+				activities: ['displayingNoPaths'],
+			},
+			noGeneLengths: {
+				on: {
+					[FETCH_SUMMARY]: { target: 'verifyPath' },
+					[CHANGE_CLASS]: { target: 'idle' },
+					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
+				},
+				activities: ['displayingNoValues'],
 			},
 		},
 	},
@@ -77,7 +104,8 @@ export const BarChartMachine = Machine(
 		},
 		activities: {
 			isLoading: startActivity,
-			hasNoValues: startActivity,
+			displayingNoValues: startActivity,
+			displayingNoPaths: startActivity,
 		},
 		guards: {
 			hasNoSummary: (ctx) => {
@@ -85,7 +113,20 @@ export const BarChartMachine = Machine(
 			},
 		},
 		services: {
-			fetchLengths: async (_ctx, { classView, rootUrl, query: nextQuery }) => {
+			verifyPath: async (_ctx, event) => {
+				const { classView, rootUrl, query } = event
+
+				await verifyPath({ rootUrl, classView, path: LENGTH_PATH })
+
+				return {
+					classView,
+					rootUrl,
+					query,
+				}
+			},
+			fetchLengths: async (_ctx, event) => {
+				const { classView, rootUrl, query: nextQuery } = event.data
+
 				let query = {
 					...nextQuery,
 					from: classView,
@@ -95,13 +136,13 @@ export const BarChartMachine = Machine(
 					},
 					orderBy: [
 						{
-							path: 'length',
+							path: LENGTH_PATH,
 							direction: 'ASC',
 						},
 					],
 				}
 
-				const summaryConfig = { rootUrl, query, path: 'length' }
+				const summaryConfig = { rootUrl, query, path: LENGTH_PATH }
 				const configHash = hash(summaryConfig)
 				let summary
 

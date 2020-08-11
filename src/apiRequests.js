@@ -39,6 +39,14 @@ export const fetchSummary = async ({ rootUrl, query, path }) => {
 	return await q.summarize(fullPath)
 }
 
+export const verifyPath = async ({ rootUrl, classView, path }) => {
+	const service = getService(rootUrl)
+
+	const fullPath = formatConstraintPath({ classView, path })
+
+	return await service.makePath(fullPath)
+}
+
 export const fetchTable = async ({ rootUrl, query, page }) => {
 	const service = getService(rootUrl)
 	const summary = await service.tableRows(query, page)

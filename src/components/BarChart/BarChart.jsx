@@ -92,11 +92,18 @@ export const BarChart = React.memo(function BarChart() {
 		}
 	})
 
-	if (state.activities.hasNoValues) {
+	const { displayingNoValues, displayingNoPaths } = state.activities
+
+	if (displayingNoValues || displayingNoPaths) {
+		const description = displayingNoValues
+			? `The mine/class combination does not provide ${classView} lengths. If you feel this is an error, please contact support`
+			: `The class ${classView} does not contain lengths`
+
 		return (
 			<NonIdealStateWarning
-				title={`No lengths for ${classView} available`}
-				description={`The mine/class combination does not provide ${classView} lengths. If you feel this is an error, please contact support`}
+				title="No lengths available"
+				description={description}
+				isWarning={displayingNoValues ? true : false}
 			/>
 		)
 	}

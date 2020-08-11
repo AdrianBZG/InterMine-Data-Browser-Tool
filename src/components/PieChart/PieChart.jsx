@@ -1,8 +1,6 @@
 import { ProgressBar } from '@blueprintjs/core'
 import { useMachine } from '@xstate/react'
 import React from 'react'
-// use direct import because babel is not properly changing it in webpack
-import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import {
 	Cell,
 	Label,
@@ -62,8 +60,6 @@ const renderLoadingLabel = (props) => {
 }
 
 export const PieChart = React.memo(function PieChart() {
-	const isFirstRender = useFirstMountState()
-
 	const [state, , service] = useMachine(PieChartMachine)
 	const [appState] = usePartialContext('appManager', (ctx) => ({
 		classView: ctx.classView,
@@ -74,16 +70,21 @@ export const PieChart = React.memo(function PieChart() {
 	const { allClassOrganisms } = state.context
 	const { classView } = appState
 
-	const { isLoading, hasNoValues } = state.activities
+	const { isLoading, displayingNoValues, displayingNoPaths } = state.activities
 	const data = isLoading ? pieChartLoadingData : allClassOrganisms
 
-	if (hasNoValues) {
-		const title = isFirstRender ? 'No query has been executed' : 'No Organism Summary available'
-		const description = isFirstRender
-			? 'Define the constraints to the left, and execute a query to see visual data results'
+	if (displayingNoValues || displayingNoPaths) {
+		const description = displayingNoPaths
+			? `The class ${classView} does not contain organism summaries`
 			: 'The mine/class combination did not return any organism summaries. If you feel this an error, please contact support'
 
-		return <NonIdealStateWarning title={title} description={description} />
+		return (
+			<NonIdealStateWarning
+				isWarning={displayingNoValues ? true : false}
+				title="No Organism Summary available"
+				description={description}
+			/>
+		)
 	}
 
 	return (

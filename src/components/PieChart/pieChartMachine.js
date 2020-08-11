@@ -1,5 +1,5 @@
 import hash from 'object-hash'
-import { fetchSummary } from 'src/apiRequests'
+import { fetchSummary, verifyPath } from 'src/apiRequests'
 import { pieChartCache } from 'src/caches'
 import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { startActivity } from 'src/utils'
@@ -9,6 +9,8 @@ const setSummaryResults = assign({
 	// @ts-ignore
 	allClassOrganisms: (_, { data }) => data.summary,
 })
+
+const ORGANISM_PATH = 'organism.shortName'
 
 export const PieChartMachine = Machine(
 	{
@@ -24,15 +26,27 @@ export const PieChartMachine = Machine(
 			idle: {
 				always: [{ target: 'hasNoSummary', cond: 'hasNoSummary' }],
 				on: {
-					[FETCH_SUMMARY]: { target: 'loading' },
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+					[FETCH_SUMMARY]: { target: 'verifyPath' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'verifyPath' },
 				},
 			},
 			waitingOnMineToLoad: {
 				on: {
-					[FETCH_INITIAL_SUMMARY]: { target: 'loading' },
+					[FETCH_INITIAL_SUMMARY]: { target: 'verifyPath' },
 				},
 				activities: ['isLoading'],
+			},
+			verifyPath: {
+				invoke: {
+					id: 'verifyPath',
+					src: 'verifyPath',
+					onDone: {
+						target: 'loading',
+					},
+					onError: {
+						target: 'pathNotAvailable',
+					},
+				},
 			},
 			loading: {
 				activities: ['isLoading'],
@@ -49,13 +63,21 @@ export const PieChartMachine = Machine(
 					},
 				},
 			},
-			hasNoSummary: {
+			pathNotAvailable: {
 				on: {
-					[FETCH_SUMMARY]: { target: 'loading' },
+					[FETCH_SUMMARY]: { target: 'verifyPath' },
 					[CHANGE_CLASS]: { target: 'idle' },
 					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 				},
-				activities: ['hasNoValues'],
+				activities: ['displayingNoPaths'],
+			},
+			hasNoSummary: {
+				on: {
+					[FETCH_SUMMARY]: { target: 'verifyPath' },
+					[CHANGE_CLASS]: { target: 'idle' },
+					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
+				},
+				activities: ['displayingNoValues'],
 			},
 		},
 	},
@@ -65,14 +87,26 @@ export const PieChartMachine = Machine(
 		},
 		activities: {
 			isLoading: startActivity,
-			hasNoValues: startActivity,
+			displayingNoValues: startActivity,
+			displayingNoPaths: startActivity,
 		},
 		guards: {
 			hasNoSummary: (ctx) => ctx.allClassOrganisms.length === 0,
 		},
 		services: {
+			verifyPath: async (_ctx, event) => {
+				const { classView, rootUrl, query } = event
+
+				await verifyPath({ rootUrl, classView, path: ORGANISM_PATH })
+
+				return {
+					classView,
+					rootUrl,
+					query,
+				}
+			},
 			fetchItems: async (_ctx, event) => {
-				const { classView, rootUrl, query: nextQuery } = event
+				const { classView, rootUrl, query: nextQuery } = event.data
 
 				let query = {
 					...nextQuery,
@@ -83,7 +117,7 @@ export const PieChartMachine = Machine(
 					},
 				}
 
-				const summaryConfig = { rootUrl, query, path: 'organism.shortName' }
+				const summaryConfig = { rootUrl, query, path: ORGANISM_PATH }
 				const configHash = hash(summaryConfig)
 				let summary
 
