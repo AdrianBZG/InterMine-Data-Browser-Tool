@@ -1,9 +1,10 @@
 import {
-	ADD_LIST_CONSTRAINT,
+	ADD_LIST_TO_TEMPLATE,
 	ADD_TEMPLATE_CONSTRAINT,
 	FETCH_SUMMARY,
 	FETCH_TEMPLATE_SUMMARY,
-	REMOVE_LIST_CONSTRAINT,
+	REHYDRATE_LIST_TO_TEMPLATE,
+	REMOVE_LIST_FROM_TEMPLATE,
 	RESET_TEMPLATE_VIEW,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
@@ -135,8 +136,9 @@ export const templateQueryMachine = Machine(
 				on: {
 					[ADD_TEMPLATE_CONSTRAINT]: { actions: 'setQueries', cond: 'templateHasQuery' },
 					[FETCH_SUMMARY]: { actions: 'setActiveQuery' },
-					[ADD_LIST_CONSTRAINT]: { actions: 'addListConstraint' },
-					[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
+					[ADD_LIST_TO_TEMPLATE]: { actions: 'addListConstraint' },
+					[REHYDRATE_LIST_TO_TEMPLATE]: { actions: 'addListConstraint' },
+					[REMOVE_LIST_FROM_TEMPLATE]: { actions: 'removeListConstraint' },
 					[RESET_TEMPLATE_VIEW]: {
 						actions: ['resetTemplate', 'spawnConstraintActors', 'resetTemplateSummary'],
 					},

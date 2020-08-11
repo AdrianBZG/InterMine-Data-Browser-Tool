@@ -4,10 +4,11 @@ import { Select } from '@blueprintjs/select'
 import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { CHANGE_CLASS } from 'src/eventConstants'
-import { usePartialContext } from 'src/useEventBus'
+import { useEventBus, usePartialContext } from 'src/useEventBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { NumberedSelectMenuItems } from '../Shared/Selects'
+
 /**
  *
  */
@@ -25,11 +26,13 @@ const renderMenu = ({ filteredItems, itemsParentRef, query, renderItem }) => {
 }
 
 export const ClassSelector = () => {
-	const [state, sendToAppManager] = usePartialContext('appManager', (ctx) => ({
+	const [state] = usePartialContext('appManager', (ctx) => ({
 		modelClasses: ctx.modelClasses,
 		classView: ctx.classView,
 		mineName: ctx.selectedMine.name,
 	}))
+
+	const [sendToBus] = useEventBus()
 
 	const { modelClasses, classView, mineName } = state
 
@@ -39,7 +42,8 @@ export const ClassSelector = () => {
 		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
 
 	const handleClassSelect = ({ name }) => {
-		sendToAppManager({ type: CHANGE_CLASS, newClass: name })
+		// @ts-ignore
+		sendToBus({ type: CHANGE_CLASS, newClass: name })
 	}
 
 	useEffect(() => {

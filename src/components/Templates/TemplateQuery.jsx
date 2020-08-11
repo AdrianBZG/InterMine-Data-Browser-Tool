@@ -107,23 +107,32 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 	const showDivider = (idx) =>
 		editableConstraints.length > 1 && idx < editableConstraints.length - 1
 
-	let query = {
-		...updatedTemplate,
-		constraintLogic: template.where.map((_, idx) => CODES[idx]).join(' AND '),
-		where: updatedTemplate.where,
-	}
+	const runQuery = () => {
+		const query = {
+			...updatedTemplate,
+			constraintLogic: template.where.map((_, idx) => CODES[idx]).join(' AND '),
+			where: updatedTemplate.where,
+		}
 
-	if (listConstraint.value.length > 0) {
-		const nextCode = CODES[updatedTemplate.where.length]
-		query.constraintLogic = `${query.constraintLogic} AND ${nextCode}`
-		query.where = [
-			...query.where,
-			{
-				...listConstraint,
-				path: classView,
-				code: nextCode,
-			},
-		]
+		if (listConstraint.value.length > 0) {
+			const nextCode = CODES[updatedTemplate.where.length]
+			query.constraintLogic = `${query.constraintLogic} AND ${nextCode}`
+			query.where = [
+				...query.where,
+				{
+					...listConstraint,
+					path: classView,
+					code: nextCode,
+				},
+			]
+		}
+
+		sendToBus({
+			query,
+			classView,
+			rootUrl,
+			type: FETCH_TEMPLATE_SUMMARY,
+		})
 	}
 
 	const disableRunQuery = constraintActors.some((actor) => {
@@ -162,14 +171,7 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 					css={{ maxWidth: '50%' }}
 					className={Classes.POPOVER_DISMISS}
 					disabled={disableRunQuery}
-					onClick={() => {
-						sendToBus({
-							query,
-							classView,
-							rootUrl,
-							type: FETCH_TEMPLATE_SUMMARY,
-						})
-					}}
+					onClick={runQuery}
 				/>
 				<Button
 					text="Reset All"

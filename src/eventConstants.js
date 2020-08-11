@@ -27,13 +27,21 @@ export const FETCH_TEMPLATE_SUMMARY = 'fetch/templateSummary'
 export const FETCH_OVERVIEW_SUMMARY = 'fetch/overviewSummary'
 
 /**
+ * Lists
+ */
+export const ADD_LIST_TO_OVERVIEW = 'appManager/lists/add_to_overview'
+export const REMOVE_LIST_FROM_OVERVIEW = 'appManager/lists/remove_from_overview'
+
+export const ADD_LIST_TO_TEMPLATE = 'appManager/lists/add_to_templateView'
+export const REHYDRATE_LIST_TO_TEMPLATE = 'appManager/lists/rehydrate_to_templateView'
+export const REMOVE_LIST_FROM_TEMPLATE = 'appManager/lists/remove_from_templateView'
+
+/**
  * AppManager
  */
 export const CHANGE_MINE = 'appManager/mine/change'
 export const CHANGE_CLASS = 'appManager/class/change'
 export const TOGGLE_CATEGORY_VISIBILITY = 'appManager/category/visibility'
-export const ADD_LIST_CONSTRAINT = 'appManager/lists/add'
-export const REMOVE_LIST_CONSTRAINT = 'appManager/lists/remove'
 export const SET_API_TOKEN = 'appManager/api/token'
 export const RESET_VIEW = 'appManager/reset/overview'
 export const RESET_OVERVIEW = 'appManager/reset/overview'

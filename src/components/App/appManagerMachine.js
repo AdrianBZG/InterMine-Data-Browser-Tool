@@ -1,6 +1,7 @@
 import hash from 'object-hash'
 import { fetchClasses, fetchInstances, fetchLists, INTERMINE_REGISTRY } from 'src/apiRequests'
 import { interminesConfigCache } from 'src/caches'
+import { DEFAULT_VIEW } from 'src/constants'
 import {
 	CHANGE_CLASS,
 	CHANGE_MINE,
@@ -305,7 +306,7 @@ export const appManagerMachine = Machine(
 				overview: null,
 				queryController: null,
 			},
-			appView: 'defaultView',
+			appView: DEFAULT_VIEW,
 			classView: 'Gene',
 			intermines: [],
 			modelClasses: [],

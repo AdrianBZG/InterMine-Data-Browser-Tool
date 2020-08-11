@@ -1,11 +1,11 @@
 import {
-	ADD_LIST_CONSTRAINT,
+	ADD_LIST_TO_OVERVIEW,
 	APPLY_OVERVIEW_CONSTRAINT_TO_QUERY,
 	CHANGE_CLASS,
 	CHANGE_MINE,
 	CONSTRAINT_UPDATED,
 	DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY,
-	REMOVE_LIST_CONSTRAINT,
+	REMOVE_LIST_FROM_OVERVIEW,
 	SET_AVAILABLE_COLUMNS,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
@@ -101,14 +101,14 @@ export const queryControllerMachine = Machine(
 		on: {
 			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths' },
 			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
-			[REMOVE_LIST_CONSTRAINT]: { actions: 'removeListConstraint' },
+			[REMOVE_LIST_FROM_OVERVIEW]: { actions: 'removeListConstraint' },
 			[CHANGE_MINE]: { actions: 'removeListConstraint' },
 			[CHANGE_CLASS]: { actions: 'removeListConstraint' },
 		},
 		states: {
 			idle: {
 				on: {
-					[ADD_LIST_CONSTRAINT]: [
+					[ADD_LIST_TO_OVERVIEW]: [
 						{
 							target: 'constraintLimitReached',
 							cond: {

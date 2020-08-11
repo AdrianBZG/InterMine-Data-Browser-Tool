@@ -1,15 +1,23 @@
 import { Button, Menu, MenuItem } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
-import React, { useEffect, useRef, useState } from 'react'
-import { usePrevious } from 'react-use'
+import { useMachine } from '@xstate/react'
+import React, { useEffect, useRef } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
-import { ADD_LIST_CONSTRAINT, REMOVE_LIST_CONSTRAINT } from 'src/eventConstants'
+import { DEFAULT_VIEW, TEMPLATE_VIEW } from 'src/constants'
+import {
+	ADD_LIST_TO_OVERVIEW,
+	ADD_LIST_TO_TEMPLATE,
+	REHYDRATE_LIST_TO_TEMPLATE,
+	REMOVE_LIST_FROM_OVERVIEW,
+	REMOVE_LIST_FROM_TEMPLATE,
+} from 'src/eventConstants'
 import { useEventBus, usePartialContext } from 'src/useEventBus'
 import { pluralizeFilteredCount } from 'src/utils'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { InfoIconPopover } from '../Shared/InfoIconPopover'
+import { listSelectorMachine } from './listSelectorMachine'
 
 export const ListMenuItems = (item, props) => {
 	return (
@@ -33,7 +41,7 @@ export const ListMenuItems = (item, props) => {
 /**
  *
  */
-const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, renderItem }) => {
+const renderMenu = (selectedListName) => ({ filteredItems, itemsParentRef, query, renderItem }) => {
 	const renderedItems = filteredItems.map(renderItem)
 	const infoText = pluralizeFilteredCount(filteredItems, query)
 
@@ -41,8 +49,8 @@ const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, r
 		<>
 			<MenuItem disabled={true} text="Selected list (click to remove)" />
 			{renderItem({
-				listName: selectedValue,
-				displayName: selectedValue,
+				listName: selectedListName,
+				displayName: selectedListName,
 				isSelected: true,
 			})}
 		</>
@@ -50,7 +58,7 @@ const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, r
 
 	return (
 		<Menu ulRef={itemsParentRef}>
-			{selectedValue !== '' && renderSelected}
+			{selectedListName !== '' && renderSelected}
 			<MenuItem disabled={true} text={infoText} />
 			{renderedItems}
 		</Menu>
@@ -58,26 +66,38 @@ const renderMenu = (selectedValue) => ({ filteredItems, itemsParentRef, query, r
 }
 
 export const ListSelector = () => {
-	const [state] = usePartialContext('appManager', (ctx) => ({
+	const [appState] = usePartialContext('appManager', (ctx) => ({
+		appView: ctx.appView,
 		mineName: ctx.selectedMine.name,
 		classView: ctx.classView,
 		listsForCurrentClass: ctx.listsForCurrentClass,
 	}))
 
-	const { mineName, classView, listsForCurrentClass } = state
-	const [sendToBus] = useEventBus()
+	const { appView, mineName, classView, listsForCurrentClass } = appState
+
+	const [state, , service] = useMachine(listSelectorMachine)
+	const { listForOverview, listForTemplate } = state.context
+
+	const [sendToBus] = useEventBus(service)
 
 	const listSearchIndex = useRef(null)
-	const [selectedValue, setSelectedValue] = useState('')
 
-	const prevMineName = usePrevious(mineName)
-	const prevClassView = usePrevious(classView)
+	const selectedListName =
+		(appView === DEFAULT_VIEW ? listForOverview?.displayName : listForTemplate?.displayName) ?? ''
 
 	useEffect(() => {
-		if (mineName !== prevMineName || classView !== prevClassView) {
-			setSelectedValue('')
+		// This will log a warning to the console about an uninitialized service. You can disregard that
+		// because it means the template machines and it's spawned children haven't started yet. But they will
+		// and the event will be deferred until they do. This can be removed once a better model, probably using
+		// another machine is created.
+		if (selectedListName !== '' && appView === TEMPLATE_VIEW) {
+			sendToBus({
+				type: REHYDRATE_LIST_TO_TEMPLATE,
+				// @ts-ignore
+				listName: listForTemplate.listName,
+			})
 		}
-	}, [classView, mineName, prevClassView, prevMineName])
+	})
 
 	useEffect(() => {
 		const indexClasses = async () => {
@@ -96,7 +116,7 @@ export const ListSelector = () => {
 
 	const filterQuery = (query, items) => {
 		if (query === '' || !listSearchIndex?.current) {
-			return items.filter((item) => item.displayName !== selectedValue)
+			return items.filter((item) => item.displayName !== selectedListName)
 		}
 
 		// flexSearch's default result limit is set 1000, so we set it to the length of all items
@@ -109,7 +129,7 @@ export const ListSelector = () => {
 				},
 				{
 					field: 'displayName',
-					query: selectedValue,
+					query: selectedListName,
 					bool: 'not',
 				},
 			],
@@ -118,13 +138,14 @@ export const ListSelector = () => {
 	}
 
 	const handleListSelect = ({ displayName, listName }) => {
-		if (displayName === selectedValue) {
-			sendToBus({ type: REMOVE_LIST_CONSTRAINT })
-			setSelectedValue('')
+		if (displayName === selectedListName) {
+			const type = appView === DEFAULT_VIEW ? REMOVE_LIST_FROM_OVERVIEW : REMOVE_LIST_FROM_TEMPLATE
+
+			sendToBus({ type })
 		} else {
+			const type = appView === DEFAULT_VIEW ? ADD_LIST_TO_OVERVIEW : ADD_LIST_TO_TEMPLATE
 			// @ts-ignore
-			sendToBus({ type: ADD_LIST_CONSTRAINT, listName })
-			setSelectedValue(displayName)
+			sendToBus({ type, listName, displayName })
 		}
 	}
 
@@ -146,7 +167,7 @@ export const ListSelector = () => {
 				filterable={true}
 				itemRenderer={ListMenuItems}
 				onItemSelect={handleListSelect}
-				itemListRenderer={renderMenu(selectedValue)}
+				itemListRenderer={renderMenu(selectedListName)}
 				itemListPredicate={filterQuery}
 				resetOnClose={true}
 				popoverProps={{ boundary: 'window', usePortal: true, lazy: true }}
@@ -162,8 +183,8 @@ export const ListSelector = () => {
 			</Select>
 			<div css={{ marginLeft: 10 }}>
 				<ConstraintSetTag
-					constraintApplied={selectedValue !== ''}
-					text={selectedValue === '' ? 'No list set' : selectedValue}
+					constraintApplied={selectedListName !== ''}
+					text={selectedListName === '' ? 'No list set' : selectedListName}
 					ellipsize={true}
 				/>
 			</div>

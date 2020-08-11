@@ -210,6 +210,9 @@ const fetchTemplateSummary = (_ctx, { query, rootUrl, classView }) => {
 	sendToBus({ type: FETCH_SUMMARY, query, rootUrl, classView })
 }
 
+/**
+ *
+ */
 export const templateViewMachine = Machine(
 	{
 		id: 'template view',
@@ -227,7 +230,7 @@ export const templateViewMachine = Machine(
 		},
 		initial: 'loadTemplates',
 		states: {
-			allCategories: {
+			idle: {
 				on: {
 					[CHANGE_CLASS]: {
 						actions: [
@@ -264,7 +267,7 @@ export const templateViewMachine = Machine(
 					id: 'fetchTemplates',
 					src: 'fetchTemplates',
 					onDone: {
-						target: 'allCategories',
+						target: 'idle',
 						actions: [
 							'setTemplates',
 							'enableShowAllTag',
