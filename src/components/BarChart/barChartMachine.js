@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { barChartCache } from 'src/caches'
-import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
+import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { assign, Machine } from 'xstate'
 
 import { logErrorToConsole, startActivity } from '../../utils'
@@ -46,6 +46,7 @@ export const BarChartMachine = Machine(
 				activities: ['isLoading'],
 			},
 			loading: {
+				activities: ['isLoading'],
 				invoke: {
 					id: 'fetchGeneLength',
 					src: 'fetchGeneLength',
@@ -62,6 +63,8 @@ export const BarChartMachine = Machine(
 			noGeneLengths: {
 				on: {
 					[FETCH_SUMMARY]: { target: 'loading' },
+					[CHANGE_CLASS]: { target: 'idle' },
+					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 				},
 				activities: ['hasNoValues'],
 			},

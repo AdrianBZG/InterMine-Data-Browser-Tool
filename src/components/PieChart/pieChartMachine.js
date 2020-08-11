@@ -1,7 +1,7 @@
 import hash from 'object-hash'
 import { fetchSummary } from 'src/apiRequests'
 import { pieChartCache } from 'src/caches'
-import { CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
+import { CHANGE_CLASS, CHANGE_MINE, FETCH_INITIAL_SUMMARY, FETCH_SUMMARY } from 'src/eventConstants'
 import { startActivity } from 'src/utils'
 import { assign, Machine } from 'xstate'
 
@@ -52,6 +52,8 @@ export const PieChartMachine = Machine(
 			hasNoSummary: {
 				on: {
 					[FETCH_SUMMARY]: { target: 'loading' },
+					[CHANGE_CLASS]: { target: 'idle' },
+					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
 				},
 				activities: ['hasNoValues'],
 			},

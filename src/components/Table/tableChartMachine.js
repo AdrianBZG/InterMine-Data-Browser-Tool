@@ -2,6 +2,7 @@ import hash from 'object-hash'
 import { fetchTable } from 'src/apiRequests'
 import { tableCache } from 'src/caches'
 import {
+	CHANGE_CLASS,
 	CHANGE_MINE,
 	CHANGE_PAGE,
 	FETCH_INITIAL_SUMMARY,
@@ -123,6 +124,7 @@ export const TableChartMachine = Machine(
 				activities: ['isLoading'],
 			},
 			fetchNewPages: {
+				activities: ['isLoading'],
 				invoke: {
 					id: 'fetchNewPages',
 					src: 'fetchNewPages',
@@ -136,7 +138,6 @@ export const TableChartMachine = Machine(
 							console.error('FETCH: Could not fetch new Table Rows', { ctx, event }),
 					},
 				},
-				activities: ['isLoading'],
 			},
 			noTableSummary: {
 				on: {
@@ -144,6 +145,8 @@ export const TableChartMachine = Machine(
 						target: 'fetchInitialRows',
 						actions: 'bustCachedPages',
 					},
+					[CHANGE_MINE]: { target: 'waitingOnMineToLoad' },
+					[CHANGE_CLASS]: { target: 'idle' },
 				},
 				activities: ['hasNoValues'],
 			},

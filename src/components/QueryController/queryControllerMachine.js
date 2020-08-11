@@ -13,15 +13,6 @@ import { assign, Machine } from 'xstate'
 
 import { listConstraintQuery } from '../common'
 
-const initializeMachine = assign({
-	currentConstraints: () => [],
-	selectedPaths: () => [],
-	// @ts-ignore
-	classView: (_, { classView }) => classView,
-	// @ts-ignore
-	rootUrl: (_, { rootUrl }) => rootUrl,
-})
-
 const addConstraint = assign({
 	// @ts-ignore
 	currentConstraints: (ctx, { query }) => {
@@ -87,6 +78,13 @@ const removeListConstraint = assign({
 /**
  *
  */
+const resetPaths = assign({
+	selectedPaths: () => [],
+})
+
+/**
+ *
+ */
 export const queryControllerMachine = Machine(
 	{
 		id: 'QueryController',
@@ -99,10 +97,10 @@ export const queryControllerMachine = Machine(
 			rootUrl: '',
 		},
 		on: {
-			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths' },
+			[SET_AVAILABLE_COLUMNS]: { actions: 'setSelectedPaths', cond: 'doesNotHaveSelectedPaths' },
 			[DELETE_OVERVIEW_CONSTRAINT_FROM_QUERY]: { target: 'idle', actions: 'removeConstraint' },
 			[REMOVE_LIST_FROM_OVERVIEW]: { actions: 'removeListConstraint' },
-			[CHANGE_MINE]: { actions: 'removeListConstraint' },
+			[CHANGE_MINE]: { actions: ['removeListConstraint', 'resetPaths'] },
 			[CHANGE_CLASS]: { actions: 'removeListConstraint' },
 		},
 		states: {
@@ -149,12 +147,12 @@ export const queryControllerMachine = Machine(
 	},
 	{
 		actions: {
-			initializeMachine,
 			addConstraint,
 			removeConstraint,
 			setSelectedPaths,
 			addListConstraint,
 			removeListConstraint,
+			resetPaths,
 		},
 		guards: {
 			isLastConstraint: (context, _, { cond }) => {
@@ -168,9 +166,8 @@ export const queryControllerMachine = Machine(
 				// @ts-ignore
 				return context.currentConstraints.length + 1 === cond.maxConstraints
 			},
-			// @ts-ignore
-			isInitialFetch: (ctx, { globalConfig }) => {
-				return ctx.classView !== globalConfig.classView || ctx.rootUrl !== globalConfig.rootUrl
+			doesNotHaveSelectedPaths: (ctx) => {
+				return ctx.selectedPaths.length === 0
 			},
 		},
 	}
