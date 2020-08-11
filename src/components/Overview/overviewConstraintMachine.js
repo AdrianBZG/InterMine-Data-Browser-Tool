@@ -1,5 +1,5 @@
 import hash from 'object-hash'
-import { fetchSummary } from 'src/apiRequests'
+import { fetchSummary, verifyPath } from 'src/apiRequests'
 import { constraintValuesCache } from 'src/caches'
 import {
 	ADD_CONSTRAINT,
@@ -14,24 +14,36 @@ import {
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { formatConstraintPath, startActivity } from 'src/utils'
-import { assign, Machine } from 'xstate'
+import { assign, Machine, sendUpdate } from 'xstate'
 
 import { logErrorToConsole } from '../../utils'
 
+/**
+ *
+ */
 const addConstraint = assign({
 	// @ts-ignore
 	selectedValues: (ctx, { constraint }) => [...ctx.selectedValues, constraint],
 })
 
+/**
+ *
+ */
 const removeConstraint = assign({
 	// @ts-ignore
 	selectedValues: (ctx, { constraint }) => ctx.selectedValues.filter((name) => name !== constraint),
 })
 
+/**
+ *
+ */
 const removeAll = assign({
 	selectedValues: () => [],
 })
 
+/**
+ *
+ */
 const setAvailableValues = assign({
 	// @ts-ignore
 	availableValues: (_, { data }) => {
@@ -48,6 +60,9 @@ const setAvailableValues = assign({
 	selectedValues: () => [],
 })
 
+/**
+ *
+ */
 const applyOverviewConstraint = (ctx) => {
 	const { classView, constraintPath, selectedValues, availableValues, op } = ctx
 
@@ -64,6 +79,9 @@ const applyOverviewConstraint = (ctx) => {
 	sendToBus({ query, type: APPLY_OVERVIEW_CONSTRAINT_TO_QUERY })
 }
 
+/**
+ *
+ */
 const resetConstraint = ({ classView, constraintPath }) => {
 	// @ts-ignore
 	sendToBus({
@@ -72,10 +90,18 @@ const resetConstraint = ({ classView, constraintPath }) => {
 	})
 }
 
+/**
+ *
+ */
+const notifyParent = sendUpdate()
+
+/**
+ *
+ */
 export const overviewConstraintMachine = Machine(
 	{
 		id: 'Constraint machine',
-		initial: 'loading',
+		initial: 'verifyPath',
 		context: {
 			type: '',
 			op: '',
@@ -95,6 +121,22 @@ export const overviewConstraintMachine = Machine(
 			[CONSTRAINT_UPDATED]: { target: 'constraintsUpdated', cond: 'pathMatches' },
 		},
 		states: {
+			verifyPath: {
+				invoke: {
+					id: 'verifyPath',
+					src: 'verifyPath',
+					onDone: {
+						target: 'loading',
+					},
+					onError: {
+						target: 'pathNotAvailable',
+					},
+				},
+			},
+			pathNotAvailable: {
+				entry: 'notifyParent',
+				activities: ['hidingConstraintFromView'],
+			},
 			loading: {
 				invoke: {
 					id: 'fetchInitialValues',
@@ -164,12 +206,14 @@ export const overviewConstraintMachine = Machine(
 			setAvailableValues,
 			applyOverviewConstraint,
 			resetConstraint,
+			notifyParent,
 		},
 		activities: {
 			isLoading: startActivity,
 			disablingButtons: startActivity,
 			waitingToApplyContraint: startActivity,
 			hasNoValues: startActivity,
+			hidingConstraintFromView: startActivity,
 		},
 		guards: {
 			selectedListIsEmpty: (ctx) => {
@@ -184,18 +228,29 @@ export const overviewConstraintMachine = Machine(
 			},
 		},
 		services: {
-			fetchInitialValues: async (ctx, event) => {
-				const { constraintItemsQuery, constraintPath } = ctx
+			verifyPath: async (ctx, event) => {
+				const rootUrl = event.rootUrl ?? ctx.rootUrl
+				const classView = event.classView ?? ctx.classView
+				const { constraintItemsQuery, constraintPath: path } = ctx
 
-				const rootUrl = event?.rootUrl ?? ctx.rootUrl
-				const classView = event?.classView ?? ctx.classView
+				await verifyPath({ rootUrl, classView, path: ctx.constraintPath })
+
+				return {
+					classView,
+					rootUrl,
+					constraintItemsQuery,
+					path,
+				}
+			},
+			fetchInitialValues: async (ctx, event) => {
+				const { rootUrl, classView, constraintItemsQuery, path } = event.data
 
 				const query = {
 					...constraintItemsQuery,
 					from: classView,
 				}
 
-				const summaryConfig = { rootUrl, query, path: constraintPath }
+				const summaryConfig = { rootUrl, query, path }
 				const configHash = hash(summaryConfig)
 				let summary
 

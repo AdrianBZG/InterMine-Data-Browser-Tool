@@ -7,6 +7,7 @@ export const NonIdealStateWarning = ({
 	description = '',
 	className = '',
 	isWarning = true,
+	styles = {},
 }) => (
 	<NonIdealState
 		title={title}
@@ -19,6 +20,7 @@ export const NonIdealStateWarning = ({
 			[`& .${Classes.NON_IDEAL_STATE_VISUAL}`]: {
 				color: isWarning ? 'var(--yellow5)' : 'var(--blue5)',
 			},
+			...styles,
 		}}
 	/>
 )

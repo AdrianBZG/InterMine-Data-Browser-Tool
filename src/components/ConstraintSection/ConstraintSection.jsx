@@ -11,6 +11,7 @@ import { sendToBus, useEventBus } from 'src/useEventBus'
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { OverviewConstraint } from '../Overview/OverviewConstraint'
 import { QueryController } from '../QueryController/QueryController'
+import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { TemplateQuery } from '../Templates/TemplateQuery'
 
 const ShowCategories = ({ categoryTagsForClass, handleCategoryToggle, showAll, showAllLabel }) => {
@@ -169,6 +170,21 @@ const OverviewConstraintList = ({ overviewActor }) => {
 			sendToBus({ type: FETCH_SUMMARY, query: lastOverviewQuery, classView, rootUrl })
 		}
 	})
+
+	const hasNoConstraints = constraintActors.every((actor) => {
+		return actor.state.activities.hidingConstraintFromView
+	})
+
+	if (hasNoConstraints) {
+		return (
+			<NonIdealStateWarning
+				title="No Constraints available"
+				description="The selected class does not provide constraints to edit"
+				isWarning={false}
+				styles={{ display: 'block', paddingTop: 100 }}
+			/>
+		)
+	}
 
 	return (
 		<ul
