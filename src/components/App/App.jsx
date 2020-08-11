@@ -61,7 +61,9 @@ export const App = () => {
 								</AppManagerServiceContext.Provider>
 							</div>
 							<div css={{ height: '100%', width: '45%' }}>
-								<BarChart />
+								<AppManagerServiceContext.Provider value={service}>
+									<BarChart />
+								</AppManagerServiceContext.Provider>
 							</div>
 						</Card>
 					</section>

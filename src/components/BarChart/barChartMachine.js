@@ -48,8 +48,8 @@ export const BarChartMachine = Machine(
 			loading: {
 				activities: ['isLoading'],
 				invoke: {
-					id: 'fetchGeneLength',
-					src: 'fetchGeneLength',
+					id: 'fetchLengths',
+					src: 'fetchLengths',
 					onDone: {
 						target: 'idle',
 						actions: 'setLengthSummary',
@@ -85,7 +85,7 @@ export const BarChartMachine = Machine(
 			},
 		},
 		services: {
-			fetchGeneLength: async (_ctx, { classView, rootUrl, query: nextQuery }) => {
+			fetchLengths: async (_ctx, { classView, rootUrl, query: nextQuery }) => {
 				let query = {
 					...nextQuery,
 					from: classView,
@@ -120,8 +120,6 @@ export const BarChartMachine = Machine(
 				}
 
 				return {
-					classView,
-					rootUrl,
 					lengthStats: summary.stats,
 					lengthSummary: summary.results.slice(0, summary.results.length - 1),
 				}

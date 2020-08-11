@@ -2,7 +2,6 @@ import { ProgressBar } from '@blueprintjs/core'
 import { useMachine } from '@xstate/react'
 import React from 'react'
 // use direct import because babel is not properly changing it in webpack
-import { useFirstMountState } from 'react-use/lib/useFirstMountState'
 import {
 	Bar,
 	BarChart as RBarChart,
@@ -15,7 +14,7 @@ import {
 	XAxis,
 } from 'recharts'
 import { blinkingSkeletonAnimation } from 'src/styleUtils'
-import { useEventBus } from 'src/useEventBus'
+import { useEventBus, usePartialContext } from 'src/useEventBus'
 import { barChartLoadingData } from 'src/utils/loadingData/barChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -56,11 +55,15 @@ const colorizeBars = (data, isLoading) =>
 	))
 
 export const BarChart = React.memo(function BarChart() {
-	const isFirstRender = useFirstMountState()
 	const [state, , service] = useMachine(BarChartMachine)
+	const [appContext] = usePartialContext('appManager', (ctx) => ({
+		classView: ctx.classView,
+	}))
+
 	useEventBus(service)
 
 	const { lengthSummary, lengthStats } = state.context
+	const { classView } = appContext
 
 	const { isLoading } = state.activities
 	const summary = isLoading ? barChartLoadingData : lengthSummary
@@ -71,7 +74,7 @@ export const BarChart = React.memo(function BarChart() {
 	const stdevFixed = parseFloat(`${stdev}`).toFixed(3)
 	const avgFixed = parseFloat(`${average}`).toFixed(3)
 
-	const title = `Distribution of ${uniqueValues} Gene Lengths`
+	const title = `Distribution of ${uniqueValues} ${classView} Lengths`
 	const subtitle = `Min: ${min} ⚬ Max: ${max} ⚬ Avg: ${avgFixed} ⚬ Stdev: ${stdevFixed}`
 
 	const chartData = summary.map((item, idx) => {
@@ -90,12 +93,12 @@ export const BarChart = React.memo(function BarChart() {
 	})
 
 	if (state.activities.hasNoValues) {
-		const title = isFirstRender ? 'No query has been executed' : 'No Gene lengths available'
-		const description = isFirstRender
-			? 'Define the constraints to the left, and execute a query to see visual data results'
-			: 'The mine/class combination does not provide gene lengths. If you feel this is an error, please contact support'
-
-		return <NonIdealStateWarning title={title} description={description} />
+		return (
+			<NonIdealStateWarning
+				title={`No lengths for ${classView} available`}
+				description={`The mine/class combination does not provide ${classView} lengths. If you feel this is an error, please contact support`}
+			/>
+		)
 	}
 
 	return (
