@@ -3,10 +3,10 @@ import { fetchTemplates } from 'src/apiRequests'
 import { templatesCache } from 'src/caches'
 import {
 	CHANGE_CLASS,
-	FETCH_INITIAL_SUMMARY,
-	FETCH_SUMMARY,
+	FETCH_DEFAULT_SUMMARY,
 	FETCH_TEMPLATE_SUMMARY,
 	TOGGLE_CATEGORY_VISIBILITY,
+	UPDATE_TEMPLATE_PLOTS,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { getTagCategories, startActivity } from 'src/utils'
@@ -207,13 +207,13 @@ const resetLastTemplateQuery = assign({
  *
  */
 const fetchTemplateSummary = (_ctx, { query, rootUrl, classView }) => {
-	sendToBus({ type: FETCH_SUMMARY, query, rootUrl, classView })
+	sendToBus({ type: FETCH_TEMPLATE_SUMMARY, query, rootUrl, classView })
 }
 
 /**
  *
  */
-export const templateViewMachine = Machine(
+export const TemplateViewTabMachine = Machine(
 	{
 		id: 'template view',
 		context: {
@@ -252,10 +252,10 @@ export const templateViewMachine = Machine(
 							actions: ['disableShowAllTag', 'toggleCategory', 'filterBySelectedCategory'],
 						},
 					],
-					[FETCH_TEMPLATE_SUMMARY]: {
+					[UPDATE_TEMPLATE_PLOTS]: {
 						actions: ['assignLastTemplateQuery', 'fetchTemplateSummary'],
 					},
-					[FETCH_INITIAL_SUMMARY]: {
+					[FETCH_DEFAULT_SUMMARY]: {
 						actions: 'assignLastTemplateQuery',
 					},
 				},

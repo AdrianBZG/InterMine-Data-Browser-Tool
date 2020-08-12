@@ -12,7 +12,7 @@ import { ConstraintSection } from '../ConstraintSection/ConstraintSection'
 import { NavigationBar } from '../Navigation/NavigationBar'
 import { PieChart } from '../PieChart/PieChart'
 import { Table } from '../Table/Table'
-import { appManagerMachine } from './appManagerMachine'
+import { appManagerMachine } from './AppManagerMachine'
 import { Header } from './Header'
 
 export const App = () => {

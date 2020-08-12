@@ -1,7 +1,7 @@
 import { Button, Menu, MenuItem } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Select } from '@blueprintjs/select'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { buildSearchIndex } from 'src/buildSearchIndex'
 import { CHANGE_CLASS } from 'src/eventConstants'
 import { useEventBus, usePartialContext } from 'src/useEventBus'
@@ -41,9 +41,13 @@ export const ClassSelector = () => {
 	const classDisplayName =
 		modelClasses.find((model) => model.name === classView)?.displayName ?? 'Gene'
 
+	const [currentClass, setCurrentClass] = useState(classView)
 	const handleClassSelect = ({ name }) => {
-		// @ts-ignore
-		sendToBus({ type: CHANGE_CLASS, newClass: name })
+		if (name !== currentClass) {
+			// @ts-ignore
+			sendToBus({ type: CHANGE_CLASS, newClass: name })
+			setCurrentClass(name)
+		}
 	}
 
 	useEffect(() => {

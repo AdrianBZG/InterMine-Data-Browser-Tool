@@ -6,8 +6,9 @@ import { buildSearchIndex } from 'src/buildSearchIndex'
 import { isMultiSelection, isSingleSelection } from 'src/constraintOperations'
 import {
 	FETCH_TEMPLATE_CONSTRAINT_ITEMS,
-	FETCH_TEMPLATE_SUMMARY,
+	RESET_PLOTS,
 	RESET_TEMPLATE_CONSTRAINT,
+	UPDATE_TEMPLATE_PLOTS,
 } from 'src/eventConstants'
 import { ConstraintServiceContext, useEventBus } from 'src/useEventBus'
 
@@ -17,7 +18,7 @@ import { PopupCard } from '../Shared/PopupCard'
 import { InputWidget } from '../Widgets/InputWidget'
 import { SelectWidget } from '../Widgets/SelectWidget'
 import { SuggestWidget } from '../Widgets/SuggestWidget'
-import { templateQueryMachine } from './templateQueryMachine'
+import { templateQueryMachine } from './TemplateQueryMachine'
 
 const ConstraintWidget = ({ templateConstraintActor, mineName }) => {
 	const [state, send, service] = useService(templateConstraintActor)
@@ -127,12 +128,8 @@ export const TemplateQuery = ({ classView, template, rootUrl, mineName }) => {
 			]
 		}
 
-		sendToBus({
-			query,
-			classView,
-			rootUrl,
-			type: FETCH_TEMPLATE_SUMMARY,
-		})
+		sendToBus({ type: RESET_PLOTS })
+		sendToBus({ query, classView, rootUrl, type: UPDATE_TEMPLATE_PLOTS })
 	}
 
 	const disableRunQuery = constraintActors.some((actor) => {

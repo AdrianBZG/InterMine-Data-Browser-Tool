@@ -17,7 +17,7 @@ import { pieChartLoadingData } from 'src/utils/loadingData/pieChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
-import { PieChartMachine } from './pieChartMachine'
+import { PieChartMachine } from './PieChartMachine'
 
 const renderLabelContent = (props) => {
 	const {

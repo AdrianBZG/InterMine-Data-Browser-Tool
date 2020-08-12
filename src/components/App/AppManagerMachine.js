@@ -5,22 +5,23 @@ import { DEFAULT_VIEW } from 'src/constants'
 import {
 	CHANGE_CLASS,
 	CHANGE_MINE,
-	FETCH_INITIAL_SUMMARY,
+	FETCH_DEFAULT_SUMMARY,
+	RESET_PLOTS_TO_DEFAULT,
 	SET_API_TOKEN,
 	TOGGLE_VIEW,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
-import { queryControllerMachine } from '../QueryController/queryControllerMachine'
+import { QueryControllerMachine } from '../QueryController/QueryControllerMachine'
 import {
 	interminesConfig,
 	listsConfig,
 	maybeFetchPromise,
 	modelClassesConfig,
 } from './fetchMineConfigUtils'
-import { overviewMachine } from './overviewMachine'
-import { templateViewMachine } from './templateViewMachine'
+import { OverviewTabMachine } from './OverviewTabMachine'
+import { TemplateViewTabMachine } from './TemplateViewTabMachine'
 
 // Todo: Change this after fixing biotestmine dev environment
 const isProduction = true
@@ -127,8 +128,8 @@ const spawnTemplateViewMachine = assign({
 			ctx.viewActors.templateView.stop()
 		}
 
-		const actor = templateViewMachine.withContext({
-			...templateViewMachine.context,
+		const actor = TemplateViewTabMachine.withContext({
+			...TemplateViewTabMachine.context,
 			classView: ctx.classView,
 			rootUrl: ctx.selectedMine.rootUrl,
 			showAllLabel: ctx.showAllLabel,
@@ -151,8 +152,8 @@ const spawnOverviewMachine = assign({
 			ctx.viewActors.overview.stop()
 		}
 
-		const actor = overviewMachine.withContext({
-			...overviewMachine.context,
+		const actor = OverviewTabMachine.withContext({
+			...OverviewTabMachine.context,
 			classView: ctx.classView,
 			rootUrl: ctx.selectedMine.rootUrl,
 		})
@@ -173,8 +174,8 @@ const spawnQueryControllerMachine = assign({
 			ctx.viewActors.queryController.stop()
 		}
 
-		const actor = queryControllerMachine.withContext({
-			...queryControllerMachine.context,
+		const actor = QueryControllerMachine.withContext({
+			...QueryControllerMachine.context,
 			classView: ctx.classView,
 			rootUrl: ctx.selectedMine.rootUrl,
 		})
@@ -190,8 +191,10 @@ const spawnQueryControllerMachine = assign({
  *
  */
 const fetchInitialSummaryForMine = (ctx) => {
+	sendToBus({ type: RESET_PLOTS_TO_DEFAULT })
+
 	sendToBus({
-		type: FETCH_INITIAL_SUMMARY,
+		type: FETCH_DEFAULT_SUMMARY,
 		classView: ctx.classView,
 		rootUrl: ctx.selectedMine.rootUrl,
 	})
@@ -230,6 +233,13 @@ const assignAppView = assign({
 	// @ts-ignore
 	appView: (_, { newTabId }) => newTabId,
 })
+
+/**
+ *
+ */
+const resetCharts = () => {
+	sendToBus({ type: RESET_PLOTS_TO_DEFAULT })
+}
 
 /**
  * Services
@@ -330,7 +340,7 @@ export const appManagerMachine = Machine(
 			[TOGGLE_VIEW]: { actions: 'assignAppView' },
 			[CHANGE_MINE]: {
 				target: 'loading',
-				actions: ['changeMine', 'stopAllActors', 'getApiTokenFromStorage'],
+				actions: ['resetCharts', 'changeMine', 'stopAllActors', 'getApiTokenFromStorage'],
 			},
 			[CHANGE_CLASS]: {
 				actions: [
@@ -385,6 +395,7 @@ export const appManagerMachine = Machine(
 			fetchInitialSummaryForMine,
 			stopAllActors,
 			assignAppView,
+			resetCharts,
 		},
 		services: {
 			fetchMineConfiguration,

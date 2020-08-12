@@ -19,7 +19,7 @@ import { barChartLoadingData } from 'src/utils/loadingData/barChartData'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
-import { BarChartMachine } from './barChartMachine'
+import { BarChartMachine } from './BarChartMachine'
 
 const renderCustomTick = (isLoading) => ({ x, y, payload }) => {
 	return (

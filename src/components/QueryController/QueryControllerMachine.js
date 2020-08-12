@@ -85,7 +85,7 @@ const resetPaths = assign({
 /**
  *
  */
-export const queryControllerMachine = Machine(
+export const QueryControllerMachine = Machine(
 	{
 		id: 'QueryController',
 		initial: 'idle',

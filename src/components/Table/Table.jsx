@@ -11,7 +11,7 @@ import { humanize, titleize } from 'underscore.string'
 import { NonIdealStateWarning } from '../Shared/NonIdealStates'
 import { ExportTableButton } from './ExportTableButton'
 import { GenerateCodeButton } from './GenerateCodeButton'
-import { TableChartMachine } from './tableChartMachine'
+import { TableMachine } from './TableMachine'
 import { TablePagingButtons } from './TablePagingButtons'
 
 /**
@@ -70,7 +70,7 @@ const Cell = ({ cell, rootUrl, isLoading }) => {
  */
 export const Table = React.memo(function Table() {
 	const isFirstRender = useFirstMountState()
-	const [state, , service] = useMachine(TableChartMachine)
+	const [state, , service] = useMachine(TableMachine)
 	useEventBus(service)
 
 	// hack until https://github.com/davidkpiano/xstate/issues/938 is closed

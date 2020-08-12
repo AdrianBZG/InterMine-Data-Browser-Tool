@@ -46,7 +46,7 @@ const removeTemplateList = assign({
 	listForTemplate: () => {},
 })
 
-export const listSelectorMachine = Machine(
+export const ListSelectorMachine = Machine(
 	{
 		id: 'List Selector',
 		initial: 'idle',

@@ -68,7 +68,7 @@ const updateParent = sendUpdate()
 /**
  *
  */
-export const templateConstraintMachine = Machine(
+export const TemplateConstraintMachine = Machine(
 	{
 		id: 'Template constraint widget',
 		initial: 'idle',

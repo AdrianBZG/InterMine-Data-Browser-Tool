@@ -17,7 +17,7 @@ import { pluralizeFilteredCount } from 'src/utils'
 
 import { ConstraintSetTag } from '../Shared/ConstraintSetTag'
 import { InfoIconPopover } from '../Shared/InfoIconPopover'
-import { listSelectorMachine } from './listSelectorMachine'
+import { ListSelectorMachine } from './ListSelectorMachine'
 
 export const ListMenuItems = (item, props) => {
 	return (
@@ -75,7 +75,7 @@ export const ListSelector = () => {
 
 	const { appView, mineName, classView, listsForCurrentClass } = appState
 
-	const [state, , service] = useMachine(listSelectorMachine)
+	const [state, , service] = useMachine(ListSelectorMachine)
 	const { listForOverview, listForTemplate } = state.context
 
 	const [sendToBus] = useEventBus(service)

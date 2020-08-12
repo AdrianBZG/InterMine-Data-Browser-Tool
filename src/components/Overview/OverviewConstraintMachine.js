@@ -98,7 +98,7 @@ const notifyParent = sendUpdate()
 /**
  *
  */
-export const overviewConstraintMachine = Machine(
+export const OverviewConstraintMachine = Machine(
 	{
 		id: 'Constraint machine',
 		initial: 'verifyPath',

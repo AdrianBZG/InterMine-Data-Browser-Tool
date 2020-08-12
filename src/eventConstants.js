@@ -22,7 +22,7 @@ export const ADD_TEMPLATE_CONSTRAINT = 'constraint/template/add'
  */
 export const FETCH_TEMPLATE_CONSTRAINT_ITEMS = 'fetch/template/init'
 export const FETCH_SUMMARY = 'fetch/summary'
-export const FETCH_INITIAL_SUMMARY = 'fetch/initial_summary'
+export const FETCH_DEFAULT_SUMMARY = 'fetch/initial_summary'
 export const FETCH_TEMPLATE_SUMMARY = 'fetch/templateSummary'
 export const FETCH_OVERVIEW_SUMMARY = 'fetch/overviewSummary'
 
@@ -53,3 +53,11 @@ export const TOGGLE_VIEW = 'appManager/view/toggle'
  */
 export const CHANGE_PAGE = 'table/page/change'
 export const SET_AVAILABLE_COLUMNS = 'table/set_columns'
+
+/**
+ * Plots
+ */
+export const UPDATE_OVERVIEW_PLOTS = 'update_overview_plots'
+export const UPDATE_TEMPLATE_PLOTS = 'update_template_plots'
+export const RESET_PLOTS = 'reset_chart_query'
+export const RESET_PLOTS_TO_DEFAULT = 'reset_chart_initial'

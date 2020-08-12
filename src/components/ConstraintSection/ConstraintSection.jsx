@@ -5,7 +5,13 @@ import React, { useEffect, useState } from 'react'
 import { useWindowSize } from 'react-use'
 // use direct import because babel is not properly changing it in webpack
 import { useFirstMountState } from 'react-use/lib/useFirstMountState'
-import { FETCH_SUMMARY, TOGGLE_CATEGORY_VISIBILITY, TOGGLE_VIEW } from 'src/eventConstants'
+import {
+	RESET_PLOTS,
+	TOGGLE_CATEGORY_VISIBILITY,
+	TOGGLE_VIEW,
+	UPDATE_OVERVIEW_PLOTS,
+	UPDATE_TEMPLATE_PLOTS,
+} from 'src/eventConstants'
 import { sendToBus, useEventBus } from 'src/useEventBus'
 
 import { DATA_VIZ_COLORS } from '../dataVizColors'
@@ -88,7 +94,8 @@ const TemplatesList = ({
 
 	useEffect(() => {
 		if (isFirstMount) {
-			sendToBus({ type: FETCH_SUMMARY, query: lastTemplateQuery, classView, rootUrl })
+			sendToBus({ type: RESET_PLOTS })
+			sendToBus({ type: UPDATE_TEMPLATE_PLOTS, query: lastTemplateQuery, classView, rootUrl })
 		}
 	})
 
@@ -167,7 +174,8 @@ const OverviewConstraintList = ({ overviewActor }) => {
 
 	useEffect(() => {
 		if (isFirstMount) {
-			sendToBus({ type: FETCH_SUMMARY, query: lastOverviewQuery, classView, rootUrl })
+			sendToBus({ type: RESET_PLOTS })
+			sendToBus({ type: UPDATE_OVERVIEW_PLOTS, query: lastOverviewQuery, classView, rootUrl })
 		}
 	})
 

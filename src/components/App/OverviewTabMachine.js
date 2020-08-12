@@ -1,14 +1,15 @@
 import {
 	CHANGE_CLASS,
-	FETCH_INITIAL_SUMMARY,
+	FETCH_DEFAULT_SUMMARY,
 	FETCH_OVERVIEW_SUMMARY,
-	FETCH_SUMMARY,
 	RESET_OVERVIEW,
+	RESET_PLOTS,
+	UPDATE_OVERVIEW_PLOTS,
 } from 'src/eventConstants'
 import { sendToBus } from 'src/useEventBus'
 import { assign, Machine, spawn } from 'xstate'
 
-import { overviewConstraintMachine } from '../Overview/overviewConstraintMachine'
+import { OverviewConstraintMachine } from '../Overview/OverviewConstraintMachine'
 
 /** @type {import('../../types').ConstraintConfig[]} */
 const defaultQueries = [
@@ -71,9 +72,13 @@ const defaultQueries = [
  */
 const spawnConstraintActors = assign({
 	constraintActors: (ctx) => {
+		ctx.constraintActors.map((actor) => {
+			return actor.stop()
+		})
+
 		return ctx.constraints.map(({ type, name, label, path, op, valuesQuery }) => {
-			const constraintActor = overviewConstraintMachine.withContext({
-				...overviewConstraintMachine.context,
+			const constraintActor = OverviewConstraintMachine.withContext({
+				...OverviewConstraintMachine.context,
 				op,
 				type,
 				label,
@@ -102,9 +107,9 @@ const assignLastOverviewQuery = assign({
 /**
  *
  */
-const assignInitialOverviewQuery = assign({
+const assigndefaultOverviewQuery = assign({
 	// @ts-ignore
-	initialOverviewQuery: (_ctx, { query }) => {
+	defaultOverviewQuery: (_ctx, { query }) => {
 		return query
 	},
 })
@@ -122,14 +127,16 @@ const resetLastOverviewQuery = assign({
  *
  */
 const fetchOverviewSummary = (_ctx, { query, rootUrl, classView }) => {
-	sendToBus({ type: FETCH_SUMMARY, query, rootUrl, classView })
+	sendToBus({ type: RESET_PLOTS })
+	sendToBus({ type: FETCH_OVERVIEW_SUMMARY, query, rootUrl, classView })
 }
 
 /**
  *
  */
-const fetchInitialOverviewSummary = ({ classView, rootUrl, initialOverviewQuery }) => {
-	sendToBus({ type: FETCH_SUMMARY, classView, rootUrl, query: initialOverviewQuery })
+const fetchDefaultSummary = ({ classView, rootUrl, defaultOverviewQuery }) => {
+	sendToBus({ type: RESET_PLOTS })
+	sendToBus({ type: FETCH_OVERVIEW_SUMMARY, classView, rootUrl, query: defaultOverviewQuery })
 }
 
 /**
@@ -137,14 +144,14 @@ const fetchInitialOverviewSummary = ({ classView, rootUrl, initialOverviewQuery 
  */
 const resetToInitialQuery = assign({
 	lastOverviewQuery: (ctx) => {
-		return ctx.initialOverviewQuery
+		return ctx.defaultOverviewQuery
 	},
 })
 
 /**
  *
  */
-export const overviewMachine = Machine(
+export const OverviewTabMachine = Machine(
 	{
 		id: 'overview',
 		initial: 'idle',
@@ -154,25 +161,21 @@ export const overviewMachine = Machine(
 			classView: '',
 			rootUrl: '',
 			lastOverviewQuery: {},
-			initialOverviewQuery: {},
+			defaultOverviewQuery: {},
 		},
 		states: {
 			idle: {
 				entry: 'spawnConstraintActors',
 				on: {
-					[FETCH_INITIAL_SUMMARY]: {
-						actions: ['assignLastOverviewQuery', 'assignInitialOverviewQuery'],
+					[FETCH_DEFAULT_SUMMARY]: {
+						actions: ['assignLastOverviewQuery', 'assigndefaultOverviewQuery'],
 					},
-					[FETCH_OVERVIEW_SUMMARY]: {
+					[UPDATE_OVERVIEW_PLOTS]: {
 						actions: ['assignLastOverviewQuery', 'fetchOverviewSummary'],
 					},
 					[CHANGE_CLASS]: { actions: 'resetLastOverviewQuery' },
 					[RESET_OVERVIEW]: {
-						actions: [
-							'resetToInitialQuery',
-							'spawnConstraintActors',
-							'fetchInitialOverviewSummary',
-						],
+						actions: ['resetToInitialQuery', 'spawnConstraintActors', 'fetchDefaultSummary'],
 					},
 				},
 			},
@@ -182,12 +185,12 @@ export const overviewMachine = Machine(
 		actions: {
 			spawnConstraintActors,
 			assignLastOverviewQuery,
-			assignInitialOverviewQuery,
+			assigndefaultOverviewQuery,
 			resetToInitialQuery,
 			resetLastOverviewQuery,
 			// @ts-ignore
 			fetchOverviewSummary,
-			fetchInitialOverviewSummary,
+			fetchDefaultSummary,
 		},
 	}
 )
