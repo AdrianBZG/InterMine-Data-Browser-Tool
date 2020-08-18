@@ -1,7 +1,6 @@
 import { ProgressBar } from '@blueprintjs/core'
 import { useMachine } from '@xstate/react'
 import React from 'react'
-// use direct import because babel is not properly changing it in webpack
 import {
 	Bar,
 	BarChart as RBarChart,
