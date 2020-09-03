@@ -1,0 +1,31 @@
+@import '../partials/typography';
+
+:root {
+	--fs-desktopS1: #{$fs-desktop-s1};
+	--fs-desktopS2: #{$fs-desktop-s2};
+
+	--fs-desktopM1: #{$fs-desktop-m1};
+	--fs-desktopM2: #{$fs-desktop-m2};
+	--fs-desktopM3: #{$fs-desktop-m3};
+
+	--fs-desktopL1: #{$fs-desktop-l1};
+	--fs-desktopL2: #{$fs-desktop-l2};
+	--fs-desktopL3: #{$fs-desktop-l3};
+
+	--fs-mobileS1: #{$fs-mobile-s1};
+	--fs-mobileS2: #{$fs-mobile-s2};
+
+	--fs-mobileM1: #{$fs-mobile-m1};
+	--fs-mobileM2: #{$fs-mobile-m2};
+	--fs-mobileM3: #{$fs-mobile-m3};
+
+	--fs-mobileL1: #{$fs-mobile-l1};
+	--fs-mobileL2: #{$fs-mobile-l2};
+	--fs-mobileL3: #{$fs-mobile-l3};
+
+	--fw-light: #{$fs-weight-light};
+	--fw-regular: #{$fs-weight-regular};
+	--fw-medium: #{$fs-weight-medium};
+	--fw-semibold: #{$fs-weight-semibold};
+	--fw-bold: #{$fs-weight-bold};
+}

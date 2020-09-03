@@ -1,0 +1,15 @@
+// This file is only used from the command line for packages that require it
+// like stylelint. It must be kept in sync with craco's modifications of create-react-app
+{
+	"presets": ["react-app"],
+	"plugins": [
+		[
+			"import",
+			{
+				"libraryName": "react-use",
+				"libraryDirectory": "lib",
+				"camel2DashComponentName": false
+			}
+		]
+	]
+}

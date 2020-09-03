@@ -1,0 +1,15 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+# 3 tab indentation, because github has a bug when set at 2
+[*]
+indent_style = tab
+indent_size = 3
+tab_width = 3

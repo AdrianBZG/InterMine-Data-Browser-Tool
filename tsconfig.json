@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"module": "esnext",
+		"moduleResolution": "node",
+		"baseUrl": ".",
+		"rootDir": "src",
+		"checkJs": true,
+		"allowJs": true,
+		"jsx": "react",
+		"lib": ["es2018", "es2019", "dom"],
+		"noEmit": true,
+		"esModuleInterop": true,
+		"target": "es5",
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"strict": false,
+		"downlevelIteration": true
+	},
+	"include": ["src/**/*"],
+	"exclude": [
+		"**/node_modules/*",
+		"src/blueprintIcons.js",
+		"build",
+		"orig_app",
+		"storybook-dist",
+		"docs",
+		// Todo: remove when we're fixing broken stories
+		"**/*.story*",
+		"**/*.stories*"
+	],
+	"typeRoots": ["./node_modules/@types"]
+}

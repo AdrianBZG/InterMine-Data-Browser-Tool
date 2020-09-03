@@ -1,0 +1,94 @@
+@use 'palette';
+
+:root {
+	--solidBlack: #{$solidBlack};
+	--solidWhite: #{$solidWhite};
+
+	--grey0: #{$grey000};
+	--grey1: #{$grey100};
+	--grey2: #{$grey200};
+	--grey3: #{$grey300};
+	--grey4: #{$grey400};
+	--grey5: #{$grey500};
+	--grey6: #{$grey600};
+	--grey7: #{$grey700};
+	--grey8: #{$grey800};
+	--grey9: #{$grey900};
+
+	--blue0: #{$blue000};
+	--blue1: #{$blue100};
+	--blue2: #{$blue200};
+	--blue3: #{$blue300};
+	--blue4: #{$blue400};
+	--blue5: #{$blue500};
+	--blue6: #{$blue600};
+	--blue7: #{$blue700};
+	--blue8: #{$blue800};
+	--blue9: #{$blue900};
+
+	--green0: #{$green000};
+	--green1: #{$green100};
+	--green2: #{$green200};
+	--green3: #{$green300};
+	--green4: #{$green400};
+	--green5: #{$green500};
+	--green6: #{$green600};
+	--green7: #{$green700};
+	--green8: #{$green800};
+	--green9: #{$green900};
+
+	--purple0: #{$purple000};
+	--purple1: #{$purple100};
+	--purple2: #{$purple200};
+	--purple3: #{$purple300};
+	--purple4: #{$purple400};
+	--purple5: #{$purple500};
+	--purple6: #{$purple600};
+	--purple7: #{$purple700};
+	--purple8: #{$purple800};
+	--purple9: #{$purple900};
+
+	--yellow0: #{$yellow000};
+	--yellow1: #{$yellow100};
+	--yellow2: #{$yellow200};
+	--yellow3: #{$yellow300};
+	--yellow4: #{$yellow400};
+	--yellow5: #{$yellow500};
+	--yellow6: #{$yellow600};
+	--yellow7: #{$yellow700};
+	--yellow8: #{$yellow800};
+	--yellow9: #{$yellow900};
+
+	--orange0: #{$orange000};
+	--orange1: #{$orange100};
+	--orange2: #{$orange200};
+	--orange3: #{$orange300};
+	--orange4: #{$orange400};
+	--orange5: #{$orange500};
+	--orange6: #{$orange600};
+	--orange7: #{$orange700};
+	--orange8: #{$orange800};
+	--orange9: #{$orange900};
+
+	--red0: #{$red000};
+	--red1: #{$red100};
+	--red2: #{$red200};
+	--red3: #{$red300};
+	--red4: #{$red400};
+	--red5: #{$red500};
+	--red6: #{$red600};
+	--red7: #{$red700};
+	--red8: #{$red800};
+	--red9: #{$red900};
+
+	--pink0: #{$pink000};
+	--pink1: #{$pink100};
+	--pink2: #{$pink200};
+	--pink3: #{$pink300};
+	--pink4: #{$pink400};
+	--pink5: #{$pink500};
+	--pink6: #{$pink600};
+	--pink7: #{$pink700};
+	--pink8: #{$pink800};
+	--pink9: #{$pink900};
+}

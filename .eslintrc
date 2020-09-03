@@ -1,0 +1,18 @@
+{
+	"extends": [
+		"react-app",
+		"plugin:jsx-a11y/recommended",
+		"plugin:@blueprintjs/recommended",
+		"prettier"
+	],
+	"plugins": ["jsx-a11y", "simple-import-sort", "@blueprintjs"],
+	"rules": {
+		"simple-import-sort/sort": "error",
+		"sort-imports": "off",
+		"import/order": "off",
+		"react/jsx-pascal-case": "off",
+		"@blueprintjs/classes-constants": ["error"],
+		"@blueprintjs/html-components": ["error"],
+		"@blueprintjs/icon-components": ["error"]
+	}
+}

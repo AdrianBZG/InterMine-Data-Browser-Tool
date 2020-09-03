@@ -1,0 +1,41 @@
+/* [IMAGE] */
+.zoom {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+/* [LIGHTBOX BACKGROUND] */
+#lb-back {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+  transition: all ease 0.4s;
+  transform: unset;
+  padding: 64px;
+}
+
+#lb-back.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* [LIGHTBOX IMAGE] */
+#lb-img {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  background-color: white;
+  margin: auto;
+  padding: 24px 0;
+}
+
+#lb-img img {
+  width: 100vw;
+  max-width: 75vw;
+}
