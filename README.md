@@ -1,14 +1,15 @@
-import { Meta } from '@storybook/addon-docs/blocks'
+# Description
 
-<Meta title="Docs/Intro" />
-
-# Intermine Data Browser
-
-The goal of this project is to implement a faceted search tool to display the data from InterMine
-database, allowing the users to search easily within the different mines available around InterMine
+Faceted search tool to display the data from InterMine database, allowing the users to search easily within the different mines available around InterMine
 without the requirement of having an extensive knowledge of the data model.
 
-For the project organization, please refer to [InterMine](https://github.com/intermine)
+## Demo / Preview
+
+You can access the demo in [this link](https://intermine-data-browser.netlify.app/).
+
+<p align="center">
+  <img src="https://github.com/AdrianBZG/InterMine-Data-Browser-Tool/assets/8275330/ed04f673-4bd8-48d5-9e74-69400187cbd9"/>
+</p>
 
 ## Quick Links
 
@@ -32,39 +33,3 @@ For the project organization, please refer to [InterMine](https://github.com/int
 | Interactions         | interactions.participant2.symbol + interactions.details.type + interactions.details.dataSets.name                                                                                |
 | Expression           | atlasExpression.pValue + atlasExpression.tStatistic + atlasExpression.expression + atlasExpression.dataSets.name                                                                 |
 
-## Contributing Guidelines
-
-1. Find a thing to fix/implement in [Issues](https://github.com/JM-Mendez/InterMine-Data-Browser-Tool/issues?direction=desc&sort=created&state=open)
-   or come up with your own idea, [create a discussion issue](https://github.com/JM-Mendez/InterMine-Data-Browser-Tool/issues/new) for it and get a feedback.
-
-2. [Fork](https://help.github.com/articles/fork-a-repo) the repository.
-
-3. Create your new feature branch.
-
-```bash
-   git checkout -b my-new-feature
-```
-
-4. Install the packages.
-
-This project uses `yarn berry` for package management. Make sure to have it globally installed before proceeding.
-
-```bash
-npm install -g yarn
-```
-
-If you run `yarn -v`, the version displayed will be `v1*`. Yet, this project will automatically use `v2 berry`.
-
-5. Commit your changes.
-
-```bash
-git commit -am 'Add some feature
-```
-
-6. Push to the newly created feature branch.
-
-```bash
-git push origin my-new-feature
-```
-
-7. Create a new [Pull Request](https://help.github.com/articles/using-pull-requests)
